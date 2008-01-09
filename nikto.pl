@@ -47,7 +47,7 @@ $DIV               = "-" x 75;
 $NIKTO{version}    = "2.01";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "config.txt";    ### Change this line if your setup is having trouble finding it
-$http_eol="\r\n";
+$http_eol          = "\r\n";
 
 # read the --config option
 {
@@ -60,15 +60,16 @@ $http_eol="\r\n";
 
 load_configs();
 find_plugins();
-require "$NIKTO{plugindir}/nikto_core.plugin";       ### Change this line if your setup is having trouble finding it
-nprint("T:$STARTTIME: Starting","d");
+require "$NIKTO{plugindir}/nikto_core.plugin";    ### Change this line if your setup is having trouble finding it
+nprint("T:$STARTTIME: Starting", "d");
 require "$NIKTO{plugindir}/nikto_reports.plugin";    ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/nikto_single.plugin";     ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/LW2.pm";                  ### Change this line if your setup is having trouble finding it
+
 # use LW2;					     ### Change this line to use a different installed version
 
-($a,$b) = split(/\./, $LW2::VERSION);
-die("- You must use LW2 2.4 or later\n") if($a != 2 || $b < 4);
+($a, $b) = split(/\./, $LW2::VERSION);
+die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 
 general_config();
 load_databases();
@@ -79,7 +80,7 @@ $request{'whisker'}->{'ssl_save_info'}              = 1;
 $request{'whisker'}->{'lowercase_incoming_headers'} = 1;
 $request{'whisker'}->{'timeout'}                    = $CLI{timeout} || 10;
 if ($CLI{evasion} ne "") { $request{'whisker'}->{'encode_anti_ids'} = $CLI{evasion}; }
-$request{'User-Agent'}         = $NIKTO{useragent};
+$request{'User-Agent'} = $NIKTO{useragent};
 $request{'whisker'}->{'retry'} = 0;
 proxy_setup();
 
@@ -98,16 +99,19 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     $COUNTERS{hosts_completed}++;
     if (($CLI{findonly}) && ($COUNTERS{hosts_completed} % 10) eq 0) { nprint("($COUNTERS{hosts_completed} of $COUNTERS{hosts_total})"); }
 
-    ($TARGETS{$CURRENT_HOST_ID}{hostname}, $TARGETS{$CURRENT_HOST_ID}{ip}, $TARGETS{$CURRENT_HOST_ID}{display_name}) = resolve($TARGETS{$CURRENT_HOST_ID}{ident});
+    ($TARGETS{$CURRENT_HOST_ID}{hostname}, $TARGETS{$CURRENT_HOST_ID}{ip}, $TARGETS{$CURRENT_HOST_ID}{display_name}) =
+      resolve($TARGETS{$CURRENT_HOST_ID}{ident});
     if ($TARGETS{$CURRENT_HOST_ID}{ident} eq "") { next; }
     port_scan($TARGETS{$CURRENT_HOST_ID}{ports_in});
 
     # make sure we have open ports on this target
-    if (keys(%{$TARGETS{$CURRENT_HOST_ID}{ports}}) eq 0)
-   	{ nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident} / $TARGETS{$CURRENT_HOST_ID}{ports_in}"); }
+    if (keys(%{ $TARGETS{$CURRENT_HOST_ID}{ports} }) eq 0)
+    {
+        nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident} / $TARGETS{$CURRENT_HOST_ID}{ports_in}");
+    }
 
     $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
-    if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'}=$TARGETS{$CURRENT_HOST_ID}{vhost}; }
+    if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
 
     foreach $CURRENT_PORT (keys %{ $TARGETS{$CURRENT_HOST_ID}{ports} })
     {
@@ -117,7 +121,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
         $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};
         if ($NIKTOCONFIG{'STATIC-COOKIE'} ne "") { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
         $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
-	delete $TARGETS{$CURRENT_HOST_ID}{positives};
+        delete $TARGETS{$CURRENT_HOST_ID}{positives};
         %FoF = ();
 
         get_banner();
@@ -131,9 +135,8 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
             }
             if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
             nprint("+ Server: $protocol://$TARGETS{$CURRENT_HOST_ID}{display_name}:$CURRENT_PORT\t$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}");
-        }
-	else 
-	{
+        } else
+        {
             dump_target_info();
             auth_check();
             check_cgi();
@@ -141,7 +144,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
             map_codes();
             run_plugins();
             test_target();
-	}
+        }
         write_output();
     }
 }
@@ -149,7 +152,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
 nprint("+ $COUNTERS{hosts_total} host(s) tested");
 send_updates();
 close_output();
-nprint("T:" . localtime() . ": Ending","d");
+nprint("T:" . localtime() . ": Ending", "d");
 exit;
 
 #################################################################################
@@ -185,42 +188,43 @@ sub load_configs
 # find plugins directory
 sub find_plugins
 {
+
     # get the correct path to 'plugins'
     # if defined in config.txt file... most accurate, we hope
     if (($NIKTOCONFIG{EXECDIR} ne "") && (-d "$NIKTOCONFIG{EXECDIR}/plugins"))
     {
-       	$NIKTO{execdir}     = $NIKTOCONFIG{EXECDIR};
-	$NIKTO{plugindir}   = "$NIKTO{execdir}/plugins"; 
-	$NIKTO{templatedir} = "$NIKTO{execdir}/templates";
+        $NIKTO{execdir}     = $NIKTOCONFIG{EXECDIR};
+        $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
+        $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
     }
 
     if ($NIKTO{execdir} eq "")
-    {   # try pwd
+    {    # try pwd
         if (-d "$ENV{PWD}/plugins")
         {
-            	$NIKTO{execdir}     = $ENV{PWD};
-        	$NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-        	$NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-        } 
-	else {  # try $0
-            	my $EXECDIR = $0;
-            	chomp($EXECDIR);
-            	$EXECDIR =~ s/\/nikto.pl$//;
+            $NIKTO{execdir}     = $ENV{PWD};
+            $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
+            $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
+        } else
+        {    # try $0
+            my $EXECDIR = $0;
+            chomp($EXECDIR);
+            $EXECDIR =~ s/\/nikto.pl$//;
 
-        	if (-d "$EXECDIR/plugins")
-        	{
-               	 	$NIKTO{execdir}     = $EXECDIR;
-                	$NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-                	$NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-        	} 
+            if (-d "$EXECDIR/plugins")
+            {
+                $NIKTO{execdir}     = $EXECDIR;
+                $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
+                $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
+            }
         }
 
-	if ($NIKTO{execdir} eq "")  
-		{ 	# try ./
-			$NIKTO{execdir}= "./"; 
-                	$NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-                	$NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-		}
+        if ($NIKTO{execdir} eq "")
+        {    # try ./
+            $NIKTO{execdir}     = "./";
+            $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
+            $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
+        }
     }
 
     if (!(-d $NIKTO{plugindir}))
