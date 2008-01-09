@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use strict;
 #VERSION,2.02
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
@@ -9,7 +10,7 @@ Getopt::Long::Configure('no_ignore_case');
 #                       last update: 01.09.2008                               #
 # --------------------------------------------------------------------------- #
 ###############################################################################
-#  Copyright (C) 2004-2007 CIRT, Inc.
+#  Copyright (C) 2004-2008 CIRT, Inc.
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -36,13 +37,14 @@ Getopt::Long::Configure('no_ignore_case');
 # can not be held liable for anything done with this program, code, or items discovered
 # with this program's use.
 #######################################################################
+
 # global var/definitions
-my $STARTTIME = localtime();
 use vars qw/$TEMPLATES %ERRSTRINGS %VERSIONS %CLI %VARIABLES %TESTS $CONTENT %FILES $CURRENT_HOST_ID $CURRENT_PORT/;
-use vars qw/%REALMS %REALMS_TESTED %NIKTOCONFIG %NIKTO %OUTPUT %SERVER %request %result %COUNTERS/;
-use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED/;
+use vars qw/%REALMS %REALMS_TESTED %NIKTOCONFIG %NIKTO %OUTPUT %SERVER %request %result %COUNTERS $STARTTIME/;
+use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
 
 # setup
+$STARTTIME         = localtime();
 $DIV               = "-" x 75;
 $NIKTO{version}    = "2.01";
 $NIKTO{name}       = "Nikto";
@@ -60,7 +62,7 @@ $http_eol          = "\r\n";
 
 load_configs();
 find_plugins();
-require "$NIKTO{plugindir}/nikto_core.plugin";    ### Change this line if your setup is having trouble finding it
+require "$NIKTO{plugindir}/nikto_core.plugin";       ### Change this line if your setup is having trouble finding it
 nprint("T:$STARTTIME: Starting", "d");
 require "$NIKTO{plugindir}/nikto_reports.plugin";    ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/nikto_single.plugin";     ### Change this line if your setup is having trouble finding it
@@ -229,9 +231,9 @@ sub find_plugins
     if (!(-d $NIKTO{plugindir}))
     {
         print STDERR "I can't find 'plugins' directory. I looked around:\n";
-        print STDERR "\t$CONFIG{PLUGINDIR}\n\t$ENV{PWD}\n\t$0\n";
+        print STDERR "\t$NIKTOCONFIG{EXECDIR}\n\t$ENV{PWD}\n\t$0\n";
         print STDERR "Try: switch to the 'nikto' base dir, or\n";
-        print STDERR "Try: set PLUGINDIR in config.txt\n";
+        print STDERR "Try: set EXECDIR in config.txt\n";
         exit;
     }
     return;
