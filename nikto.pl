@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use strict;
+
 #VERSION,2.02
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
@@ -62,7 +63,7 @@ $http_eol          = "\r\n";
 
 load_configs();
 find_plugins();
-require "$NIKTO{plugindir}/nikto_core.plugin";       ### Change this line if your setup is having trouble finding it
+require "$NIKTO{plugindir}/nikto_core.plugin";    ### Change this line if your setup is having trouble finding it
 nprint("T:$STARTTIME: Starting", "d");
 require "$NIKTO{plugindir}/nikto_reports.plugin";    ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/nikto_single.plugin";     ### Change this line if your setup is having trouble finding it
@@ -109,18 +110,20 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     # make sure we have open ports on this target
     if (keys(%{ $TARGETS{$CURRENT_HOST_ID}{ports} }) eq 0)
     {
+
         #nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident} / $TARGETS{$CURRENT_HOST_ID}{ports_in}");
         nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident}");
-	next;
+        next;
     }
 
     $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
     if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
 
-    foreach $CURRENT_PORT (split(',',$TARGETS{$CURRENT_HOST_ID}{ports_in}))
+    foreach $CURRENT_PORT (split(',', $TARGETS{$CURRENT_HOST_ID}{ports_in}))
     {
         if ($CURRENT_PORT eq "") { next; }
-        elsif ( !defined($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}) ) {
+        elsif (!defined($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}))
+        {
             nprint("+ No HTTP(s) server found on $TARGETS{$CURRENT_HOST_ID}{ident} / $CURRENT_PORT");
             next;
         }
@@ -196,6 +199,7 @@ sub load_configs
 # find plugins directory
 sub find_plugins
 {
+
     # get the correct path to 'plugins'
     # if defined in config.txt file... most accurate, we hope
     if (($NIKTOCONFIG{EXECDIR} ne "") && (-d "$NIKTOCONFIG{EXECDIR}/plugins"))
