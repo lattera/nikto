@@ -1,5 +1,5 @@
-#VERSION,2.02
-#LASTMOD,11.19.2007
+#VERSION,2.03
+#LASTMOD,01.09.2008
 
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
@@ -23,16 +23,9 @@
 # PURPOSE
 # Check for outdated items in banner
 ###############################################################################
-# NOTES
-# the stripping of letters from version numbers could be done better
-# versions are loaded from the "db_outdated" file, which should be in the
-# plugins directory we cheat, as apache is the main one that uses spaces for
-# loaded modules... if there are others we'll have to hard code them
-###############################################################################
 
 sub nikto_outdated
 {
-
     # populate @BUILDITEMS with appropriate values
     # if Apache, split on space...
     if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /apache/i)
@@ -114,7 +107,6 @@ sub nikto_outdated
 
 sub vereval
 {
-
     # split both by last char of @_[0], as it is the name to version separator
     my $sepr = substr($_[2], (length($sepr) - 1), 1);
     nprint("nikto_outdated.plugin: verstring: $_[2], sepr:$sepr", "d");
@@ -165,7 +157,6 @@ sub vereval
             return 0;
         }
     }
-
     return 0;                                                      # running is the same version if we make it here
 }
 
