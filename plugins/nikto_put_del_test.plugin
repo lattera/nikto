@@ -27,52 +27,53 @@
 sub nikto_put_del_test
 {
     my $msg;
+
     # PUT a page
     LW2::http_close(\%request);    # force-close any old connections
     LW2::http_fixup_request(\%request);
     LW2::http_reset();
     my $uri = "/nikto-test-" . LW2::utils_randstr(8) . ".html";
-    $request{'whisker'}->{'data'} = "This was a Nikto test.";
-    $request{'whisker'}->{'version'}  = "1.0";
+    $request{'whisker'}->{'data'}    = "This was a Nikto test.";
+    $request{'whisker'}->{'version'} = "1.0";
     (my $RES, $CONTENT) = fetch($uri, "PUT", "This was a Nikto test.");
 
     # Request it back
     if ($RES eq 201)
-     {
-      LW2::http_close(\%request);    # force-close any old connections
-      LW2::http_fixup_request(\%request);
-      LW2::http_reset();
-      (my $RES, $CONTENT) = fetch($uri, "GET");
-      if ($CONTENT =~ /This was a Nikto test/)
-       {
-	$msg="HTTP method 'PUT' allows clients to save files on the web server.";
-	$TESTS{999995}{uri}=$uri;
-	$TESTS{999995}{message}=$msg;
-	$TESTS{999995}{method}="PUT";
-	$TESTS{999995}{osvdb}=397;
-        $TARGETS{$CURRENT_HOST_ID}{positives}{999995}=1;
-        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-        nprint("+ OSVDB-$TESTS{999995}{osvdb}: $msg");
+    {
+        LW2::http_close(\%request);    # force-close any old connections
+        LW2::http_fixup_request(\%request);
+        LW2::http_reset();
+        (my $RES, $CONTENT) = fetch($uri, "GET");
+        if ($CONTENT =~ /This was a Nikto test/)
+        {
+            $msg                                          = "HTTP method 'PUT' allows clients to save files on the web server.";
+            $TESTS{999995}{uri}                           = $uri;
+            $TESTS{999995}{message}                       = $msg;
+            $TESTS{999995}{method}                        = "PUT";
+            $TESTS{999995}{osvdb}                         = 397;
+            $TARGETS{$CURRENT_HOST_ID}{positives}{999995} = 1;
+            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+            nprint("+ OSVDB-$TESTS{999995}{osvdb}: $msg");
 
-        # we were able to put it there--can we delete it?
-        (my $RES, $CONTENT) = fetch($uri, "DELETE");
-        if ($RES eq 200)
-         {
-           (my $RES, $CONTENT) = fetch($uri, "GET");
-           if ($CONTENT !~ /This was a Nikto test/)  # gone now
+            # we were able to put it there--can we delete it?
+            (my $RES, $CONTENT) = fetch($uri, "DELETE");
+            if ($RES eq 200)
             {
-		$msg="HTTP method 'DELETE' allows clients to delete file on the web server.";
-	        $TESTS{999994}{uri}=$uri;
-        	$TESTS{999994}{message}=$msg;
-        	$TESTS{999994}{method}="DELETE";
-        	$TESTS{999994}{osvdb}=5646;
-        	$TARGETS{$CURRENT_HOST_ID}{positives}{999994}=1;
-        	$TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-        	nprint("+ OSVDB-$TESTS{999994}{osvdb}: $msg");
+                (my $RES, $CONTENT) = fetch($uri, "GET");
+                if ($CONTENT !~ /This was a Nikto test/)    # gone now
+                {
+                    $msg                                          = "HTTP method 'DELETE' allows clients to delete file on the web server.";
+                    $TESTS{999994}{uri}                           = $uri;
+                    $TESTS{999994}{message}                       = $msg;
+                    $TESTS{999994}{method}                        = "DELETE";
+                    $TESTS{999994}{osvdb}                         = 5646;
+                    $TARGETS{$CURRENT_HOST_ID}{positives}{999994} = 1;
+                    $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+                    nprint("+ OSVDB-$TESTS{999994}{osvdb}: $msg");
+                }
             }
-         } 
-       }
-     }
+        }
+    }
 }
 
 1;

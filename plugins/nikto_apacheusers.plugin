@@ -36,12 +36,13 @@ sub nikto_apacheusers
         $CONTENT = char_escape($CONTENT);
         if ($CONTENT !~ /forbidden/i)    # Good, it gave an error instead of forbidden
         {
-            $TESTS{999999}{uri}="/~root";
-            $TESTS{999999}{message}="Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).";
-            $TESTS{999999}{method}="GET";
-            $TESTS{999999}{osvdb}=637;
+            $TESTS{999999}{uri} = "/~root";
+            $TESTS{999999}{message} =
+              "Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).";
+            $TESTS{999999}{method} = "GET";
+            $TESTS{999999}{osvdb}  = 637;
             $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-            $TARGETS{$CURRENT_HOST_ID}{positives}{999999}=1;
+            $TARGETS{$CURRENT_HOST_ID}{positives}{999999} = 1;
             nprint("+ OSVDB-$TESTS{999999}{osvdb}: $TESTS{999999}{method} $TESTS{999999}{uri} - $TESTS{999999}{message}");
         }
     }

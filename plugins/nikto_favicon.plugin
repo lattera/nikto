@@ -48,8 +48,8 @@ sub nikto_favicon
                 nprint("+ OSVDB-39272: /favicon.ico file identifies this server as: $FAVICONS{$match_hash}");
                 $TARGETS{$CURRENT_HOST_ID}{positives}{ $FAVICONS{$hash}{tid} } = 1;
                 $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-		$TESTS{$FAVICONS{$hash}{tid}}{message}="/favicon.ico file identifies this server as: $FAVICONS{$match_hash}";
-		$TESTS{$FAVICONS{$hash}{tid}}{osvdb}=39272;
+                $TESTS{ $FAVICONS{$hash}{tid} }{message} = "/favicon.ico file identifies this server as: $FAVICONS{$match_hash}";
+                $TESTS{ $FAVICONS{$hash}{tid} }{osvdb}   = 39272;
             }
         }
     }

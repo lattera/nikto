@@ -75,15 +75,15 @@ sub nikto_user_enum_cgiwrap
             if ($CONTENT !~ /unable to find/i)    # this is a valid user
             {
                 if (exists($TESTS{999993}{message}))
-                        {
-                                $TESTS{999993}{message}.= ", $text";
-                        }
-                else
-                        {
-                                $TESTS{999993}{message}="Valid users were guessed via cgiwrap user enumeration. Recompile cgiwrap with the '--with-quiet-errors' to stop this. Users found are: $text";
-                        }
-                $TESTS{999993}{osvdb}=0;
-                $TARGETS{$CURRENT_HOST_ID}{positives}{999993}=1;
+                {
+                    $TESTS{999993}{message} .= ", $text";
+                } else
+                {
+                    $TESTS{999993}{message} =
+"Valid users were guessed via cgiwrap user enumeration. Recompile cgiwrap with the '--with-quiet-errors' to stop this. Users found are: $text";
+                }
+                $TESTS{999993}{osvdb} = 0;
+                $TARGETS{$CURRENT_HOST_ID}{positives}{999993} = 1;
                 $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
                 $start++;
                 $ctr++;

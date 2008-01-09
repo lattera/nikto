@@ -90,7 +90,7 @@ sub nikto_outdated
                 $have_match = 1;
                 foreach $k (keys %{ $OVERS{$V} })
                 {
-                    if ($k eq "") { next; }
+                    if ($k eq "")    { next; }
                     if ($k eq "tid") { next; }
                     $v = $k;
                 }
@@ -101,9 +101,9 @@ sub nikto_outdated
                     $msg =~ s/\@CURRENT_VER/$v/g;
                     chomp($msg);
                     nprint("+ $msg");
-                    $TESTS{$OVERS{$V}{tid}}{message}=$msg;
-                    $TARGETS{$CURRENT_HOST_ID}{positives}{$OVERS{$V}{tid}}=1;
-		    $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+                    $TESTS{ $OVERS{$V}{tid} }{message} = $msg;
+                    $TARGETS{$CURRENT_HOST_ID}{positives}{ $OVERS{$V}{tid} } = 1;
+                    $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
                 }
             }
         }
