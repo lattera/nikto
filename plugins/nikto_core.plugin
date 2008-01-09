@@ -1333,10 +1333,6 @@ sub port_check
       $request{'whisker'}->{'host'}=$oldhost; 
       nprint("- Server found: $TARGETS{$CURRENT_HOST_ID}{ip}:$port \t$result{'server'}","d"); 
     }
- else
-    {
-      nprint("- No server found: $TARGETS{$CURRENT_HOST_ID}{ip}:$port"); 
-    }
  dump_var("Result Hash", \%result);
  return;
 }
