@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-#VERSION,2.01
+#VERSION,2.02
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 
 ###############################################################################
 #                               Nikto                                         #
 # --------------------------------------------------------------------------- #
-#                       last update: 11.13.2007                               #
+#                       last update: 01.09.2008                               #
 # --------------------------------------------------------------------------- #
 ###############################################################################
 #  Copyright (C) 2004-2007 CIRT, Inc.
@@ -188,7 +188,6 @@ sub load_configs
 # find plugins directory
 sub find_plugins
 {
-
     # get the correct path to 'plugins'
     # if defined in config.txt file... most accurate, we hope
     if (($NIKTOCONFIG{EXECDIR} ne "") && (-d "$NIKTOCONFIG{EXECDIR}/plugins"))
@@ -235,7 +234,6 @@ sub find_plugins
         print STDERR "Try: set PLUGINDIR in config.txt\n";
         exit;
     }
-
     return;
 }
 #################################################################################
