@@ -3585,4 +3585,5 @@
 "003581","38580","7","@CGIDIRSc32web.exe/GetImage?ImageName=CustomerEmail.txt%00.pdf ","GET","200","","","","","Cart32 contains a null byte directory traversal in the ImageName variable.","",""
 "003582","3092","3","/sitemap.gz","GET","200","","","","","The sitemap.gz file, used for Google indexing, contains an xml representation of the web site's structure.","",""
 "003583","3092","3","/content/sitemap.gz","GET","200","","","","","The sitemap.gz file, used for Google indexing, contains an xml representation of the web site\'s structure.","",""
+"003584","3233","b","/icons/README","GET","Public Domain Icons","","","","","Apache default file found.","",""
 
