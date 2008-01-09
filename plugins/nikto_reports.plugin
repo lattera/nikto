@@ -1,5 +1,5 @@
-#VERSION,2.01
-#LASTMOD,01.07.2008
+#VERSION,2.02
+#LASTMOD,01.09.2008
 
 ###############################################################################
 #  Copyright (C) 2007 CIRT, Inc.
@@ -179,7 +179,7 @@ sub proc_template
             if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
             {
                 $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$CURRENT_PORT$TESTS{$p}{uri}";
-            } else
+            } else 
             {
                 $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
             }
@@ -226,7 +226,6 @@ sub simple_enc
     $var =~ s/"/&quot;/g;
     return $var;
 }
-
 ##############################################################################
 sub write_html
 {
@@ -291,7 +290,6 @@ sub write_xml
 
     return;
 }
-
 ###############################################################################
 sub write_output
 {
@@ -305,7 +303,6 @@ sub write_output
 
     return;
 }
-
 ###############################################################################
 
 sub nikto_reports { }    # so core doesn't freak

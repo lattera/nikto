@@ -1,5 +1,5 @@
-#VERSION,2.01
-#LASTMOD,11.16.2007
+#VERSION,2.02
+#LASTMOD,01.09.2008
 
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
@@ -44,7 +44,6 @@ sub nikto_msgs
             $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
         }
     }
-
     return;
 }
 

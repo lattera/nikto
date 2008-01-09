@@ -1,5 +1,5 @@
-#VERSION,2.00
-#LASTMOD,11.10.2007
+#VERSION,2.03
+#LASTMOD,01.09.2008
 
 ###############################################################################
 #  Copyright (C) 2004 CIRT, Inc.
@@ -56,7 +56,6 @@ sub nikto_mutate
     {
         foreach my $file (keys %FS)
         {
-
             # skip self referencing stuff
             if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
 
@@ -87,7 +86,6 @@ sub nikto_mutate
 
     nprint("- $new_tests mutate checks loaded", "v");
     return;
-
 }
 
 1;
