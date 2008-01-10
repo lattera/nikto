@@ -1,5 +1,5 @@
-#VERSION,2.002
-#LASTMOD,12.19.2007
+#VERSION,2.003
+#LASTMOD,01.09.2008
 
 # This file may only be distributed and used with the full Nikto package.
 # This file may not be used with any software product without written permission from CIRT, Inc.
@@ -359,7 +359,7 @@
 "600348","Line-Tap/","3.13","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600349","Linux-Mandrake/","3mdk","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600350","Linux/","11mdk","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600351","LiteSpeed/","1.2RC2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600351","LiteSpeed/","2.2.6","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600352","LittleDutchMoose/","v10.3Build","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600353","LocalDirector/","4.2.3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600354","Lotus-Domino/","6.0.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -461,7 +461,7 @@
 "600450","mod_demonstrans/","0.3.3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600451","mod_dp/","lk.0.4.3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600452","mod_dtcl/","mod_dtcl/0.5.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600453","mod_fastcgi/","2.4.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600453","mod_fastcgi/","2.4.6","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600454","mod_filter/","1.4.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600455","mod_frontpage/","4.0.4.3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600456","mod_gzip/","2.1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -483,7 +483,7 @@
 "600472","mod_macro/","1.1.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600473","mod_mcrypt/","2.4.11","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600474","mod_mirror/","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600475","mod_mono/","1.2.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600475","mod_mono/","1.2.5","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600476","mod_mp3/","1.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600477","mod_mp3idver/","0.12","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600478","mod_mrim/","0.17","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -513,7 +513,7 @@
 "600502","mod_rpaf/","0.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600503","mod_rsawebagent/","5.2.0[111]","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600504","mod_ruby/","1.2.6","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600505","mod_scgi/","1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600505","mod_scgi/","1.12","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600506","Mod_security/","1.9","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600507","mod_session/","1.12","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600508","mod_sleep/","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -582,7 +582,7 @@
 "600571","NetWare-Enterprise-Web-Server/","5.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600572","NetZoom","1.00","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600573","ngd/","4.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600574","nginx/","0.5.31","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600574","nginx/","0.5.34","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600575","nginx/","0.6.17","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600576","Niagara Web Server/","1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600577","NiagaraWebServer/","1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -696,7 +696,7 @@
 "600685","Roxen/","4.0.425_NT-release5","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600686","Roxen/","4.0.425-release5","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600687","Roxen·Challenger/","1.3.126","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600688","Ruby/","1.8.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600688","Ruby/","1.8.5","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600689","rus/","PL30.22","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600690","rwh/","1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600691","S.u.S.E./","6.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -776,7 +776,7 @@
 "600765","Sun-ONE-ASP/","4.0.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600766","Sun-ONE-Web-Server/","6.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600767","SunOS/","5.8","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600768","SVN/","1.4.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600768","SVN/","1.4.5","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600769","sw/","1.7","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600770","swcd/","5.2.0032","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600771","SWS-","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -919,3 +919,5 @@
 "600908","ZOT-PS-30/","8.2.0004","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600909","ZServer/","1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600910","ZyXEL-RomPager/","ZyXEL-RomPager/3.02","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600911","SAF/","4.0rc1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600912","Twisted/","2.1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
