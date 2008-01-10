@@ -110,8 +110,6 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     # make sure we have open ports on this target
     if (keys(%{ $TARGETS{$CURRENT_HOST_ID}{ports} }) eq 0)
     {
-
-        #nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident} / $TARGETS{$CURRENT_HOST_ID}{ports_in}");
         nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident}");
         next;
     }
