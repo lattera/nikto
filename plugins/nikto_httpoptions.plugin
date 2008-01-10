@@ -29,7 +29,6 @@
 
 sub nikto_httpoptions
 {
-
     # test for both OPTIONS / and OPTIONS * as they may give different results
     (my $RES, $CONTENT) = fetch("*", "OPTIONS");
     my $aoptions = "$result{allow}, ";
@@ -67,7 +66,6 @@ sub nikto_httpoptions
         nprint("- $TESTS{999985}{message}");
         foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public"); }
     }
-
     return;
 }
 
