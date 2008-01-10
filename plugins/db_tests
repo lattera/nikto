@@ -3418,7 +3418,7 @@
 "003413","3233","1","/j2ee/","GET","200","","","","","j2ee directory found--possibly an Oracle app server directory.","",""
 "003414","3233","3","@CGIDIRSprintenv.tmp","GET","DOCUMENT_ROOT","","","","","Apache 2.0 default script is executable and gives server environment variables. All default scripts should be removed. It may also allow XSS types of attacks. BID-4431.","",""
 "003415","3233","1","/perl/printenv","GET","DOCUMENT_ROOT","","","","","Apache 2.0 default script is executable and gives server environment variables. All default scripts should be removed. It may also allow XSS types of attacks. BID-4431.","",""
-"003416","3233","3","/perl-status","GET","200","","","","","Default perl status page found.","",""
+"003416","3233","3","/perl-status","GET","Embedded Perl","","","","","PERL status page found. This may reveal details about the PERL installation and operating system.","",""
 "003417","3233","13","/WebCacheDemo.html","GET","200","","","","","Oracle WebCache Demo","",""
 "003418","32333","13","/webcache/","GET","200","","","","","Oracle WebCache Demo","",""
 "003419","3233","13","/webcache/webcache.xml","GET","200","","","","","Oracle WebCache Demo","",""
