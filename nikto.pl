@@ -47,7 +47,7 @@ use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUIL
 # setup
 $STARTTIME         = localtime();
 $DIV               = "-" x 75;
-$NIKTO{version}    = "2.01";
+$NIKTO{version}    = "2.02";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "config.txt";    ### Change this line if your setup is having trouble finding it
 $http_eol          = "\r\n";
