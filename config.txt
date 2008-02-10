@@ -52,4 +52,3 @@ CIRT=209.172.49.178
 #########################################################################################################
 # send a cookie with all requests, helpful if auth cookie is needed
 #STATIC-COOKIE=cookiename=cookievalue
-
