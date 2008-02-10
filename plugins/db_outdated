@@ -1,9 +1,9 @@
-#VERSION,2.003
-#LASTMOD,01.09.2008
+#VERSION,2.004
+#LASTMOD,02.09.2008
 
 # This file may only be distributed and used with the full Nikto package.
 # This file may not be used with any software product without written permission from CIRT, Inc.
-# (c) 2007 CIRT, Inc., All Rights Reserved.
+# (c) 2008 CIRT, Inc., All Rights Reserved.
 
 # By sending any database updates to CIRT, Inc., it is assumed that you
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
@@ -914,10 +914,11 @@
 "600903","z_VM/","4.4.0.0000","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600904","Zend-LaunchPad/","1.0.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600905","Zeus/","4_3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600906","Zope/","Zope/2.8.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600906","Zope/","Zope/2.10.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600907","ZOT-PS-15/","6.8.0104","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600908","ZOT-PS-30/","8.2.0004","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600909","ZServer/","1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600910","ZyXEL-RomPager/","ZyXEL-RomPager/3.02","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600911","SAF/","4.0rc1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600912","Twisted/","2.1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600913","Plone/","3.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
