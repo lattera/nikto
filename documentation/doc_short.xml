@@ -1,0 +1,1115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book>
+  <!--Version 1.7-->
+
+  <title>Nikto v2 / The Manual</title>
+
+  <chapter>
+    <title>Introduction</title>
+
+    <sect1>
+      <title>Overview</title>
+
+      <para>Nikto is a web server assessment tool. It is designed to find
+      various default and insecure files, configurations and programs on any
+      type of web server.</para>
+    </sect1>
+
+    <sect1>
+      <title>Description</title>
+
+      <para>Nikto is PERL software designed to find many types of web server
+      problems, including:<itemizedlist>
+          <listitem>
+            <para>Server and software misconfigurations</para>
+          </listitem>
+
+          <listitem>
+            <para>Default files and programs</para>
+          </listitem>
+
+          <listitem>
+            <para>Insecure files and programs</para>
+          </listitem>
+
+          <listitem>
+            <para>Outdated servers and programs</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Nikto is built on LibWhisker (by RFP) and can run any platform
+      which has a PERL environment, and supports SSL, proxies, host
+      authentication, IDS evasion and more. It can be updated automatically
+      from the command-line, and supports the optional submission of updated
+      version data back to the maintainers.</para>
+
+      <para></para>
+
+      <para>The name "Nikto" is taken from the movie "The Day the Earth Stood
+      Still", and of course subsequent abuse by Bruce Campbell in "Army of
+      Darkness". More information on the pop-culture popularity of Nikto can
+      be found at <ulink
+      url="http://www.blather.net/archives2/issue2no21.html">http://www.blather.net/archives2/issue2no21.html</ulink></para>
+    </sect1>
+
+    <sect1>
+      <title>Advanced Error Detection Logic</title>
+
+      <para>Nikto version 2.0 utilizes multiple methods to understand how a
+      server responds to various requests. Nikto will use the fastest and most
+      accurate method of determining if a request is successful. This could
+      include basic HTTP response codes, rely on page content, or even use md5
+      hashing of content (minus some common date/time strings). When testing
+      starts against a server, tests are performed to determine which type
+      works best for the server and file type location. This eliminates many
+      of the false-positives common in other web scanners, including the 1.xx
+      tree of Nikto.</para>
+
+      <para></para>
+    </sect1>
+
+    <sect1>
+      <title>History</title>
+
+      <para>The Nikto 1.00 Beta was released on December 27, 2001, (followed
+      almost immediately by the 1.01 release). Over the course of two years
+      Nikto's code evolved into the most popular freely available web
+      vulnerability scanner.</para>
+
+      <para></para>
+
+      <para>The 2.0 release in September, 2007 represents over two years of
+      improvements.</para>
+
+      <para></para>
+    </sect1>
+
+    <sect1>
+      <title>Documentation</title>
+
+      <para>This document is a trimmed version of a larger work, available at
+      http://cirt.net/ .</para>
+
+      <para></para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Installation</title>
+
+    <sect1>
+      <title>Requirements</title>
+
+      <para>Any system which supports a basic PERL installation should allow
+      Nikto to run. It has been extensively tested on:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Windows (using ActiveState Perl)</para>
+        </listitem>
+      </itemizedlist>
+
+      <itemizedlist>
+        <listitem>
+          <para>Mac OSX</para>
+        </listitem>
+      </itemizedlist>
+
+      <itemizedlist>
+        <listitem>
+          <para>Various Linux and Unix installations (including RedHat,
+          Solaris, Debian and multiple implementations of Knoppix)</para>
+        </listitem>
+      </itemizedlist>
+
+      <para></para>
+
+      <para>Version 2 is also distributed as pre-compiled Windows executable
+      for use on Win32 platforms. This installation does not require a PERL
+      installation.</para>
+
+      <para></para>
+
+      <para>The only required PERL module that does not come standard is
+      LibWhisker. Nikto comes with and is configured to use a local LW.pm file
+      (in the plugins directory), but users may wish to change Nikto to use a
+      version installed on the system. See Section 2 for further
+      information.</para>
+
+      <para>For SSL support the Net::SSLeay PERL module must be installed
+      (which in turn requires OpenSSL on the Unix platform). Windows support
+      for SSL is dependent on the installation package, but is rumored to
+      exist for ActiveState's Perl.</para>
+
+      <para></para>
+
+      <para>The nmap scanner can be used, if desired. In some cases using nmap
+      will slow down Nikto execution, as it must call an external program. For
+      scanning many ports across one or more servers, using nmap will be
+      faster than using Nikto's internal PERL scanning.</para>
+
+      <para><itemizedlist>
+          <listitem>
+            <para>PERL: <ulink
+            url="http://www.cpan.org/">http://www.cpan.org/</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para>LibWhisker: <ulink
+            url="http://www.wiretrip.net/">http://www.wiretrip.net/</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para>ActiveState Perl: <ulink
+            url="http://www.activestate.com/">http://www.activestate.com/</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para>OpenSSL: <ulink
+            url="http://www.openssl.org/">http://www.openssl.org/</ulink></para>
+          </listitem>
+
+          <listitem>
+            <para>nmap: <ulink
+            url="http://www.insecure.org/">http://www.insecure.org/</ulink></para>
+          </listitem>
+        </itemizedlist></para>
+    </sect1>
+
+    <sect1>
+      <title>Install</title>
+
+      <para>These instructions do not include information on installing PERL,
+      PERL Modules, OpenSSL or LibWhisker.</para>
+
+      <para>Unpack the Nikto distribution file:</para>
+
+      <blockquote>
+        <para>tar -xvf nikto-current.tar.gz</para>
+
+        <para>gzip -d nikto-current.tar</para>
+      </blockquote>
+
+      <para>Assuming a standard OS/PERL installation, Nikto should now be
+      usable. See Chapter 4 (Options) or Chapter 8 (Troubleshooting) for
+      further configuration information.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Usage</title>
+
+    <sect1>
+      <title>Basic Testing</title>
+
+      <para>The most basic Nikto scan requires simply a host to target, since
+      port 80 is assumed if none is specified. The host can either be an IP or
+      a hostname of a machine, and is specified using the -h (-host) option.
+      This will scan the IP 192.168.0.1 on TCP port 80:</para>
+
+      <blockquote>
+        <para>perl nikto.pl -h 192.168.0.1</para>
+      </blockquote>
+
+      <para>To check on a different port, specify the port number with the -p
+      (-port) option. This will scan the IP 192.168.0.1 on TCP port
+      443:</para>
+
+      <blockquote>
+        <para>perl nikto.pl -h 192.168.0.1 -p 443</para>
+      </blockquote>
+
+      <para>There is no need to specify that port 443 may be SSL, as Nikto
+      will first test regular HTTP and if that fails, HTTPS. If you are sure
+      it is an SSL server, specifying -s (-ssl) will speed up the test.</para>
+    </sect1>
+
+    <sect1>
+      <title>Multiple Port Testing</title>
+
+      <para>Nikto can scan multiple ports in the same scanning session. To
+      test more than one port on the same host, specify the list of ports in
+      the -p (-port) option. Ports can be specified as a range (i.e., 80-90),
+      or as a comma-delimited list, (i.e., 80,88,90). This will scan the host
+      on ports 80, 88 and 443.</para>
+
+      <blockquote>
+        <para>perl nikto.pl -h 192.168.0.1 -p 80,88,443</para>
+      </blockquote>
+    </sect1>
+
+    <sect1>
+      <title>Multiple Host Testing</title>
+
+      <para>Nikto support scanning multiple hosts in the same session via a
+      text file of host names or IPs. Instead of giving a host name or IP for
+      the -h (-host) option, a file name can be given. Ports can be separated
+      from the host and other ports via a colon or a comma. If no port is
+      specified, port 80 is assumed.</para>
+
+      <para></para>
+
+      <para>This is an example of a valid hosts file:</para>
+
+      <blockquote>
+        <para>192.168.0.1:80</para>
+
+        <para>192.168.0.2,80</para>
+
+        <para>192.168.0.3</para>
+
+        <para>192.168.0.1,80,443</para>
+
+        <para>192.168.0.1:80:443</para>
+
+        <para>localhost:8888</para>
+      </blockquote>
+    </sect1>
+
+    <sect1>
+      <title>Using a Proxy</title>
+
+      <para>If the machine running Nikto only has access to the target host
+      (or update server) via an HTTP proxy, the test can still be performed.
+      Set the PROXY* variables (as described in section 4), then execute Nikto
+      with the -u (-useproxy) command. All connections will be relayed through
+      the HTTP proxy specified in the configuration file.</para>
+
+      <blockquote>
+        <para>perl nikto.pl -h 192.168.0.1 -p 80 -u</para>
+      </blockquote>
+    </sect1>
+
+    <sect1>
+      <title>Updating</title>
+
+      <para>To update to the latest plugins and databases, simply run Nikto
+      with the -update command.</para>
+
+      <blockquote>
+        <para>perl nikto.pl -update</para>
+      </blockquote>
+
+      <note>
+        <para>The -update option cannot be abbreviated.</para>
+      </note>
+
+      <para>Screen output will show if updates have been downloaded or if none
+      are required. Updates may also be manually downloaded from <ulink
+      url="http://www.cirt.net/">http://updates.cirt.net/</ulink></para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>All Options</title>
+
+    <para>Below are all of the Nikto command line options and explanations. A
+    brief version of this text is available by running Nikto with the -h
+    (-help) option.</para>
+
+    <glosslist>
+      <glossentry>
+        <glossterm>-Cgidirs</glossterm>
+
+        <glossdef>
+          <para>Scan these CGI directories. Special words "none" or "all" may
+          be used to scan all CGI directories or none, (respectively). A
+          literal value for a CGI directory such as "/cgi-test/" may be
+          specified (must include trailing slash). If this is option is not
+          specified, all CGI directories listed in config.txt will be
+          tested.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-config</glossterm>
+
+        <glossdef>
+          <para>Specify an alternative config file to use instead of the
+          config.txt located in the install directory.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-dbcheck</glossterm>
+
+        <glossdef>
+          <para>Check the scan databases for syntax errors. Also checks the
+          plugins to ensure they are called properly and have an entry in the
+          plugins_order.txt.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-evasion</glossterm>
+
+        <glossdef>
+          <para>Specify the LibWhisker IDS evasion technique to use (see the
+          LibWhisker docs for detailed information on these). Use the
+          reference number to specify the type, multiple may be used:</para>
+
+          <para>1 - Random URI encoding (non-UTF8)</para>
+
+          <para>2 - Directory self-reference (/./)</para>
+
+          <para>3 - Premature URL ending</para>
+
+          <para>4 - Prepend long random string</para>
+
+          <para>5 - Fake parameter</para>
+
+          <para>6 - TAB as request spacer</para>
+
+          <para>7 - Change the case of the URL</para>
+
+          <para>8 - Use Windows directory separator (\)</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-findonly</glossterm>
+
+        <glossdef>
+          <para>Only discover the HTTP(S) ports, do not perform security scan.
+          This will attempt to connect with HTTP or HTTPS, and report the
+          Server header.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-Format</glossterm>
+
+        <glossdef>
+          <para>Save the output file specified with -o (-output) option in
+          this format. If not specified, default is "txt". Valid formats
+          are:</para>
+
+          <para>csv - a comma-seperated list</para>
+
+          <para>htm - an HTML report</para>
+
+          <para>txt - a text report</para>
+
+          <para>xml - an XML report</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-host</glossterm>
+
+        <glossdef>
+          <para>Host(s) to target. Can be an IP address, hostname or text file
+          of hosts.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-Help</glossterm>
+
+        <glossdef>
+          <para>Display extended help information.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-id</glossterm>
+
+        <glossdef>
+          <para>ID and password to use for host Basic host authentication.
+          Format is "id:password".</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-mutate</glossterm>
+
+        <glossdef>
+          <para>Specify mutation technique. A mutation will cause Nikto to
+          combine tests or attempt to guess values. These techniques may cause
+          a tremendous amount of tests to be launched against the target. Use
+          the reference number to specify the type, multiple may be
+          used:</para>
+
+          <para>1 - Test all files with all root directories</para>
+
+          <para>2 - Guess for password file names</para>
+
+          <para>3 - Enumerate user names via Apache (/~user type
+          requests)</para>
+
+          <para>4 - Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user
+          type requests)</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-nolookup</glossterm>
+
+        <glossdef>
+          <para>Do not perform name lookups on IP addresses.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-output</glossterm>
+
+        <glossdef>
+          <para>Write output to the file specified. Format is defined in -F
+          (-Format), default is text. Existing files will have new information
+          appended.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-port</glossterm>
+
+        <glossdef>
+          <para>TCP port(s) to target. To test more than one port on the same
+          host, specify the list of ports in the -p (-port) option. Ports can
+          be specified as a range (i.e., 80-90), or as a comma-delimited list,
+          (i.e., 80,88,90). If not specified, port 80 is used.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-Pause</glossterm>
+
+        <glossdef>
+          <para>Seconds to delay between each test.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>- Display</glossterm>
+
+        <glossdef>
+          <para>Control the output that Nikto shows. See Chapter 5 for
+          detailed information on these options. Use the reference number or
+          letter to specify the type, multiple may be used:</para>
+
+          <para>1 - Show redirects</para>
+
+          <para>2 - Show cookies received</para>
+
+          <para>3 - Show all 200/OK responses</para>
+
+          <para>4 - Show URLs which require authentication</para>
+
+          <para>D - Debug Output</para>
+
+          <para>V - Verbose Output</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-root</glossterm>
+
+        <glossdef>
+          <para>Prepend the value specified to the beginning of every request.
+          This is useful to test applications or web servers which have all of
+          their files under a certain directory.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-ssl</glossterm>
+
+        <glossdef>
+          <para>Only test SSL on the ports specified. Using this option will
+          dramatically speed up requests to HTTPS ports, since otherwise the
+          HTTP request will have to timeout first.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-Single</glossterm>
+
+        <glossdef>
+          <para>Perform a single request to a target server. Nikto will prompt
+          for all options which can be specified, and then report the detailed
+          output. See Chapter 5 for detailed information.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-timeout</glossterm>
+
+        <glossdef>
+          <para>Seconds to wait before timing out a request. Default timeout
+          is 2 seconds.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-Tuning</glossterm>
+
+        <glossdef>
+          <para>Tuning options will control the test that Nikto will use
+          against a target. By default, if any options are specified, only
+          those tests will be performed. If the "x" option is used, it will
+          reverse the logic and exclude only those tests. Use the reference
+          number or letter to specify the type, multiple may be used:</para>
+
+          <para>0 - File Upload</para>
+
+          <para>1 - Interesting File / Seen in logs</para>
+
+          <para>2 - Misconfiguration / Default File</para>
+
+          <para>3 - Information Disclosure</para>
+
+          <para>4 - Injection (XSS/Script/HTML)</para>
+
+          <para>5 - Remote File Retrieval - Inside Web Root</para>
+
+          <para>6 - Denial of Service</para>
+
+          <para>7 - Remote File Retrieval - Server Wide</para>
+
+          <para>8 - Command Execution / Remote Shell</para>
+
+          <para>9 - SQL Injection</para>
+
+          <para>a - Authentication Bypass</para>
+
+          <para>b - Software Identification</para>
+
+          <para>g - Generic (Don't rely on banner)</para>
+
+          <para>x - Reverse Tuning Options (i.e., include all except
+          specified)</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-useproxy</glossterm>
+
+        <glossdef>
+          <para>Use the HTTP proxy defined in the config.txt file.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-update</glossterm>
+
+        <glossdef>
+          <para>Update the plugins and databases directly from
+          cirt.net.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-Version</glossterm>
+
+        <glossdef>
+          <para>Display the Nikto software, plugin and database
+          versions.</para>
+        </glossdef>
+      </glossentry>
+
+      <glossentry>
+        <glossterm>-vhost</glossterm>
+
+        <glossdef>
+          <para>Specify the Host header to be sent to the target.</para>
+        </glossdef>
+      </glossentry>
+    </glosslist>
+
+    <para></para>
+  </chapter>
+
+  <chapter>
+    <title>Detailed Options</title>
+
+    <sect1>
+      <title>Mutation Techniques</title>
+
+      <para>A mutation will cause Nikto to combine tests or attempt to guess
+      values. These techniques may cause a tremendous amount of tests to be
+      launched against the target, and are often impractible. Use the
+      reference number to specify the type, multiple may be combined.</para>
+
+      <para>1 - Test all files with all root directories.</para>
+
+      <para>2 - Guess for password file name.</para>
+
+      <para>3 - Enumerate user names via Apache (/~user type requests).</para>
+
+      <para>4 - Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type
+      requests).</para>
+    </sect1>
+
+    <sect1>
+      <title>Display</title>
+
+      <para>The Display option</para>
+
+      <para>1 - Show redirects. This will display all requests which elicit a
+      "redirect" response from the server.</para>
+
+      <para>2 - Show cookies received. This will display all cookies that were
+      sent by the remote host.</para>
+
+      <para>3 - Show all 200/OK responses. This will show all responses which
+      elicit an "okay" (200) response from the server. This could be useful
+      for debugging.</para>
+
+      <para>4 - Show URLs which require authentication. This will show all
+      responses which elicit an "authorization required" header.</para>
+
+      <para>D - Debug Output. Show debug output, which shows the verbose
+      output and extra information such as variable content.</para>
+
+      <para>V - Verbose Output. Show verbose output, which typically shows
+      where Nikto is during program execution.</para>
+    </sect1>
+
+    <sect1>
+      <title>Scan Tuning</title>
+
+      <para>Scan tuning can be used to decrease the number of tests performed
+      against a target. By specifying the type of test to include or exclude,
+      faster, focused testing can be completed. This is useful in situations
+      where the presence of certain file types are undesired--such as XSS or
+      simply "interesting" files.</para>
+
+      <para></para>
+
+      <para>Test types can be controlled at an individual level by specifying
+      their identifier to the -T (-Tuning) option. In the default mode, if -T
+      is invoked only the test type(s) specified will be executed. For
+      example, only the tests for "Remote file retrieval" and "Command
+      execution" can performed against the target:<blockquote>
+          <para>perl nikto.pl -h 192.168.0.1 -T 58</para>
+        </blockquote></para>
+
+      <para>If an "x" is passed to -T, the include or exclude logic is
+      reversed such that all tests except those specified will be performed.
+      In this example, all tests except "Remote file retrieval" and "Command
+      execution" are performed against the target:</para>
+
+      <blockquote>
+        <para>perl nikto.pl -h 192.168.0.1 -T 58x</para>
+      </blockquote>
+
+      <para>The valid tuning options are:</para>
+
+      <para>0 - File Upload. Exploits which allow a file to be uploaded to the
+      target server.</para>
+
+      <para>1 - Interesting File / Seen in logs. An unknown but suspicious
+      file or attack that has been seen in web server logs (note: if you have
+      information regarding any of these attacks, please contact CIRT,
+      Inc.).</para>
+
+      <para>2 - Misconfiguration / Default File. Default files or files which
+      have been misconfigured in some manner. This could be documentation, or
+      a resource which should be password protected.</para>
+
+      <para>3 - Information Disclosure. A resource which reveals information
+      about the target. This could be a file system path or account
+      name.</para>
+
+      <para>4 - Injection (XSS/Script/HTML). Any manner of injection,
+      including cross site scripting (XSS) or content (HTML). This does not
+      include command injection.</para>
+
+      <para>5 - Remote File Retrieval - Inside Web Root. Resource allows
+      remote users to retrieve unauthorized files from within the web server's
+      root directory.</para>
+
+      <para>6 - Denial of Service. Resource allows a denial of service against
+      the target application, web server or host (note: no intention DoS
+      attacks are attempted).</para>
+
+      <para>7 - Remote File Retrieval - Server Wide. Resource allows remote
+      users to retrieve unauthorized files from anywhere on the target.</para>
+
+      <para>8 - Command Execution / Remote Shell. Resource allows the user to
+      execute a system command or spawn a remote shell.</para>
+
+      <para>9 - SQL Injection. Any type of attack which allows SQL to be
+      executed against a database.</para>
+
+      <para>a - Authentication Bypass. Allows client to access a resource it
+      should not be allowed to access.</para>
+
+      <para>b - Software Identification. Installed software or program could
+      be positively identified.</para>
+
+      <para>c - Remote source inclusion. Software allows remote inclusion of
+      source code.</para>
+
+      <para>x - Reverse Tuning Options. Perform exclusion of the specified
+      tuning type instead of inclusion of the specified tuning type.</para>
+    </sect1>
+
+    <sect1>
+      <title>Single Request Mode</title>
+
+      <para>The single option allows manual setting of most variables used by
+      Nikto and LibWhisker, and upon completion will display both the request
+      and the result of the operation.</para>
+
+      <para></para>
+
+      <para>Most options have a default value or can be left blank. True and
+      false are specified by numeric equivalents, 1 and 0 respectively.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Output and Reports</title>
+
+    <sect1>
+      <title>Export Formats</title>
+
+      <para>Nikto saved output comes in three flavors: text, CSV or HTML. When
+      using -o (output), an output format may be specified with -F (Format).
+      Text format is assumed if nothing is specified with -F. The DTD for the
+      Nikto XML format can be found in the 'docs' directory
+      (nikto.dtd).</para>
+    </sect1>
+
+    <sect1>
+      <title>HTML Customization</title>
+
+      <para>HTML reports are generated from template files located in the
+      "templates" directory. Variables are defined as #variable-name, and are
+      replaced when the report is generated.</para>
+
+      <para></para>
+
+      <para>The files "htm_start.tmpl" and "htm_end.tmpl" are included at the
+      beginning and end of the report (respectively). The "htm_summary.tmpl"
+      also appears at the beginning of the report. The "htm_host_head" appears
+      once for every host, and the "htm_host_item.tmpl" and "htm_host_im.tmpl"
+      appear once for each item found on a host and each "informational
+      message" per host (respectively).</para>
+
+      <para></para>
+
+      <para>All valid variables are used in these templates. Future versions
+      of this documentation will include a list of variables and their
+      meaning.</para>
+
+      <para></para>
+
+      <para>The copyright and OSVDB statements must not be removed from the
+      "htm_end.tmpl" without placing them in another of the templates.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Test &amp; Code Writing</title>
+
+    <sect1>
+      <title>Scan Database Field Values</title>
+
+      <para>Though some checks can be found in other plugins, the
+      scan_database.db contains the bulk of the web test information. Here is
+      a description of the field values:</para>
+
+      <para></para>
+
+      <para><table>
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>Test ID</entry>
+
+                <entry>Nikto test ID</entry>
+              </row>
+
+              <row>
+                <entry>OSVDB-ID</entry>
+
+                <entry>Corresponding vuln entry number for osvdb.org</entry>
+              </row>
+
+              <row>
+                <entry>Tuning Type</entry>
+
+                <entry>Applicable tuning parameters (see chapter 5)</entry>
+              </row>
+
+              <row>
+                <entry>Server Type</entry>
+
+                <entry>Generic server matching type</entry>
+              </row>
+
+              <row>
+                <entry>URI</entry>
+
+                <entry>URI to retrieve</entry>
+              </row>
+
+              <row>
+                <entry>HTTP Method</entry>
+
+                <entry>HTTP method to use for URI</entry>
+              </row>
+
+              <row>
+                <entry>Match 1</entry>
+
+                <entry>String or code to match for successful test</entry>
+              </row>
+
+              <row>
+                <entry>Match1 (And)</entry>
+
+                <entry>String or code to also match for successful
+                test</entry>
+              </row>
+
+              <row>
+                <entry>Match 1 (Or)</entry>
+
+                <entry>String or code to alternatively match for successful
+                test</entry>
+              </row>
+
+              <row>
+                <entry>Fail 1</entry>
+
+                <entry>String or code to match for test failure</entry>
+              </row>
+
+              <row>
+                <entry>Fail 2</entry>
+
+                <entry>String or code to match for test failure
+                (alternative)</entry>
+              </row>
+
+              <row>
+                <entry>Summary</entry>
+
+                <entry>Summary message to report for successful test</entry>
+              </row>
+
+              <row>
+                <entry>HTTP Data</entry>
+
+                <entry>HTTP data to be sent during POST tests</entry>
+              </row>
+
+              <row>
+                <entry>Headers</entry>
+
+                <entry>Additional headers to send during test</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table></para>
+    </sect1>
+
+    <sect1>
+      <title>User-Defined Tests</title>
+
+      <para>Users can create their own, private tests in the
+      user_scan_database.db file. These tests should be written exactly as
+      they appear in scan_database.db.</para>
+
+      <para></para>
+
+      <para>For tests which require a "private" OSVDB ID, use the OSVDB ID 0
+      (zero). This should be used for all testing, as it is not a real
+      vulnerability in the database.</para>
+
+      <para></para>
+
+      <para>For the "Test ID", it is recommended you use unique numbers
+      between 400000 and 499999 to allow for growth of the Nikto database
+      without interfering with your own tests (note: numbers above 500000 are
+      reserved for other tests).</para>
+
+      <para></para>
+    </sect1>
+
+    <sect1>
+      <title>Scan Database Syntax</title>
+
+      <para>The scan database is a CSV delimited file which contains most of
+      the tests. Fields are enclosed by quotes and separated by commas. The
+      field order is:</para>
+
+      <para>Test-ID, OSVDB-ID, Tuning Type, Server Type, URI, HTTP Method,
+      Match 1, Match 1 And, Match1 Or, Fail 1, Fail 2, Summary, HTTP Data,
+      Headers</para>
+
+      <para>Here is an example test:</para>
+
+      <para>"120","3092","2","generic","/manual/","GET","200","","","","","Web
+      server manual","",""</para>
+    </sect1>
+
+    <sect1>
+      <title>Plugins</title>
+
+      <para>Plugins are standard PERL which follow a standard Nikto naming
+      format. All plugins must be named in the pattern nikto_name.plugin,
+      where "name" is the name of the plugin. The file must have a subroutine
+      named the same as the file name without the ".plugin" extension. For
+      example, a plugin named nikto_mycode.plugin would need a subroutine
+      called "sub nikto_mycode()", which would be executed when called.</para>
+
+      <para></para>
+
+      <para>All plugins must also be placed in the nikto_plugin_order.txt file
+      in the proper location for execution, otherwise it will not be
+      called.</para>
+    </sect1>
+
+    <sect1>
+      <title>Code Copyrights</title>
+
+      <para>Any new or updated code, tests or information sent to the author
+      is assumed to free of copyrights. By sending new or updated code, tests
+      or information to the author you relinquish all claims of copyright on
+      the material, and agree that this code can be claimed under the same
+      copyright as Nikto.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Troubleshooting</title>
+
+    <sect1>
+      <title>SOCKS Proxies</title>
+
+      <para>SOCKS proxies are not curently supported by Nikto</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Licenses</title>
+
+    <sect1>
+      <title>Nikto</title>
+
+      <para>Nikto is licensed under the GNU General Public License (GPL), and
+      copyrighted by CIRT, Inc.</para>
+    </sect1>
+
+    <sect1>
+      <title>LibWhisker</title>
+
+      <para>LibWhisker is licensed under the GNU General Public License (GPL),
+      and copyrighted by Rain Forrest Puppy.</para>
+    </sect1>
+
+    <sect1>
+      <title>Tests</title>
+
+      <para>The web tests are licensed for use with Nikto only, and may not be
+      reused without written consent from CIRT, Inc.</para>
+    </sect1>
+  </chapter>
+
+  <chapter>
+    <title>Credits</title>
+
+    <sect1>
+      <title>Nikto</title>
+
+      <para>Nikto is written and maintained by Sullo, CIRT, Inc. All code is ©
+      CIRT, Inc., except LibWhisker which is © rfp.labs (wiretrip.net). Other
+      portions of code may be © as specified.</para>
+    </sect1>
+
+    <sect1>
+      <title>Thanks</title>
+
+      <para>Many people have provided feedback, fixes, and suggestions. This
+      list attempts to make note of those people, though not all contributors
+      are listed. In no particular order:</para>
+
+      <para><itemizedlist>
+          <listitem>
+            <para>Nikto 2 Testing: Paul Woroshow, Mark G. Spencer, Michel
+            Arboi, Jericho, rfp</para>
+          </listitem>
+
+          <listitem>
+            <para>Jericho (attrition.org/OSVDB/OSF).
+            Support/ideas/tests/corrections/spam and help matching OSVDB IDs
+            to tests.</para>
+          </listitem>
+
+          <listitem>
+            <para>rfp (wiretrip.net). LibWhisker and continuing
+            support.</para>
+          </listitem>
+
+          <listitem>
+            <para>Erik Cabetas for many updates and fixes.</para>
+          </listitem>
+
+          <listitem>
+            <para>Jake Kouns (OSVDB/OSF). Support</para>
+          </listitem>
+
+          <listitem>
+            <para>Jabra (spl0it.org) for XML DTD, XML templates and supporting
+            code.</para>
+          </listitem>
+
+          <listitem>
+            <para>Stephen Valdez. Extensive testing. We all miss you.</para>
+          </listitem>
+
+          <listitem>
+            <para>S Saady. Extensive testing.</para>
+          </listitem>
+
+          <listitem>
+            <para>Zeno (cgisecurity.com). Nikto mirroring.</para>
+          </listitem>
+
+          <listitem>
+            <para>P Eronen (nixu.com). Provided many code fixes.</para>
+          </listitem>
+
+          <listitem>
+            <para>M Arboi. Great support by writing the code to make Nikto
+            work within Nessus, as well as bug reports.</para>
+          </listitem>
+
+          <listitem>
+            <para>T Seyrat. Maintains Nikto for the Debian releases.</para>
+          </listitem>
+
+          <listitem>
+            <para>J DePriest. Ideas/fixes.</para>
+          </listitem>
+
+          <listitem>
+            <para>P Woroshow. Ideas/fixes.</para>
+          </listitem>
+
+          <listitem>
+            <para>fr0stman. Tests.</para>
+          </listitem>
+
+          <listitem>
+            <para>H Heimann. Tests.</para>
+          </listitem>
+
+          <listitem>
+            <para>Xiola (xiola.net). Web design and more.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para></para>
+
+      <para>This document is © 2008 CIRT, Inc. and may not be reused without
+      permission.</para>
+    </sect1>
+  </chapter>
+</book>
