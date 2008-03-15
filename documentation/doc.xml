@@ -50,8 +50,8 @@
       <para>The name "Nikto" is taken from the movie "The Day the Earth Stood
       Still", and of course subsequent abuse by Bruce Campbell in "Army of
       Darkness". More information on the pop-culture popularity of Nikto can
-      be found at <ulink
-      url="http://www.blather.net/archives2/issue2no21.html">http://www.blather.net/archives2/issue2no21.html</ulink></para>
+      be found at
+      http://www.blather.net/blather/2005/10/klaatu_barada_nikto_the_day_th.html</para>
     </sect1>
 
     <sect1>
@@ -189,7 +189,7 @@
 
           <listitem>
             <para>nmap: <ulink
-            url="http://www.insecure.org/">http://www.insecure.org/</ulink></para>
+            url="http://www.insecure.org/">http://insecure.org/</ulink></para>
           </listitem>
         </itemizedlist></para>
     </sect1>
@@ -348,8 +348,8 @@
       <title>Integration with Nessus</title>
 
       <para>Nessus (<ulink
-      url="http://www.nessus.org/">http://www.nessus.org/</ulink>) can be
-      configured to automatically launch Nikto when it finds a web server.
+      url="http://www.nessus.org/">http://www.nessus.org/nessus/</ulink>) can
+      be configured to automatically launch Nikto when it finds a web server.
       Ensure Nikto works properly, then place the directory containing
       nikto.pl in root's PATH environment variable. When nessusd starts, it
       should see the nikto.pl program and enable usage through the GUI.</para>
@@ -1063,17 +1063,17 @@
       must have a unique identifier. The numbering scheme for writing tests is
       as follows:</para>
 
-      <para>000000 db_tests </para>
+      <para>000000 db_tests</para>
 
-      <para>400000 user defined tests (udb* files) </para>
+      <para>400000 user defined tests (udb* files)</para>
 
-      <para>500000 db_favicon </para>
+      <para>500000 db_favicon</para>
 
-      <para>600000 db_outdated </para>
+      <para>600000 db_outdated</para>
 
-      <para>700000 db_realms </para>
+      <para>700000 db_realms</para>
 
-      <para>800000 db_server_msgs </para>
+      <para>800000 db_server_msgs</para>
 
       <para>900000 tests defined in code</para>
 
@@ -1084,12 +1084,12 @@
       in HTML or XML reports. Not all tests are expected to have a uri, method
       or OSVDB ID. Here is an example of setting those fields:</para>
 
-      <para>$TESTS{999999}{uri}="/~root"; </para>
+      <para>$TESTS{999999}{uri}="/~root";</para>
 
       <para>$TESTS{999999}{message}="Enumeration of users is possible by
-      requesting ~username"; </para>
+      requesting ~username";</para>
 
-      <para>$TESTS{999999}{method}="GET"; </para>
+      <para>$TESTS{999999}{method}="GET";</para>
 
       <para>$TESTS{999999}{osvdb}=637;</para>
     </sect1>
