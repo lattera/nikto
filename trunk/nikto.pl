@@ -8,7 +8,7 @@ Getopt::Long::Configure('no_ignore_case');
 ###############################################################################
 #                               Nikto                                         #
 # --------------------------------------------------------------------------- #
-#                       last update: 01.09.2008                               #
+#                       last update: 2008-04-11
 # --------------------------------------------------------------------------- #
 ###############################################################################
 #  Copyright (C) 2004-2008 CIRT, Inc.
@@ -117,14 +117,9 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
     if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
 
-    foreach $CURRENT_PORT (split(',', $TARGETS{$CURRENT_HOST_ID}{ports_in}))
+    foreach $CURRENT_PORT (keys %{$TARGETS{$CURRENT_HOST_ID}{ports}})
     {
         if ($CURRENT_PORT eq "") { next; }
-        elsif (!defined($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}))
-        {
-            nprint("+ No HTTP(s) server found on $TARGETS{$CURRENT_HOST_ID}{ident} / $CURRENT_PORT");
-            next;
-        }
         $request{'whisker'}->{'port'}    = $CURRENT_PORT;
         $request{'whisker'}->{'ssl'}     = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl};
         $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};

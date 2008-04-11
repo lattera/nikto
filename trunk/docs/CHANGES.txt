@@ -1,3 +1,9 @@
+2008-04-11 nikto.pl
+      - Started using international dates instead of the weird US format
+      - Added a fix for bug id 23: allow a range of ports instead of a comma
+        separated list
+2008-04-11 db_outdated
+      - Updated current version of Apache to 2.2.8
 01.06.2008 2.02
       - Added XML output thanks to the work of Jabra. XML format comes from templates (same as HTML). See the 'templates' dir for more info.
       - HTML reports changed by Jabra to remove some oddities and remove HTML from items
