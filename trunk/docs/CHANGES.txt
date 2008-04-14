@@ -1,3 +1,5 @@
+2008-04-14 templates/htm*
+      - Fixes for bug 24: HTML output is now valid HTML 4.01 Strict
 2008-04-11 nikto.pl
       - Started using international dates instead of the weird US format
       - Added a fix for bug id 23: allow a range of ports instead of a comma
