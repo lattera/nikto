@@ -1334,6 +1334,10 @@ sub port_check
       nprint("- Server found: $TARGETS{$CURRENT_HOST_ID}{ip}:$port \t$result{'server'}","d"); 
     }
  dump_var("Result Hash", \%result);
+ if (! $TARGETS{$CURRENT_HOST_ID}{ports}{$port})
+ {
+    nprint("+ No web server found on $TARGETS{$CURRENT_HOST_ID}{ip}:$port");
+ }
  return;
 }
 ###############################################################################
