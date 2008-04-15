@@ -1,3 +1,6 @@
+2008-04-16 plugins/nikto_core.plugin
+      - Change to allow reading of a host list from stdin
+      - Fix for enhancement 10: read from nmap output (only -oG)
 2008-04-15 plugins/nikto_core.plugin
       - Fixes for bug 25: Unopen ports are now reported
 2008-04-14 templates/htm*

@@ -815,46 +815,79 @@ sub resolve
 ###############################################################################
 sub set_targets
 {
- my $host_ctr=1;
- if ($CLI{host} eq "") 
+   my $host_ctr=1;
+   my $nmap=0;
+   if ($CLI{host} eq "") 
    { 
-    nprint("+ ERROR: No host specified");
-    usage(); 
+      nprint("+ ERROR: No host specified");
+      usage(); 
    }
  
- # if -p is not set, see if each line has its own ports. if not push 80 to ports_in
- if (-e $CLI{host})
+   # if -p is not set, see if each line has its own ports. if not push 80 to ports_in
+   if (-e $CLI{host} || $CLI{host} eq "-")
    {
-    nprint("Reading from file '$CLI{host}'","v");
-    open(IN,"<$CLI{host}") || die print STDERR "+ ERROR: Cannot open '$CLI{host}':$@\n";
-    while(<IN>)
-     {
-      chomp;
-      s/\#.*$//;
-      if ($_ eq "") { next; }
-      s/\s+//g;
-      $COUNTERS{hosts_total}++;
-      if (/(\:|\,)/) # at least one port is set for host
-       {
-        my $p="";
-        my @h=split(/\:|\,/);
-        $TARGETS{$host_ctr}{ident}=$h[0];
-        # preppend anything from CLI, don't duplicate
-        for (my $i=1;$i<=$#h;$i++) { $p.="$h[$i],"; }
-        if ($p !~ /$CLI{ports}(,|$)/) { $p .= "$CLI{ports}"; }
-        $p=~s/\,$//;
-        $TARGETS{$host_ctr}{ports_in}=$p || 80;
-       }
-      else 
-       { 
-        $TARGETS{$host_ctr}{ports_in} = $CLI{ports} || 80;
-        $TARGETS{$host_ctr}{ident} = $_;
-       }
-     nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:","d");
-     $host_ctr++;
-     }
-  close(IN);
-  }
+      my $file="<$CLI{host}";
+      nprint("Reading from file '$CLI{host}'","v");
+      if ($CLI{host} eq "-")
+      {
+         $file="-";
+      }
+      open(IN,$file) || die print STDERR "+ ERROR: Cannot open '$CLI{host}':$@\n";
+      while(<IN>)
+      {
+         # Check whether this is an nmap oG file
+         chomp;
+         if (/^# Nmap [0-9.]* scan initiated/)
+         {
+            $nmap=1;
+         }
+         s/\#.*$//;
+         if ($_ eq "") { next; }
+         $COUNTERS{hosts_total}++;
+         # Parse for nmap files
+         if (nmap eq 1)
+         {
+            # First get the host name
+            my $host, $ip;
+            my @line=split(/ /);
+            my @name=split(/\(|\)/, $line[2]);
+            
+            $TARGETS{$host_ctr}{ident}=$name[1];
+            # now parse the ports list
+            for (my $i = 3; $i <= $#line; $i++)
+            {
+               my @ports=split(/\//,$line[$i]);
+               if ($ports[1] eq "open")
+               {
+                  $TARGETS{$host_ctr}{ports_in}=$ports[0];
+               }
+            }
+         }
+         else
+         {
+            s/\s+//g;
+            if (/(\:|\,)/) # at least one port is set for host
+            {
+               my $p="";
+               my @h=split(/\:|\,/);
+               $TARGETS{$host_ctr}{ident}=$h[0];
+               # preppend anything from CLI, don't duplicate
+               for (my $i=1;$i<=$#h;$i++) { $p.="$h[$i],"; }
+               if ($p !~ /$CLI{ports}(,|$)/) { $p .= "$CLI{ports}"; }
+               $p=~s/\,$//;
+               $TARGETS{$host_ctr}{ports_in}=$p || 80;
+            }
+            else 
+            { 
+               $TARGETS{$host_ctr}{ports_in} = $CLI{ports} || 80;
+               $TARGETS{$host_ctr}{ident} = $_;
+            }
+         }
+         nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:","d");
+         $host_ctr++;
+      }
+   close(IN);
+   }
 
  # Since it's not a file, it is either a host or an error
  # test for a full URL and parse, or treat like host and let resolve() sort it out
