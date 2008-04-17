@@ -845,7 +845,7 @@ sub set_targets
          if ($_ eq "") { next; }
          $COUNTERS{hosts_total}++;
          # Parse for nmap files
-         if (nmap eq 1)
+         if ($nmap eq 1)
          {
             # First get the host name
             my $host, $ip;
@@ -857,7 +857,7 @@ sub set_targets
             for (my $i = 3; $i <= $#line; $i++)
             {
                my @ports=split(/\//,$line[$i]);
-               if ($ports[1] eq "open")
+               if ($ports[1] eq "open" && $ports[4] eq "http")
                {
                   $TARGETS{$host_ctr}{ports_in}=$ports[0];
                }
