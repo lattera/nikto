@@ -28,7 +28,7 @@ sub nikto_outdated
 {
     # Below is to use a local copy, as the old version caused duplicate entries
     # when more than one host was scanned
-    my @BUILDITEMS
+    my @BUILDITEMS;
 
     # populate @BUILDITEMS with appropriate values
     # if Apache, split on space...
