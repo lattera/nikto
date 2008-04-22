@@ -1,5 +1,5 @@
-#VERSION,2.03
-#LASTMOD,01.09.2008
+#VERSION,2.04
+#LASTMOD,2008-04-22
 
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
@@ -26,6 +26,10 @@
 
 sub nikto_outdated
 {
+    # Below is to use a local copy, as the old version caused duplicate entries
+    # when more than one host was scanned
+    my @BUILDITEMS
+
     # populate @BUILDITEMS with appropriate values
     # if Apache, split on space...
     if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /apache/i)
