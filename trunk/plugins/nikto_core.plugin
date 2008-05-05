@@ -177,9 +177,17 @@ sub nprint
  
  # print errors to STDERR
  if ($line =~ /ERROR\:/) { print STDERR "$line\n"; }
- 
- # if no file saving, return
- if ($CLI{file} eq "") { return; }
+
+ # print to scan details to standard output if the users wants another format and is saving results to a file
+ if ($CLI{file} ne "-"  && $CLI{format} ne "txt")
+  {
+   $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
+   $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
+   $line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
+   $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
+   $line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
+   print "$line\n";
+  }
  
  # HTML is handled elsewhere, sadly
  if ($CLI{format} eq "txt")
