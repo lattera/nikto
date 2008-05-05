@@ -89,7 +89,6 @@ proxy_setup();
 
 open_output();
 nprint($DIV);
-print "- $NIKTO{name} $NIKTO{version}/$NIKTO{core_version}     -     cirt.net\n";
 
 set_targets();
 

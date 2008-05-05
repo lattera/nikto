@@ -70,8 +70,8 @@ sub test_target
 	if ($CONTENT =~ /$TESTS{$CHECKID}{match_1}/) 
 	{ 
 		$positive=1; 
-		#print "testid:$CHECKID\n";
-		#print "match_1:$TESTS{$CHECKID}{match_1}:\n";
+		#nprint "testid:$CHECKID\n";
+		#nprint "match_1:$TESTS{$CHECKID}{match_1}:\n";
 		#exit;
 	} 
 	}
@@ -163,7 +163,6 @@ sub nprint
 {
  my $line=$_[0];
  chomp($line);
-
  # don't print debug & verbose to output file...
  if ($_[1] eq "d")
  	{ 
@@ -176,9 +175,8 @@ sub nprint
  	 	return;
  	}
  
- # print to STDOUT
+ # print errors to STDERR
  if ($line =~ /ERROR\:/) { print STDERR "$line\n"; }
- else { print "$line\n"; }
  
  # if no file saving, return
  if ($CLI{file} eq "") { return; }
@@ -343,8 +341,8 @@ sub map_codes
 	$FoF{$ext}{location} =~ s/$file//;
 #	if ($ext eq "php")
 #	 {
-#print "$ext $FoF{$ext}\n";
-#print "loc is:$FoF{$ext}{location}\n";  exit; 
+#nprint "$ext $FoF{$ext}\n";
+#nprint "loc is:$FoF{$ext}{location}\n";  exit; 
 #}
      } # handle .com to .org redirs or whatnot
 
@@ -413,7 +411,7 @@ sub map_codes
    $FoF{"index.php"}{match}=LW2::md4($content);
    $FoF{"index.php"}{type}="HASH";
 
- # foreach $ext (keys %FoF)   { print "$ext: mode $FoF{$ext}{mode}, response $FoF{$ext}{response}, type $FoF{$ext}{type}\n"; }
+ # foreach $ext (keys %FoF)   { nprint "$ext: mode $FoF{$ext}{mode}, response $FoF{$ext}{response}, type $FoF{$ext}{type}\n"; }
 return;
 }
 ###############################################################################
@@ -678,7 +676,8 @@ sub general_config
  elsif ($CLI{Single})   { single();  }
  
  # output file
- if (($CLI{format} ne "") && ($CLI{file} eq "")) { nprint("+ ERROR: Output format specified without output file."); exit; }
+ if ($CLI{file} eq "")            { $CLI{file}="-"; }      # default to standard output
+
  if ($CLI{format} eq "")          { $CLI{format}="txt"; }  # default to txt
  elsif ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
  elsif ($CLI{format} =~ /html?/i) { $CLI{format}="htm"; }
@@ -1121,8 +1120,8 @@ sub dbcheck
  my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_server_msgs  db_variables db_favicon/;
  my $prefix = $_[0];
 
- if ($prefix eq ""  )  { print "\n-->\tNikto Databases\n"; }
- if ($prefix eq "u"  ) { print "\n-->\tUser Databases\n"; }
+ if ($prefix eq ""  )  { nprint "\n-->\tNikto Databases\n"; }
+ if ($prefix eq "u"  ) { nprint "\n-->\tUser Databases\n"; }
 
  for my $file (@dbs) 
   { 
@@ -1130,7 +1129,7 @@ sub dbcheck
    if (!-r $filename) { next; }
    open(IN,"<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
    
-   print "Syntax Check: $filename\n";
+   nprint "Syntax Check: $filename\n";
    
    if ($file eq 'db_outdated') 
      {
@@ -1147,7 +1146,7 @@ sub dbcheck
          }
 
           foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
-          print "\t" . keys(%ENTRIES) . " entries\n";
+          nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
    elsif ($file eq 'db_tests') 
      {
@@ -1165,7 +1164,7 @@ sub dbcheck
          }
 
        foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
-       print "\t" . keys(%ENTRIES) . " entries\n";
+       nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
    elsif ($file eq 'db_server_msgs') 
      {
@@ -1186,7 +1185,7 @@ sub dbcheck
          }
 
           foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
-          print "\t" . keys(%ENTRIES) ." entries\n";
+          nprint "\t" . keys(%ENTRIES) ." entries\n";
      }
    elsif ($file eq 'db_variables') 
      {
@@ -1197,7 +1196,7 @@ sub dbcheck
            if ($line !~ /^\@.+\=.+$/i ) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
-        print "\t$ctr entries\n";
+        nprint "\t$ctr entries\n";
      }
    elsif ($file eq 'db_realms') 
      {
@@ -1210,7 +1209,7 @@ sub dbcheck
            if ($#L ne 3) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
-        print "\t$ctr entries\n";
+        nprint "\t$ctr entries\n";
      }
    elsif ($file eq 'db_404_strings') 
      {
@@ -1220,7 +1219,7 @@ sub dbcheck
            # not really any syntax to check
            $ctr++;
          }
-        print "\t$ctr entries\n";
+        nprint "\t$ctr entries\n";
      }
    elsif ($file eq 'db_favicon')
      {
@@ -1233,7 +1232,7 @@ sub dbcheck
            if ($#L ne 1) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
-        print "\t$ctr entries\n";
+        nprint "\t$ctr entries\n";
      }
 
    close(IN);  
@@ -1242,7 +1241,7 @@ sub dbcheck
  if ($_[0] eq "") { dbcheck('u'); }  # do this once
 
  #### check that all plugins are in nikto_plugin_order.txt
- print "\n-->\tPlugin order ($NIKTO{plugindir}/nikto_plugin_order.txt)\n";
+ nprint "\n-->\tPlugin order ($NIKTO{plugindir}/nikto_plugin_order.txt)\n";
  my @NIKTOFILES=dirlist($NIKTO{plugindir},"(\.plugin\$)");
  my %PLUGS;
 
@@ -1276,7 +1275,7 @@ sub dbcheck
   if (!$bad) { print STDERR "\tOrder file okay\n"; }
 
  #### check that all plugins are named properly
- print "-->\tPlugin conventions ($NIKTO{plugindir}/*.plugin)\n";
+ nprint "-->\tPlugin conventions ($NIKTO{plugindir}/*.plugin)\n";
  $bad=0;
  foreach my $pluginf (@NIKTOFILES)
  {
@@ -1297,9 +1296,9 @@ sub dbcheck
     $bad++;
    } 
  }
- if (!$bad) { print "\tPlugin syntax okay\n"; }
+ if (!$bad) { nprint "\tPlugin syntax okay\n"; }
 
- print "\n";
+ nprint "\n";
  exit;
 }
 ###############################################################################
@@ -1493,9 +1492,9 @@ sub check_updates
    { 
     if ($REMOTE{$remotefile} > $NIKTO{version}) 
      { 
-      print "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{version}\n";
-      print "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n"; 
-      if ($remotemsg ne "") {  print "+ $server message: $remotemsg\n"; }
+      nprint "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{version}\n";
+      nprint "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n"; 
+      if ($remotemsg ne "") {  nprint "+ $server message: $remotemsg\n"; }
       exit; 
      }
     next;
@@ -1513,7 +1512,7 @@ sub check_updates
  # replace local files if updated
  foreach my $toget (@DBTOGET)
  {
-  print "+ Retrieving '$toget'\n";
+  nprint "+ Retrieving '$toget'\n";
   (my $RES, $CONTENT) = fetch("$serverdir/$toget","GET");
   if ($RES ne 200) { print STDERR "+ ERROR: Unable to get $server$serverdir/$toget\n"; exit; }
   if ($CONTENT ne "") {
@@ -1526,7 +1525,7 @@ sub check_updates
 # CHANGES file
 if ($code_updates)
  {
-  print "+ Retrieving 'CHANGES.txt'\n";
+  nprint "+ Retrieving 'CHANGES.txt'\n";
   (my $RES, $CONTENT) = fetch("$serverdir/CHANGES.txt","GET");
   if (($CONTENT ne "") && ($RES eq 200)) {
    open(OUT,">$NIKTO{plugindir}/../docs/CHANGES.txt") || die print STDERR "+ ERROR: Unable to open '$NIKTO{plugindir}/../CHANGES.txt' for write: $@\n";
@@ -1535,8 +1534,8 @@ if ($code_updates)
   }
  }
 
-if ($#DBTOGET < 0 )   { print "+ No updates required.\n"; }
-if ($remotemsg ne "") { print "+ $server message: $remotemsg\n"; }
+if ($#DBTOGET < 0 )   { nprint "+ No updates required.\n"; }
+if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
 exit;
 }
 ###############################################################################
@@ -1592,7 +1591,7 @@ sub auth_guess
     }
   }
  else
-  { print "+ ERROR: Authorization is required, but bogus auth test appeared to work. Server is a bit whacked.\n"; }
+  { nprint "+ ERROR: Authorization is required, but bogus auth test appeared to work. Server is a bit whacked.\n"; }
  $REALMS_TESTED{$realm}=1;
  my $pa = $request{'Proxy-Authorization'};
  LW2::auth_unset(\%request);
@@ -1708,7 +1707,7 @@ KEYSTROKE:
     # Done with waiting for input. Let's not leave the cursor sitting
     # there, after the prompt.
     print TTY "\n";
-    print "\n";
+    nprint "\n";
 
     # Let's put everything back where we found it.
     $term->setlflag($original_flags);
@@ -2052,11 +2051,11 @@ sub version
 {
  my @NIKTOFILES=dirlist($NIKTO{plugindir},"(^nikto|^db_)");
 
- print "$DIV\n$NIKTO{name} Versions\n$DIV\n";
- print "File                               Version      Last Mod\n";
- print "-----------------------------      --------     ----------\n";
- print "Nikto main                         $NIKTO{version}\n";
- print "LibWhisker                         $LW2::VERSION\n";
+ nprint "$DIV\n$NIKTO{name} Versions\n$DIV\n";
+ nprint "File                               Version      Last Mod\n";
+ nprint "-----------------------------      --------     ----------\n";
+ nprint "Nikto main                         $NIKTO{version}\n";
+ nprint "LibWhisker                         $LW2::VERSION\n";
 
  foreach my $FILE (sort @NIKTOFILES)
   {
@@ -2071,9 +2070,9 @@ sub version
    $MODS[0] =~ s/^#LASTMOD,//;
    my $ws1=(35-length($FILE));
    my $ws2=(13-length($VERS[0]));
-   print "$FILE", " " x $ws1 , "$VERS[0]", " " x $ws2, "$MODS[0]\n";
+   nprint "$FILE", " " x $ws1 , "$VERS[0]", " " x $ws2, "$MODS[0]\n";
   }
- print "$DIV\n";
+ nprint "$DIV\n";
 
  exit;
 }
@@ -2195,7 +2194,7 @@ sub send_updates
   }
  else
   {
-   print "- Sent updated version string(s) to CIRT.net\n"; 
+   nprint "- Sent updated version string(s) to CIRT.net\n"; 
   }
 
 return;
