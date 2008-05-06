@@ -896,34 +896,60 @@ sub set_targets
    close(IN);
    }
 
- # Since it's not a file, it is either a host or an error
- # test for a full URL and parse, or treat like host and let resolve() sort it out
+ # Since it's not a file, parse the items and determine the hosts to
+ # scan. Test for a full URL and parse, or treat like host and let
+ # resolve() sort it out
  else
    { 
-    $COUNTERS{hosts_total}++;
-    if ($CLI{host} =~ /^https?:\/\//)
-     {
-      my @hostdata=LW2::uri_split($CLI{host});
-      $TARGETS{$host_ctr}{ident} = $hostdata[2];
-      $TARGETS{$host_ctr}{ports_in} = $hostdata[3];
-      if ($hostdata[1] eq "https")  
-         { 
-          $CLI{ssl}=1;
-          if ($TARGETS{$host_ctr}{ports_in} eq "") { $TARGETS{$host_ctr}{ports_in}=443; } 
-         }
-      if (($CLI{root} eq '') && ($hostdata[0] ne ''))
-	{
-	 $CLI{root}=$hostdata[0];
-         nprint("- Added -root value of '$CLI{root}'","d");
-	}
-     }
-    else
-     {
-      $TARGETS{$host_ctr}{ident}=$CLI{host};
-      $TARGETS{$host_ctr}{ports_in}=$CLI{ports} || 80;
-     }
-   if ($CLI{vhost} ne '') { $TARGETS{$host_ctr}{vhost}=$CLI{vhost}; }
-   nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:vhost:$$TARGETS{$host_ctr}{vhost}=$CLI{vhost}:","d");
+        my @hosts = split(' ', $CLI{host});
+        foreach (@hosts)
+        {
+            s/\s+//g;
+            if ( $_ eq "" ) { next; }
+
+            if (/^https?:\/\//)
+            {
+                my @hostdata=LW2::uri_split($_);
+                $TARGETS{$host_ctr}{ident} = $hostdata[2];
+                $TARGETS{$host_ctr}{ports_in} = $hostdata[3];
+                if ($hostdata[1] eq "https")
+                {
+                    $CLI{ssl}=1;
+                    if ($TARGETS{$host_ctr}{ports_in} eq "") { $TARGETS{$host_ctr}{ports_in}=443; }
+                }
+                if (($CLI{root} eq '') && ($hostdata[0] ne ''))
+                {
+                    $CLI{root}=$hostdata[0];
+                    nprint("- Added -root value of '$CLI{root}'","d");
+                }
+            }
+            elsif (/(\:|\,)/)    # at least one port is set for host
+            {
+                my $p = "";
+                my @h = split(/\:|\,/);
+                $TARGETS{$host_ctr}{ident} = $h[0];
+
+                # preppend anything from CLI, don't duplicate
+                for ( my $i = 1; $i <= $#h; $i++ ) { $p .= "$h[$i],"; }
+                if ( $p !~ /$CLI{ports}(,|$)/ ) { $p .= "$CLI{ports}"; }
+                $p =~ s/\,$//;
+                $TARGETS{$host_ctr}{ports_in} = $p || 80;
+            }
+            else 
+            {
+                $TARGETS{$host_ctr}{ports_in} = $CLI{ports} || 80;
+                $TARGETS{$host_ctr}{ident} = $_;
+            }
+            
+            if ($CLI{vhost} ne '') { $TARGETS{$host_ctr}{vhost}=$CLI{vhost}; }
+            nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:vhost:$$TARGETS{$host_ctr}{vhost}=$CLI{vhost}:","d");
+
+            nprint(
+                "- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:","d"
+                );
+            $host_ctr++;
+            $COUNTERS{hosts_total}++;
+        }
    }
 
  return;
