@@ -109,8 +109,14 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     # make sure we have open ports on this target
     if (keys(%{ $TARGETS{$CURRENT_HOST_ID}{ports} }) eq 0)
     {
-        nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident}");
-        next;
+        $CURRENT_PORT = $TARGETS{$CURRENT_HOST_ID}{ports_in};
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
+        auth_check();
+        check_cgi();
+        set_scan_items();
+        map_codes();
+        run_plugins();
+        test_target();
     }
 
     $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
