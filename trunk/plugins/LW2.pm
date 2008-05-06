@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 # LW2 version 2.4
+# $Id$
 #
 #  LW2 copyright 2000-2006 by rain forest puppy, rfp.labs
 #
