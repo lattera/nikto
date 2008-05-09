@@ -1402,6 +1402,7 @@ sub port_check
  if (! $TARGETS{$CURRENT_HOST_ID}{ports}{$port})
  {
     nprint("+ No web server found on $TARGETS{$CURRENT_HOST_ID}{ip}:$port");
+    nprint("---------------------------------------------------------------------------");
  }
  return;
 }

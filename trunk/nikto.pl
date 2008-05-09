@@ -8,7 +8,7 @@ Getopt::Long::Configure('no_ignore_case');
 ###############################################################################
 #                               Nikto                                         #
 # --------------------------------------------------------------------------- #
-#   $Id$                                                                      #   
+#   $Id$                             #   
 # --------------------------------------------------------------------------- #
 ###############################################################################
 #  Copyright (C) 2004-2008 CIRT, Inc.
@@ -110,51 +110,55 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     if (keys(%{ $TARGETS{$CURRENT_HOST_ID}{ports} }) eq 0)
     {
         $CURRENT_PORT = $TARGETS{$CURRENT_HOST_ID}{ports_in};
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch}=time();
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp}=date_disp($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch});
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}
+        = "(no identification possible)";
         $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
-        auth_check();
-        check_cgi();
-        set_scan_items();
-        map_codes();
-        run_plugins();
-        test_target();
-    }
+        $TARGETS{$CURRENT_HOST_ID}{total_checks} = 0;
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch}=time();
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp}=date_disp($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch});
 
-    $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
-    if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
-
-    foreach $CURRENT_PORT (keys %{$TARGETS{$CURRENT_HOST_ID}{ports}})
-    {
-        if ($CURRENT_PORT eq "") { next; }
-        $request{'whisker'}->{'port'}    = $CURRENT_PORT;
-        $request{'whisker'}->{'ssl'}     = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl};
-        $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};
-        if ($NIKTOCONFIG{'STATIC-COOKIE'} ne "") { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
-        $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
-        delete $TARGETS{$CURRENT_HOST_ID}{positives};
-        %FoF = ();
-
-        get_banner();
-
-        if ($CLI{findonly})
-        {
-            my $protocol = "http";
-            if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} eq "")
-            {
-                $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} = "(no identification possible)";
-            }
-            if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
-            nprint("+ Server: $protocol://$TARGETS{$CURRENT_HOST_ID}{display_name}:$CURRENT_PORT\t$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}");
-        } else
-        {
-            dump_target_info();
-            auth_check();
-            check_cgi();
-            set_scan_items();
-            map_codes();
-            run_plugins();
-            test_target();
-        }
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed} = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch} -                                       $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch};
         write_output();
+    }
+    else {
+        $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
+        if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
+        foreach $CURRENT_PORT (keys %{$TARGETS{$CURRENT_HOST_ID}{ports}})
+        {
+            if ($CURRENT_PORT eq "") { next; }
+            $request{'whisker'}->{'port'}    = $CURRENT_PORT;
+            $request{'whisker'}->{'ssl'}     = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl};
+            $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};
+            if ($NIKTOCONFIG{'STATIC-COOKIE'} ne "") { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
+            $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
+            delete $TARGETS{$CURRENT_HOST_ID}{positives};
+            %FoF = ();
+
+            get_banner();
+
+            if ($CLI{findonly})
+            {
+                my $protocol = "http";
+                if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} eq "")
+                {
+                    $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} = "(no identification possible)";
+                }
+                if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
+                nprint("+ Server: $protocol://$TARGETS{$CURRENT_HOST_ID}{display_name}:$CURRENT_PORT\t$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}");
+            } else
+            {
+                dump_target_info();
+                auth_check();
+                check_cgi();
+                set_scan_items();
+                map_codes();
+                run_plugins();
+                test_target();
+            }
+            write_output();
+        }
     }
 }
 
