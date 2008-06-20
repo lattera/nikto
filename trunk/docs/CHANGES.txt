@@ -1,3 +1,5 @@
+2008-06-20 plugins/nikto_httpoptions.plugin
+      - Fix for ticket #30 - ensure that propfind has the right OSVDB tag
 2008-04-22 plugins/nikto_outdated.plugin
       - Change to allow stop duplication of items when scanning more than one
         host. Fix for bug 28

@@ -98,7 +98,7 @@ sub eval_methods
     {
         $TESTS{999981}{message} =
 "$prefix 'PROPFIND' may indicate DAV/WebDAV is installed. This may be used to get directory listings if indexing is allowed but a default page exists.";
-        $TESTS{999981}{osvdb} = 13431;
+        $TESTS{999981}{osvdb} = 0;
         nprint("+ OSVDB-$TESTS{999981}{osvdb}: $TESTS{999981}{message}");
         $TARGETS{$CURRENT_HOST_ID}{positives}{999981} = 1;
         $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
@@ -135,7 +135,7 @@ sub eval_methods
     elsif ($method eq "PROPPATCH")
     {
         $TESTS{999977}{message} = "$prefix 'PROPPATCH' indicates DAV/WebDAV is installed.";
-        $TESTS{999977}{osvdb}   = 425;
+        $TESTS{999977}{osvdb}   = 0;
         nprint("+ OSVDB-$TESTS{999977}{osvdb}: $TESTS{999977}{message}");
         $TARGETS{$CURRENT_HOST_ID}{positives}{999977} = 1;
         $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
