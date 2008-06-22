@@ -435,7 +435,7 @@
 "000424","0","3","@CGIDIRScom5..........................................................................................................................................................................................................................box","GET","Execution of Perl script","","","","","Lotus reveals file system paths when requesting DOS devices with bad syntax.","",""
 "000425","0","3","@CGIDIRScom5.java","GET","Execution of","","","","","Lotus reveals file system paths when requesting DOS devices with bad syntax.","",""
 "000426","0","3","@CGIDIRScom5.pl","GET","Execution of Perl script","","","","","Lotus reveals file system paths when requesting DOS devices with bad syntax.","",""
-"000427","0","3","/?Open","GET","nsf","","","","","This displays a list of all databases on the server. Disable this capability via server options.","",""
+"000427","0","3","/?Open","GET",".nsf","","","","","This displays a list of all databases on the server. Disable this capability via server options.","",""
 "000428","0","3","/?OpenServer","GET","\/icons\/abook\.gif","","","","","This install allows remote users to enumerate DB names, see http://www.securiteam.com/securitynews/6W0030U35W.html","",""
 "000429","0","3","/catalog.nsf","GET","200","","","","","A list of server databases can be retrieved, as well as a list of ACLs.","",""
 "000430","0","3","/cersvr.nsf","GET","200","","","","","Server certificate data can be accessed remotely.","",""
