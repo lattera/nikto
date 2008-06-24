@@ -1,10 +1,16 @@
+2008-06-24 plugins/nikto_core.plugin
+	- Fix for ticket #35 - allow multiple HTTP methods to identify
+	  an HTTP server, these are set with the variable CHECKMETHODS in
+	  config.txt
+	- Fix for a bug in the nmap reader where it would ignore the IP
+	  address if it nmap didn't return a hostname.
 2008-06-22 plugins/db_tests
 	- Fix for ticket #26 - stop domino tests producing false positives
 2008-06-20 plugins/nikto_httpoptions.plugin
 	- Fix for ticket #30 - ensure that propfind has the right OSVDB tag
 2008-04-22 plugins/nikto_outdated.plugin
 	- Change to allow stop duplication of items when scanning more than one
-	host. Fix for bug 28
+	  host. Fix for bug 28
 2008-04-16 plugins/nikto_core.plugin
 	- Change to allow reading of a host list from stdin
 	- Fix for enhancement 10: read from nmap output (only -oG)

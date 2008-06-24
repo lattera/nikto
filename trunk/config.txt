@@ -54,3 +54,7 @@ CIRT=209.172.49.178
 # send a cookie with all requests, helpful if auth cookie is needed
 #STATIC-COOKIE=cookiename=cookievalue
 
+# The below allows you to vary which HTTP methods are used to check whether
+# an HTTP(s) server is running. Some web servers, such as the autopsy web
+# server do not implement the HEAD method
+CHECKMETHODS=HEAD GET
