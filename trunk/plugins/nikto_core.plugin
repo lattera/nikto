@@ -504,19 +504,19 @@ sub dump_target_info
    }
   
  if ($TARGETS{$CURRENT_HOST_ID}{ip} =~ /[a-z]/i) { nprint("+ Target IP:       (proxied)"); }
-     else { nprint("+ Target IP:       $TARGETS{$CURRENT_HOST_ID}{ip}"); }
+     else { nprint("+ Target IP:          $TARGETS{$CURRENT_HOST_ID}{ip}"); }
 
- nprint("+ Target Hostname: $TARGETS{$CURRENT_HOST_ID}{hostname}"); 
- nprint("+ Target Port:     $CURRENT_PORT");
+ nprint("+ Target Hostname:    $TARGETS{$CURRENT_HOST_ID}{hostname}"); 
+ nprint("+ Target Port:        $CURRENT_PORT");
  if (($CLI{vhost} ne $TARGETS{$CURRENT_HOST_ID}{hostname}) && ($CLI{vhost} ne ""))
-     { nprint("+ Virtual Host:    $CLI{vhost}"); }
+     { nprint("+ Virtual Host:   $CLI{vhost}"); }
  if ($request{'whisker'}->{'proxy_host'} ne "") 
-     { nprint("- Proxy:           $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); }
+     { nprint("- Proxy:       $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); }
  if ($NIKTO{hostid} ne "") { nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); }
  if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { nprint($SSLPRINT); }
- for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { if ($CLI{evasion} =~ /$i/) { nprint("+ Using IDS Evasion:\t$NIKTO{anti_ids}{$i}"); }}
- for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { if ($CLI{mutate} =~ /$i/) { nprint("+ Using Mutation:\t$NIKTO{mutate_opts}{$i}"); }}
- nprint("+ Start Time:      $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp}");
+ for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { if ($CLI{evasion} =~ /$i/) { nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); }}
+ for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { if ($CLI{mutate} =~ /$i/) { nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); }}
+ nprint("+ Start Time:         $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp}");
  nprint($DIV);
  
  if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} ne "") 
@@ -530,6 +530,16 @@ sub dump_target_info
     { nprint("+ Server: No banner retrieved"); }
     
  return;
+}
+###############################################################################
+sub badargs
+{
+ print("HERE\n");
+ my $i;
+ for ($i=0;$i<=$#_;$i++)
+ {
+  print("Argument: $_[$i]\n");
+ }
 }
 ###############################################################################
 sub general_config
@@ -653,7 +663,8 @@ sub general_config
    elsif ($ARGV[$i] eq '-debug')    { print STDERR "-debug is deprecated, please  use '-D D' instead (debug enabled)\n";     $OUTPUT{debug}=1;   $ARGV[$i]=""; }
   }
 
- GetOptions(
+ GetOptions
+ (
            "nolookup"                => \$CLI{skiplookup},
            "config=s"                => \$CLI{config},
            "Cgidirs=s"               => \$CLI{forcecgi},
@@ -676,7 +687,7 @@ sub general_config
            "Single"                  => \$CLI{Single},
            "Tuning=s"                => \$CLI{tuning},
            "Version"                 => \$CLI{version},
-           );
+ ) or usage(0);
 
  if    ($CLI{help})     { usage(2);  }
  elsif ($CLI{version})  { version(); }
@@ -713,7 +724,7 @@ sub general_config
  {
   my @x=split(/:/,$CLI{hostauth});
   if (($#x ne 1) || ($x[0] eq ""))
-   { nprint("+ ERROR: '$CLI{hostauth}' (-i option) syntax is 'user:password' or 'user:password:domain' for host authentication.")  }
+   { nprint("+ ERROR: '$CLI{hostauth}' (-i option) syntax is 'user:password' or 'user:password:domain' for host authentication."); exit;  }
   $NIKTO{hostid}     = $x[0];
   $NIKTO{hostpw}     = $x[1];
   $NIKTO{hostdomain} = $x[2];
