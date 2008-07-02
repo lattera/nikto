@@ -53,18 +53,22 @@ sub nikto_user_enum_apache
     {
         if (($ctr % 500) eq 0) { nprint("\tUser enumeration guess $ctr ($text)", "v"); }
         (my $RES, $CONTENT) = fetch("/~" . $text, "HEAD");
-        if ($RES eq 301 || $RES eq 200 || $RES eq 403)    # this is a valid user
+        foreach $found (split(/ /,$VARIABLES{"\@HTTPFOUND"}))
         {
-            if (exists($TESTS{999997}{message}))
-            {
-                $TESTS{999997}{message} .= ", $text";
-            } else
-            {
-                $TESTS{999997}{message} = "Valid users found via Apache enumeration: $text";
-            }
-            $TESTS{999997}{osvdb} = 637;
-            $TARGETS{$CURRENT_HOST_ID}{positives}{999997} = 1;
-            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+           if ($RES eq $found) # this is a valid user
+           {
+               if (exists($TESTS{999997}{message}))
+               {
+                   $TESTS{999997}{message} .= ", $text";
+               }
+               else
+               {
+                   $TESTS{999997}{message} = "Valid users found via Apache enumeration: $text";
+               }
+               $TESTS{999997}{osvdb} = 637;
+               $TARGETS{$CURRENT_HOST_ID}{positives}{999997} = 1;
+               $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+           }
         }
         $text++;
         $ctr++;
