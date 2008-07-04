@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY description SYSTEM "description.xml">
+<!ENTITY options SYSTEM "options.xml">
+<!ENTITY files SYSTEM "files.xml">
+<!ENTITY bugs SYSTEM "bugs.xml">
+<!ENTITY authors SYSTEM "authors.xml">
+]>
+
+<refentry id="commands.nikto">
+  <refmeta>
+    <refentrytitle>nikto</refentrytitle>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+
+  <refnamediv>
+    <refname>nikto</refname>
+    <refpurpose>Scan web server for known vulnerabilities</refpurpose>
+  </refnamediv>
+
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>/usr/local/bin/nikto</command>
+      <arg choice="opt" rep="repeat">options</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+
+  <refsect1>
+    <title>Description</title>
+    &description;
+ </refsect1>
+
+  <refsect1>
+    <title>Options</title>
+    &options;
+  </refsect1>
+
+  <refsect1>
+    <title>Files</title>
+    &files;
+  </refsect1>
+
+  <refsect1>
+    <title>Bugs</title>
+    &bugs;
+  </refsect1>
+
+  <refsect1>
+    <title>Authors</title>
+    &authors;
+  </refsect1>
+
+  <refsect1>
+    <title>See also</title>
+    <para>
+      <simplelist type="inline">
+        <member>
+          <ulink url="http://www.cirt.net/">Nikto Homepage</ulink>
+        </member>
+      </simplelist>
+    </para>
+  </refsect1>
+</refentry>
