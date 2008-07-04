@@ -815,7 +815,7 @@
 
       <para></para>
 
-      <para><table>
+          <informaltable>
           <tgroup cols="2">
             <tbody>
               <row>
@@ -905,8 +905,8 @@
                 <entry>Additional headers to send during test</entry>
               </row>
             </tbody>
-          </tgroup>
-        </table></para>
+         </tgroup>
+         </informaltable>
     </sect1>
 
     <sect1>
