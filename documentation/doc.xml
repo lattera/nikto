@@ -142,12 +142,6 @@
 
       <para></para>
 
-      <para>Version 2 is also distributed as pre-compiled Windows executable
-      for use on Win32 platforms. This installation does not require a PERL
-      installation.</para>
-
-      <para></para>
-
       <para>The only required PERL module that does not come standard is
       LibWhisker. Nikto comes with and is configured to use a local LW.pm file
       (in the plugins directory), but users may wish to change Nikto to use a
