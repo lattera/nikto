@@ -1,0 +1,81 @@
+#VERSION,2.02
+# $Id: nikto_cgi.plugin 41 2008-05-06 03:36:38Z jabra $
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Perform CGI tests
+###############################################################################
+
+sub nikto_cgi
+{
+   my ($gotvalid,$gotinvalid)=0;
+   my @POSSIBLECGI=();
+   my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));
+   my ($res, $possiblecgidir, $found) ="";
+
+   if ($CLI{forcecgi} eq "all")                       # all possible CGI dirs to be "true" 
+   { 
+      nprint("Using all known CGI directories\n","d");
+      $VARIABLES{"\@CGIDIRS"} = join(" ",@CFGCGI); 
+   }
+   elsif ($CLI{forcecgi} eq "none")                   # scan no CGI directories
+   {
+      nprint("Using no CGI directories\n","d");
+      $VARIABLES{"\@CGIDIRS"} = ""; 
+   }   
+   elsif ($CLI{forcecgi} =~ /[a-zA-Z0-9]/)            # scan a specific directory 
+   {
+      nprint("Using CGI dir '$CLI{forcecgi}'\n","d");
+      $VARIABLES{"\@CGIDIRS"} = $CLI{forcecgi}; 
+   }
+   else                                               # or normal testing of each dir 
+   {
+      foreach $possiblecgidir (@CFGCGI)
+      {
+         ($res, $CONTENT)=fetch($possiblecgidir,"GET");
+         nprint("Checked for CGI dir\t$possiblecgidir\tgot:$res","d");
+         if (content_present($res) eq true)
+         {
+            $gotvalid++; 
+            push(@POSSIBLECGI,$possiblecgidir);
+         }
+      }
+
+      if ($gotvalid eq 0) 
+      { 
+         nprint("+ No CGI Directories found (use '-C all' to force check all possible dirs)"); 
+         $VARIABLES{"\@CGIDIRS"} = "";
+      }
+      elsif ($#CFGCGI eq $#POSSIBLECGI)
+      {
+         nprint("+ All CGI directories 'found', use '-C none' to test none"); 
+         $VARIABLES{"\@CGIDIRS"} = join(" ",@CFGCGI);
+      }
+      else 
+      {
+         $VARIABLES{"\@CGIDIRS"} = join(" ",@POSSIBLECGI);
+      }
+   } # end !$CLI{forcecgi}
+
+   nprint("- Checking for CGI in: $VARIABLES{\"\@CGIDIRS\"}","v");
+}
+
+1;

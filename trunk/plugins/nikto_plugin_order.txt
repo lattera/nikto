@@ -24,11 +24,12 @@
 # Order to run the plugins
 ###############################################################################
 
+nikto_robots
+nikto_cgi
 nikto_single
 nikto_reports
 nikto_httpoptions
 nikto_headers
-nikto_robots
 nikto_outdated
 nikto_msgs
 nikto_apache_expect_xss

@@ -151,10 +151,9 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
             {
                 dump_target_info();
                 auth_check();
-                check_cgi();
+                run_plugins();
                 set_scan_items();
                 map_codes();
-                run_plugins();
                 test_target();
             }
             write_output();

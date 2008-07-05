@@ -45,7 +45,7 @@ sub nikto_robots
                 $line =~ s/(^\s+|\s+$)//g;
                 $line =~ s/\s+/ /g;
                 $line =~ s/\\t/ /g;
-                $line =~ s/disallow(:)?( )?//i;
+                $line =~ s/disallow(\\:)?( )?//i;
                 $line =~ s/\*//g;
                 $line =~ s/\/+/\//g;
 
@@ -69,13 +69,39 @@ sub nikto_robots
         }    # end foreach my $line (@DOC)_
 
         # add them  to mutate dir/file
-        foreach my $d (sort keys %DIRS)
+        my $raw;
+        foreach $raw (sort keys %DIRS)
         {
-            if ($VARIABLES{"\@MUTATEDIRS"} !~ /$d/) { $VARIABLES{"\@MUTATEDIRS"} .= " $d"; }
+            $raw =~ s/\\//g;
+            if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/)
+            {
+               $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
+            }
+            if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/)
+            {
+               $VARIABLES{"\@CGIDIRS"} .= " $raw";
+            }
+            if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/)
+            {
+               $VARIABLES{"\@NUKE"} .= " $raw";
+            }
+            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/)
+            {
+               $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
+            }
         }
-        foreach my $f (sort keys %RFILES)
+
+        foreach $raw (sort keys %RFILES)
         {
-            if ($VARIABLES{"\@MUTATEFILES"} !~ /$d/) { $VARIABLES{"\@MUTATEFILES"} .= " $f"; }
+            $raw =~ s/\\//g;
+            if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/)
+            {
+               $VARIABLES{"\@MUTATEFILES"} .= " $raw";
+            }
+            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/)
+            {
+               $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
+            }
         }
 
         my $msg;
