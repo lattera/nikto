@@ -148,6 +148,7 @@ sub proc_template
         foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
         {
             if ($TESTS{$p}{uri} ne '') { next; }
+            print("$p\n");
             my $OSVDB = $TESTS{$p}{osvdb};
             if (($OSVDB eq '') && ($TESTS{$p}{message} =~ /^OSVDB-([0-9]+):/)) { $OSVDB = $1; }
             if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
@@ -170,44 +171,47 @@ sub proc_template
         foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
         {
             if ($TESTS{$p}{uri} eq '') { next; }
-            $TESTS{$p}{uri}                  = simple_enc($TESTS{$p}{uri});
-            $variables{"#TEMPL_URI"}         = $TESTS{$p}{uri};
-            $variables{"#TEMPL_MSG"}         = $TESTS{$p}{message};
-            $variables{"#TEMPL_HTTP_METHOD"} = $TESTS{$p}{method};
-
-            $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$CURRENT_PORT$TESTS{$p}{uri}";
-            if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
+            foreach my $uri (split(' ',$TARGETS{$CURRENT_HOST_ID}{$p}{uri}))
             {
-                $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$CURRENT_PORT$TESTS{$p}{uri}";
-            } else 
-            {
-                $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
-            }
-
-            $OSVDB      = "";
-            $OSVDB_LINK = "";
-            foreach my $o (split(/ /, $TESTS{$p}{osvdb}))
-            {
-                if ($o eq "")
-                {
-                    $o = "0";
-                }
-
-                $OSVDB      .= "$o";
-                $OSVDB_LINK .= "http://osvdb.org/$o";
-            }
-
-            $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
-            $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
-            $template =~ s/\#ID/$p/;
-
-            foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
-            $template_final .= $template;
-            $template = $template_orig;
+               $TESTS{$p}{uri}                  = simple_enc($TESTS{$p}{uri});
+               $variables{"#TEMPL_URI"}         = $uri;
+               $variables{"#TEMPL_MSG"}         = $TESTS{$p}{message};
+               $variables{"#TEMPL_HTTP_METHOD"} = $TESTS{$p}{method};
+   
+               $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$CURRENT_PORT$variables{\"#TEMPL_URI\"}";
+               if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
+               {
+                   $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$CURRENT_PORT$variables{\"#TEMPL_URI\"}";
+               }
+               else 
+               {
+                   $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
+               }
+   
+               $OSVDB      = "";
+               $OSVDB_LINK = "";
+               foreach my $o (split(/ /, $TESTS{$p}{osvdb}))
+               {
+                   if ($o eq "")
+                   {
+                       $o = "0";
+                   }
+   
+                   $OSVDB      .= "$o";
+                   $OSVDB_LINK .= "http://osvdb.org/$o";
+               }
+   
+               $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
+               $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
+               $template =~ s/\#ID/$p/;
+   
+               foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
+               $template_final .= $template;
+               $template = $template_orig;
+           }
         }
         $template = "$template_final\n";
     }
-
     return $template;
 }
 ###############################################################################

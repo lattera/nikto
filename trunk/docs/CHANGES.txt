@@ -1,3 +1,6 @@
+2008-07-07 nikto.pl plugins/nikto_core.plugin plugins/nikto_reports.plugin
+	- Fix for ticket #41 - a rather nasty bug that's been in nikto 2 since
+	  its inception; where variables weren't fully expanded.
 2008-07-02 plugins/nikto_core.plugin
 	- Fix for ticket #11 - change CGIDIRS test so that they're not
 	  hardcoded. The reponse codes are now kept in a variable in
