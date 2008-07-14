@@ -148,7 +148,6 @@ sub proc_template
         foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
         {
             if ($TESTS{$p}{uri} ne '') { next; }
-            print("$p\n");
             my $OSVDB = $TESTS{$p}{osvdb};
             if (($OSVDB eq '') && ($TESTS{$p}{message} =~ /^OSVDB-([0-9]+):/)) { $OSVDB = $1; }
             if ($OSVDB !~ /\d+/) { $OSVDB = 0; }

@@ -1,3 +1,6 @@
+2008-07-14 plugins/nikto_headers.plugin
+	- Changes to look at non-standard headers
+	- Changes to examine Apache's ETag header
 2008-07-07 nikto.pl plugins/nikto_core.plugin plugins/nikto_reports.plugin
 	- Fix for ticket #41 - a rather nasty bug that's been in nikto 2 since
 	  its inception; where variables weren't fully expanded.

@@ -27,12 +27,15 @@
 sub nikto_headers
 {
     my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
+    # Standard headers, whisker is added to stop false positives
+    my @standard_headers = qw /accept accept-charset accept-encoding accept-language accept-ranges age allow authorization cache-control connection content-encoding content-language content-length content-location content-md5 content-range content-type date etag expect expires from host if-match if-modified-since if-none-match if-range if-unmodified-since last-modified location max-forwards pragma proxy-authenticate proxy-authorization range referer retry-after server te trailer transfer-encoding upgrade user-agent vary via warning www-authenticate whisker/;
+    # Host Pragma
 
     #######################################################################
     # look for a powered-by header...could require a valid file, maybe not
     my %xpb;
     foreach
-      my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/)
+      my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
     {
         (my $RES, $CONTENT) = fetch($f, "GET");
         if ($result{'x-powered-by'} ne "") { $xpb{ $result{'x-powered-by'} } = 1; }
@@ -167,6 +170,73 @@ sub nikto_headers
             $TARGETS{$CURRENT_HOST_ID}{positives}{999986} = 1;
             $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
         }
+    }
+
+    #######################################################################
+    # Look for any non-standard headers
+    foreach my $header (sort keys %result)
+    {
+       my $found = 0;
+       my $reportnum = 999100;
+       foreach my $st_header (@standard_headers)
+       {
+          if ($header eq $st_header)
+          {
+             $found=1;
+          }
+       }
+       if ($found == 0)
+       {
+          my $x = $result{$header};
+          $x =~s/\s+.*$//;
+          push(@BUILDITEMS, $x);
+          $TESTS{$reportnum}{message} = "Non-standard header $header returned by server, with contents: $result{$header}";
+          $TESTS{$reportnum}{osvdb}   = 0;
+          nprint("+ OSVDB-$TESTS{$reportnum}{osvdb}: $TESTS{$reportnum}{message}");
+          $TARGETS{$CURRENT_HOST_ID}{positives}{$reportnum} = 1;
+          $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+          $reportnum++;
+       }
+    }
+           
+    #######################################################################
+    # ETag header
+    
+    # Try to grab a standard file
+    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
+    {
+       (my $RES, $CONTENT) = fetch($f, "GET");
+       if ($result{etag} ne '') { break; }
+    }
+
+    # Now we have a header, let's check ETag for inode
+    if ($result{etag} ne '')
+    {
+       my $etag=$result{etag};
+       $etag =~ s/"//g;
+       my @fields = split("-",$etag);
+       my $message = "ETag header found on server";
+       if ($#fields == 2)
+       {
+          my $inode="0x$fields[0]";
+          my $size="0x$fields[1]";
+          my $mtime="0x$fields[2]";
+          # for some reason $mtime is mangled
+          $message .= sprintf(", inode: %d, size: %d, mtime: %s", hex($inode), hex($size),  $mtime);
+       }
+       else
+       {
+          $message .= ", fields: ";
+          foreach my $field (@fields)
+          {
+             $message .= "0x$field ";
+          }
+       }
+       $TESTS{999984}{message} = $message;
+       $TESTS{999984}{osvdb}   = 0;
+       nprint("+ OSVDB-$TESTS{999984}{osvdb}: $TESTS{999984}{message}");
+       $TARGETS{$CURRENT_HOST_ID}{positives}{999984} = 1;
+       $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
     }
 }
 
