@@ -1,6 +1,7 @@
 - Files -
 doc.xml       -  Full Nikto 2 documentation as found on cirt.net
 doc_short.xml -  Trimmed documentation as included in the Nikto source distribution
+manpage.xml   -  Man page
 
 - Editing -
 These file were written in DocBook format with the XML Mind editor, though any 

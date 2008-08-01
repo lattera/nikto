@@ -131,7 +131,7 @@ be specified as a range (i.e., 80-90), or as a comma-delimited list,
       </listitem>
     </varlistentry>
     <varlistentry>
-      <term><option>- Display</option></term>
+      <term><option>-Display</option></term>
       <listitem>
         <para>Control the output that Nikto shows. See Chapter 5 for
 detailed information on these options. Use the reference number or
@@ -172,7 +172,7 @@ output. See Chapter 5 for detailed information.</para>
       <term><option>-timeout</option></term>
       <listitem>
         <para>Seconds to wait before timing out a request. Default timeout
-is 2 seconds.</para>
+is 10 seconds.</para>
       </listitem>
     </varlistentry>
     <varlistentry>

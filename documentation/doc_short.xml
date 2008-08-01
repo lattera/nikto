@@ -532,7 +532,7 @@
 
         <glossdef>
           <para>Seconds to wait before timing out a request. Default timeout
-          is 2 seconds.</para>
+          is 10 seconds.</para>
         </glossdef>
       </glossentry>
 
