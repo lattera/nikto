@@ -1,4 +1,4 @@
-#VERSION,2.002
+#VERSION,2.003
 # $Id$ 
 # http://www.cirt.net
 
@@ -31,4 +31,6 @@
 "500018","a5b126cdeaa3081f77a22b3e43730942","Horde Groupware Webmail 1.0.1 (Kronolith Theme)"
 "500019","dc0816f371699823e1e03e0078622d75","Aruba Networks device"
 "500020","d41d8cd98f00b204e9800998ecf8427e","Apache HTTP Server on Apple Mac OS X Server"
-"500020","f097f0adf2b9e95a972d21e5e5ab746d","Citrix Access Server"
+"500021","f097f0adf2b9e95a972d21e5e5ab746d","Citrix Access Server"
+"500022","69ae01d0c74570d4d221e6c24a06d73b","Roku Soundbridge"
+"500023","2e9545474ee33884b5fb8a9a0b8806dd","Ampache"
