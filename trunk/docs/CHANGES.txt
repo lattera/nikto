@@ -1,3 +1,8 @@
+=========Nikto 2.03=========
+2008-08-06 docs/nikto_manual.html
+	- New export of the manual from the docbook
+2008-08-06 plugins/db_outdated
+	- Added various new versions
 2008-08-05 plugins/db_favicon
 	- Fix for ticket #45
 	- Added favicons for Roku Soundbridge and Ampache
