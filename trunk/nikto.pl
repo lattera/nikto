@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
-#VERSION,2.02
+#VERSION,2.03
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 
@@ -48,7 +48,7 @@ use vars qw/%RESULTS/;
 # setup
 $STARTTIME         = localtime();
 $DIV               = "-" x 75;
-$NIKTO{version}    = "2.02";
+$NIKTO{version}    = "2.03";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "config.txt";    ### Change this line if your setup is having trouble finding it
 $http_eol          = "\r\n";

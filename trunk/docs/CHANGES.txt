@@ -1,6 +1,7 @@
 =========Nikto 2.03=========
-2008-08-06 docs/nikto_manual.html
+2008-08-07 docs/nikto_manual.html
 	- New export of the manual from the docbook
+	- Updated versions in nikto.pl
 2008-08-06 plugins/db_outdated
 	- Added various new versions
 2008-08-05 plugins/db_favicon
