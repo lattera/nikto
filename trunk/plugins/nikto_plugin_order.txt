@@ -24,7 +24,6 @@
 # Order to run the plugins
 ###############################################################################
 
-nikto_outdated
 nikto_robots
 nikto_cgi
 nikto_single
