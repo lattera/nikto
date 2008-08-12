@@ -332,7 +332,7 @@
 "600321","JBoss_","4_0_3_SP1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600322","JC-HTTPD/","1.14.18","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600323","JETServ/","2.2.18","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600324","Jetty/","6.1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600324","Jetty","Jetty(6.1.11)","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600325","JeusWebContainer/","Jeus WebContainer/4.2.4.0","RUNNING_VER appears to be outdated (current is at least CURRENT_VER)"
 "600326","Jigsaw/","2.2.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600327","Joke/","0.9b5","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"

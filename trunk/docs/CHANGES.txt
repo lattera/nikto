@@ -1,4 +1,6 @@
 =========Nikto 2.03=========
+2008-08-12 plugins/db_outdated
+	- Fix for Jetty to latest version, fixes ticket #49
 2008-08-07 docs/nikto_manual.html
 	- New export of the manual from the docbook
 	- Updated versions in nikto.pl
