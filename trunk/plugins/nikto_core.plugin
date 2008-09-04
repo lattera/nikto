@@ -1,4 +1,4 @@
-#VERSION,2.03
+#VERSION,2.04
 # $Id$
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
@@ -2132,7 +2132,7 @@ sub version
    $MODS[0] =~ s/^#LASTMOD,//;
    my $ws1=(35-length($FILE));
    my $ws2=(13-length($VERS[0]));
-   nprint "$FILE", " " x $ws1 , "$VERS[0]", " " x $ws2, "$MODS[0]\n";
+   nprint "$FILE". " " x $ws1  . "$VERS[0]". " " x $ws2. "$MODS[0]\n";
   }
  nprint "$DIV\n";
 
