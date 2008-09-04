@@ -1,3 +1,5 @@
+2008-09-04 plugins/nikto_core.plugin
+	- Fix for ticket #55, introduced by the solution for ticket #44
 =========Nikto 2.03=========
 2008-08-12 plugins/db_outdated
 	- Fix for Jetty to latest version, fixes ticket #49

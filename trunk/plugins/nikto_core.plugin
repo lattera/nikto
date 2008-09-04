@@ -1435,7 +1435,7 @@ sub port_check
   foreach my $checkssl (@checktypes)
   {
    nprint("- Checking for $checkssl on port $TARGETS{$CURRENT_HOST_ID}{ip}:$port, using $method","v");
-   $request{'whisker'}->{'ssl'}=($checkssl=="HTTP")?0:1;
+   $request{'whisker'}->{'ssl'}=($checkssl eq "HTTP")?0:1;
    $request{'whisker'}->{'port'}= $port;
    $request{'whisker'}->{'http_eol'}=$http_eol;
    dump_var("Request Hash", \%request);
@@ -1447,7 +1447,7 @@ sub port_check
     # this will fix for some Apaches that are smart enough to answer non ssl reqs on an ssl server
     if ($result{'whisker'}->{'data'} !~ /speaking plain HTTP to an SSL/) 
     {
-     $TARGETS{$CURRENT_HOST_ID}{ports}{$port}{ssl}=0;
+     $TARGETS{$CURRENT_HOST_ID}{ports}{$port}{ssl}=$request{'whisker'}->{'ssl'};
      nprint("- $checkssl Server found: $TARGETS{$CURRENT_HOST_ID}{ip}:$port \t$result{'server'}","d"); 
      $request{'whisker'}->{'host'}=$oldhost; 
      dump_var("Result Hash", \%result);
