@@ -1,3 +1,5 @@
+2008-09-06 plugins/nikto_core.plugin
+	- Fix for ticket #53; all plugins now show last mod date
 2008-09-04 plugins/nikto_core.plugin
 	- Fix for ticket #55, introduced by the solution for ticket #44
 	- Fix for ticket #53

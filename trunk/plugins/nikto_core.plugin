@@ -2125,14 +2125,14 @@ sub version
    my @F=<FI>;
    close(FI);
    my @VERS=grep(/^#VERSION/,@F);
-   my @MODS=grep(/^#LASTMOD/,@F);
+   my @MODS=grep(/^# \$Id:/,@F);
    chomp($VERS[0]);
    chomp($MODS[0]);
+   my @modification=split(/ /,$MODS[0]);
    $VERS[0] =~ s/^#VERSION,//;
-   $MODS[0] =~ s/^#LASTMOD,//;
    my $ws1=(35-length($FILE));
    my $ws2=(13-length($VERS[0]));
-   nprint "$FILE". " " x $ws1  . "$VERS[0]". " " x $ws2. "$MODS[0]\n";
+   nprint "$FILE". " " x $ws1  . "$VERS[0]". " " x $ws2. "$modification[4]\n";
   }
  nprint "$DIV\n";
 
