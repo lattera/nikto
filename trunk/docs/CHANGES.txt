@@ -1,5 +1,6 @@
-2008-09-06 plugins/nikto_core.plugin
-	- Fix for ticket #53; all plugins now show last mod date
+2008-09-06 plugins/nikto_core.plugin tmpl/htm_close.tmpl
+	- Fix for ticket #53: all plugins now show last mod date
+	- Fix for ticket #51: updated copyright date in HTML
 2008-09-04 plugins/nikto_core.plugin
 	- Fix for ticket #55, introduced by the solution for ticket #44
 	- Fix for ticket #53
