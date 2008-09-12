@@ -1103,7 +1103,7 @@ sub port_scan
 ###############################################################################
 sub load_databases
 {
- my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_server_msgs  db_variables db_favicon/;
+ my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_server_msgs  db_variables/;
  my $prefix = $_[0];
 
  # verify required files
@@ -1197,16 +1197,6 @@ sub load_databases
               }
            }
 
-       # db_favicons
-       elsif ($file eq 'db_favicon')
-          {
-            foreach my $l (@file)
-              {
-                my @t=parse_csv($l);
-                $FAVICONS{$t[1]}=$t[2];
-                $FAVICONS{$t[1]}{tid}=$t[0];
-              }
-           }
    close(IN);
   }
  }
