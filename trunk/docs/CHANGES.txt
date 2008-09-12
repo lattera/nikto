@@ -1,3 +1,8 @@
+2008-09-12 plugins/nikto_core.plugin plugins/nikto_httpoptions.plugin
+plugins/db_httpoptions
+	- Fix for ticket #38: httpoptions are drawn from a database
+	- Now setup to allow dynamic databases, rather than all being imported
+          by nikto_core at start time
 2008-09-06 plugins/nikto_core.plugin tmpl/htm_close.tmpl
 	- Fix for ticket #53: all plugins now show last mod date
 	- Fix for ticket #51: updated copyright date in HTML
