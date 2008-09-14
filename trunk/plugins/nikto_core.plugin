@@ -171,11 +171,8 @@ sub test_target
                if (is_404($request{whisker}{uri},$CONTENT,$RES)) { next; }
             }
 
-            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
             $TESTS{$CHECKID}{osvdb} =~ s/\s+/ OSVDB\-/g;
-            nprint("+ OSVDB-$TESTS{$CHECKID}{osvdb}: $TESTS{$CHECKID}{method} $request{whisker}{uri} : $TESTS{$CHECKID}{message}");
-            $TARGETS{$CURRENT_HOST_ID}{positives}{$CHECKID}=1;
-            $TARGETS{$CURRENT_HOST_ID}{$CHECKID}{uri}.=" $uri";
+            add_vulnerability($CURRENT_HOST_ID,"$TESTS{$CHECKID}{method} $request{whisker}{uri} : $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},"",$uri);
          }
       }
    } # end check loop
@@ -1103,7 +1100,7 @@ sub port_scan
 ###############################################################################
 sub load_databases
 {
- my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_server_msgs  db_variables/;
+ my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
  my $prefix = $_[0];
 
  # verify required files
@@ -1186,17 +1183,6 @@ sub load_databases
               }
            }
 
-       # db_server_msgs
-       elsif ($file eq 'db_server_msgs')
-          {
-            foreach my $l (@file) 
-              { 
-                my @t=parse_csv($l);
-                $VERSIONS{$t[1]}=$t[2];
-                $VERSIONS{$t[1]}{tid}=$t[0];
-              }
-           }
-
    close(IN);
   }
  }
@@ -1206,7 +1192,7 @@ sub load_databases
 ###############################################################################
 sub dbcheck
 {
- my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_server_msgs  db_variables db_favicon/;
+ my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
  my $prefix = $_[0];
 
  if ($prefix eq ""  )  { nprint "\n-->\tNikto Databases\n"; }
@@ -1255,27 +1241,6 @@ sub dbcheck
        foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
        nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
-   elsif ($file eq 'db_server_msgs') 
-     {
-       foreach $line (<IN>)
-         {
-           $line =~ s/^\s+//;
-           if ($line =~ /^\#/) { next; }
-           chomp($line);
-           if ($line eq "") { next; }
-           my @L=parse_csv($line);
-           if ($line !~ /^\".*\"\,\".*\"$/) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
-           if ($#L ne 1) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
-  
-           # test regex to look for errors
-           "test" =~ /$L[0]/;
-
-           $ENTRIES{"$L[0]"}++;
-         }
-
-          foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
-          nprint "\t" . keys(%ENTRIES) ." entries\n";
-     }
    elsif ($file eq 'db_variables') 
      {
        my $ctr=0;
@@ -1306,19 +1271,6 @@ sub dbcheck
        foreach $line (<IN>)
          {
            # not really any syntax to check
-           $ctr++;
-         }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_favicon')
-     {
-       my $ctr=0;
-       foreach $line (<IN>)
-         {
-           if ($line !~ /^\"/)  { next; }
-           chomp($line);
-           my @L=parse_csv($line);
-           if ($#L ne 1) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
         nprint "\t$ctr entries\n";
@@ -1628,61 +1580,58 @@ exit;
 ###############################################################################
 sub auth_guess
 {
- my ($realm, $checkid) = @_;
- my $successful=0;
- # check for 'broken' web server, returns a blank www-auth header no matter what the id/pw sent
- my $tid=LW2::utils_randstr();
- LW2::http_close(\%request);  # force-close any old connections
- LW2::auth_set("basic",\%request,$tid,$tid);
- $request{'whisker'}->{'http_eol'}=$http_eol;
- LW2::http_fixup_request(\%request);
- if ($CLI{pause} > 0) { sleep $CLI{pause}; }
- LW2::http_do_request_timeout(\%request,\%result); # test auth
- if ($result{'www-authenticate'} ne "")
-  {
-   foreach my $REALM (keys %REALMS)
-    {
-     if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq "") && ($result{'www-authenticate'} =~ /$REALMS{$REALM}{realm}/i))
-        { 
-		nprint("+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}"); 
-     		$TARGETS{$CURRENT_HOST_ID}{positives}{$REALMS{$REALM}{tid}}=1;
-            	$TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-	}
+   my ($realm, $checkid) = @_;
+   my $successful=0;
+   # check for 'broken' web server, returns a blank www-auth header no matter what the id/pw sent
+   my $tid=LW2::utils_randstr();
+   LW2::http_close(\%request);  # force-close any old connections
+   LW2::auth_set("basic",\%request,$tid,$tid);
+   $request{'whisker'}->{'http_eol'}=$http_eol;
+   LW2::http_fixup_request(\%request);
+   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   LW2::http_do_request_timeout(\%request,\%result); # test auth
+   if ($result{'www-authenticate'} ne "")
+   {
+      foreach my $REALM (keys %REALMS)
+      {
+         if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq "") && ($result{'www-authenticate'} =~ /$REALMS{$REALM}{realm}/i))
+         { 
+            add_vulnerability($CURRENT_HOST_ID, "+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid}); 
+         }
            
-     if (($result{'www-authenticate'} =~ /$REALMS{$REALM}{realm}/i) || ($REALMS{$REALM}{realm} eq "\@ANY"))
-        { 
-         my $realm_temp=$result{'www-authenticate'}; # grab name
-         LW2::http_close(\%request);  # force-close any old connections
-         LW2::auth_set("basic",\%request,$REALMS{$REALM}{id},$REALMS{$REALM}{pw});   # set auth
-	 $request{'whisker'}->{'http_eol'}=$http_eol;
-         LW2::http_fixup_request(\%request);
-         if ($CLI{pause} > 0) { sleep $CLI{pause}; }
-         LW2::http_do_request_timeout(\%request,\%result); # test auth
-         if ($result{'www-authenticate'} eq "")
-           { 
-            nprint("+ Default account found for '$realm' at $TESTS{$checkid}{uri} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}"); 
-     	    $TARGETS{$CURRENT_HOST_ID}{positives}{$REALMS{$REALM}{tid}}=1;
-            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-            #set auth stuff & run auth_check again
-            $NIKTO{hostid}=$REALMS{$REALM}{id};
-            $NIKTO{hostpw}=$REALMS{$REALM}{pw};
-            $result{'www-authenticate'}=$realm_temp; # set it back so auth_check properly checks it
-            auth_check();
-            # and lastly, redo the check
-            $successful=1;
-            (my $RES, $CONTENT) = fetch($TESTS{$checkid}{uri},$TESTS{$checkid}{method},$TESTS{$checkid}{data});
-            nprint("- $RES for $TESTS{$checkid}{method}:\t$request{whisker}{uri}","v");
-            last;
-           }
-        }
-    }
-  }
- else
-  { nprint "+ ERROR: Authorization is required, but bogus auth test appeared to work. Server is a bit whacked.\n"; }
- $REALMS_TESTED{$realm}=1;
- my $pa = $request{'Proxy-Authorization'};
- LW2::auth_unset(\%request);
- if ($pa ne '') { $request{'Proxy-Authorization'} = $pa; }
+         if (($result{'www-authenticate'} =~ /$REALMS{$REALM}{realm}/i) || ($REALMS{$REALM}{realm} eq "\@ANY"))
+         { 
+            my $realm_temp=$result{'www-authenticate'}; # grab name
+            LW2::http_close(\%request);  # force-close any old connections
+            LW2::auth_set("basic",\%request,$REALMS{$REALM}{id},$REALMS{$REALM}{pw});   # set auth
+            $request{'whisker'}->{'http_eol'}=$http_eol;
+            LW2::http_fixup_request(\%request);
+            if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+            LW2::http_do_request_timeout(\%request,\%result); # test auth
+            if ($result{'www-authenticate'} eq "")
+            { 
+               add_vulnerability($CURRENT_HOST_ID,"Default account found for '$realm' at $TESTS{$checkid}{uri} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0); 
+
+               #set auth stuff & run auth_check again
+               $NIKTO{hostid}=$REALMS{$REALM}{id};
+               $NIKTO{hostpw}=$REALMS{$REALM}{pw};
+               $result{'www-authenticate'}=$realm_temp; # set it back so auth_check properly checks it
+               auth_check();
+               # and lastly, redo the check
+               $successful=1;
+               (my $RES, $CONTENT) = fetch($TESTS{$checkid}{uri},$TESTS{$checkid}{method},$TESTS{$checkid}{data});
+               nprint("- $RES for $TESTS{$checkid}{method}:\t$request{whisker}{uri}","v");
+               last;
+            }
+         }
+      }
+   }
+   else
+   { nprint "+ ERROR: Authorization is required, but bogus auth test appeared to work. Server is a bit whacked.\n"; }
+   $REALMS_TESTED{$realm}=1;
+   my $pa = $request{'Proxy-Authorization'};
+   LW2::auth_unset(\%request);
+   if ($pa ne '') { $request{'Proxy-Authorization'} = $pa; }
 }
 ###############################################################################
 # auth_check
@@ -1690,37 +1639,37 @@ sub auth_guess
 ###############################################################################
 sub auth_check
 {
- my $REALM=$result{'www-authenticate'} || return;
- $REALM =~ s/^Basic //i;
- $REALM =~ s/realm=//i;
- if ($REALM eq "") { $REALM="unnamed"; }
+   my $REALM=$result{'www-authenticate'} || return;
+   $REALM =~ s/^Basic //i;
+   $REALM =~ s/realm=//i;
+   if ($REALM eq "") { $REALM="unnamed"; }
 
-if ($result{'www-authenticate'} !~ /basic|ntlm/i)   # doh, not basic!
- {
-  my $AUTHTYPE=$result{'www-authenticate'};
-  $AUTHTYPE =~ s/ .*$//;
-  nprint("+ ERROR: Host uses '$AUTHTYPE'");
-  return;
- }
-elsif ($NIKTO{hostid} eq "")
- {
-  nprint("+ ERROR: No auth credentials for $REALM, please set.");
-  return;
- }
-else
- {
-  nprint("- Attempting authorization to $REALM realm.","v");
-  LW2::auth_set("basic",\%request,$NIKTO{hostid},$NIKTO{hostpw},$NIKTO{hostdomain});   # set auth
-  LW2::http_fixup_request(\%request);
-  if ($CLI{pause} > 0) { sleep $CLI{pause}; }
-  $request{'whisker'}->{'http_eol'}=$http_eol;
-  LW2::http_do_request_timeout(\%request,\%result); # test auth
-  dump_var("Request Hash", \%request);
-  dump_var("Result Hash", \%result);
-  if ($result{'www-authenticate'} ne "")  { nprint("+ ERROR: Unable to authenticate to $REALM");  }
-  else { nprint("- Successfully authenticated to realm $REALM."); }
-  }
-return;
+   if ($result{'www-authenticate'} !~ /basic|ntlm/i)   # doh, not basic!
+   {
+      my $AUTHTYPE=$result{'www-authenticate'};
+      $AUTHTYPE =~ s/ .*$//;
+      nprint("+ ERROR: Host uses '$AUTHTYPE'");
+      return;
+   }
+   elsif ($NIKTO{hostid} eq "")
+   {
+      nprint("+ ERROR: No auth credentials for $REALM, please set.");
+      return;
+   }
+   else
+   {
+      nprint("- Attempting authorization to $REALM realm.","v");
+      LW2::auth_set("basic",\%request,$NIKTO{hostid},$NIKTO{hostpw},$NIKTO{hostdomain});   # set auth
+      LW2::http_fixup_request(\%request);
+      if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+      $request{'whisker'}->{'http_eol'}=$http_eol;
+      LW2::http_do_request_timeout(\%request,\%result); # test auth
+      dump_var("Request Hash", \%request);
+      dump_var("Result Hash", \%result);
+      if ($result{'www-authenticate'} ne "")  { nprint("+ ERROR: Unable to authenticate to $REALM");  }
+      else { nprint("- Successfully authenticated to realm $REALM."); }
+   }
+   return;
 }
 ###############################################################################
 # read_data ( prompt, mode )
@@ -1936,6 +1885,17 @@ sub fetch
     	$request{'whisker'}->{'data'} = $r;
   }
   
+ # check for extra HTTP headers
+ if (defined $_[3])
+ {
+    # define temporary hash due to more perl stupidity
+    my $header_hash=$_[3];
+    # loop through the hash ref passed and add each header to request
+    while (my($key, $value) = each(%$header_hash))
+    {
+       $request{'whisker'}->{$key}=$value;
+    }
+ } 
  $NIKTO{totalrequests}++;
  LW2::http_fixup_request(\%request);
  LW2::http_do_request_timeout(\%request,\%result);
@@ -2296,6 +2256,33 @@ sub initialise_db
       }
    }
    return \@dbarray;
+}
+#######################################################################
+sub add_vulnerability
+{
+   my $host=$_[0];
+   my $message=$_[1];
+   my $nikto_id=$_[2];
+   my $osvdb=$_[3];
+   my $method=$_[4];
+   my $uri=$_[5];
+   my $outmessage=$message;
+   my $resulthash={};
+
+   unless ($osvdb eq "")
+   {
+      $outmessage ="OSVDB-$osvdb: $message";
+   }
+   nprint("+ $outmessage"); 
+   %$resulthash = (
+      host => $host,
+      message => $message,
+      nikto_id => $nikto_id,
+      osvdb => $osvdb,
+      method => $method,
+      uri => $uri,
+   );
+   push(@RESULTS,$resulthash);
 }
    
 #######################################################################

@@ -52,21 +52,13 @@ sub nikto_httpoptions
 
    if ($allow_methods ne "")
    {
-      $TARGETS{$CURRENT_HOST_ID}{positives}{999990} = 1;
-      $TESTS{999990}{message}                       = "Allowed HTTP Methods: $allow_methods $txt";
-      $TESTS{999990}{osvdb}                         = 0;
-      $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-      nprint("- $TESTS{999990}{message}");
+      add_vulnerability($CURRENT_HOST_ID,"Allowed HTTP Methods: $allow_methods $txt",999990,0);
       foreach my $m (split /,? /, $allow_methods) { eval_methods($m, "Allow", $dbarray); }
    }
 
    if ($public_methods ne "")
    {
-      $TESTS{999985}{message}                       = "Public HTTP Methods: $public_methods $txt";
-      $TESTS{999985}{osvdb}                         = 0;
-      $TARGETS{$CURRENT_HOST_ID}{positives}{999985} = 1;
-      $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-      nprint("- $TESTS{999985}{message}");
+      add_vulnerability($CURRENT_HOST_ID,"Public HTTP Methods: $public_methods $txt",999985,0);
       foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public", $dbarray); }
    }
  
@@ -80,6 +72,7 @@ sub eval_methods
    my $method = $_[0] || return;
    my $type = $_[1];
    my $dbarray = $_[2];
+   my $message;
    $method = uc($method);
 
    # Now search database for the method.
@@ -87,12 +80,9 @@ sub eval_methods
    {
       if ($item->{method} eq $method)
       {
-         $TESTS{$item->{nikto_id}}{message} = $item->{message};
-         $TESTS{$item->{nikto_id}}{message} =~ s/\@TYPE\@/$type/;
-         $TESTS{$item->{nikto_id}}{osvdb} = $item->{osvdb};
-         nprint("+ OSVDB-$item->{osvdb}: $TESTS{$item->{nikto_id}}{message}");
-         $TARGETS{$CURRENT_HOST_ID}{positives}{$item->{nikto_id}} = 1;
-         $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+         $message = $item->{message};
+         $message =~ s/\@TYPE\@/$type/;
+         add_vulnerability($CURRENT_HOST_ID,"$message",$item->{nikto_id},$item->{osvdb});
       }
    }
 }

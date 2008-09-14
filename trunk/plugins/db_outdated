@@ -913,7 +913,7 @@
 "600902","Yaws/","2.49.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600903","z_VM/","4.4.0.0000","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600904","Zend-LaunchPad/","1.0.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600905","Zeus/","4_3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600905","Zeus/","4.3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600906","Zope/","Zope/2.10.4","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600907","ZOT-PS-15/","6.8.0104","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600908","ZOT-PS-30/","8.2.0004","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"

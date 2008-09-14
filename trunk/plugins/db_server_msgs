@@ -9,6 +9,7 @@
 # By sending any database updates to CIRT, Inc., it is assumed that you
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
 
+"nikto_id","server","message"
 "800000","4D_WebSTAR_S\/5\.([0-2]|3\.[0-2])","May be vulnerable to multiple flaws. http://secunia.com/advisories/12063/"
 "800001","4D_WebSTAR_S\/5\.([0-2]|3\.[01])","May be vulnerable to denial of service threw openssl implementation bug. http://secunia.com/advisories/11181/"
 "800002","4D_WebSTAR_S\/5\.([0-3]|4[^.])","May be vulnerable to a buffer overflow in tomcat plugin URL. http://secunia.com/advisories/15278/"

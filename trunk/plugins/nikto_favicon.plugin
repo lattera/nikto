@@ -39,11 +39,7 @@ sub nikto_favicon
       {
          if ($item->{md5hash} eq $hash)
          {
-            $TESTS{$item->{nikto_id}}{message} = "/favicon.ico file identifies this server as: $item->{description}";
-            nprint("+ OSVDB-39272: $TESTS{$item->{nikto_id}}{message}");
-            $TARGETS{$CURRENT_HOST_ID}{positives}{$item->{nikto_id}} = 1;
-            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
-            $TESTS{$item->{nikto_id}}{osvdb}   = 39272;
+            add_vulnerability($CURRENT_HOST_ID, "/favicon.ico file identifies this server as: $item->{description}", $item->{nikto_id}, 39272);
          }
       }
    }

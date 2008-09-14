@@ -145,17 +145,17 @@ sub proc_template
     {
         my $template_orig  = $template;
         my $template_final = "";
-        foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
+        foreach my $item (@RESULTS)
         {
-            if ($TESTS{$p}{uri} ne '') { next; }
-            my $OSVDB = $TESTS{$p}{osvdb};
-            if (($OSVDB eq '') && ($TESTS{$p}{message} =~ /^OSVDB-([0-9]+):/)) { $OSVDB = $1; }
+            unless($item->{host} == $CURRENT_HOST_ID) { next; }
+            if ($item->{uri} ne '') { next; }
+            my $OSVDB = $item->{osvdb};
             if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
             $OSVDB_LINK = "http://osvdb.org/$OSVDB";
-            $template =~ s/\#TEMPL_SMMSG/$TESTS{$p}{message}/;
+            $template =~ s/\#TEMPL_SMMSG/$item->{message}/;
             $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
             $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
-            $template =~ s/\#ID/$p/;
+            $template =~ s/\#ID/$item->{nikto_id}/;
             $template_final .= $template;
             $template = $template_orig;
         }
@@ -167,15 +167,16 @@ sub proc_template
     {
         my $template_orig  = $template;
         my $template_final = "";
-        foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
+        foreach my $item (@RESULTS)
         {
-            if ($TESTS{$p}{uri} eq '') { next; }
-            foreach my $uri (split(' ',$TARGETS{$CURRENT_HOST_ID}{$p}{uri}))
+            unless($item->{host} == $CURRENT_HOST_ID) { next; }
+            if ($item->{uri} eq '') { next; }
+            foreach my $uri (split(' ',$item->{uri}))
             {
-               $TESTS{$p}{uri}                  = simple_enc($TESTS{$p}{uri});
+               $item->{uri}                     = simple_enc($item->{uri});
                $variables{"#TEMPL_URI"}         = $uri;
-               $variables{"#TEMPL_MSG"}         = $TESTS{$p}{message};
-               $variables{"#TEMPL_HTTP_METHOD"} = $TESTS{$p}{method};
+               $variables{"#TEMPL_MSG"}         = $item->{message};
+               $variables{"#TEMPL_HTTP_METHOD"} = $item->{method};
    
                $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$CURRENT_PORT$variables{\"#TEMPL_URI\"}";
                if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
@@ -189,7 +190,7 @@ sub proc_template
    
                $OSVDB      = "";
                $OSVDB_LINK = "";
-               foreach my $o (split(/ /, $TESTS{$p}{osvdb}))
+               foreach my $o (split(/ /, $item->{osvdb}))
                {
                    if ($o eq "")
                    {
@@ -202,7 +203,7 @@ sub proc_template
    
                $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
                $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
-               $template =~ s/\#ID/$p/;
+               $template =~ s/\#ID/$item->{nikto_id}/;
    
                foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
                $template_final .= $template;

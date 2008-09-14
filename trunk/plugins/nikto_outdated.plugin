@@ -97,10 +97,7 @@ sub nikto_outdated
                     $msg =~ s/\@RUNNING_VER/$BI/g;
                     $msg =~ s/\@CURRENT_VER/$v/g;
                     chomp($msg);
-                    nprint("+ $msg");
-                    $TESTS{ $OVERS{$V}{tid} }{message} = $msg;
-                    $TARGETS{$CURRENT_HOST_ID}{positives}{ $OVERS{$V}{tid} } = 1;
-                    $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+                    add_vulnerability($CURRENT_HOST_ID, $msg, $OVERS{$V}{tid});
                 }
             }
         }

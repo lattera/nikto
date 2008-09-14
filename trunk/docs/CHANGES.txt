@@ -1,3 +1,11 @@
+2008-09-14 plugins/db_server_msgs plugins/nikto_*.plugin
+	- Update server messages to dynamic database format
+	- Altered all plugins to use a separate RESULTS array for storing
+	  results; meaning that it is easier to abstract
+	- Added add_vulnerability method to nikto_core to report
+	  vulnerabilities and reduce code size.
+	- Added ability to add an extra hash to fetch() to allow extra headers
+	  to be added.
 2008-09-12 plugins/nikto_core.plugin plugins/nikto_httpoptions.plugin
 plugins/db_httpoptions plugins/nikto_favicon plugins/db_favicon
 	- Fix for ticket #38: httpoptions are drawn from a database
