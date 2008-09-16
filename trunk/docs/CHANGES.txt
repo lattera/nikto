@@ -1,3 +1,7 @@
+2008-09-16 plugins/nikto_core.plugin plugins/nikto_httpoptions.plugin
+	- Fix for ticket #37
+	- Allow fetch to optionally call LW2::http_fixup_request
+	- Better handling of extra headers within fetch
 2008-09-14 plugins/db_server_msgs plugins/nikto_*.plugin
 	- Update server messages to dynamic database format
 	- Altered all plugins to use a separate RESULTS array for storing

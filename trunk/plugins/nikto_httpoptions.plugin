@@ -61,6 +61,24 @@ sub nikto_httpoptions
       add_vulnerability($CURRENT_HOST_ID,"Public HTTP Methods: $public_methods $txt",999985,0);
       foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public", $dbarray); }
    }
+
+   # Check for other weirdness
+   # IIS PROPFIND HEADER
+   my %headers=(
+      "Host" => "",
+      "Content-Length" => "0",
+   );
+   ($RES, $CONTENT) = fetch("/","PROPFIND","",\%headers,1);
+   if ($RES == 207)
+   {
+      if ($CONTENT =~ "<a:href>http://")
+      {
+         my $ipfound=$CONTENT;
+         $ipfound =~ s/^.*<a:href>//g;
+         $ipfound =~ s/<\/a:href>.*$//g;
+         add_vulnerability($CURRENT_HOST_ID,"PROPFIND may show the server's internal IP address: $ipfound",999973,13431);
+      }
+   } 
  
    # Now release memory for the dbarray
    undef @$dbarray;

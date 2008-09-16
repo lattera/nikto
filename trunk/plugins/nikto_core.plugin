@@ -1877,6 +1877,7 @@ sub fetch
  delete $request{'whisker'}->{'data'};
  delete $request{'Content-Encoding'};
  delete $request{'Content-Length'};
+ my $header_hash=$_[3];
 
  if ($_[2] ne "")
   { 
@@ -1888,16 +1889,14 @@ sub fetch
  # check for extra HTTP headers
  if (defined $_[3])
  {
-    # define temporary hash due to more perl stupidity
-    my $header_hash=$_[3];
     # loop through the hash ref passed and add each header to request
     while (my($key, $value) = each(%$header_hash))
     {
-       $request{'whisker'}->{$key}=$value;
+       $request{$key}=$value;
     }
  } 
  $NIKTO{totalrequests}++;
- LW2::http_fixup_request(\%request);
+ unless ($_[4]) { LW2::http_fixup_request(\%request); }
  LW2::http_do_request_timeout(\%request,\%result);
  dump_var("Request Hash", \%request);
  dump_var("Result Hash", \%result);
@@ -1910,6 +1909,14 @@ sub fetch
     }
   }
 
+ # Clean up extra headers
+ if (defined $_[3])
+ {
+    while (my($key, $value) = each(%$header_hash))
+    {
+       delete $request{$key};
+    }
+ }
  return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
 }
 #######################################################################

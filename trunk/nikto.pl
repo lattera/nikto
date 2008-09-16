@@ -162,7 +162,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     }
 }
 
-nprint("+ %COUNTERS{host_total} host(s) tested");
+nprint("+ $COUNTERS{hosts_total} host(s) tested");
 send_updates();
 close_output();
 nprint("T:" . localtime() . ": Ending", "d");
