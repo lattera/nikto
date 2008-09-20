@@ -83,7 +83,7 @@ LW2::http_init_request(\%request);
 $request{'whisker'}->{'ssl_save_info'}              = 1;
 $request{'whisker'}->{'lowercase_incoming_headers'} = 1;
 $request{'whisker'}->{'timeout'}                    = $CLI{timeout} || 10;
-if ($CLI{evasion} ne "") { $request{'whisker'}->{'encode_anti_ids'} = $CLI{evasion}; }
+if (defined $CLI{evasion}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{evasion}; }
 $request{'User-Agent'} = $NIKTO{useragent};
 $request{'whisker'}->{'retry'} = 0;
 proxy_setup();
@@ -125,14 +125,14 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
     }
     else {
         $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
-        if ($TARGETS{$CURRENT_HOST_ID}{vhost} ne '') { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
+        if (defined $TARGETS{$CURRENT_HOST_ID}{vhost}) { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
         foreach $CURRENT_PORT (keys %{$TARGETS{$CURRENT_HOST_ID}{ports}})
         {
             if ($CURRENT_PORT eq "") { next; }
             $request{'whisker'}->{'port'}    = $CURRENT_PORT;
             $request{'whisker'}->{'ssl'}     = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl};
             $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};
-            if ($NIKTOCONFIG{'STATIC-COOKIE'} ne "") { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
+            if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
             $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
             delete $TARGETS{$CURRENT_HOST_ID}{positives};
             %FoF = ();
@@ -191,7 +191,7 @@ sub load_configs
     }
 
     # add CONFIG{CLIOPTS} to ARGV if defined...
-    if ($NIKTOCONFIG{CLIOPTS} ne "")
+    if (defined $NIKTOCONFIG{CLIOPTS})
     {
         my @t = split(/ /, $NIKTOCONFIG{CLIOPTS});
         foreach my $c (@t) { push(@ARGV, $c); }
@@ -205,14 +205,14 @@ sub find_plugins
 
     # get the correct path to 'plugins'
     # if defined in config.txt file... most accurate, we hope
-    if (($NIKTOCONFIG{EXECDIR} ne "") && (-d "$NIKTOCONFIG{EXECDIR}/plugins"))
+    if ((defined $NIKTOCONFIG{EXECDIR}) && (-d "$NIKTOCONFIG{EXECDIR}/plugins"))
     {
         $NIKTO{execdir}     = $NIKTOCONFIG{EXECDIR};
         $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
         $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
     }
 
-    if ($NIKTO{execdir} eq "")
+    unless (defined $NIKTO{execdir})
     {    # try pwd
         if (-d "$ENV{PWD}/plugins")
         {

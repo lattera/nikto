@@ -214,17 +214,19 @@ sub nprint
  my $line=$_[0];
  chomp($line);
  # don't print debug & verbose to output file...
- if ($_[1] eq "d")
- 	{ 
- 		if ($OUTPUT{debug}) { print "D:" . localtime() . " $line\n"; }
- 	 	return;
- 	}
- elsif ($_[1] eq "v")
- 	{ 
- 		if ($OUTPUT{verbose}) { print "V:" . localtime() . " $line\n"; }
- 	 	return;
- 	}
- 
+ if (defined $_[1])
+ {
+    if ($_[1] eq "d")
+    { 
+       if ($OUTPUT{debug}) { print "D:" . localtime() . " $line\n"; }
+       return;
+    }
+    elsif ($_[1] eq "v")
+    { 
+       if ($OUTPUT{verbose}) { print "V:" . localtime() . " $line\n"; }
+       return;
+    }
+ } 
  # print errors to STDERR
  if ($line =~ /ERROR\:/) { print STDERR "$line\n"; }
 
@@ -323,7 +325,7 @@ sub map_codes
  if ($CLI{pause} > 0) { sleep $CLI{pause}; }
  LW2::http_do_request_timeout(\%request,\%result);
  dump_var("Result Hash", \%result);
- if ($result{location} ne "") 
+ if (defined $result{location}) 
   { 
    nprint("- Root page / redirects to: $result{location}");
     if ($result{location} =~ /^$request{'whisker'}{'host'}/i) # same host
@@ -392,7 +394,7 @@ sub map_codes
 
    $ext=$REQS{$file};
    $FoF{$ext}{response} = $result{'whisker'}->{'code'};
-   if ($result{location} ne "") 
+   if (defined $result{location}) 
      { 
 	$FoF{$ext}{location} = $result{location};
 	$file=char_escape($file);
@@ -491,7 +493,7 @@ sub rm_active_content
  # Advertising
  
  # URI, if provided, plus encoded versions of it
- if ($_[1] ne '') 
+ if (defined $_[1]) 
 	{ 
 		my $e = $_[1];
 
@@ -559,14 +561,20 @@ sub dump_target_info
 
  nprint("+ Target Hostname:    $TARGETS{$CURRENT_HOST_ID}{hostname}"); 
  nprint("+ Target Port:        $CURRENT_PORT");
- if (($CLI{vhost} ne $TARGETS{$CURRENT_HOST_ID}{hostname}) && ($CLI{vhost} ne ""))
+ if ((defined $CLI{vhost}) && ($CLI{vhost} ne $TARGETS{$CURRENT_HOST_ID}{hostname}))
      { nprint("+ Virtual Host:   $CLI{vhost}"); }
- if ($request{'whisker'}->{'proxy_host'} ne "") 
+ if (defined $request{'whisker'}->{'proxy_host'}) 
      { nprint("- Proxy:       $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); }
- if ($NIKTO{hostid} ne "") { nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); }
+ if (defined $NIKTO{hostid}) { nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); }
  if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { nprint($SSLPRINT); }
- for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { if ($CLI{evasion} =~ /$i/) { nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); }}
- for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { if ($CLI{mutate} =~ /$i/) { nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); }}
+ if (defined $NIKTO{anti_ids} && defined $CLI{evasion})
+ {
+    for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { if ($CLI{evasion} =~ /$i/) { nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); }}
+ }
+ if (defined $NIKTO{mutate_opts} && defined $CLI{mutate})
+ {
+    for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { if ($CLI{mutate} =~ /$i/) { nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); }}
+ }
  nprint("+ Start Time:         $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp}");
  nprint($DIV);
  
@@ -758,20 +766,29 @@ sub general_config
  if ($CLI{format} =~ /xml/i and !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
 
  # screen output
- if ($CLI{display} =~ /d/i)  { $OUTPUT{debug}=1; }
- if ($CLI{display} =~ /v/i)  { $OUTPUT{verbose}=1; }
+ if (defined $CLI{display})
+ {
+    if ($CLI{display} =~ /d/i)  { $OUTPUT{debug}=1; }
+    if ($CLI{display} =~ /v/i)  { $OUTPUT{verbose}=1; }
+ }
  
  # port(s)
- $CLI{ports}=~s/^\s+//;
- $CLI{ports}=~s/\s+$//;
- #if ($CLI{ports} eq "") { $CLI{ports}=80; }
- if ($CLI{ports} =~ /[^0-9\-\, ]/) { nprint("+ ERROR: Invalid port option '$CLI{ports}'"); exit; }
+ if (defined $CLI{ports})
+ {
+    $CLI{ports}=~s/^\s+//;
+    $CLI{ports}=~s/\s+$//;
+    #if ($CLI{ports} eq "") { $CLI{ports}=80; }
+    if ($CLI{ports} =~ /[^0-9\-\, ]/) { nprint("+ ERROR: Invalid port option '$CLI{ports}'"); exit; }
+ }
 
  # Fixup
- $CLI{root} =~ s/\/$//;
- if (($CLI{root} !~ /^\//) && ($CLI{root} ne "")) { $CLI{root} = "/$CLI{root}"; }
+ if (defined $CLI{root})
+ {
+    $CLI{root} =~ s/\/$//;
+    if (($CLI{root} !~ /^\//) && ($CLI{root} ne "")) { $CLI{root} = "/$CLI{root}"; }
+ }
 
- if ($CLI{hostauth} ne "")
+ if (defined $CLI{hostauth})
  {
   my @x=split(/:/,$CLI{hostauth});
   if (($#x ne 1) || ($x[0] eq ""))
@@ -780,16 +797,20 @@ sub general_config
   $NIKTO{hostpw}     = $x[1];
   $NIKTO{hostdomain} = $x[2];
  } 
- $CLI{evasion}=~s/[^0-9]//g;
 
- $NIKTO{useragent}="Mozilla/4.75 ($NIKTO{name}/$NIKTO{version} $request{'User-Agent'})";
+ if (defined $CLI{evasion})
+ {
+    $CLI{evasion}=~s/[^0-9]//g;
+ }
+
+ $NIKTO{useragent}="Mozilla/4.75 ($NIKTO{name}/$NIKTO{version})";
  
  # SSL Test
  if (!LW2::ssl_is_available()) { nprint("- ***** SSL support not available (see docs for SSL install instructions) *****"); }
  
  # Notices
- my $notice;
- if ($CLI{root} ne '') 
+ my $notice="";
+ if (defined $CLI{root}) 
    { $notice .= "Prepending '$CLI{root}' to requests"; }
  if ($CLI{pause} > 0) 
    { $notice .= ", Pausing $CLI{pause} seconds per request"; }
@@ -916,7 +937,7 @@ sub set_targets
          if ($nmap eq 1)
          {
             # First get the host name
-            my $host, $ip;
+            my ($host, $ip);
             my @line=split(/ /);
             my @name=split(/\(|\)/, $line[2]);
             if (!$name[1]) { $name[1]=$line[1]; }
@@ -1003,9 +1024,11 @@ sub set_targets
                 $TARGETS{$host_ctr}{ident} = $_;
             }
             
-            if ($CLI{vhost} ne '') { $TARGETS{$host_ctr}{vhost}=$CLI{vhost}; }
-            nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:vhost:$$TARGETS{$host_ctr}{vhost}=$CLI{vhost}:","d");
-
+            if (defined $CLI{vhost})
+            {
+               $TARGETS{$host_ctr}{vhost}=$CLI{vhost};
+               nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:vhost:$$TARGETS{$host_ctr}{vhost}=$CLI{vhost}:","d");
+            }
             nprint(
                 "- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:","d"
                 );
@@ -1102,6 +1125,11 @@ sub load_databases
 {
  my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
  my $prefix = $_[0];
+
+ unless (defined $prefix)
+ {
+    $prefix="";
+ }
 
  # verify required files
  for my $file (@dbs) 
@@ -1777,7 +1805,7 @@ sub proxy_check
  $request{'whisker'}->{'method'}="HEAD";
  $request{'whisker'}->{'uri'}="/";
 
- if ($request{'whisker'}->{'proxy_host'} ne "")  # proxy is set up
+ if (defined $request{'whisker'}->{'proxy_host'})  # proxy is set up
  {
   LW2::http_close(\%request);  # force-close any old connections
   $request{'whisker'}->{'http_eol'}=$http_eol;
@@ -1829,14 +1857,14 @@ sub dirlist
  my $PATTERN=$_[1] || "";
  my @FILES_TMP = ();
 
- opendir(directory,$DIR) || die print STDERR "+ ERROR: Can't open directory '$DIR': $@";
- foreach my $file (readdir(directory))
+ opendir(DIRECTORY,$DIR) || die print STDERR "+ ERROR: Can't open directory '$DIR': $@";
+ foreach my $file (readdir(DIRECTORY))
   {
    if ($file =~ /^\./)    { next; } # skip hidden files, '.' and '..'
    if ($PATTERN ne "") { if ($file =~ /$PATTERN/) { push (@FILES_TMP,$file); } }
    else { push (@FILES_TMP,$file); }
    }
-closedir(directory);
+closedir(DIRECTORY);
  
 return @FILES_TMP;
 }
@@ -1854,14 +1882,14 @@ sub dump_var
 ######################################################################
 sub content_present
 {
-   my $result=false;
+   my $result=FALSE;
    my $res=$_[0];
 
    foreach $found (split(' ', $VARIABLES{"\@HTTPFOUND"}))
    {
       if ($res eq $found)
       {
-         $result=true;
+         $result=TRUE;
       }
    }
    return $result;
@@ -1871,7 +1899,10 @@ sub fetch
 {
  if ($CLI{pause} > 0) { sleep $CLI{pause}; }
  LW2::http_close(\%request);  # force-close any old connections
- $request{'whisker'}->{'uri'}    = $CLI{root} . $_[0];   # prepend -root option value
+ if (defined $CLI{root})
+ {
+    $request{'whisker'}->{'uri'}    = $CLI{root} . $_[0];   # prepend -root option value
+ }
  $request{'whisker'}->{'method'} = $_[1];
  $request{'whisker'}->{'http_eol'}=$http_eol;
  delete $request{'whisker'}->{'data'};
@@ -1879,7 +1910,7 @@ sub fetch
  delete $request{'Content-Length'};
  my $header_hash=$_[3];
 
- if ($_[2] ne "")
+ if (defined $_[2])
   { 
 	my $r=$_[2];
     	$r =~ s/\\\"/\"/g; 
@@ -1926,7 +1957,11 @@ sub set_scan_items
  my $shname=$TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
  %TESTS = ();
  $TARGETS{$CURRENT_HOST_ID}{total_checks}=0;
- my @SKIPLIST = split(/ /,$NIKTOCONFIG{SKIPIDS});
+ my @SKIPLIST=();
+ if (defined $NIKTOCONFIG{SKIPIDS})
+ {
+    @SKIPLIST = split(/ /,$NIKTOCONFIG{SKIPIDS});
+ }
   
  # now load checks
  foreach my $line (@DBFILE)
@@ -1941,7 +1976,7 @@ sub set_scan_items
    my $add=1;
      
    # check tuning options
-   if (($CLI{tuning} ne "") && ($item[2] ne ""))
+   if ((defined $CLI{tuning}) && (defined $item[2]))
      {
       if ($CLI{tuning} =~ /x/)
          {
@@ -2257,7 +2292,7 @@ sub initialise_db
          my $hashref={};
          for (my $i=0; $i<=$#contents; $i++)
          {
-            $hashref->{@headers[$i]} = @contents[$i];
+            $hashref->{$headers[$i]} = $contents[$i];
          }
          push(@dbarray, $hashref);
       }

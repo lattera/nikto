@@ -1,3 +1,5 @@
+2008-09-20 plugins/nikto_core.plugin plugins/nikto_cgi.plugin nikto.pl
+	- Fixes to ensure nikto produces less perl warnings
 2008-09-16 plugins/nikto_core.plugin plugins/nikto_httpoptions.plugin
 	- Fix for ticket #37
 	- Allow fetch to optionally call LW2::http_fixup_request

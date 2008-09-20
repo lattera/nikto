@@ -52,7 +52,7 @@ sub nikto_cgi
       {
          ($res, $CONTENT)=fetch($possiblecgidir,"GET");
          nprint("Checked for CGI dir\t$possiblecgidir\tgot:$res","d");
-         if (content_present($res) eq true)
+         if (content_present($res) eq TRUE)
          {
             $gotvalid++; 
             push(@POSSIBLECGI,$possiblecgidir);
