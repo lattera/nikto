@@ -58,5 +58,3 @@ CIRT=209.172.49.178
 # an HTTP(s) server is running. Some web servers, such as the autopsy web
 # server do not implement the HEAD method
 CHECKMETHODS=HEAD GET
-
-CLIOPTS=-Format html -output report.html
