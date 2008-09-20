@@ -116,6 +116,11 @@ sub proc_template
     $variables{"#TEMPL_HCTR"}               = $NIKTO{TEMPL_HCTR};
     $variables{"#TEMPL_END"}                = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp};
     $variables{"#TEMPL_HOSTNAME"}           = simple_enc($TARGETS{$CURRENT_HOST_ID}{hostname});
+    $variables{"#TEMPL_HOST_HEADER"}        = $TARGETS{$CURRENT_HOST_ID}{hostname};
+    if (defined $TARGETS{$CURRENT_HOST_ID}{vhost})
+    {
+       $variables{"#TEMPL_HOST_HEADER"}     = $TARGETS{$CURRENT_HOST_ID}{vhost};
+    }
     $variables{"#TEMPL_IP"}                 = simple_enc($TARGETS{$CURRENT_HOST_ID}{ip});
     $variables{"#TEMPL_ITEMS_TESTED"}       = $TARGETS{$CURRENT_HOST_ID}{total_checks};
     $variables{"#TEMPL_PORT"}               = $CURRENT_PORT;

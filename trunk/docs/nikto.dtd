@@ -16,6 +16,7 @@
 <!ATTLIST scandetails siteip CDATA #REQUIRED>
 <!ATTLIST scandetails itemstested CDATA #REQUIRED>
 <!ATTLIST scandetails itemsfound CDATA #REQUIRED>
+<!ATTLIST scandetails hostheader CDATA>
 
 <!ELEMENT item (description,uri?,namelink?,iplink?)>
 <!ATTLIST item id CDATA #REQUIRED>

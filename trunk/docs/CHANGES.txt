@@ -1,5 +1,8 @@
 2008-09-20 plugins/nikto_core.plugin plugins/nikto_cgi.plugin nikto.pl
+           plugins/nikto_reports.plugin templates/xml_host_head.tmpl
+	   docs/nikto.dtd
 	- Fixes to ensure nikto produces less perl warnings
+	- Fix for ticket #59: add vhost to xml output
 2008-09-16 plugins/nikto_core.plugin plugins/nikto_httpoptions.plugin
 	- Fix for ticket #37
 	- Allow fetch to optionally call LW2::http_fixup_request
