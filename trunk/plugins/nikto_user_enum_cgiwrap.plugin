@@ -30,6 +30,19 @@
 # this plugin is a hack of nikto_apacheusers.plugin, which was originally written by
 # Javier Fernandez-Sanguino Pe–a.
 ###############################################################################
+sub nikto_user_enum_cgiwrap_init
+{
+   my $id =
+   {
+      name         => "user_enum_cgiwrap",
+      full_name    => "Enumerate Usernames via cgiwrap",
+      author       => "Javier Fenandez-Sanguino Pena",
+      description  => "Attempts to enumerate usernames by guessing through cgiwrap.",
+      scan_method  => \&nikto_user_enum_cgiwrap,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_user_enum_cgiwrap
 {

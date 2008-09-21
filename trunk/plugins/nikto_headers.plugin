@@ -23,6 +23,19 @@
 # PURPOSE
 # General HTTP headers checks
 ###############################################################################
+sub nikto_headers_init
+{
+   my $id =
+   {
+      name         => "headers",
+      full_name    => "HTTP Headers",
+      author       => "Sullo",
+      description  => "Performs various checks against the headers returned from a HTTP request.",
+      scan_method  => \&nikto_headers,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_headers
 {

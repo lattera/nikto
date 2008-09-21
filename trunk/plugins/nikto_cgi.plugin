@@ -23,6 +23,19 @@
 # PURPOSE
 # Perform CGI tests
 ###############################################################################
+sub nikto_cgi_init
+{
+   my $id =
+   {
+      name         => "cgi",
+      full_name    => "CGI",
+      author       => "Sullo",
+      description  => "Enumerates possible CGI directories.",
+      recon_method => \&nikto_cgi,
+      copyright    => "2008 CIRT Inc.",
+   };
+   return $id;
+}
 
 sub nikto_cgi
 {

@@ -30,6 +30,19 @@
 # (which could later on be used for a ssh brute-force attack).
 # This plugin was originally written by Javier Fernandez-Sanguino Pe–a
 ###############################################################################
+sub nikto_user_enum_apache_init
+{
+   my $id =
+   {
+      name         => "user_enum_apache",
+      full_name    => "Apache User Enumeration",
+      author       => "Javier Fernandez-Sanguinoi Pena",
+      description  => "Attempts to enumerate usernames by guessing usernames.",
+      scan_method  => \&nikto_user_enum_apache,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_user_enum_apache
 {

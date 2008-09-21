@@ -23,6 +23,19 @@
 # PURPOSE
 # Try put and then delete a file
 ###############################################################################
+sub nikto_put_del_test_init
+{
+   my $id =
+   {
+      name         => "put_del_test",
+      full_name    => "Put/Delete test",
+      author       => "Sullo",
+      description  => "Attempts to upload and delete files through the PUT and DELETE HTTP methods.",
+      scan_method  => \&nikto_put_del_test,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_put_del_test
 {

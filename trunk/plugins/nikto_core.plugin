@@ -1439,38 +1439,74 @@ sub port_check
  return;
 }
 
+sub load_plugins
+{
+   my @pluginlist=dirlist("$NIKTO{plugindir}",'\.plugin$');
+
+   foreach my $plugin (@pluginlist)
+   {
+      my $plugin_name = $plugin;
+      $plugin_name =~ s/\.plugin$//;
+      my $plugin_init = $plugin_name . "_init";
+      eval {
+         require "$NIKTO{plugindir}/$plugin";
+      };
+      if ($@)
+      {
+         nprint("- Could not load or parse plugin: $plugin_name\n Error: ");
+         warn $@;
+         nprint("- The plugin could not be run.");
+      }
+      else
+      {
+         nprint("- Initialising plugin $plugin_name","v");
+         # Call initialisation method
+         if (defined &$plugin_init)
+         {
+            my $pluginhash=&$plugin_init;
+            # Add default weights if not already assigned
+            $pluginhash->{recon_weight}=50 unless (defined $pluginhash->{recon_weight});
+            $pluginhash->{scan_weight}=50 unless (defined $pluginhash->{scan_weight});
+            push(@PLUGINS, $pluginhash);
+            nprint("- Loaded \"$pluginhash->{full_name}\" plugin.","v");
+         }
+      }
+   }
+}
+
 ###############################################################################
 # this is ugly, and potentially dangerous if untrusted plugins are present
 ###############################################################################
 sub run_plugins
 {
- open(ORDERFILE,"<$NIKTO{plugindir}/nikto_plugin_order.txt");
- my @ORDER=<ORDERFILE>;
- close(ORDERFILE);
- 
- foreach my $pluginf (@ORDER)
- {
-  if ($pluginf =~ /^\#/) { next; }
-  chomp($pluginf);
-  $pluginf =~ s/\s+//;
-  if ($pluginf eq "") { next; }
-  eval {
-    require "$NIKTO{plugindir}/$pluginf\.plugin";
-   };
-  if ($@) 
-   { 
-    nprint("- Could not load or parse plugin: $pluginf\.plugin\nError: ","");
-    warn $@; 
-    nprint("- The plugin could not be run.","");
-   }
-  else
+   nprint("- Entering recon phase","v");
+   # This is a frig until I can think of a better way of achieving it
+   foreach my $i (1..100)
    {
-    nprint("- Calling plugin: $pluginf\.plugin","d");
-    # just call it...hope it works...taint doesn't like this very much for obvious reasons
-    &$pluginf;
+      foreach my $plugin (@PLUGINS)
+      {
+         if (defined $plugin->{recon_method} && $plugin->{recon_weight} == $i)
+         {
+            nprint("- Running recon for \"$plugin->{full_name}\" plugin","v");
+            &{$plugin->{recon_method}};
+         }
+      }
    }
- }
-return;
+
+   nprint("- Entering scan phase","v");
+   # This is a frig until I can think of a better way of achieving it
+   foreach my $i (1..100)
+   {
+      foreach my $plugin (@PLUGINS)
+      {
+         if (defined $plugin->{scan_method} && $plugin->{scan_weight} == $i)
+         {
+            nprint("- Running scan for \"$plugin->{full_name}\" plugin","v");
+            &{$plugin->{scan_method}};
+         }
+      }
+   }
+   return;
 }
 ###############################################################################
 sub check_updates
@@ -1899,6 +1935,7 @@ sub fetch
 {
  if ($CLI{pause} > 0) { sleep $CLI{pause}; }
  LW2::http_close(\%request);  # force-close any old connections
+ $request{'whisker'}->{'uri'} = $_[0];
  if (defined $CLI{root})
  {
     $request{'whisker'}->{'uri'}    = $CLI{root} . $_[0];   # prepend -root option value
@@ -2324,6 +2361,7 @@ sub add_vulnerability
       method => $method,
       uri => $uri,
    );
+   $TARGETS{$host}{total_vulns}++;
    push(@RESULTS,$resulthash);
 }
    

@@ -23,7 +23,19 @@
 # PURPOSE
 # HTTP options check
 ###############################################################################
-
+sub nikto_httpoptions_init
+{
+   my $id =
+   {
+      name         => "httpoptions",
+      full_name    => "HTTP Options",
+      author       => "Sullo",
+      description  => "Performs a variety of checks against the HTTP options returned from the server.",
+      scan_method  => \&nikto_httpoptions,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 # This just gets the HTTP options & checks 'em out.
 # See RFC 2626 for more info...
 

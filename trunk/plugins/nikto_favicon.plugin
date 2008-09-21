@@ -23,6 +23,19 @@
 # PURPOSE
 # Get a favicon.ico file & MD5 fingerprint
 ###############################################################################
+sub nikto_favicon_init
+{
+   my $id =
+   {
+      name         => "favicon",
+      full_name    => "Favicon",
+      author       => "Sullo",
+      description  => "Checks the web server's favicon against known favicons.",
+      copyright    => "2008 CIRT Inc.",
+      scan_method  => \&nikto_favicon,
+   };
+   return $id;
+}
 
 sub nikto_favicon
 {

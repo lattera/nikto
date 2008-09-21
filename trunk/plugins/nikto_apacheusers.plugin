@@ -23,6 +23,19 @@
 # PURPOSE
 # Apache user enumeration
 ###############################################################################
+sub nikto_apacheusers_init
+{
+   my $id =
+   {
+      name         => "apacheusers",
+      full_name    => "Apache Users",
+      author       => "Sullo",
+      description  => "Checks whether we can enumerate usernames directly from the web server",
+      scan_method  => \&nikto_apacheusers,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_apacheusers
 {

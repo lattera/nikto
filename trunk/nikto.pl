@@ -43,7 +43,7 @@ Getopt::Long::Configure('no_ignore_case');
 use vars qw/$TEMPLATES %ERRSTRINGS %VERSIONS %CLI %VARIABLES %TESTS $CONTENT %FILES $CURRENT_HOST_ID $CURRENT_PORT/;
 use vars qw/%REALMS %REALMS_TESTED %NIKTOCONFIG %NIKTO %OUTPUT %SERVER %request %result %COUNTERS $STARTTIME/;
 use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
-use vars qw/@RESULTS/;
+use vars qw/@RESULTS @PLUGINS/;
 
 # setup
 $STARTTIME         = localtime();
@@ -154,6 +154,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
                 auth_check();
                 set_scan_items();
                 map_codes();
+                load_plugins();
                 run_plugins();
                 test_target();
             }

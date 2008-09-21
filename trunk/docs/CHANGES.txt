@@ -1,3 +1,7 @@
+2008-09-21 plugins/*.plugin
+	- Changes for new plugin running structure; it needs to be finished
+	  (conditional plugins and report methods) but it is good enough to
+	  release now.
 2008-09-20 plugins/nikto_core.plugin plugins/nikto_cgi.plugin nikto.pl
            plugins/nikto_reports.plugin templates/xml_host_head.tmpl
 	   docs/nikto.dtd

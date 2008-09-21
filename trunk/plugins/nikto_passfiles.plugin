@@ -18,6 +18,19 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ###############################################################################
+sub nikto_passfiles_init
+{
+   my $id =
+   {
+      name         => "passfiles",
+      full_name    => "Password Files",
+      author       => "Sullo",
+      description  => "Checks for any files that may potentially contain passwords.",
+      scan_method  => \&nikto_passfiles,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 ###############################################################################
 # PURPOSE

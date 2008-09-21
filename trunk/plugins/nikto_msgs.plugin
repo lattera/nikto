@@ -30,6 +30,19 @@
 # nikto_outdated because that is ONLY checking to see if it is an old version,
 # whereas this checks to see if the versions match
 ###############################################################################
+sub nikto_msgs_init
+{
+   my $id =
+   {
+      name         => "msgs",
+      full_name    => "Server Messages",
+      author       => "Sullo",
+      description  => "Checks the server version against known issues.",
+      scan_method  => \&nikto_msgs,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_msgs
 {

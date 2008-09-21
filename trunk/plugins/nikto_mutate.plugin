@@ -23,6 +23,19 @@
 # PURPOSE
 # Mutated file checks
 ###############################################################################
+sub nikto_mutate_init
+{
+   my $id =
+   {
+      name         => "mutate",
+      full_name    => "Mutate",
+      author       => "Sullo",
+      description  => "Performs various extra independant checks that may not be needed for each scan.",
+      scan_method  => \&nikto_mutate,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub nikto_mutate
 {
