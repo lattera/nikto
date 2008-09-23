@@ -32,6 +32,7 @@ sub nikto_mutate_init
       author       => "Sullo",
       description  => "Performs various extra independant checks that may not be needed for each scan.",
       scan_method  => \&nikto_mutate,
+      scan_cond    => '$CLI{mutate} =~ /1/',
       copyright    => "2008 CIRT Inc."
    };
    return $id;
@@ -39,7 +40,6 @@ sub nikto_mutate_init
 
 sub nikto_mutate
 {
-    if ($CLI{mutate} !~ /1/) { return; }
     my ($c, %DIRS, %FS) = "";
 
     # build a hash of all the unique directories

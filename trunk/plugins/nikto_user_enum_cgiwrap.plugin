@@ -39,6 +39,7 @@ sub nikto_user_enum_cgiwrap_init
       author       => "Javier Fenandez-Sanguino Pena",
       description  => "Attempts to enumerate usernames by guessing through cgiwrap.",
       scan_method  => \&nikto_user_enum_cgiwrap,
+      scan_cond    => '$CLI{mutate} =~ /4/',
       copyright    => "2008 CIRT Inc."
    };
    return $id;
@@ -46,8 +47,6 @@ sub nikto_user_enum_cgiwrap_init
 
 sub nikto_user_enum_cgiwrap
 {
-    if ($CLI{mutate} !~ /4/) { return; }
-
     my @CGIWRAPS;
     my $valid = $ctr = 0;
     my @CFGCGI = (split(/ /, $VARIABLES{"\@CGIDIRS"}));

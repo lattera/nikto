@@ -1309,64 +1309,6 @@ sub dbcheck
   
  if ($_[0] eq "") { dbcheck('u'); }  # do this once
 
- #### check that all plugins are in nikto_plugin_order.txt
- nprint "\n-->\tPlugin order ($NIKTO{plugindir}/nikto_plugin_order.txt)\n";
- my @NIKTOFILES=dirlist($NIKTO{plugindir},"(\.plugin\$)");
- my %PLUGS;
-
- foreach my $pluginf (@NIKTOFILES)
- {
-  chomp($pluginf);
-  $pluginf =~ s/\#.*$//;
-  $pluginf =~ s/\..*$//;
-  $pluginf =~ s/\s+//;
-  if (($pluginf eq "") || ($pluginf eq "nikto_core")) { next; }
-  $PLUGS{$pluginf}=0;
- }
-
- open(ORDERFILE,"<$NIKTO{plugindir}/nikto_plugin_order.txt") || die print STDERR "\tERROR: Unable to open '$NIKTO{plugindir}/nikto_plugin_order.txt' for read: $@\n"; 
- foreach my $line (<ORDERFILE>) 
-  {
-   chomp($line); 
-   $line =~ s/\#.*$//;
-   $line =~ s/\s+/ /;
-   if (($line eq "") || ($line eq " "))    { next; }
-   $PLUGS{$line}=1; 
-  }
- close(ORDERFILE);
-
- my $bad=0;
- foreach my $p (sort keys %PLUGS) 
-  {
-   if ($PLUGS{$p} eq 0) 
-     { $bad=1; print STDERR "\tERROR: plugin '$p' not in nikto_plugin_order.txt\n"; }
-  }
-  if (!$bad) { print STDERR "\tOrder file okay\n"; }
-
- #### check that all plugins are named properly
- nprint "-->\tPlugin conventions ($NIKTO{plugindir}/*.plugin)\n";
- $bad=0;
- foreach my $pluginf (@NIKTOFILES)
- {
-  chomp($pluginf);
-  $pluginf =~ s/\#.*$//;
-  $pluginf =~ s/\..*$//;
-  $pluginf =~ s/\s+//;
-  if (($pluginf eq "") || ($pluginf eq "nikto_core")) { next; }
-
-  open(IN,"<$NIKTO{plugindir}/$pluginf.plugin") || 
-		die print STDERR "\tERROR: Unable to open '$NIKTO{plugindir}/$pluginf.plugin' for read: $@\n"; 
-  my @F=<IN>;
-  close(IN);
-  my $CT=grep(/sub $pluginf/,@F);
-  if ($CT < 1) 
-   {
-    print STDERR "\tERROR: file '$pluginf\.plugin' does not have 'sub $pluginf' defined.\n";
-    $bad++;
-   } 
- }
- if (!$bad) { nprint "\tPlugin syntax okay\n"; }
-
  nprint "\n";
  exit;
 }
@@ -1487,8 +1429,18 @@ sub run_plugins
       {
          if (defined $plugin->{recon_method} && $plugin->{recon_weight} == $i)
          {
-            nprint("- Running recon for \"$plugin->{full_name}\" plugin","v");
-            &{$plugin->{recon_method}};
+            my $run=1;
+            # first check for conditionals
+            if (defined $plugin->{recon_cond})
+            {
+               # Evaluate condition
+               $run=eval($plugin->{recon_cond});
+            }
+            if ($run)
+            {   
+               nprint("- Running recon for \"$plugin->{full_name}\" plugin","v");
+               &{$plugin->{recon_method}};
+            }
          }
       }
    }
@@ -1501,8 +1453,18 @@ sub run_plugins
       {
          if (defined $plugin->{scan_method} && $plugin->{scan_weight} == $i)
          {
-            nprint("- Running scan for \"$plugin->{full_name}\" plugin","v");
-            &{$plugin->{scan_method}};
+            my $run=1;
+            # first check for conditionals
+            if (defined $plugin->{scan_cond})
+            {
+               # Evaluate condition
+               $run=eval "$plugin->{scan_cond}";
+            }
+            if ($run)
+            {   
+               nprint("- Running scan for \"$plugin->{full_name}\" plugin","v");
+               &{$plugin->{scan_method}};
+            }
          }
       }
    }

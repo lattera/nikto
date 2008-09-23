@@ -27,6 +27,7 @@ sub nikto_passfiles_init
       author       => "Sullo",
       description  => "Checks for any files that may potentially contain passwords.",
       scan_method  => \&nikto_passfiles,
+      scan_cond    => '$CLI{mutate} =~ /2/',
       copyright    => "2008 CIRT Inc."
    };
    return $id;
@@ -39,8 +40,6 @@ sub nikto_passfiles_init
 
 sub nikto_passfiles
 {
-    if ($CLI{mutate} !~ /2/) { return; }
-
     my @DIRS   = (split(/ /, $VARIABLES{"\@PASSWORDDIRS"}));
     my @PFILES = (split(/ /, $VARIABLES{"\@PASSWORDFILES"}));
     my @EXTS = qw(asp bak dat data dbc dbf exe htm html htx ini lst txt xml php php3 phtml);

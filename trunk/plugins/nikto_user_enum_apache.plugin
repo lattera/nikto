@@ -39,6 +39,7 @@ sub nikto_user_enum_apache_init
       author       => "Javier Fernandez-Sanguinoi Pena",
       description  => "Attempts to enumerate usernames by guessing usernames.",
       scan_method  => \&nikto_user_enum_apache,
+      scan_cond    => '$CLI{mutate} =~ /3/',
       copyright    => "2008 CIRT Inc."
    };
    return $id;
@@ -46,8 +47,6 @@ sub nikto_user_enum_apache_init
 
 sub nikto_user_enum_apache
 {
-    if ($CLI{mutate} !~ /3/) { return; }
-
     nprint("- Enumerating Apache users (1 to 5 characters).", "d");
 
     # Note1: This script only generates names with letters A-Z (no numbers)
