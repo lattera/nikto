@@ -1,3 +1,9 @@
+2008-09-24 plugins/nikto_core.plugin db_tets
+	- Fixed problem with nikto using authentication provided from the
+	  command line. It now adds it to the list of realms.
+	- Added extra test to highlight localstart.asp if it is the default
+	  page.
+	- Added tests to identify Ampache.
 2008-09-23 plugins/*.plugin
 	- Added support for conditional recon and scan plugins.
 2008-09-21 plugins/*.plugin

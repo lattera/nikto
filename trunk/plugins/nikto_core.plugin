@@ -793,9 +793,6 @@ sub general_config
   my @x=split(/:/,$CLI{hostauth});
   if (($#x ne 1) || ($x[0] eq ""))
    { nprint("+ ERROR: '$CLI{hostauth}' (-i option) syntax is 'user:password' or 'user:password:domain' for host authentication."); exit;  }
-  $NIKTO{hostid}     = $x[0];
-  $NIKTO{hostpw}     = $x[1];
-  $NIKTO{hostdomain} = $x[2];
  } 
 
  if (defined $CLI{evasion})
@@ -1209,6 +1206,17 @@ sub load_databases
                 $REALMS{$db_realms_ctr}{msg}    = $t[4];
                 $db_realms_ctr++;
               }
+            # Cheat and add CLI directly to REALMS
+            if (defined $CLI{hostauth})
+            {
+             my @x=split(/:/,$CLI{hostauth});
+
+             $REALMS{$db_realms_ctr}{tid} = "700500";
+             $REALMS{$db_realms_ctr}{realm} = $x[2];
+             $REALMS{$db_realms_ctr}{pw} = $x[1];
+             $REALMS{$db_realms_ctr}{id} = $x[0];
+             $REALMS{$db_realms_ctr}{msg} = "Credentials provided by CLI.";
+            }
            }
 
    close(IN);
