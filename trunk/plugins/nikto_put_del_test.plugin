@@ -42,20 +42,12 @@ sub nikto_put_del_test
     my $msg;
 
     # PUT a page
-    LW2::http_close(\%request);    # force-close any old connections
-    LW2::http_fixup_request(\%request);
-    LW2::http_reset();
     my $uri = "/nikto-test-" . LW2::utils_randstr(8) . ".html";
-    $request{'whisker'}->{'data'}    = "This was a Nikto test.";
-    $request{'whisker'}->{'version'} = "1.0";
     (my $RES, $CONTENT) = fetch($uri, "PUT", "This was a Nikto test.");
 
     # Request it back
     if ($RES eq 201)
     {
-        LW2::http_close(\%request);    # force-close any old connections
-        LW2::http_fixup_request(\%request);
-        LW2::http_reset();
         (my $RES, $CONTENT) = fetch($uri, "GET");
         if ($CONTENT =~ /This was a Nikto test/)
         {
