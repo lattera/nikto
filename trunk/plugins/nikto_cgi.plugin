@@ -44,17 +44,17 @@ sub nikto_cgi
    my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));
    my ($res, $possiblecgidir, $found) ="";
 
-   if ($CLI{forcecgi} eq "all")                       # all possible CGI dirs to be "true" 
+   if (defined $CLI{forcecgi} && $CLI{forcecgi} eq "all")                       # all possible CGI dirs to be "true" 
    { 
       nprint("Using all known CGI directories\n","d");
       $VARIABLES{"\@CGIDIRS"} = join(" ",@CFGCGI); 
    }
-   elsif ($CLI{forcecgi} eq "none")                   # scan no CGI directories
+   elsif (defined $CLI{forcecgi} && $CLI{forcecgi} eq "none")                   # scan no CGI directories
    {
       nprint("Using no CGI directories\n","d");
       $VARIABLES{"\@CGIDIRS"} = ""; 
    }   
-   elsif ($CLI{forcecgi} =~ /[a-zA-Z0-9]/)            # scan a specific directory 
+   elsif (defined $CLI{forcecgi} && $CLI{forcecgi} =~ /[a-zA-Z0-9]/)            # scan a specific directory 
    {
       nprint("Using CGI dir '$CLI{forcecgi}'\n","d");
       $VARIABLES{"\@CGIDIRS"} = $CLI{forcecgi}; 

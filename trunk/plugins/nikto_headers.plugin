@@ -50,7 +50,7 @@ sub nikto_headers
    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
    {
       (my $RES, $CONTENT) = fetch($f, "GET");
-      if ($result{'x-powered-by'} ne "") { $xpb{ $result{'x-powered-by'} } = 1; }
+      if (defined $result{'x-powered-by'}) { $xpb{ $result{'x-powered-by'} } = 1; }
    }
 
    foreach my $x (sort keys %xpb)
@@ -66,7 +66,7 @@ sub nikto_headers
 
    #######################################################################
    # Servlet-Engine info
-   if ($result{'servlet-engine'} ne "")
+   if (defined $result{'servlet-engine'})
    {
       my $x = $result{'servlet-engine'};
       $x = ~s/\(.*$//;
@@ -185,11 +185,10 @@ sub nikto_headers
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
       (my $RES, $CONTENT) = fetch($f, "GET");
-      if ($result{etag} ne '') { break; }
    }
 
    # Now we have a header, let's check ETag for inode
-   if ($result{etag} ne '')
+   if (defined $result{etag})
    {
       my $etag=$result{etag};
       $etag =~ s/"//g;
