@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
-#VERSION,2.03
+#VERSION,2.10
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 
@@ -48,7 +48,7 @@ use vars qw/@RESULTS @PLUGINS/;
 # setup
 $STARTTIME         = localtime();
 $DIV               = "-" x 75;
-$NIKTO{version}    = "2.03";
+$NIKTO{version}    = "2.10";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "config.txt";    ### Change this line if your setup is having trouble finding it
 $http_eol          = "\r\n";
@@ -151,7 +151,6 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
             } else
             {
                 dump_target_info();
-                auth_check();
                 set_scan_items();
                 map_codes();
                 load_plugins();

@@ -1,3 +1,6 @@
+2008-10-02 plugins/nikto_core.plugin nikto.pl
+	- Altered authentication code to make it simpler.
+	- Now supports NTLM authentication.
 2008-09-24 plugins/nikto_core.plugin db_tets
 	- Fixed problem with nikto using authentication provided from the
 	  command line. It now adds it to the list of realms.
