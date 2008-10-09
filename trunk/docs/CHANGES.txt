@@ -1,3 +1,5 @@
+2008-10-09 plugins/nikto_core.plugin nikto.pl
+	- Further tunings to authentication code to simplify it.
 2008-10-02 plugins/nikto_core.plugin nikto.pl
 	- Altered authentication code to make it simpler.
 	- Now supports NTLM authentication.
