@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-<!ENTITY description SYSTEM "description.xml">
-<!ENTITY options SYSTEM "options.xml">
-<!ENTITY files SYSTEM "files.xml">
-<!ENTITY bugs SYSTEM "bugs.xml">
-<!ENTITY authors SYSTEM "authors.xml">
+<!ENTITY description SYSTEM "sections/description.xml">
+<!ENTITY options SYSTEM "sections/options.xml">
+<!ENTITY files SYSTEM "sections/files.xml">
+<!ENTITY bugs SYSTEM "sections/bugs.xml">
+<!ENTITY authors SYSTEM "sections/authors.xml">
 ]>
 
 <refentry id="commands.nikto">
