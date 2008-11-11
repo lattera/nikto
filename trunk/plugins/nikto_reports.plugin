@@ -23,6 +23,20 @@
 # PURPOSE
 # Reporting
 ###############################################################################
+sub nikto_reports_init
+{
+   my $id =
+   {
+      name         => "reports",
+      full_name    => "Report as XML or HTML",
+      author       => "Sullo",
+      description  => "Produces an XML or HTML report.",
+      recon_method => \&open_output,
+      report_method  => \&write_output,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
 
 sub open_output
 {

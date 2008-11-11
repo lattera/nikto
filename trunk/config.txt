@@ -44,7 +44,7 @@ CIRT=209.172.49.178
 # PROXY STUFF
 #########################################################################################################
 #PROXYHOST=127.0.0.1
-#PROXYPORT=8080
+#PROXYPORT=3128
 #PROXYUSER=proxyuserid
 #PROXYPASS=proxypassword
 

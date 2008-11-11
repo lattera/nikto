@@ -172,7 +172,7 @@ sub test_target
             }
 
             $TESTS{$CHECKID}{osvdb} =~ s/\s+/ OSVDB\-/g;
-            add_vulnerability($CURRENT_HOST_ID,"$TESTS{$CHECKID}{method} $request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},"",$uri);
+            add_vulnerability($CURRENT_HOST_ID,"$request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},$TESTS{$CHECKID}{method},$uri);
          }
       }
    } # end check loop
@@ -589,16 +589,6 @@ sub dump_target_info
     { nprint("+ Server: No banner retrieved"); }
     
  return;
-}
-###############################################################################
-sub badargs
-{
- print("HERE\n");
- my $i;
- for ($i=0;$i<=$#_;$i++)
- {
-  print("Argument: $_[$i]\n");
- }
 }
 ###############################################################################
 sub general_config
@@ -1421,6 +1411,7 @@ sub load_plugins
             # Add default weights if not already assigned
             $pluginhash->{recon_weight}=50 unless (defined $pluginhash->{recon_weight});
             $pluginhash->{scan_weight}=50 unless (defined $pluginhash->{scan_weight});
+            $pluginhash->{report_weight}=50 unless (defined $pluginhash->{report_weight});
             push(@PLUGINS, $pluginhash);
             nprint("- Loaded \"$pluginhash->{full_name}\" plugin.","v");
          }
@@ -1476,6 +1467,35 @@ sub run_plugins
             {   
                nprint("- Running scan for \"$plugin->{full_name}\" plugin","v");
                &{$plugin->{scan_method}};
+            }
+         }
+      }
+   }
+   
+   return;
+}
+   
+sub run_report
+{
+   nprint("- Entering report phase","v");
+   # This is a frig until I can think of a better way of achieving it
+   foreach my $i (1..100)
+   {
+      foreach my $plugin (@PLUGINS)
+      {
+         if (defined $plugin->{report_method} && $plugin->{report_weight} == $i)
+         {
+            my $run=1;
+            # first check for conditionals
+            if (defined $plugin->{report_cond})
+            {
+               # Evaluate condition
+               $run=eval "$plugin->{report_cond}";
+            }
+            if ($run)
+            {   
+               nprint("- Running report for \"$plugin->{full_name}\" plugin","v");
+               &{$plugin->{report_method}};
             }
          }
       }

@@ -1,3 +1,5 @@
+2008-11-11 plugins/nikto_core.plugin nikto.pl plugins/nikto_reports.plugin
+	- Added report phase to plugin runner
 2008-10-09 plugins/nikto_core.plugin nikto.pl
 	- Further tunings to authentication code to simplify it.
 2008-10-02 plugins/nikto_core.plugin nikto.pl

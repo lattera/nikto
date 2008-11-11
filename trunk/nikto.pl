@@ -40,8 +40,8 @@ Getopt::Long::Configure('no_ignore_case');
 #######################################################################
 
 # global var/definitions
-use vars qw/$TEMPLATES %ERRSTRINGS %VERSIONS %CLI %VARIABLES %TESTS $CONTENT %FILES $CURRENT_HOST_ID $CURRENT_PORT/;
-use vars qw/%REALMS %REALMS_TESTED %NIKTOCONFIG %NIKTO %OUTPUT %SERVER %request %result %COUNTERS $STARTTIME/;
+use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT $CURRENT_HOST_ID $CURRENT_PORT/;
+use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS $STARTTIME/;
 use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
 use vars qw/@RESULTS @PLUGINS/;
 
@@ -66,7 +66,7 @@ load_configs();
 find_plugins();
 require "$NIKTO{plugindir}/nikto_core.plugin";    ### Change this line if your setup is having trouble finding it
 nprint("T:$STARTTIME: Starting", "d");
-require "$NIKTO{plugindir}/nikto_reports.plugin";    ### Change this line if your setup is having trouble finding it
+#require "$NIKTO{plugindir}/nikto_reports.plugin";    ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/nikto_single.plugin";     ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/LW2.pm";                  ### Change this line if your setup is having trouble finding it
 
@@ -88,7 +88,7 @@ $request{'User-Agent'} = $NIKTO{useragent};
 $request{'whisker'}->{'retry'} = 0;
 proxy_setup();
 
-open_output();
+#open_output();
 nprint($DIV);
 
 set_targets();
@@ -157,7 +157,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
                 run_plugins();
                 test_target();
             }
-            write_output();
+            run_report();
         }
     }
 }
