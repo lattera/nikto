@@ -1487,9 +1487,8 @@ sub run_report
             if (defined $plugin->{report_cond})
             {
                # Evaluate condition
-               nprint("$run");
                $run=eval "$plugin->{report_cond}";
-               nprint("- Conditional: $plugin->{report_cond} $CLI{file} $CLI{format} $run");
+               nprint("- Conditional: $plugin->{report_cond} $CLI{file} $CLI{format} $run","v");
             }
             if ($run)
             {   
