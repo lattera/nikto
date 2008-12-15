@@ -1,0 +1,63 @@
+#VERSION,2.02
+# $Id: nikto_reports.plugin 87 2008-11-11 19:13:19Z deity $
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Reporting
+###############################################################################
+sub nikto_report_text_init
+{
+   my $id =
+   {
+      name         => "reports_text",
+      full_name    => "Text reports",
+      author       => "Deity",
+      description  => "Produces a text report.",
+      report_method=> \&text_report,
+      report_cond  => '$CLI{format} eq "txt" && $CLI{file} ne "-"',
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
+
+sub text_report
+{
+   # Open file and produce header
+   open(OUT, ">>$CLI{file}") || die print STDERR "+ ERROR: Unable to open '$CLI{file}' for write: $@\n";
+
+   # Write header
+   print OUT "- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}\n";
+
+   foreach my $item (@RESULTS)
+   {
+      foreach my $uri (split(' ',$item->{uri}))
+      {
+         my $line="+ ";
+         if ($item->{osvdb})  { $line.="OSVDB-$item->{osvdb}: " }; 
+         if ($item->{method}) { $line.="$item->{method} " }; 
+         if ($uri)            { $line.="${uri}: " }; 
+         $line.=$item->{message};
+         print OUT "$line\n";
+      }
+   }
+}
+
+1;
