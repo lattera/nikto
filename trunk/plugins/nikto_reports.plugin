@@ -72,11 +72,7 @@ sub open_output
 ###############################################################################
 sub close_output
 {
-    if ($CLI{format} =~ /^txt/i)
-    {
-        print OUT "\nTest Options: $CLI{all_options}\n";
-        print OUT "$DIV\n";
-    } elsif ($CLI{format} =~ /^csv/i)
+    if ($CLI{format} =~ /^csv/i)
     {
         print OUT "\n\"Test Options\",\"$CLI{all_options}\"\n";
     } elsif ($CLI{format} =~ /^xml/i)
