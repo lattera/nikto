@@ -110,7 +110,7 @@ sub nikto_outdated
                     $msg =~ s/\@RUNNING_VER/$BI/g;
                     $msg =~ s/\@CURRENT_VER/$v/g;
                     chomp($msg);
-                    add_vulnerability($CURRENT_HOST_ID, $msg, $OVERS{$V}{tid});
+                    add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,$msg, $OVERS{$V}{tid});
                 }
             }
         }

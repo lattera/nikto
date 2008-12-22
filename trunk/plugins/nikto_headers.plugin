@@ -210,7 +210,7 @@ sub nikto_headers
             $message .= "0x$field ";
          }
       }
-      add_vulnerability($CURRENT_HOST_ID, $message, 999984, 0);
+      add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, $message, 999984, 0);
    }
 }
 

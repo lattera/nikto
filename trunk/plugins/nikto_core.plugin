@@ -172,7 +172,7 @@ sub test_target
             }
 
             $TESTS{$CHECKID}{osvdb} =~ s/\s+/ OSVDB\-/g;
-            add_vulnerability($CURRENT_HOST_ID,"$request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},$TESTS{$CHECKID}{method},$uri);
+            add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"$request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},$TESTS{$CHECKID}{method},$uri);
          }
       }
    } # end check loop
@@ -211,72 +211,33 @@ return 0;
 ###############################################################################
 sub nprint
 {
- my $line=$_[0];
- chomp($line);
- # don't print debug & verbose to output file...
- if (defined $_[1])
- {
-    if ($_[1] eq "d")
-    { 
-       if ($OUTPUT{debug}) { print "D:" . localtime() . " $line\n"; }
-       return;
-    }
-    elsif ($_[1] eq "v")
-    { 
-       if ($OUTPUT{verbose}) { print "V:" . localtime() . " $line\n"; }
-       return;
-    }
- } 
- # print errors to STDERR
- if ($line =~ /ERROR\:/) { print STDERR "$line\n"; }
+   my $line=$_[0];
+   chomp($line);
+   # don't print debug & verbose to output file...
+   if (defined $_[1])
+   {
+      if ($_[1] eq "d" && $OUTPUT{debug})
+      { 
+         print "D:" . localtime() . " $line\n";
+      }
+      if ($_[1] eq "v" && $OUTPUT{verbose})
+      { 
+         print "V:" . localtime() . " $line\n";
+      }
+      return;
+   } 
+   # print errors to STDERR
+   if ($line =~ /ERROR\:/) { print STDERR "$line\n"; }
 
- # print to scan details to standard output if the users wants another format and is saving results to a file
- $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
- $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
- $line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
- $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
- $line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
- print "$line\n";
+   # print to scan details to standard output if the users wants another format and is saving results to a file
+   $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
+   $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
+   $line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
+   $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
+   $line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
+   print "$line\n";
  
- # HTML is handled elsewhere, sadly
- #if ($CLI{format} eq "txt")
-  #{
-   #$line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
-   #$line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
-   #$line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
-   #$line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
-   #$line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
-   #print OUT "$line\n";
-  #}
-  
- if ($CLI{format} eq "csv")
-  {
-   chomp($line);
-   if ($line =~ /-------------/) { $line="\"$DIV\",\"$DIV\""; }
-
-   if ($line =~ /^\+/) { $line =~ s/^\+ (.*) - (.*)/"$1","$2"/; }
-   $line =~ s/Target IP:       (.*)/"Target IP","$1"/;
-   $line =~ s/Target Hostname: (.*)/"Target Hostname","$1"/;
-   $line =~ s/Target Port:     (.*)/"Target Port","$1"/;
-   $line =~ s/Start Time:      (.*)/"Start Time","$1"/;
-   $line =~ s/End Time:        (.*)/"End Time","$1"/;
-   $line =~ s/ERROR: (.*)/"ERROR","$1"/;
-  
-   chomp($line);
-   $line =~ s/\t/     /g;
-   $line =~ s/Server: ([^ ]*)(.*$)/"Server","$1","$2"/;
-   $line =~ s/Test Options: (.*)/"Test Options","$1\n"/;
-   $line =~ s/Allowed HTTP Methods: (.*)/"Allowed HTTP Methods","$1"/;
-   $line =~ s/^\+//;
-   $line =~ s/^\-//;
-   $line =~ s/^\s+//;
-   if ($line !~ /^\"/) { $line = "\"$line\""; }
-   $line =~ s/\n\r//g;
-   $line =~ s/\"\"/\"/g;
-   print OUT "$line\n";
-  }
-
- return;
+   return;
 }
 ###############################################################################
 sub get_ext
@@ -697,7 +658,7 @@ sub general_config
    ";
 
  ### CLI STUFF
- $CLI{pause}=$CLI{html}=$OUTPUT{verbose}=$CLI{skiplookup}=$NIKTO{totalrequests}=0;
+ $CLI{pause}=$CLI{html}=$OUTPUT{verbose}=$CLI{skiplookup}=$NIKTO{totalrequests}=$OUTPUT{debug}=0;
  $CLI{all_options}=join(" ",@ARGV);
  
  # preprocess CLI options which cannot be abbreviated
@@ -1672,7 +1633,7 @@ sub do_auth
       next unless ($realm =~ /$REALMS{$REALM}{realm}/i || $REALMS{$REALM}{realm} eq '@ANY');
       if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq ""))
       { 
-         add_vulnerability($CURRENT_HOST_ID, "+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid}); 
+         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid}); 
       }
       else
       { 
@@ -1699,7 +1660,7 @@ sub do_auth
             unless ($REALMS{$REALM}{tid} == 700500 ||
                     $REALMS{$REALM}{checked} == 1)
             {
-               add_vulnerability($CURRENT_HOST_ID,"Default account found for '$realm' at $request{'uri'} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0);
+               add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Default account found for '$realm' at $request{'uri'} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0);
                $REALMS{$REALM}{checked}=1;
             }
             # Finally repeat the check
@@ -2318,11 +2279,12 @@ sub initialise_db
 sub add_vulnerability
 {
    my $host=$_[0];
-   my $message=$_[1];
-   my $nikto_id=$_[2];
-   my $osvdb=$_[3];
-   my $method=$_[4];
-   my $uri=$_[5];
+   my $port=$_[1];
+   my $message=$_[2];
+   my $nikto_id=$_[3];
+   my $osvdb=$_[4];
+   my $method=$_[5];
+   my $uri=$_[6];
    my $outmessage=$message;
    my $resulthash={};
 
@@ -2333,6 +2295,7 @@ sub add_vulnerability
    nprint("+ $outmessage"); 
    %$resulthash = (
       host => $host,
+      port => $port,
       message => $message,
       nikto_id => $nikto_id,
       osvdb => $osvdb,

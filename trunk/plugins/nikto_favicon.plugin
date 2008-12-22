@@ -52,7 +52,7 @@ sub nikto_favicon
       {
          if ($item->{md5hash} eq $hash)
          {
-            add_vulnerability($CURRENT_HOST_ID, "/favicon.ico file identifies this server as: $item->{description}", $item->{nikto_id}, 39272);
+            add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"/favicon.ico file identifies this server as: $item->{description}", $item->{nikto_id}, 39272);
          }
       }
    }

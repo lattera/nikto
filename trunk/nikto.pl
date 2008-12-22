@@ -155,7 +155,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
                 map_codes();
                 load_plugins();
                 run_plugins();
-                test_target();
+                #test_target();
             }
             run_report();
         }
@@ -164,7 +164,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
 
 nprint("+ $COUNTERS{hosts_total} host(s) tested");
 send_updates();
-close_output();
+#close_output();
 nprint("T:" . localtime() . ": Ending", "d");
 
 exit;

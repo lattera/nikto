@@ -54,7 +54,7 @@ sub nikto_msgs
       
       if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /($item->{server})\b/i)
       {
-         add_vulnerability($CURRENT_HOST_ID, "$1 - $item->{message}",$item->{nikto_id},0);
+         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"$1 - $item->{message}",$item->{nikto_id},0);
       }
    }
 }

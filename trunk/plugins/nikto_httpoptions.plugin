@@ -64,13 +64,13 @@ sub nikto_httpoptions
 
    if ($allow_methods ne "")
    {
-      add_vulnerability($CURRENT_HOST_ID,"Allowed HTTP Methods: $allow_methods $txt",999990,0);
+      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"Allowed HTTP Methods: $allow_methods $txt",999990,0);
       foreach my $m (split /,? /, $allow_methods) { eval_methods($m, "Allow", $dbarray); }
    }
 
    if ($public_methods ne "")
    {
-      add_vulnerability($CURRENT_HOST_ID,"Public HTTP Methods: $public_methods $txt",999985,0);
+      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"Public HTTP Methods: $public_methods $txt",999985,0);
       foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public", $dbarray); }
    }
 
@@ -88,7 +88,7 @@ sub nikto_httpoptions
          my $ipfound=$CONTENT;
          $ipfound =~ s/^.*<a:href>//g;
          $ipfound =~ s/<\/a:href>.*$//g;
-         add_vulnerability($CURRENT_HOST_ID,"PROPFIND may show the server's internal IP address: $ipfound",999973,13431);
+         add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"PROPFIND may show the server's internal IP address: $ipfound",999973,13431);
       }
    } 
  
@@ -112,7 +112,7 @@ sub eval_methods
       {
          $message = $item->{message};
          $message =~ s/\@TYPE\@/$type/;
-         add_vulnerability($CURRENT_HOST_ID,"$message",$item->{nikto_id},$item->{osvdb});
+         add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"$message",$item->{nikto_id},$item->{osvdb});
       }
    }
 }
