@@ -66,7 +66,6 @@ load_configs();
 find_plugins();
 require "$NIKTO{plugindir}/nikto_core.plugin";    ### Change this line if your setup is having trouble finding it
 nprint("T:$STARTTIME: Starting", "d");
-#require "$NIKTO{plugindir}/nikto_reports.plugin";    ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/nikto_single.plugin";     ### Change this line if your setup is having trouble finding it
 require "$NIKTO{plugindir}/LW2.pm";                  ### Change this line if your setup is having trouble finding it
 
@@ -78,6 +77,7 @@ die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 general_config();
 load_databases();
 load_databases('u');
+nprint("- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}");
 
 LW2::http_init_request(\%request);
 $request{'whisker'}->{'ssl_save_info'}              = 1;
