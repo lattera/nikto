@@ -2305,7 +2305,6 @@ sub add_vulnerability
    $TARGETS{$host}{total_vulns}++;
    push(@RESULTS,$resulthash);
 }
-   
 #######################################################################
 sub nikto_core { return; } # trap for this plugin being called to run. lame.
 #######################################################################

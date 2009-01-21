@@ -196,6 +196,10 @@ sub load_configs
         my @t = split(/ /, $NIKTOCONFIG{CLIOPTS});
         foreach my $c (@t) { push(@ARGV, $c); }
     }
+
+    # Check for necessary config items
+    check_config_defined("CHECKMETHODS", "HEAD");
+
     return;
 }
 #################################################################################
@@ -251,4 +255,18 @@ sub find_plugins
     }
     return;
 }
-#################################################################################
+
+######################################################################
+## check_config_defined(item, default)
+## Checks whether config has been set, warns and sets to a default
+sub check_config_defined
+{
+   my $item=$_[0];
+   my $default=$_[1];
+ 
+   if (!defined $NIKTOCONFIG{$item})
+   {
+      print STDERR "- Warning: $item is not defined in Nikto configuration, setting to \"$default\"\n"; 
+      $NIKTOCONFIG{$item}=$default;
+   }
+}
