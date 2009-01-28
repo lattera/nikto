@@ -91,7 +91,29 @@ sub nikto_httpoptions
          add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"PROPFIND may show the server's internal IP address: $ipfound",999973,13431);
       }
    } 
- 
+
+   # Special checks for TRACE/TRACK to see whether its vulnerable
+   my %headers=(
+      "Host" => "Nikto",
+   );
+   foreach my $method (split(/ /,"TRACE TRACK"))
+   {
+      # Check for all flavours of HTTP
+      foreach my $version (split(/ /,"1.0 1.1"))
+      {
+         $request{whisker}{version} = $version; 
+         ($RES, $CONTENT) = fetch("/","$method","",\%headers);
+         if ($RES == 200)
+         {
+            if ($CONTENT =~ "Nikto")
+            {
+               add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"HTTP $method method is active, suggesting the host is vulnerable to XST",999974,877);
+               # now we know its vulnerable stop testing
+               last;
+            }
+         }
+      }
+   } 
    # Now release memory for the dbarray
    undef @$dbarray;
    return;
