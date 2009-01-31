@@ -51,7 +51,6 @@ sub nikto_msgs
 
    foreach my $item (@$dbarray)
    {
-      
       if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /($item->{server})\b/i)
       {
          add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"$1 - $item->{message}",$item->{nikto_id},0);

@@ -599,6 +599,7 @@ sub general_config
        -id+          		host authentication to use, format is userid:password
        -mutate+           	Guess additional file names
        -output+       		write output to this file
+       -nossl                   disables using SSL
        -port+       		port to use (default 80)
        -Display+       		turn on/off display outputs
        -ssl 	     		force ssl mode on port
@@ -638,6 +639,7 @@ sub general_config
 		{ $NIKTO{options} .= "       		       	           $k     $NIKTO{mutate_opts}{$k}\n"; }
 
  $NIKTO{options}.="       -nolookup       		skip name lookup
+       -nossl                   disables using SSL\n
        -output+       		write output to this file
        -port+       		port to use (default 80)
        -Pause+       		pause between tests (seconds)\n";
@@ -684,6 +686,7 @@ sub general_config
            "timeout=s"               => \$CLI{timeout},
            "Pause=s"                 => \$CLI{pause},
            "ssl"                     => \$CLI{ssl},
+           "nossl"                   => \$CLI{nossl},
            "useproxy"                => \$CLI{useproxy},
            "Help"                    => \$CLI{help},
            "vhost=s"                 => \$CLI{vhost},
@@ -1292,10 +1295,8 @@ sub port_check
  proxy_check() unless $PROXYCHECKED;
 
  my @checktypes=('HTTP', 'HTTPS');
- if ($CLI{ssl})
- {
-  shift(@checktypes);
- }
+ if ($CLI{ssl}) { shift(@checktypes); }
+ if ($CLI{nossl}) { pop(@checktypes); }
 
  foreach my $method (split(/ /,$NIKTOCONFIG{CHECKMETHODS}))
  {

@@ -88,7 +88,7 @@
 "800075","Folkweb","Win 32 platform"
 "800076","frontier","http://www.frontiertech.com/products/superweb.htm"
 "800077","frontpage","http://www.insecure.org/sploits/Microsoft.frontpage.insecurities.html"
-"800078","ghttpd\/1\.[0-4]","The Ghttpd server may contain a remote buffer overflow. Upgrade to the latest version."
+"800078","^ghttpd\/1\.[0-4]","The Ghttpd server may contain a remote buffer overflow. Upgrade to the latest version."
 "800079","glaci","Netware web server"
 "800080","GoAhead-Webs","This may be a Cyclade, http://www.cyclades.com/"
 "800081","GoAhead-Webs\/2\.(0.*|1)","GoAhead-Webs 2.1 and below is vulnerable to command execution through a buffer overflow. See http://www.securiteam.com for details."

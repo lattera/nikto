@@ -355,7 +355,6 @@
 "600344","Liberator/","3.4.9","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600345","libwww-perl-daemon/","1.24","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600346","lighttpd/","1.5.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600347","lighttpd\/","1.4.2","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600348","Line-Tap/","3.13","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600349","Linux-Mandrake/","3mdk","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600350","Linux/","11mdk","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
