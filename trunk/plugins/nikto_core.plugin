@@ -767,7 +767,7 @@ sub general_config
    { nprint("-***** $notice *****"); }
 
  # get core version
- open(FI,"<$NIKTO{plugindir}/nikto_core.plugin");
+ open(FI,"<$NIKTOCONFIG{PLUGINDIR}/nikto_core.plugin");
  my @F=<FI>;
  close(FI);
  my @VERS=grep(/^#VERSION/,@F);
@@ -1082,12 +1082,12 @@ sub load_databases
  # verify required files
  for my $file (@dbs) 
   { 
-   if (!-r "$NIKTO{plugindir}/$file") { die nprint("+ ERROR: Can't find/read required file \"$NIKTO{plugindir}/$file\""); }
+   if (!-r "$NIKTOCONFIG{PLUGINDIR}/$file") { die nprint("+ ERROR: Can't find/read required file \"$NIKTOCONFIG{PLUGINDIR}/$file\""); }
   }
 
  for my $file (@dbs) 
   { 
-   my $filename = $NIKTO{plugindir} . "/" . $prefix . $file;
+   my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
    if (!-r $filename) { next; }
    open(IN,"<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
    
@@ -1187,7 +1187,7 @@ sub dbcheck
 
  for my $file (@dbs) 
   { 
-   my $filename = $NIKTO{plugindir} . "/" . $prefix . $file;
+   my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
    if (!-r $filename) { next; }
    open(IN,"<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
    
@@ -1344,7 +1344,7 @@ sub port_check
 
 sub load_plugins
 {
-   my @pluginlist=dirlist("$NIKTO{plugindir}",'\.plugin$');
+   my @pluginlist=dirlist("$NIKTOCONFIG{PLUGINDIR}",'\.plugin$');
 
    foreach my $plugin (@pluginlist)
    {
@@ -1352,7 +1352,7 @@ sub load_plugins
       $plugin_name =~ s/\.plugin$//;
       my $plugin_init = $plugin_name . "_init";
       eval {
-         require "$NIKTO{plugindir}/$plugin";
+         require "$NIKTOCONFIG{PLUGINDIR}/$plugin";
       };
       if ($@)
       {
@@ -1528,12 +1528,12 @@ sub check_updates
  }
  
  # get local versions of plugins/dbs
- my @NIKTOFILES=dirlist($NIKTO{plugindir},"");
+ my @NIKTOFILES=dirlist($NIKTOCONFIG{PLUGINDIR},"");
 
  foreach my $file (@NIKTOFILES)
  {
   my $v="";
-  open(LOCAL,"<$NIKTO{plugindir}/$file") || print STDERR "+ ERROR: Unable to open '$NIKTO{plugindir}/$file' for read: $@\n";
+  open(LOCAL,"<$NIKTOCONFIG{PLUGINDIR}/$file") || print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$file' for read: $@\n";
   my @l=<LOCAL>;
   close(LOCAL);
   
@@ -1573,7 +1573,7 @@ sub check_updates
   (my $RES, $CONTENT) = fetch("$serverdir/$toget","GET");
   if ($RES ne 200) { print STDERR "+ ERROR: Unable to get $server$serverdir/$toget\n"; exit; }
   if ($CONTENT ne "") {
-   open(OUT,">$NIKTO{plugindir}/$toget") || die print STDERR "+ ERROR: Unable to open '$NIKTO{plugindir}/$toget' for write: $@\n";
+   open(OUT,">$NIKTOCONFIG{PLUGINDIR}/$toget") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$toget' for write: $@\n";
    print OUT $CONTENT;
    close(OUT); 
   }
@@ -1585,7 +1585,7 @@ if ($code_updates)
   nprint "+ Retrieving 'CHANGES.txt'\n";
   (my $RES, $CONTENT) = fetch("$serverdir/CHANGES.txt","GET");
   if (($CONTENT ne "") && ($RES eq 200)) {
-   open(OUT,">$NIKTO{plugindir}/../docs/CHANGES.txt") || die print STDERR "+ ERROR: Unable to open '$NIKTO{plugindir}/../CHANGES.txt' for write: $@\n";
+   open(OUT,">$NIKTOCONFIG{PLUGINDIR}/../docs/CHANGES.txt") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/../CHANGES.txt' for write: $@\n";
    print OUT $CONTENT;
    close(OUT); 
   }
@@ -2080,7 +2080,7 @@ sub parse_csv
 #######################################################################
 sub version
 {
- my @NIKTOFILES=dirlist($NIKTO{plugindir},"(^nikto|^db_)");
+ my @NIKTOFILES=dirlist($NIKTOCONFIG{PLUGINDIR},"(^nikto|^db_)");
 
  nprint "$DIV\n$NIKTO{name} Versions\n$DIV\n";
  nprint "File                               Version      Last Mod\n";
@@ -2090,7 +2090,7 @@ sub version
 
  foreach my $FILE (sort @NIKTOFILES)
   {
-   open(FI,"<$NIKTO{plugindir}/$FILE") || die print STDERR "- ERROR: Unable to open '$NIKTO{plugindir}/$FILE': $!\n";;;
+   open(FI,"<$NIKTOCONFIG{PLUGINDIR}/$FILE") || die print STDERR "- ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$FILE': $!\n";;;
    my @F=<FI>;
    close(FI);
    my @VERS=grep(/^#VERSION/,@F);
@@ -2129,7 +2129,7 @@ sub send_updates
  if ($updated_version eq "") { return; }
  
  # make sure the db_outdatedb isn't *too* old
- open(OD,"<$NIKTO{plugindir}/db_outdated") || die print STDERR "- ERROR: Unable to open '$NIKTO{plugindir}/db_outdated': $!\n";;
+ open(OD,"<$NIKTOCONFIG{PLUGINDIR}/db_outdated") || die print STDERR "- ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/db_outdated': $!\n";;
  @F=<OD>;
  close(OD);
  
@@ -2241,7 +2241,7 @@ sub usage
 sub initialise_db
 {
    my $dbname=$_[0];
-   my $filename="$NIKTO{plugindir}/" . $dbname;
+   my $filename="$NIKTOCONFIG{PLUGINDIR}/" . $dbname;
    my (@dbarray, @headers);
    my $hashref = {};
 

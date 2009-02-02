@@ -50,7 +50,7 @@ $STARTTIME         = localtime();
 $DIV               = "-" x 75;
 $NIKTO{version}    = "2.10";
 $NIKTO{name}       = "Nikto";
-$NIKTO{configfile} = "config.txt";    ### Change this line if your setup is having trouble finding it
+$NIKTO{configfile} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
 $http_eol          = "\r\n";
 
 # read the --config option
@@ -62,12 +62,26 @@ $http_eol          = "\r\n";
     if (defined $optcfg{'config'}) { $NIKTO{configfile} = $optcfg{'config'}; }
 }
 
-load_configs();
-find_plugins();
-require "$NIKTO{plugindir}/nikto_core.plugin";    ### Change this line if your setup is having trouble finding it
+# Read the config files in order
+my $error;
+my $config_exists=0;
+$error=load_config("$NIKTO{configfile}");
+$config_exists=1 if ($error eq "");
+$error=load_config("$ENV{HOME}/nikto.conf");
+$config_exists=1 if ($error eq "");
+$error=load_config("nikto.conf");
+$config_exists=1 if ($error eq "");
+
+if ($config_exists==0)
+{
+   die "- Could not find a valid nikto config file\n";
+}
+
+setup_dirs();
+require "$NIKTOCONFIG{PLUGINDIR}/nikto_core.plugin";
 nprint("T:$STARTTIME: Starting", "d");
-require "$NIKTO{plugindir}/nikto_single.plugin";     ### Change this line if your setup is having trouble finding it
-require "$NIKTO{plugindir}/LW2.pm";                  ### Change this line if your setup is having trouble finding it
+require "$NIKTOCONFIG{PLUGINDIR}/nikto_single.plugin";
+require "$NIKTOCONFIG{PLUGINDIR}/LW2.pm";
 
 # use LW2;					     ### Change this line to use a different installed version
 
@@ -121,7 +135,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
         $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp}=date_disp($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch});
 
         $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed} = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch} -                                       $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch};
-        write_output();
+        #write_output();
     }
     else {
         $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
@@ -173,87 +187,80 @@ exit;
 ####                Most code is now in nikto_core.plugin                    ####
 #################################################################################
 # load config file
-sub load_configs
+# error=load_config(FILENAME)
+sub load_config
 {
-    open(CONF, "<$NIKTO{configfile}") || print STDERR "- ERROR: Unable to open config file '$NIKTO{configfile}' ($!), only 1 CGI directory defined.\n";
-    my @CONFILE = <CONF>;
-    close(CONF);
+   my $configfile=$_[0];
 
-    foreach my $line (@CONFILE)
-    {
-        $line =~ s/\#.*$//;
-        chomp($line);
-        $line =~ s/\s+$//;
-        $line =~ s/^\s+//;
-        if ($line eq "") { next; }
-        my @temp = split(/=/, $line, 2);
-        if ($temp[0] ne "") { $NIKTOCONFIG{ $temp[0] } = $temp[1]; }
-    }
+   open(CONF, "<$configfile") || return "- ERROR: Unable to open config file '$configfile'";
+   my @CONFILE = <CONF>;
+   close(CONF);
 
-    # add CONFIG{CLIOPTS} to ARGV if defined...
-    if (defined $NIKTOCONFIG{CLIOPTS})
-    {
-        my @t = split(/ /, $NIKTOCONFIG{CLIOPTS});
-        foreach my $c (@t) { push(@ARGV, $c); }
-    }
+   foreach my $line (@CONFILE)
+   {
+      $line =~ s/\#.*$//;
+      chomp($line);
+      $line =~ s/\s+$//;
+      $line =~ s/^\s+//;
+      next if ($line eq "");
+      my @temp = split(/=/, $line, 2);
+      if ($temp[0] ne "") { $NIKTOCONFIG{ $temp[0] } = $temp[1]; }
+   }
 
-    # Check for necessary config items
-    check_config_defined("CHECKMETHODS", "HEAD");
+   # add CONFIG{CLIOPTS} to ARGV if defined...
+   if (defined $NIKTOCONFIG{CLIOPTS})
+   {
+      my @t = split(/ /, $NIKTOCONFIG{CLIOPTS});
+      foreach my $c (@t) { push(@ARGV, $c); }
+   }
 
-    return;
+   # Check for necessary config items
+   check_config_defined("CHECKMETHODS", "HEAD");
+
+   return "";
 }
 #################################################################################
 # find plugins directory
-sub find_plugins
+sub setup_dirs
 {
+   my $CURRENTDIR = $0;
+   chomp($CURRENTDIR);
+   $CURRENTDIR =~ s/\/nikto.pl$//;
 
-    # get the correct path to 'plugins'
-    # if defined in config.txt file... most accurate, we hope
-    if ((defined $NIKTOCONFIG{EXECDIR}) && (-d "$NIKTOCONFIG{EXECDIR}/plugins"))
-    {
-        $NIKTO{execdir}     = $NIKTOCONFIG{EXECDIR};
-        $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-        $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-    }
-
-    unless (defined $NIKTO{execdir})
-    {    # try pwd
-        if (-d "$ENV{PWD}/plugins")
-        {
-            $NIKTO{execdir}     = $ENV{PWD};
-            $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-            $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-        } else
-        {    # try $0
-            my $EXECDIR = $0;
-            chomp($EXECDIR);
-            $EXECDIR =~ s/\/nikto.pl$//;
-
-            if (-d "$EXECDIR/plugins")
-            {
-                $NIKTO{execdir}     = $EXECDIR;
-                $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-                $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-            }
-        }
-
-        if ($NIKTO{execdir} eq "")
-        {    # try ./
-            $NIKTO{execdir}     = "./";
-            $NIKTO{plugindir}   = "$NIKTO{execdir}/plugins";
-            $NIKTO{templatedir} = "$NIKTO{execdir}/templates";
-        }
-    }
-
-    if (!(-d $NIKTO{plugindir}))
-    {
-        print STDERR "I can't find 'plugins' directory. I looked around:\n";
-        print STDERR "\t$NIKTOCONFIG{EXECDIR}\n\t$ENV{PWD}\n\t$0\n";
-        print STDERR "Try: switch to the 'nikto' base dir, or\n";
-        print STDERR "Try: set EXECDIR in config.txt\n";
-        exit;
-    }
-    return;
+   # First assume we get it from NIKTOCONFIG
+   unless (defined $NIKTOCONFIG{EXECDIR})
+   {
+      if (-d "$ENV{PWD}/plugins")
+      {
+         $NIKTOCONFIG{EXECDIR}=$ENV{PWD};
+      }
+      elsif (-d "$CURRENTDIR/plugins")
+      {
+         $NIKTOCONFIG{EXECDIR}=$CURRENTDIR;
+      }
+      elsif (-d "./plugins")
+      {
+         $NIKTOCONFIG{EXECDIR}=$CURRENTDIR;
+      }
+      else
+      {
+         print STDERR "Could not work out the nikto EXECDIR, try setting it in niktorc";
+         exit;
+      }
+   }
+   unless (defined $NIKTOCONFIG{PLUGINDIR})
+   {
+      $NIKTOCONFIG{PLUGINDIR}="$NIKTOCONFIG{EXECDIR}/plugins";
+   }
+   unless (defined $NIKTOCONFIG{TEMPLATEDIR})
+   {
+      $NIKTOCONFIG{TEMPLATEDIR}="$NIKTOCONFIG{EXECDIR}/templates";
+   }
+   unless (defined $NIKTOCONFIG{DOCUMENTDIR})
+   {
+      $NIKTOCONFIG{DOCUMENTDIR}="$NIKTOCONFIG{EXECDIR}/docs";
+   }
+   return;
 }
 
 ######################################################################

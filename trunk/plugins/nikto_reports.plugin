@@ -93,11 +93,11 @@ sub close_output
 ###############################################################################
 sub open_templates
 {
-    my @ts        = dirlist($NIKTO{templatedir});
+    my @ts        = dirlist($NIKTOCONFIG{TEMPLATEDIR});
     my $have_cirt = 0;
     foreach my $t (@ts)
     {
-        open(T, "<$NIKTO{templatedir}/$t");
+        open(T, "<$NIKTOCONFIG{TEMPLATEDIR}/$t");
         my @TEMPLATE = <T>;
         close(T);
         my $T = join("", @TEMPLATE);
