@@ -1585,7 +1585,7 @@ if ($code_updates)
   nprint "+ Retrieving 'CHANGES.txt'\n";
   (my $RES, $CONTENT) = fetch("$serverdir/CHANGES.txt","GET");
   if (($CONTENT ne "") && ($RES eq 200)) {
-   open(OUT,">$NIKTOCONFIG{PLUGINDIR}/../docs/CHANGES.txt") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/../CHANGES.txt' for write: $@\n";
+   open(OUT,">$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt' for write: $@\n";
    print OUT $CONTENT;
    close(OUT); 
   }
