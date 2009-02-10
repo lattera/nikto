@@ -1,3 +1,5 @@
+2009-01-10 plugins/nikto_core.plugin
+	- Removed test_target function as now done in the nikto_test plugin
 2008-11-11 plugins/nikto_core.plugin nikto.pl plugins/nikto_reports.plugin
 	- Added report phase to plugin runner
 2008-10-09 plugins/nikto_core.plugin nikto.pl
