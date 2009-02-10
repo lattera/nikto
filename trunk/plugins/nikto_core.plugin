@@ -1773,8 +1773,11 @@ sub fetch
  $NIKTO{totalrequests}++;
  unless ($_[4]) { LW2::http_fixup_request(\%request); }
  LW2::http_do_request_timeout(\%request,\%result);
- dump_var("Request Hash", \%request);
- dump_var("Result Hash", \%result);
+ if ($OUTPUT{debug})
+ {
+    dump_var("Request Hash", \%request);
+    dump_var("Result Hash", \%result);
+ }
  
  if (defined $CLI{display} && ($CLI{display} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
   { 
