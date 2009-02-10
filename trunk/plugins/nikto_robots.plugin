@@ -52,14 +52,14 @@ sub nikto_robots
         foreach my $line (@DOC)
         {
             $line = char_escape($line);
-            if ($line =~ /disallow/i)                       # hmmm...
+            if ($line =~ /allow/i)                       # hmmm...
             {
                 chomp($line);
                 $line =~ s/\#.*$//;
                 $line =~ s/(^\s+|\s+$)//g;
                 $line =~ s/\s+/ /g;
                 $line =~ s/\\t/ /g;
-                $line =~ s/disallow(\\:)?( )?//i;
+                $line =~ s/(dis)?allow(\\:)?( )?//i;
                 $line =~ s/\*//g;
                 $line =~ s/\/+/\//g;
 
@@ -119,8 +119,8 @@ sub nikto_robots
         }
 
         my $msg;
-        if ($DISCTR eq 1)   { $msg = "contains $DISCTR 'disallow' entry which should be manually viewed."; }
-        elsif ($DISCTR > 1) { $msg = "contains $DISCTR 'disallow' entries which should be manually viewed."; }
+        if ($DISCTR eq 1)   { $msg = "contains $DISCTR entry which should be manually viewed."; }
+        elsif ($DISCTR > 1) { $msg = "contains $DISCTR entries which should be manually viewed."; }
         else                { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
 
         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"robots.txt $msg", 999996, "", "GET", "/robots.txt");
