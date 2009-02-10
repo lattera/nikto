@@ -1,4 +1,6 @@
 2009-01-10 plugins/nikto_core.plugin
+	- Added fix for #73 to apply multiple variables for tests, supplied by
+	  Laurent Licour
 	- Removed test_target function as now done in the nikto_test plugin
 2008-11-11 plugins/nikto_core.plugin nikto.pl plugins/nikto_reports.plugin
 	- Added report phase to plugin runner

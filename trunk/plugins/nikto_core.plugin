@@ -30,7 +30,7 @@ sub change_variables
    my @subtests;
    my $cooked;
 
-   if ($line !~ "^\@")
+   if ($line !~ "\@")
    {
       push(@subtests, $line);
    }
@@ -45,7 +45,7 @@ sub change_variables
             {
                $cooked = $line;
                $cooked =~ s/$varname/$value/g;
-               push(@subtests, $cooked);
+               push(@subtests, change_variables($cooked));
             }
          }
       }
