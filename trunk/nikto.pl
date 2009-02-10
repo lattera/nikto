@@ -169,7 +169,6 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
                 map_codes();
                 load_plugins();
                 run_plugins();
-                #test_target();
             }
             run_report();
         }
