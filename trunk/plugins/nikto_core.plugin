@@ -94,7 +94,7 @@ sub nprint
       return;
    } 
    # print errors to STDERR
-   if ($line =~ /ERROR\:/) { print STDERR "$line\n"; }
+   if ($line =~ /ERROR\:/) { print STDERR "$line\n"; return; }
 
    # print to scan details to standard output if the users wants another format and is saving results to a file
    $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
@@ -1656,6 +1656,15 @@ sub proxy_check
   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
   LW2::http_do_request_timeout(\%request,\%result);
 
+  # First check that we can connect to the proxy
+  if (exists $result{'whisker'}{'error'})
+  {
+     if ($result{'whisker'}{'error'} =~ "Transport endpoint is not connected")
+     {
+        nprint("ERROR: Could not connect to the defined proxy $NIKTOCONFIG{PROXYHOST}");
+        exit 1;
+     }
+  }
   if ($result{'whisker'}{'code'} eq "407")       # proxy requires auth
   { 
    # have id/pw?
