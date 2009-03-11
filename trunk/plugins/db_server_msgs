@@ -263,3 +263,4 @@
 "800250","ZyXEL-RomPager","Probably a Netgear SoHo Router (RT-314 or similar), most likely vulnerable to CSS."
 "800251","Netscape-Enterprise\/4.","Netscape-Enterprise 4.x was made End of Life by Sun in December  2002. http://www.sun.com/software/products/web_srvr/lifecycle.xml"
 "800252","CERN\/3","CERN 3.0A has not been updated since July, 1996 and likely has a few flaws."
+"800253","Agent-ListenServer-HttpSvr\/1\.0","McAfee ePolicy Orchestra Agent. This may reveal information about anti-virus and software update schedules."

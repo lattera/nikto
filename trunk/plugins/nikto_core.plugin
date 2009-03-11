@@ -1737,13 +1737,20 @@ sub content_present
    my $result=FALSE;
    my $res=$_[0];
 
-   foreach $found (split(' ', $VARIABLES{"\@HTTPFOUND"}))
-   {
-      if ($res eq $found)
+   # perform an extra check just in case the web server lies about finds 
+   # basically assume that the value for a non-extension is the true 
+   # code for "File not Found". 
+   if ($res ne $FoF{NONE}{response}) 
+   { 
+      foreach $found (split(' ', $VARIABLES{"\@HTTPFOUND"}))
       {
-         $result=TRUE;
+         if ($res eq $found)
+         {
+            $result=TRUE;
+         }
       }
    }
+
    return $result;
 }
 #######################################################################
