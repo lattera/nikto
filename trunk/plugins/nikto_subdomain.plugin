@@ -49,6 +49,13 @@ sub nikto_subdomain
       return;
    }
 
+   # Check if the start of the domain is "www"
+   if ($host =~ /^www\./)
+   {
+      # Remove the www.
+      $host =~ s/^www\.//;
+   }
+
    foreach my $item (@$dbarray)
    {
       # Use fetch to minimise extra code
