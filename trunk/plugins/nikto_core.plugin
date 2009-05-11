@@ -2167,7 +2167,7 @@ sub initialise_db
 sub add_vulnerability
 {
    my ($host, $port, $message, $nikto_id, $osvdb, $method, $uri) = @_;
-   my $result=();
+   my $result="";
    if (defined $_[7])
    {
       $result=$_[7]->{whisker}->{data};
