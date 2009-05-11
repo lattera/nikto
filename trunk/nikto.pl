@@ -166,7 +166,7 @@ foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
             {
                 dump_target_info();
                 set_scan_items();
-                map_codes();
+                unless (defined $CLI{nofof}) { map_codes() };
                 load_plugins();
                 run_plugins();
             }

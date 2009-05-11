@@ -4,6 +4,8 @@
 	- Added extra tests to pull information if scanning ePO agent or HP
 	  WBEM
 	- Added test to recognise a Dell Remote Access Console
+	- Added -no404 switch to disable 404 checking. Warning, this produces
+	  a lot of false positives at the moment
 2009-01-10 plugins/nikto_core.plugin
 	- Added fix for #73 to apply multiple variables for tests, supplied by
 	  Laurent Licour
