@@ -55,6 +55,44 @@ sub nikto_msgs
       {
          add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"$1 - $item->{message}",$item->{nikto_id},0);
       }
+
+      # Special stuff to pull information from results 
+      # McAfee ePO 
+      if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /(Agent-ListenServer-HttpSvr\/1\.0)\b/i) 
+      { 
+         my ($RES, $CONTENT) = fetch("/","GET"); 
+         next unless ($RES == 200); 
+         # Computer name 
+         my $name=$CONTENT; 
+         $name =~ s#(^.*<ComputerName>)([a-zA-Z0-9]*)(</ComputerName>.*$)#\2#; 
+         my $eposerver=$CONTENT; 
+         $eposerver =~ s#(^.*<ePOServerName>)([a-zA-Z0-9]*)(</ePOServerName>.*$)#\2#; 
+         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Web server is a McAfee ePO agent, showing the hostname is $name and the ePO server is $eposerver.",80100,0);      
+      } 
+      # HP WBEM 
+      if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /(CompaqHTTPServer)/i) 
+      { 
+         my ($RES, $CONTENT) = fetch("/cpqlogin.htm","GET"); 
+         next unless ($RES == 200); 
+         my $ipaddrs=""; 
+         my $name; 
+         foreach my $line (split(/\n/, $CONTENT)) 
+         { 
+            if ($line =~ "System Management Homepage for ") 
+            { 
+               $name=$line; 
+               $name =~ s#(^.*System Management Homepage for )([a-zA-Z0-9]*)(</font>.*$)#\2#; 
+            } 
+            if ($line =~ "new ObjectIpAddresses") 
+            { 
+               my $ipaddr=$line; 
+               $ipaddr =~ s#(^.*new ObjectIpAddresses\(")([\d\.]+)("\);.*$)#\2#; 
+               nprint("$ipaddr"); 
+               $ipaddrs .= " $ipaddr"; 
+            } 
+         } 
+         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Web server is an HP WBEM agent, showing the hostname is $name and the IP addresses are$ipaddrs.",80100,0);      
+      } 
    }
 }
 

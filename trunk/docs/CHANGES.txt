@@ -1,6 +1,9 @@
 2009-05-11 plugins/nikto_core.plugin plugins/nikto_subdomain.plugin
 	- Added subdomain buteforcer as mutate option 5, thanks to Ryan
 	  DewHurst
+	- Added extra tests to pull information if scanning ePO agent or HP
+	  WBEM
+	- Added test to recognise a Dell Remote Access Console
 2009-01-10 plugins/nikto_core.plugin
 	- Added fix for #73 to apply multiple variables for tests, supplied by
 	  Laurent Licour
