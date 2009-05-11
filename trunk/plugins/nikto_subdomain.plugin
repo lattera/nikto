@@ -1,0 +1,70 @@
+#VERSION,1.00
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+sub nikto_subdomain_init
+{
+   my $id =
+   {
+      name         => "subdomain",
+      full_name    => "Sub-domain forcer",
+      author       => "Ryan Dewhurst",
+      description  => "Attempts to bruteforce commonly known sub-domains",
+      scan_method  => \&nikto_subdomain,
+      scan_cond    => '$CLI{mutate} =~ /5/',
+      scan_weight => 20,
+      copyright    => "2009 Ryan Dewhurst"
+   };
+
+   return $id;
+}
+
+sub nikto_subdomain
+{
+   my $dbarray = initialise_db("db_subdomains");
+
+   # Record the host for future use
+   my $host=$TARGETS{$CURRENT_HOST_ID}{hostname};
+
+   # Check whether the host is an IP address
+   if ($host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/)
+   {
+      # Host is an IP address, don't bother!
+      return;
+   }
+
+   foreach my $item (@$dbarray)
+   {
+      # Use fetch to minimise extra code
+      # First we need to mangle the host.
+      my $newhost=$item->{subdomain} . "." . $host;
+      $request{whisker}{host} = $newhost;
+      my ($res, $content) = fetch("/", "HEAD");
+
+      if (($res == 200) || ($res == 302))
+      {
+         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Subdomain $item->{subdomain} found", $item->{nikto_id}, 0);
+      } # End if
+
+   } # End foreach
+   # Reset $request - we need to localise $request!
+   $request{whisker}{host}=$host; 
+} # End sub
+
+1;

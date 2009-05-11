@@ -433,6 +433,7 @@ sub general_config
  $NIKTO{mutate_opts}{2}="Guess for password file names";
  $NIKTO{mutate_opts}{3}="Enumerate user names via Apache (/~user type requests)";
  $NIKTO{mutate_opts}{4}="Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type requests)";
+ $NIKTO{mutate_opts}{5}="Attempt to brute force sub-domain names, assume that the host name is the parent domain";
 
  $NIKTO{display}{1}="Show redirects";
  $NIKTO{display}{2}="Show cookies received";
@@ -1501,7 +1502,7 @@ sub do_auth
       next unless ($realm =~ /$REALMS{$REALM}{realm}/i || $REALMS{$REALM}{realm} eq '@ANY');
       if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq ""))
       { 
-         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid}); 
+         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid},\%result); 
       }
       else
       { 
@@ -1528,7 +1529,7 @@ sub do_auth
             unless ($REALMS{$REALM}{tid} == 700500 ||
                     $REALMS{$REALM}{checked} == 1)
             {
-               add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Default account found for '$realm' at $request{'uri'} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0);
+               add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Default account found for '$realm' at $request{'uri'} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0,\%result);
                $REALMS{$REALM}{checked}=1;
             }
             # Finally repeat the check
@@ -2165,13 +2166,12 @@ sub initialise_db
 #######################################################################
 sub add_vulnerability
 {
-   my $host=$_[0];
-   my $port=$_[1];
-   my $message=$_[2];
-   my $nikto_id=$_[3];
-   my $osvdb=$_[4];
-   my $method=$_[5];
-   my $uri=$_[6];
+   my ($host, $port, $message, $nikto_id, $osvdb, $method, $uri) = @_;
+   my $result=();
+   if (defined $_[7])
+   {
+      $result=$_[7]->{whisker}->{data};
+   }
    my $outmessage=$message;
    my $resulthash={};
 
@@ -2188,6 +2188,7 @@ sub add_vulnerability
       osvdb => $osvdb,
       method => $method,
       uri => $uri,
+      result => $result,
    );
    $TARGETS{$host}{total_vulns}++;
    push(@RESULTS,$resulthash);
