@@ -29,7 +29,7 @@ sub nikto_reports_init
    {
       name         => "reports",
       full_name    => "Report as XML or HTML",
-      author       => "Sullo",
+      author       => "Sullo/Jabra",
       description  => "Produces an XML or HTML report.",
       recon_method => \&open_output,
       report_method=> \&write_output,
