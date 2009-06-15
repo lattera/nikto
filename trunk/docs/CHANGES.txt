@@ -1,3 +1,5 @@
+2009-06-15 plugins/nikto_reports.plugin templates/xml_end
+	- Fixed bug with xml not terminating correctly
 2009-05-11 plugins/nikto_core.plugin plugins/nikto_subdomain.plugin
 	- Added subdomain buteforcer as mutate option 5, thanks to Ryan
 	  DewHurst
