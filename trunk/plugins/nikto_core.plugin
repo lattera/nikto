@@ -466,6 +466,7 @@ sub general_config
        -Help        		Extended help information
        -id+          		host authentication to use, format is userid:password
        -mutate+           	Guess additional file names
+       -mutate-options+         Provide extra information for mutations
        -output+       		write output to this file
        -nossl                   disables using SSL
        -no404			disables 404 checks
@@ -548,6 +549,7 @@ sub general_config
            "config=s"                => \$CLI{config},
            "Cgidirs=s"               => \$CLI{forcecgi},
            "mutate=s"                => \$CLI{mutate},
+           "mutate-options=s"	     => \$CLI{mutate-options},
            "id=s"                    => \$CLI{hostauth},
            "evasion=s"               => \$CLI{evasion},
            "port=s"                  => \$CLI{ports},

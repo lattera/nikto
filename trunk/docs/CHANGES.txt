@@ -1,3 +1,8 @@
+2009-06-27 plugins/nikto_user_enum_cgiwrap.plugin
+	- Managled cgiwrap and apache plugins together and allow use of a
+	  dictionary (to speed things up). Also made it work with new
+          reporting style
+        - Added -mutate-options switch
 2009-06-15 plugins/nikto_reports.plugin templates/xml_end
 	- Fixed bug with xml not terminating correctly
 2009-05-11 plugins/nikto_core.plugin plugins/nikto_subdomain.plugin

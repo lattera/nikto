@@ -28,4 +28,4 @@
 @PASSWORDDIRS=/ /admin/ /clients/ /pass/ /password/ /passwords/ /store/ /users/ /access/ /members/ /private/ /ccbill/ /dmr/ /mastergate/ /dmr/ /epoch/ /netbilling/ /webcash/ /wwwjoin/ /etc/security/
 @PASSWORDFILES=admins clients pass password passwords passwd passwd.adjunct store users .htpasswd .passwd
 @PHPMYADMIN=/ /3rdparty/phpMyAdmin/ /phpMyAdmin/
-@HTTPFOUND=200 302 403
+@HTTPFOUND=200 301 302 403
