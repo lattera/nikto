@@ -224,7 +224,7 @@ sub setup_dirs
 {
    my $CURRENTDIR = $0;
    chomp($CURRENTDIR);
-   $CURRENTDIR =~ s/\/nikto.pl$//;
+   $CURRENTDIR =~ s#[\\/]nikto.pl$##;
 
    # First assume we get it from NIKTOCONFIG
    unless (defined $NIKTOCONFIG{EXECDIR})

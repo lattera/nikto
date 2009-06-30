@@ -434,6 +434,7 @@ sub general_config
  $NIKTO{mutate_opts}{3}="Enumerate user names via Apache (/~user type requests)";
  $NIKTO{mutate_opts}{4}="Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type requests)";
  $NIKTO{mutate_opts}{5}="Attempt to brute force sub-domain names, assume that the host name is the parent domain";
+ $NIKTO{mutate_opts}{6}="Attempt to guess directory names from the supplied dictionary file";
 
  $NIKTO{display}{1}="Show redirects";
  $NIKTO{display}{2}="Show cookies received";
@@ -508,7 +509,8 @@ sub general_config
  	foreach my $k (sort keys %{$NIKTO{mutate_opts}}) 
 		{ $NIKTO{options} .= "       		       	           $k     $NIKTO{mutate_opts}{$k}\n"; }
 
- $NIKTO{options}.="       -nolookup       		skip name lookup
+ $NIKTO{options}.="       -mutate-options		Provide information for mutates
+       -nolookup       		skip name lookup
        -nossl                   disables using SSL
        -no404			disables nikto attempting to guess a 404 page
        -output+       		write output to this file
@@ -2172,6 +2174,7 @@ sub initialise_db
 sub add_vulnerability
 {
    my ($host, $port, $message, $nikto_id, $osvdb, $method, $uri) = @_;
+   $uri="/" unless (defined $uri);
    my $result="";
    if (defined $_[7])
    {
