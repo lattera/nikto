@@ -62,13 +62,6 @@ sub open_output
         $xml =~ s/\#NIKTODTD/$NIKTOCONFIG{NIKTODTD}/;
         print OUT "$xml";
     }
-    #elsif ($CLI{format} =~ /^txt/i)
-    #{
-        #print OUT "- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}\n";
-    #} elsif ($CLI{format} =~ /^csv/i)
-    #{
-        #print OUT "\"$NIKTO{name} v$NIKTO{version}\",\"Core v$NIKTO{core_version}\"\n";
-    #}
     return;
 }
 ###############################################################################

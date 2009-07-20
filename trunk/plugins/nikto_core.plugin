@@ -1848,19 +1848,27 @@ sub set_scan_items
      
    # check tuning options
    if ((defined $CLI{tuning}) && (defined $item[2]))
-     {
-      if ($CLI{tuning} =~ /x/)
+   {
+      # Work out the required tuning from the CLI string
+      my $exclude=0;
+      foreach my $tune (split(//,$CLI{tuning}))
+      {
+         if ($tune eq "x")
          {
-           # don't include checks that have the tuning set
-           if ($CLI{tuning} =~ /$item[2]/) { $add=0; }
+            $exclude=1;
+            next;
          }
-      else 
+         if ($exclude == 0)
          {
-           # only include checks that have the tuning set
-           if ($CLI{tuning} !~ /$item[2]/) { $add=0; }
+            if ($item[2] !~ /$tune/) { $add = 0; }
+            next;
+         }
+         if ($exclude == 1)
+         {
+            if ($item[2] =~ /$tune/) { $add = 0; }
          }
       }
-
+   }
     # Skip list
     foreach my $id (@SKIPLIST) { if ($id eq $item[0]) { $add=0; } }
 
