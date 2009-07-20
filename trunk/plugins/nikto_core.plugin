@@ -1952,7 +1952,7 @@ sub set_scan_items
   }
 
 nprint("- $TARGETS{$CURRENT_HOST_ID}{total_checks} server checks loaded","v");
-if ($TARGETS{$CURRENT_HOST_ID}{total_checks} eq 0) { nprint("+ Unable to load valid checks!"); exit; }
+if ($TARGETS{$CURRENT_HOST_ID}{total_checks} eq 0 && !defined $CLI{tuning}) { nprint("+ Unable to load valid checks!"); exit; }
 return;
 }
 #######################################################################
