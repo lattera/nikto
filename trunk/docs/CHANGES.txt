@@ -1,5 +1,7 @@
 2009-07-20 plugins/nikto_core
 	- Fix to ensure that -Tuning works as expected, fixes bug #84
+	- Fix to add a warning if a web server has been configured to restrict
+	  information on its server banner, fixes bug #66
 2009-06-30 plugins/nikto_dictionary_attack
 	- Add plugin to use dirbuster lists with mutate 6 and mutate-options
 	- couple of minor fixes to prevent errors on Windows and exporting as

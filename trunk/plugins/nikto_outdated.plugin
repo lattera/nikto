@@ -157,6 +157,12 @@ sub vereval
         @RUN = split(//, $RUNNING);
     }
 
+    # Check to see whether the arrays both have the same length
+    if (scalar(@RUN) != scalar(@CUR))
+    {
+       add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING while the database has: $CURRENT. This may cause false positives.\n",699999);
+    }
+
     # start with 0... eval each in turn...
     for (my $i = 0 ; $i <= $#CUR ; $i++)
     {
