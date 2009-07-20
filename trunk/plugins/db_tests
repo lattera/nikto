@@ -3588,4 +3588,5 @@
 "003586","0","b","/ampache/update.php","GET","Ampache Update","","","","","Ampache update page is visible.","","" 
 "003587","0","b","/ampache/login.php","GET","Ampache :: Pour l&#039;Amour de la Musique","","","","","Ampache is installed.","",""
 "003588","0","b","/ampache/docs/README","GET","README - Ampache","","","","","Ampache installation documents found.","",""
-"003589","0","b","/cgi-bin/webcgi/about","GET","/cgi/locale/about_en.xsl","","","","","Host seems to be a Dell Remote Access Controller (RAC)."
+"003589","0","b","/cgi-bin/webcgi/about","GET","/cgi/locale/about_en.xsl","","","","","Host seems to be a Dell Remote Access Controller (RAC).","",""
+"003590","0","b","/webservices/IlaWebServices","GET","200","","","","","Host has the Oracle iLearning environment installed.","",""

@@ -1078,7 +1078,7 @@ sub dbcheck
            if ($line eq "") { next; }
            my @L=parse_csv($line);
            if ($line !~ /^\".*\"\,\".*\"\,\".*\"$/) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
-           if ($#L ne 2) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+           if ($#L ne 3) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
            $ENTRIES{"$L[0]"}++;
          }
 
@@ -1122,7 +1122,7 @@ sub dbcheck
            if ($line !~ /^\"/)  { next; }
            chomp($line);
            my @L=parse_csv($line);
-           if ($#L ne 3) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
+           if ($#L ne 4) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
         nprint "\t$ctr entries\n";
