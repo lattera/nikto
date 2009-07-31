@@ -39,43 +39,43 @@ sub nikto_outdated_init
 
 sub nikto_outdated
 {
+   my ($mark)=@_;
     # Below is to use a local copy, as the old version caused duplicate entries
     # when more than one host was scanned
     my @BUILDITEMS;
 
     # populate @BUILDITEMS with appropriate values
     # if Apache, split on space...
-    if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /apache/i)
+    if ($mark->{banner} =~ /apache/i)
     {
-        push(@BUILDITEMS, (split(/ /, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner})));
-    } elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /weblogic/i)    # strip all the date info...
+        push(@BUILDITEMS, (split(/ /, $mark->{banner})));
+    } elsif ($mark->{banner} =~ /weblogic/i)    # strip all the date info...
     {
-        my @T = split(/ /, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+        my @T = split(/ /, $mark->{banner});
         push(@BUILDITEMS, "$T[0]\/$T[1]");
-    } elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /sitescope/i)    # strip all the date info...
+    } elsif ($mark->{banner} =~ /sitescope/i)    # strip all the date info...
     {
-        my @T = split(/ /, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+        my @T = split(/ /, $mark->{banner});
         push(@BUILDITEMS, "$T[0]");
     } else
     {
-        if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} !~ /\s/)             # has no spaces
+        if ($mark->{banner} !~ /\s/)             # has no spaces
         {
-            $MATCHSTRING = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner};
-        } elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /\//)        # has spaces and / sepr
+            $MATCHSTRING = $mark->{banner};
+        } elsif ($mark->{banner} =~ /\//)        # has spaces and / sepr
         {
-            $MATCHSTRING = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner};
+            $MATCHSTRING = $mark->{banner};
             $MATCHSTRING =~ s/\s+//g;
         } else                                                                            # must create  sepr
         {
-
             # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)
-            my $sepr = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner};
+            my $sepr = $mark->{banner};
             $sepr =~ s/[a-zA-Z0-9\.\(\)]//gi;
             $sepr = substr($sepr, (length($sepr) - 1), 1);
 
             # $sepr=~ s/\s+/ /g;
             # break up ID string on $sepr
-            my @T = split(/$sepr/, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+            my @T = split(/$sepr/, $mark->{banner});
 
             # assume last is version...
             for ($i = 0 ; $i < $#T ; $i++) { $MATCHSTRING .= "$T[$i] "; }
@@ -110,7 +110,7 @@ sub nikto_outdated
                     $msg =~ s/\@RUNNING_VER/$BI/g;
                     $msg =~ s/\@CURRENT_VER/$v/g;
                     chomp($msg);
-                    add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,$msg, $OVERS{$V}{tid});
+                    add_vulnerability($mark,$msg, $OVERS{$V}{tid});
                 }
             }
         }
@@ -160,7 +160,7 @@ sub vereval
     # Check to see whether the arrays both have the same length
     if (scalar(@RUN) != scalar(@CUR))
     {
-       add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING while the database has: $CURRENT. This may cause false positives.\n",699999);
+       add_vulnerability($mark, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING while the database has: $CURRENT. This may cause false positives.\n",699999);
     }
 
     # start with 0... eval each in turn...

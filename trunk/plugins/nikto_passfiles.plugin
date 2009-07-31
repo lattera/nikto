@@ -40,6 +40,7 @@ sub nikto_passfiles_init
 
 sub nikto_passfiles
 {
+   my ($mark)=@_;
     my @DIRS   = (split(/ /, $VARIABLES{"\@PASSWORDDIRS"}));
     my @PFILES = (split(/ /, $VARIABLES{"\@PASSWORDFILES"}));
     my @EXTS = qw(asp bak dat data dbc dbf exe htm html htx ini lst txt xml php php3 phtml);

@@ -51,8 +51,8 @@ sub csv_report
       foreach my $uri (split(' ',$item->{uri}))
       {
          my $line;
-         $line.="\"$TARGETS{$item->{host}}{hostname}\",";
-         $line.="\"$item->{port}\",";
+         $line.="\"$item->{mark}->{hostname}\",";
+         $line.="\"$item->{mark}->{port}\",";
          $line.="\"";
          if ($item->{osvdb})  { $line.="OSVDB-$item->{osvdb}: " }; 
          if ($item->{method}) { $line.="$item->{method} " }; 

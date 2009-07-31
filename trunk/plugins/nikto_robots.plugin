@@ -40,91 +40,92 @@ sub nikto_robots_init
 
 sub nikto_robots
 {
-    (my $RES, $CONTENT) = fetch("/robots.txt", "GET");
+   my ($mark) = @_;
+   (my $RES, $CONTENT) = fetch("/robots.txt", "GET");
 
-    if (($RES eq 200) || ($RES eq $FoF{okay}{response}))    # got one!
-    {
-        if (is_404("robots.txt", $CONTENT, $RES)) { return; }
+   if (($RES eq 200) || ($RES eq $FoF{okay}{response}))    # got one!
+   {
+      if (is_404("robots.txt", $CONTENT, $RES)) { return; }
 
-        my ($DIRS, $RFILES) = "";
-        my $DISCTR = 0;
-        my @DOC = split(/\n/, $CONTENT);
-        foreach my $line (@DOC)
-        {
-            $line = char_escape($line);
-            if ($line =~ /allow/i)                       # hmmm...
-            {
-                chomp($line);
-                $line =~ s/\#.*$//;
-                $line =~ s/(^\s+|\s+$)//g;
-                $line =~ s/\s+/ /g;
-                $line =~ s/\\t/ /g;
-                $line =~ s/(dis)?allow(\\:)?( )?//i;
-                $line =~ s/\*//g;
-                $line =~ s/\/+/\//g;
+      my ($DIRS, $RFILES) = "";
+      my $DISCTR = 0;
+      my @DOC = split(/\n/, $CONTENT);
+      foreach my $line (@DOC)
+      {
+         $line = char_escape($line);
+         if ($line =~ /allow/i)                       # hmmm...
+         {
+            chomp($line);
+            $line =~ s/\#.*$//;
+            $line =~ s/(^\s+|\s+$)//g;
+            $line =~ s/\s+/ /g;
+            $line =~ s/\\t/ /g;
+            $line =~ s/(dis)?allow(\\:)?( )?//i;
+            $line =~ s/\*//g;
+            $line =~ s/\/+/\//g;
 
-                if ($line eq "") { next; }
+            if ($line eq "") { next; }
+   
+            # try to figure out file vs dir... just guess...
+            if (($line !~ /\./) && ($line !~ /\/$/)) { $line .= "/"; }
 
-                # try to figure out file vs dir... just guess...
-                if (($line !~ /\./) && ($line !~ /\/$/)) { $line .= "/"; }
+            $line = LW2::uri_normalize($line);
 
-                $line = LW2::uri_normalize($line);
+            # figure out dirs/files...
+            my $realdir  = LW2::uri_get_dir($line);
+            my $realfile = $line;
+            $realfile =~ s/^$realdir//;
 
-                # figure out dirs/files...
-                my $realdir  = LW2::uri_get_dir($line);
-                my $realfile = $line;
-                $realfile =~ s/^$realdir//;
+            nprint("- robots.txt entry dir:$realdir -- file:$realfile", "d");
+            if (($realdir  ne "") && ($realdir  ne "/")) { $DIRS{$realdir}++; }
+            if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
+            $DISCTR++;
+         }    # end if $line =~ disallow
+      }    # end foreach my $line (@DOC)_
 
-                nprint("- robots.txt entry dir:$realdir -- file:$realfile", "d");
-                if (($realdir  ne "") && ($realdir  ne "/")) { $DIRS{$realdir}++; }
-                if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
-                $DISCTR++;
-            }    # end if $line =~ disallow
-        }    # end foreach my $line (@DOC)_
+      # add them  to mutate dir/file
+      my $raw;
+      foreach $raw (sort keys %DIRS)
+      {
+         $raw =~ s/\\//g;
+         if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/)
+         {
+            $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
+         }
+         if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/)
+         {
+            $VARIABLES{"\@CGIDIRS"} .= " $raw";
+         }
+         if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/)
+         {
+            $VARIABLES{"\@NUKE"} .= " $raw";
+         }
+         if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/)
+         {
+            $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
+         }
+      }
 
-        # add them  to mutate dir/file
-        my $raw;
-        foreach $raw (sort keys %DIRS)
-        {
-            $raw =~ s/\\//g;
-            if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/)
-            {
-               $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
-            }
-            if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/)
-            {
-               $VARIABLES{"\@CGIDIRS"} .= " $raw";
-            }
-            if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/)
-            {
-               $VARIABLES{"\@NUKE"} .= " $raw";
-            }
-            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/)
-            {
-               $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
-            }
-        }
+      foreach $raw (sort keys %RFILES)
+      {
+         $raw =~ s/\\//g;
+         if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/)
+         {
+            $VARIABLES{"\@MUTATEFILES"} .= " $raw";
+         }
+         if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/)
+         {
+            $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
+         }
+      }
 
-        foreach $raw (sort keys %RFILES)
-        {
-            $raw =~ s/\\//g;
-            if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/)
-            {
-               $VARIABLES{"\@MUTATEFILES"} .= " $raw";
-            }
-            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/)
-            {
-               $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
-            }
-        }
+      my $msg;
+      if ($DISCTR eq 1)   { $msg = "contains $DISCTR entry which should be manually viewed."; }
+      elsif ($DISCTR > 1) { $msg = "contains $DISCTR entries which should be manually viewed."; }
+      else                { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
 
-        my $msg;
-        if ($DISCTR eq 1)   { $msg = "contains $DISCTR entry which should be manually viewed."; }
-        elsif ($DISCTR > 1) { $msg = "contains $DISCTR entries which should be manually viewed."; }
-        else                { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
-
-        add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"robots.txt $msg", 999996, "", "GET", "/robots.txt",\%result);
-    }
+      add_vulnerability($mark,"robots.txt $msg", 999996, "", "GET", "/robots.txt",\%result);
+   }
 }
 
 1;

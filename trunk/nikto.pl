@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
-#VERSION,2.10
+#VERSION,2.1.0
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 
@@ -28,8 +28,8 @@ Getopt::Long::Configure('no_ignore_case');
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 # Contact Information:
-#  	Sullo (sullo@cirt.net)
-#  	http://cirt.net/
+#     Sullo (sullo@cirt.net)
+#     http://cirt.net/
 #######################################################################
 # See the README.txt and/or help files for more information on how to use & config.
 # See the LICENSE.txt file for more information on the License Nikto is distributed under.
@@ -43,12 +43,12 @@ Getopt::Long::Configure('no_ignore_case');
 use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT $CURRENT_HOST_ID $CURRENT_PORT/;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS $STARTTIME/;
 use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
-use vars qw/@RESULTS @PLUGINS/;
+use vars qw/@RESULTS @PLUGINS @MARKS/;
 
 # setup
 $STARTTIME         = localtime();
 $DIV               = "-" x 75;
-$NIKTO{version}    = "2.10";
+$NIKTO{version}    = "2.1.0";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
 $http_eol          = "\r\n";
@@ -83,7 +83,7 @@ nprint("T:$STARTTIME: Starting", "d");
 require "$NIKTOCONFIG{PLUGINDIR}/nikto_single.plugin";
 require "$NIKTOCONFIG{PLUGINDIR}/LW2.pm";
 
-# use LW2;					     ### Change this line to use a different installed version
+# use LW2;                   ### Change this line to use a different installed version
 
 ($a, $b) = split(/\./, $LW2::VERSION);
 die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
@@ -105,76 +105,92 @@ proxy_setup();
 #open_output();
 nprint($DIV);
 
-set_targets();
-
-$PROXYCHECKED = 0;    # only do proxy_check once
-
-# actual scan for each host/port
-foreach $CURRENT_HOST_ID (sort { $a <=> $b } keys %TARGETS)
-{
-    LW2::http_reset();
-    $COUNTERS{hosts_completed}++;
-    if (($CLI{findonly}) && ($COUNTERS{hosts_completed} % 10) eq 0) { nprint("($COUNTERS{hosts_completed} of $COUNTERS{hosts_total})"); }
-
-    ($TARGETS{$CURRENT_HOST_ID}{hostname}, $TARGETS{$CURRENT_HOST_ID}{ip}, $TARGETS{$CURRENT_HOST_ID}{display_name}) =
-      resolve($TARGETS{$CURRENT_HOST_ID}{ident});
-    if ($TARGETS{$CURRENT_HOST_ID}{ident} eq "") { next; }
-    port_scan($TARGETS{$CURRENT_HOST_ID}{ports_in});
-
-    # make sure we have open ports on this target
-    if (keys(%{ $TARGETS{$CURRENT_HOST_ID}{ports} }) eq 0)
-    {
-        $CURRENT_PORT = $TARGETS{$CURRENT_HOST_ID}{ports_in};
-        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch}=time();
-        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp}=date_disp($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch});
-        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}
-        = "(no identification possible)";
-        $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
-        $TARGETS{$CURRENT_HOST_ID}{total_checks} = 0;
-        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch}=time();
-        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp}=date_disp($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch});
-
-        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed} = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch} -                                       $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch};
-        #write_output();
-    }
-    else {
-        $request{'whisker'}->{'host'} = $TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
-        if (defined $TARGETS{$CURRENT_HOST_ID}{vhost}) { $request{'Host'} = $TARGETS{$CURRENT_HOST_ID}{vhost}; }
-        foreach $CURRENT_PORT (keys %{$TARGETS{$CURRENT_HOST_ID}{ports}})
-        {
-            if ($CURRENT_PORT eq "") { next; }
-            $request{'whisker'}->{'port'}    = $CURRENT_PORT;
-            $request{'whisker'}->{'ssl'}     = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl};
-            $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};
-            if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
-            $TARGETS{$CURRENT_HOST_ID}{total_vulns} = 0;
-            delete $TARGETS{$CURRENT_HOST_ID}{positives};
-            %FoF = ();
-
-            get_banner();
-
-            if ($CLI{findonly})
-            {
-                my $protocol = "http";
-                if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} eq "")
-                {
-                    $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} = "(no identification possible)";
-                }
-                if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
-                nprint("+ Server: $protocol://$TARGETS{$CURRENT_HOST_ID}{display_name}:$CURRENT_PORT\t$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}");
-            } else
-            {
-                dump_target_info();
-                set_scan_items();
-                unless (defined $CLI{nofof}) { map_codes() };
-                load_plugins();
-                run_plugins();
-            }
-            run_report();
-        }
-    }
+# No targets - quit while we're ahead
+if ($CLI{host} eq "") 
+{ 
+   nprint("+ ERROR: No host specified");
+   usage(); 
 }
 
+$PROXYCHECKED = 0;    # only do proxy_check once
+load_plugins();
+
+# Parse the supplied list of targets
+my @MARKS=set_targets($CLI{host}, $CLI{ports}, $CLI{ssl}, $CLI{root});
+# Now check each target is real and remove duplicates/fill in extra information
+foreach my $mark (@MARKS)
+{
+   $mark->{test} = 1;
+   # Try to resolve the host
+   ($mark->{hostname}, $mark->{ip}, $mark->{display_name}) = resolve($mark->{ident});
+   
+   # Skip if we can't resolve the host - we'll error later
+   if (!defined $mark->{ip})
+   {
+      $mark->{test} = 0;
+      next;
+   }
+
+   # Check that the port is open
+   my $open=port_check($mark->{ip}, $mark->{port});
+   if ($open == 0) 
+   {
+      $mark->{test} = 0;
+      next;
+   }
+   $mark->{ssl}=$open-1;
+}
+
+# Now we've done the precursor, do the scan
+foreach my $mark (@MARKS)
+{
+   next unless ($mark->{test});
+   $mark->{start_time} = time();
+   # These should just be passed in the hash - but it's a lot of work to move to a local $request
+   $request{whisker}->{host} = $mark->{hostname} || $mark->{ip};
+   if (defined $CLI{vhost})
+   {
+      $request{Host} = $CLI{vhost};
+      $mark->{vhost} = $CLI{vhost};
+   }
+   $request{'whisker'}->{'port'}    = $mark->{port};
+   $request{'whisker'}->{'ssl'}     = $mark->{ssl};
+   $request{'whisker'}->{'version'} = $NIKTOCONFIG{DEFAULTHTTPVER};
+   if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
+   $mark->{total_vulns}=0;
+   $mark->{total_checks}=0;
+   
+   %FoF = ();
+   
+   $mark->{banner}=get_banner($mark);
+   
+   if ($CLI{findonly})
+   {
+      my $protocol="http";
+      if ($mark->{ssl}) { $protocol .= "s"; }
+      if ($mark->{banner} eq "")
+      {
+         $mark->{banner} = "(no identification possible)";
+      }
+      nprint("+ Server: $protocol://$mark->{display_name}:$mark->{port}\t$mark->{banner}");
+   }
+   else
+   {
+      dump_target_info($mark);
+      set_scan_items($mark);
+      unless (defined $CLI{nofof}) { map_codes() };
+      run_plugins($mark);
+   }
+   $mark->{end_time} = time();
+   my $time=date_disp($mark->{end_time});
+   my $elapsed=$mark->{end_time}-$mark->{start_time};
+   nprint("+ $mark->{total_checks} items checked: $mark->{total_vulns} item(s) reported on remote host");
+   
+   nprint("+ End Time:           $time ($elapsed seconds)");
+   nprint("$DIV");
+}
+run_report();
+   
 nprint("+ $COUNTERS{hosts_total} host(s) tested");
 send_updates();
 #close_output();

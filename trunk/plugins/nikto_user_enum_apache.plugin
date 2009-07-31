@@ -47,6 +47,7 @@ sub nikto_user_enum_apache_init
 
 sub nikto_user_enum_apache
 {
+   my ($mark) = @_;
    my $url;
    my @cgiwraps, @cfgcgi=split(/ /, $VARIABLES{"\@CGIDIRS"});
    
@@ -133,7 +134,7 @@ sub nikto_user_enum_apache_brute
    }
    if ($found)
    {
-      add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, $message . join(' ',@foundusers), 999997, "637", "HEAD", "/");
+      add_vulnerability($mark, $message . join(' ',@foundusers), 999997, "637", "HEAD", "/");
    }
    
 }
@@ -172,7 +173,7 @@ sub nikto_user_enum_apache_dictionary
    close(IN);
    if (scalar(@foundusers))
    {
-      add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, $message . join(' ',@foundusers), 999997, "637", "HEAD", "/");
+      add_vulnerability($mark, $message . join(' ',@foundusers), 999997, "637", "HEAD", "/");
    }
 }
 

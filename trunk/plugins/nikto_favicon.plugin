@@ -39,6 +39,7 @@ sub nikto_favicon_init
 
 sub nikto_favicon
 {
+   my ($mark)=@_;
    my ($RES, $CONTENT) = fetch("/favicon.ico","GET");
    my $dbarray = initialise_db("db_favicon");
 
@@ -52,7 +53,7 @@ sub nikto_favicon
       {
          if ($item->{md5hash} eq $hash)
          {
-            add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"/favicon.ico file identifies this server as: $item->{description}", $item->{nikto_id}, 39272);
+            add_vulnerability($mark,"/favicon.ico file identifies this server as: $item->{description}", $item->{nikto_id}, 39272);
          }
       }
    }

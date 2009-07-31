@@ -1,3 +1,8 @@
+2009-07-31 plugin/* nikto.pl
+	- Fix for ePO agent/HP iLO to not report for each known type of
+	  webserver
+	- Big changes to the way nikto assigns targets to remove globals, have
+	  deliberately broken nmap scanning and allowing port ranges.
 2009-07-20 plugins/nikto_core plugins/nikto_outdated db_tests db_outdated
 	- Fix to ensure that -Tuning works as expected, fixes ticket #84
 	- Fix to add a warning if a web server has been configured to restrict

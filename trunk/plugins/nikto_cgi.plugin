@@ -39,6 +39,7 @@ sub nikto_cgi_init
 
 sub nikto_cgi
 {
+   my ($mark) = @_;
    my ($gotvalid,$gotinvalid)=0;
    my @POSSIBLECGI=();
    my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));

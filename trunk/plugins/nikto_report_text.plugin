@@ -49,21 +49,21 @@ sub text_report
    my $curr_host, $curr_port;
    foreach my $item (@RESULTS)
    {
-      if ($TARGETS{$item->{host}}{hostname} ne $curr_host)
+      if ($item->{mark}->{hostname} ne $curr_host)
       {
-         $curr_host=$TARGETS{$item->{host}}{hostname};
+         $curr_host=$item->{mark}->{hostname};
          print OUT "+ Target Host: $curr_host\n";
       }
-      if ($item->{port} ne $curr_port)
+      if ($item->{mark}->{port} ne $curr_port)
       {
-         $curr_port=$item->{port};
+         $curr_port=$item->{mark}->{port};
          print OUT "+ Target Port: $curr_port\n";
       }
       foreach my $uri (split(' ',$item->{uri}))
       {
          my $line="+ ";
-         #$line.="$TARGETS{$item->{host}}{hostname}:";
-         #$line.="$item->{port} ";
+         #$line.="$item->{mark}->{hostname}:";
+         #$line.="$item->{mark}->{port} ";
          if ($item->{osvdb})  { $line.="OSVDB-$item->{osvdb}: " }; 
          if ($item->{method}) { $line.="$item->{method} " }; 
          if ($uri)            { $line.="${uri}: " }; 

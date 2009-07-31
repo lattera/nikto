@@ -37,6 +37,7 @@ sub nikto_dictionary_attack_init
 
 sub nikto_dictionary_attack
 {
+   my ($mark) = @_;
    my $dictfile=$CLI{mutate-options};
    my $ctr=0;
    
@@ -47,7 +48,7 @@ sub nikto_dictionary_attack
    }
 
    # Record the host for future use
-   my $host=$TARGETS{$CURRENT_HOST_ID}{hostname};
+   my $host=$mark->{hostname};
 
    nprint("- Guessing directories/files (using dictionary $dictfile).", "v");
    unless (open(IN, "<$dictfile"))
@@ -68,7 +69,7 @@ sub nikto_dictionary_attack
       {
          if ($result eq $found)
          {
-            add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, "Found directory /$dir/", 999996, "0", "HEAD", "/$dir/");
+            add_vulnerability($mark, "Found directory /$dir/", 999969, "0", "HEAD", "/$dir/");
          }
       }
       $ctr++;

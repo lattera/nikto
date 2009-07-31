@@ -39,6 +39,7 @@ sub nikto_apacheusers_init
 
 sub nikto_apacheusers
 {
+   my ($mark) = @_;
    (my $RES, $CONTENT) = fetch("/~root", "GET");
 
    $CONTENT = char_escape($CONTENT);
@@ -49,7 +50,7 @@ sub nikto_apacheusers
       $CONTENT = char_escape($CONTENT);
       if ($CONTENT !~ /forbidden/i)    # Good, it gave an error instead of forbidden
       {
-         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, "Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).", 999999, 637, "GET", "/~root");
+         add_vulnerability($mark, "Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).", 999999, 637, "GET", "/~root");
       }
    }
 }

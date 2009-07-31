@@ -39,12 +39,13 @@ sub nikto_apache_expect_xss_init
 
 sub nikto_apache_expect_xss
 {
+   my ($mark) = @_;
    my %headers=('Expect', '<script>alert(xss)</script>');
    (my $RES, $CONTENT) = fetch("/", "GET", "", \%headers);
 
    if ($CONTENT =~ /<script>alert\(xss\)<\/script>/)
    {
-      add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, "Apache is vulnerable to XSS via the Expect header", 999974, 27487);
+      add_vulnerability($mark, "Apache is vulnerable to XSS via the Expect header", 999974, 27487);
    }
 }
 

@@ -40,6 +40,7 @@ sub nikto_mutate_init
 
 sub nikto_mutate
 {
+   my ($mark)=@_;
     my ($c, %DIRS, %FS) = "";
 
     # build a hash of all the unique directories
@@ -75,7 +76,7 @@ sub nikto_mutate
             # args with no file
             if (($root eq "/") && ($file =~ /^\?/)) { next; }
             if (($root eq "")  && ($file =~ /^\?/)) { next; }
-            $TARGETS{$CURRENT_HOST_ID}{total_checks}++;
+            $mark->{total_checks}++;
             $m_test++;
             $new_tests++;
 

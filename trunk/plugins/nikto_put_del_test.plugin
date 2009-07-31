@@ -39,6 +39,7 @@ sub nikto_put_del_test_init
 
 sub nikto_put_del_test
 {
+   my ($mark)=@_;
     my $msg;
 
     # PUT a page
@@ -51,7 +52,7 @@ sub nikto_put_del_test
         (my $RES, $CONTENT) = fetch($uri, "GET");
         if ($CONTENT =~ /This was a Nikto test/)
         {
-            add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"HTTP method 'PUT' allows clients to save files on the web server.", 999995, 397, "PUT", $uri);
+            add_vulnerability($mark,"HTTP method 'PUT' allows clients to save files on the web server.", 999995, 397, "PUT", $uri);
 
             # we were able to put it there--can we delete it?
             (my $RES, $CONTENT) = fetch($uri, "DELETE");
@@ -60,8 +61,7 @@ sub nikto_put_del_test
                 (my $RES, $CONTENT) = fetch($uri, "GET");
                 if ($CONTENT !~ /This was a Nikto test/)    # gone now
                 {
-                    add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"HTTP method 'DELETE' allows clients to delete files on the web server.", 999994, 5646, "DELETE", $uri);
-                    $msg                                          = "HTTP method 'DELETE' allows clients to delete file on the web server.";
+                    add_vulnerability($mark,"HTTP method 'DELETE' allows clients to delete files on the web server.", 999994, 5646, "DELETE", $uri);
                 }
             }
         }

@@ -39,6 +39,7 @@ sub nikto_headers_init
 
 sub nikto_headers
 {
+   my ($mark)=@_; 
    my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
    # Standard headers, whisker is added to stop false positives
    my @standard_headers = qw /accept accept-charset accept-encoding accept-language accept-ranges age allow authorization cache-control connection content-encoding content-language content-length content-location content-md5 content-range content-type date etag expect expires from host if-match if-modified-since if-none-match if-range if-unmodified-since last-modified location max-forwards pragma proxy-authenticate proxy-authorization range referer retry-after server te trailer transfer-encoding upgrade user-agent vary via warning www-authenticate whisker/;
@@ -61,7 +62,7 @@ sub nikto_headers
       push(@BUILDITEMS, $x);
 
       $message .= " $x";
-      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"Retrieved X-Powered-By header:$message", 999992, 0);
+      add_vulnerability($mark,"Retrieved X-Powered-By header:$message", 999992, 0);
    }
 
    #######################################################################
@@ -73,13 +74,11 @@ sub nikto_headers
       $x =~ s/\s+//g;
       push(@BUILDITEMS, $x);
 
-      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT, "Retrieved servlet-engine headers: $x",999991,0);
+      add_vulnerability($mark, "Retrieved servlet-engine headers: $x",999991,0);
 
       my @bits = split(/;/, $x);
       foreach my $bit (@bits)
       {
-         #    nprint("- Retrieved servlet-engine headers : $bit");
-         #    $TARGETS{$CURRENT_HOST_ID}{positives}{999998}=1;
          push(@BUILDITEMS, $bit);
       }
    }
@@ -100,9 +99,9 @@ sub nikto_headers
    LW2::http_do_request_timeout(\%request, \%result);
    if (   ($result{'content-location'} ne "")
       && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
-      && ($result{'content-location'} !~ /$TARGETS{$CURRENT_HOST_ID}{ip}/))
+      && ($result{'content-location'} !~ /$mark->{ip}/))
    {
-      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".", 999989, 630);
+      add_vulnerability($mark,"IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".", 999989, 630);
    }
    
    LW2::http_close(\%request);    # force-close any old connections
@@ -118,9 +117,9 @@ sub nikto_headers
 
    if (($result{'location'} ne "")
       && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
-      && ($result{'location'} !~ /$TARGETS{$CURRENT_HOST_ID}{ip}/))
+      && ($result{'location'} !~ /$mark->{ip}/))
    {
-      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630);
+      add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630);
    }
 
    $request{'whisker'}{'Host'} = $wh;
@@ -139,7 +138,7 @@ sub nikto_headers
 
    if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//))
    {
-      add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737);
+      add_vulnerability($mark,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737);
    }
 
    #######################################################################
@@ -151,7 +150,7 @@ sub nikto_headers
          my $x = $result{$header};
          $x =~ s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"Retrieved $header header: $result{$header}",999986,0);
+         add_vulnerability($mark,"Retrieved $header header: $result{$header}",999986,0);
       }
    }
 
@@ -173,7 +172,7 @@ sub nikto_headers
          my $x = $result{$header};
          $x =~s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"Non-standard header $header returned by server, with contents: $result{$header}",$reportnum,0);
+         add_vulnerability($mark,"Non-standard header $header returned by server, with contents: $result{$header}",$reportnum,0);
          $reportnum++;
       }
    }
@@ -210,7 +209,7 @@ sub nikto_headers
             $message .= "0x$field ";
          }
       }
-      add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT, $message, 999984, 0);
+      add_vulnerability($mark, $message, 999984, 0);
    }
 }
 

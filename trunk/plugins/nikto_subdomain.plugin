@@ -37,10 +37,11 @@ sub nikto_subdomain_init
 
 sub nikto_subdomain
 {
+   my ($mark) = @_;
    my $dbarray = initialise_db("db_subdomains");
 
    # Record the host for future use
-   my $host=$TARGETS{$CURRENT_HOST_ID}{hostname};
+   my $host=$mark->{hostname};
 
    # Check whether the host is an IP address
    if ($host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/)
@@ -66,7 +67,7 @@ sub nikto_subdomain
 
       if (($res == 200) || ($res == 302))
       {
-         add_vulnerability($CURRENT_HOST_ID, $CURRENT_PORT,"Subdomain $item->{subdomain} found", $item->{nikto_id}, 0);
+         add_vulnerability($mark,"Subdomain $item->{subdomain} found", $item->{nikto_id}, 0);
       } # End if
 
    } # End foreach

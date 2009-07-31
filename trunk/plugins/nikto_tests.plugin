@@ -40,7 +40,7 @@ sub nikto_tests_init
 
 sub nikto_tests
 {
-   dump_var("Result Hash", \%result);
+   my ($mark) = @_;
 
    # this is the actual the looped code for all the checks
    foreach my $CHECKID (sort keys %TESTS) 
@@ -161,18 +161,10 @@ sub nikto_tests
             }
    
             $TESTS{$CHECKID}{osvdb} =~ s/\s+/ OSVDB\-/g;
-            add_vulnerability($CURRENT_HOST_ID,$CURRENT_PORT,"$request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},$TESTS{$CHECKID}{method},$uri);
+            add_vulnerability($mark,"$request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},$TESTS{$CHECKID}{method},$uri);
          }
       }
    } # end check loop
-   
-   nprint("+ $TARGETS{$CURRENT_HOST_ID}{total_checks} items checked: $TARGETS{$CURRENT_HOST_ID}{total_vulns} item(s) reported on remote host");
-   $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch}=time();
-   $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp}=date_disp($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch});
-   
-   $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed} = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch} - $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch};
-   nprint("+ End Time:        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp} ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed} seconds)");
-   nprint($DIV);
    
    return;
 }
