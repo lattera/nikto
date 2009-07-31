@@ -1,11 +1,12 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY description SYSTEM "sections/description.xml">
 <!ENTITY options SYSTEM "sections/options.xml">
 ]>
 <book>
   <!--Version 1.1-->
 
-  <title>Nikto v2 / The Manual</title>
+  <title>Nikto v2.1.0 / The Manual</title>
 
   <chapter>
     <title>Introduction</title>
@@ -21,32 +22,7 @@
     <sect1>
       <title>Description</title>
 
-      <para>Nikto is PERL software designed to find many types of web server
-      problems, including:<itemizedlist>
-          <listitem>
-            <para>Server and software misconfigurations</para>
-          </listitem>
-
-          <listitem>
-            <para>Default files and programs</para>
-          </listitem>
-
-          <listitem>
-            <para>Insecure files and programs</para>
-          </listitem>
-
-          <listitem>
-            <para>Outdated servers and programs</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para>Nikto is built on LibWhisker and can run any platform which has a
-      PERL runtime, and supports SSL, proxies, host authentication, IDS
-      evasion and more. It can be updated automatically from the command-line,
-      and supports the optional submission of updated version data back to the
-      maintainers.</para>
-
-      <para></para>
+      &description;
 
       <para>The name "Nikto" is taken from the movie "The Day the Earth Stood
       Still", and of course subsequent abuse by Bruce Campbell in "Army of
@@ -66,14 +42,14 @@
       responses for various file extensions can differ--the "not found"
       response for a .html file is often different than a .cgi.</para>
 
-      <para></para>
+      
 
       <para>Some testing tools, such as Nessus, also look at the content of
       the response to help eliminate these false positives. While often
       effective, this method relies on pre-defined strings to help eliminate
       false positives.</para>
 
-      <para></para>
+      
 
       <para>As of version 2.0 Nikto no longer assumes the error pages for
       different file types will be the same. A list of unique file extensions
@@ -85,7 +61,7 @@
       type, and therefore help eliminate the false positives seen for some
       servers in version 1.32 and below.</para>
 
-      <para></para>
+      
 
       <para>For example, if a server responds with a 404 "not found" error for
       a non-existent .txt file, Nikto will match the HTTP response of "404" on
@@ -109,7 +85,7 @@
       vulnerability scanner. The 2.0 release, in November, 2007 represents
       several years of improvements.</para>
 
-      <para></para>
+      
     </sect1>
   </chapter>
 
@@ -141,8 +117,6 @@
         </listitem>
       </itemizedlist>
 
-      <para></para>
-
       <para>The only required PERL module that does not come standard is
       LibWhisker. Nikto comes with and is configured to use a local LW.pm file
       (in the plugins directory), but users may wish to change Nikto to use a
@@ -153,8 +127,6 @@
       (which in turn requires OpenSSL on the Unix platform). Windows support
       for SSL is dependent on the installation package, but is rumored to
       exist for ActiveState's Perl.</para>
-
-      <para></para>
 
       <para>The nmap scanner can also be used, if desired. In some cases using
       nmap will slow down Nikto execution, as it must call an external
@@ -201,9 +173,7 @@
       <para>Unpack the download file:</para>
 
       <blockquote>
-        <para>tar -xvf nikto-current.tar.gz</para>
-
-        <para>gzip -d nikto-current.tar</para>
+        <para>tar -xvfz nikto-current.tar.gz</para>
       </blockquote>
 
       <para>Assuming a standard OS/PERL installation, Nikto should now be
@@ -275,8 +245,6 @@
       each line. Ports can be separated from the host and other ports via a
       colon or a comma. If no port is specified, port 80 is assumed.</para>
 
-      <para></para>
-
       <para>This is an example of a valid hosts file:</para>
 
       <blockquote>
@@ -291,6 +259,14 @@
         <para>192.168.0.1:80:443</para>
 
         <para>localhost:8888</para>
+      </blockquote>
+      
+      <para>A host file may also be an nmap output in "greppable" format (i.e.
+      from -oG). This may be passed to nikto through stdout/stdin using a "-" as
+      the filename. For example:</para>
+      
+      <blockquote>
+         <para>nmap -p80 192.168.0.0/24 -oG - | nikto.pl -h -</para>
       </blockquote>
     </sect1>
 
@@ -349,7 +325,7 @@
       nikto.pl in root's PATH environment variable. When nessusd starts, it
       should see the nikto.pl program and enable usage through the GUI.</para>
 
-      <para></para>
+      
     </sect1>
   </chapter>
 
@@ -386,11 +362,23 @@
       <para>3 - Enumerate user names via Apache (/~user type requests).
       Exploit a misconfiguration with Apache UserDir setups which allows valid
       user names to be discovered. This will attempt to brute-force guess user
-      names.</para>
+      names. A file of known users can also be supplied by supplying the file
+      name in the -mutate-options parameter.</para>
 
       <para>4 - Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type
       requests). Exploit a flaw in cgiwrap which allows valid user names to be
-      discovered. This will attempt to brute-force guess user names.</para>
+      discovered. This will attempt to brute-force guess user names.A file of
+      known users can also be supplied by supplying the file name in the
+      -mutate-options parameter.</para>
+      
+      <para>5 - Attempt to brute force sub-domain names. This will attempt to
+      brute force know domain names, it will assume the the given host (without
+      a www) is the parent domain.</para>
+      
+      <para>6 - Attempt to brute directory names. This is the only mutate
+      option that requires a file to be passed. It will use the given file to
+      attempt to guess directory names. Lists of common directories may be
+      found in the OWASP DirBuster project.</para>  
     </sect1>
 
     <sect1>
@@ -427,7 +415,7 @@
       where the presence of certain file types are undesired--such as XSS or
       simply "interesting" files.</para>
 
-      <para></para>
+      
 
       <para>Test types can be controlled at an individual level by specifying
       their identifier to the -T (-Tuning) option. In the default mode, if -T
@@ -437,13 +425,12 @@
           <para>perl nikto.pl -h 192.168.0.1 -T 58</para>
         </blockquote></para>
 
-      <para>If an "x" is passed to -T, the include or exclude logic is
-      reversed such that all tests except those specified will be performed.
-      In this example, all tests except "Remote file retrieval" and "Command
-      execution" are performed against the target:</para>
+      <para>If an "x" is passed to -T then this will negate all tests of types
+      following the x. This is useful where a test may check several different
+      types of exploit. For example:</para>
 
       <blockquote>
-        <para>perl nikto.pl -h 192.168.0.1 -T 58x</para>
+        <para>perl nikto.pl -h 192.168.0.1 -T 58xb</para>
       </blockquote>
 
       <para>The valid tuning options are:</para>
@@ -508,7 +495,7 @@
       completion will display both the request and the result of the
       operation.</para>
 
-      <para></para>
+      
 
       <para>Most options have a default value or can be left blank. The most
       common and required values are at the beginning of the "questions"
@@ -531,15 +518,15 @@
     <sect1>
       <title>Export Formats</title>
 
-      <para>Nikto saved output comes in three flavors: text, CSV or HTML. When
-      using -o (output), an output format may be specified with -F (Format).
+      <para>Nikto saved output comes in four flavours: text, CSV, XML or HTML.
+      When using -o (output), an output format may be specified with -F (Format).
       Text format is assumed if nothing is specified with -F. The DTD for the
       Nikto XML format can be found in the 'docs' directory
       (nikto.dtd).</para>
     </sect1>
 
     <sect1>
-      <title>HTML Customization</title>
+      <title>HTML Customisation</title>
 
       <para>HTML reports are generated from template files located in the
       "templates" directory. Variables are defined as #variable-name, and are
@@ -551,17 +538,17 @@
       found on a host and each "informational message" per host
       (respectively).</para>
 
-      <para></para>
+      
 
       <para>All valid variables are used in these templates. Future versions
       of this documentation will include a list of variables and their
       meaning.</para>
 
-      <para></para>
+      
 
       <para>The copyright statements must not be removed from the
       "htm_end.tmpl" without placing them in another of the templates. It is a
-      violation of the Nikto license to remove these notices.</para>
+      violation of the Nikto licence to remove these notices.</para>
     </sect1>
   </chapter>
 
@@ -575,7 +562,7 @@
       scan_database.db contains the bulk of the web test information. Here is
       a description of the field values:</para>
 
-      <para></para>
+      
 
       <informaltable>
           <tgroup cols="2">
@@ -618,16 +605,16 @@
               </row>
 
               <row>
-                <entry>Match1 (And)</entry>
+                <entry>Match 1 (Or)</entry>
 
-                <entry>String or code to also match for successful
+                <entry>String or code to alternatively match for successful
                 test</entry>
               </row>
 
               <row>
-                <entry>Match 1 (Or)</entry>
+                <entry>Match1 (And)</entry>
 
-                <entry>String or code to alternatively match for successful
+                <entry>String or code to also match for successful
                 test</entry>
               </row>
 
@@ -674,13 +661,13 @@
       "plugins" directory, with a file name prefaced with a "u", the data will
       be loaded along with the built-in checks.</para>
 
-      <para></para>
+      
 
       <para>For example, create the file "plugins/udb_outdated" and it will be
       loaded at the same time "plugins/db_outdated" is loaded. These files
       will also be checked for syntax when -dbcheck is used.</para>
 
-      <para></para>
+      
 
       <para>For tests which require a "private" OSVDB ID, use the OSVDB ID 0
       (zero). This should be used for all vulnerabilities that do not (or
@@ -688,14 +675,14 @@
       encouraged to send missing information to OSVDB at
       moderators@osvdb.org.</para>
 
-      <para></para>
+      
 
       <para>For the "Test ID", it is recommended you use unique numbers
       between 400000 and 499999 to allow for growth of the Nikto database
       without interfering with your own tests (note: numbers above 500000 are
       reserved for other tests).</para>
 
-      <para></para>
+      
 
       <para>Please help Nikto's continued success by sending test updates to
       sullo@cirt.net.</para>
@@ -709,7 +696,7 @@
       field order is:</para>
 
       <para>Test-ID, OSVDB-ID, Tuning Type, URI, HTTP Method, Match 1, Match 1
-      And, Match1 Or, Fail 1, Fail 2, Summary, HTTP Data, Headers</para>
+      Or, Match1 And, Fail 1, Fail 2, Summary, HTTP Data, Headers</para>
 
       <para>Here is an example test:</para>
 
@@ -727,13 +714,13 @@
       example, a plugin named nikto_mycode.plugin would need a subroutine
       called "sub nikto_mycode()", which would be executed when called.</para>
 
-      <para></para>
+      
 
       <para>All plugins must also be placed in the nikto_plugin_order.txt file
       in the proper location for execution, otherwise it will not be
       called.</para>
 
-      <para></para>
+      
 
       <para>See the section "Test Identifiers" for how to select and create a
       unique identifier for any test written in code, and how to ensure the
@@ -918,7 +905,7 @@
           </listitem>
         </itemizedlist></para>
 
-      <para></para>
+      
 
       <para>This document is © 2008 CIRT, Inc. and may not be reused without
       permission.</para>

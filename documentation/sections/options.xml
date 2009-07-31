@@ -24,9 +24,21 @@ config.txt located in the install directory.</para>
     <varlistentry>
       <term><option>-dbcheck</option></term>
       <listitem>
-        <para>Check the scan databases for syntax errors. Also checks the
-plugins to ensure they are called properly and have an entry in the
-plugins_order.txt.</para>
+        <para>Check the scan databases for syntax errors.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-Display</option></term>
+      <listitem>
+        <para>Control the output that Nikto shows. See Chapter 5 for
+detailed information on these options. Use the reference number or
+letter to specify the type, multiple may be used:</para>
+        <para>1 - Show redirects</para>
+        <para>2 - Show cookies received</para>
+        <para>3 - Show all 200/OK responses</para>
+        <para>4 - Show URLs which require authentication</para>
+        <para>D - Debug Output</para>
+        <para>V - Verbose Output</para>
       </listitem>
     </varlistentry>
     <varlistentry>
@@ -48,7 +60,7 @@ reference number to specify the type, multiple may be used:</para>
     <varlistentry>
       <term><option>-findonly</option></term>
       <listitem>
-        <para>Only discover the HTTP(S) ports, do not perform security scan.
+        <para>Only discover the HTTP(S) ports, do not perform a security scan.
 This will attempt to connect with HTTP or HTTPS, and report the
 Server header.</para>
       </listitem>
@@ -69,7 +81,8 @@ are:</para>
       <term><option>-host</option></term>
       <listitem>
         <para>Host(s) to target. Can be an IP address, hostname or text file
-of hosts.</para>
+of hosts. A single dash (-) maybe used for stdout. Can also parse nmap -oG
+style output</para>
       </listitem>
     </varlistentry>
     <varlistentry>
@@ -99,12 +112,39 @@ used:</para>
 requests)</para>
         <para>4 - Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user
 type requests)</para>
+        <para>5 - Attempt to brute force sub-domain names, assume that
+        the host name is the parent domain</para>
+        <para>6 - Attempt to guess directory names from the supplied
+        dictionary file</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-mutate-options</option></term>
+      <listitem>
+        <para>Provide extra information for mutates, e.g. a dictionary
+        file</para>
       </listitem>
     </varlistentry>
     <varlistentry>
       <term><option>-nolookup</option></term>
       <listitem>
         <para>Do not perform name lookups on IP addresses.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-nossl</option></term>
+      <listitem>
+        <para>Do not use SSL to connect to the server.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-no404</option></term>
+      <listitem>
+        <para>Disable 404 (file not found) checking. This will reduce
+        the total number of requests made to the webserver and may be
+        preferable when checking a server over a slow link, or an embedded
+        device. This will generally lead to more false positives being
+        discovered.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
@@ -128,20 +168,6 @@ be specified as a range (i.e., 80-90), or as a comma-delimited list,
       <term><option>-Pause</option></term>
       <listitem>
         <para>Seconds to delay between each test.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
-      <term><option>-Display</option></term>
-      <listitem>
-        <para>Control the output that Nikto shows. See Chapter 5 for
-detailed information on these options. Use the reference number or
-letter to specify the type, multiple may be used:</para>
-        <para>1 - Show redirects</para>
-        <para>2 - Show cookies received</para>
-        <para>3 - Show all 200/OK responses</para>
-        <para>4 - Show URLs which require authentication</para>
-        <para>D - Debug Output</para>
-        <para>V - Verbose Output</para>
       </listitem>
     </varlistentry>
     <varlistentry>
@@ -195,15 +221,18 @@ number or letter to specify the type, multiple may be used:</para>
         <para>9 - SQL Injection</para>
         <para>a - Authentication Bypass</para>
         <para>b - Software Identification</para>
-        <para>g - Generic (Don't rely on banner)</para>
+        <para>c - Remote Source Inclusion</para>
         <para>x - Reverse Tuning Options (i.e., include all except
 specified)</para>
+        <para>The given string will be parsed from left to right, any x
+        characters will apply to all characters to the right of the
+        character.
       </listitem>
     </varlistentry>
     <varlistentry>
       <term><option>-useproxy</option></term>
       <listitem>
-        <para>Use the HTTP proxy defined in the config.txt file.</para>
+        <para>Use the HTTP proxy defined in the configuration file.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
