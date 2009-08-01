@@ -40,9 +40,9 @@ Getopt::Long::Configure('no_ignore_case');
 #######################################################################
 
 # global var/definitions
-use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT $CURRENT_HOST_ID $CURRENT_PORT/;
+use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT /;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS $STARTTIME/;
-use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
+use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS/;
 
 # setup
