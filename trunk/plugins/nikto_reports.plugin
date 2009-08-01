@@ -31,9 +31,8 @@ sub nikto_reports_init
       full_name    => "Report as XML or HTML",
       author       => "Sullo/Jabra",
       description  => "Produces an XML or HTML report.",
-      recon_method => \&open_output,
       report_method=> \&write_output,
-      report_cond  => '$CLI{format} eq "html" || $CLI{format} eq "xml"',
+      report_cond  => '$CLI{format} eq "htmlxx" || $CLI{format} eq "xmlxx"',
       copyright    => "2008 CIRT Inc."
    };
    return $id;

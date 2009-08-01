@@ -124,7 +124,7 @@ sub nikto_robots
       elsif ($DISCTR > 1) { $msg = "contains $DISCTR entries which should be manually viewed."; }
       else                { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
 
-      add_vulnerability($mark,"robots.txt $msg", 999996, "", "GET", "/robots.txt",\%result);
+      add_vulnerability($mark,"robots.txt $msg", 999996, 0, "GET", "/robots.txt",\%result);
    }
 }
 

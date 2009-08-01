@@ -649,9 +649,8 @@ sub general_config
  chomp($NIKTO{core_version});
  $NIKTO{TMPL_HCTR}=0;
  $NIKTO{TMPL_SUMMARY}=0;
- $COUNTERS{hosts_total}=$COUNTERS{hosts_completed}=0;
 
-return;
+ return;
 }
 ###############################################################################
 sub resolve
@@ -836,7 +835,6 @@ sub parse_hostfile
       }
       s/\#.*$//;
       if ($_ eq "") { next; }
-      $COUNTERS{hosts_total}++;
       # Parse for nmap files
       if ($nmap == 1)
       {
@@ -1233,33 +1231,101 @@ sub run_plugins
    return;
 }
    
-sub run_report
+sub report_head
 {
-   nprint("- Entering report phase","v");
+   my ($format,$file) = @_;
+   nprint("- Opening reports","v");
+   
+   # For tuning set up a list of report methods, formats and handles
+   
    # This is a frig until I can think of a better way of achieving it
    foreach my $i (1..100)
    {
       foreach my $plugin (@PLUGINS)
       {
-         if (defined $plugin->{report_method} && $plugin->{report_weight} == $i)
+         if (defined $plugin->{report_item} && $plugin->{report_weight} == $i)
          {
             my $run=1;
             # first check for conditionals
-            if (defined $plugin->{report_cond})
+            if (defined $plugin->{report_format})
             {
                # Evaluate condition
-               $run=eval "$plugin->{report_cond}";
-               nprint("- Conditional: $plugin->{report_cond} $CLI{file} $CLI{format} $run","v");
+               $run=($format eq $plugin->{report_format});
             }
             if ($run)
             {   
-               nprint("- Running report for \"$plugin->{full_name}\" plugin","v");
-               &{$plugin->{report_method}};
+               nprint("- Opening report for \"$plugin->{full_name}\" plugin","v");
+               my $handle;
+               if (defined $plugin->{report_head})
+               {
+                  $handle=&{$plugin->{report_head}}($file);
+               }
+               # Now store this 
+               my $report_entry=
+               {
+                  host_start => $plugin->{report_host_start},
+                  host_end   => $plugin->{report_host_end},
+                  item       => $plugin->{report_item},
+                  close      => $plugin->{report_close},
+                  handle     => $handle,
+               };
+               push(@REPORTS, $report_entry);
             }
          }
       }
    }
    return;
+}
+###############################################################################
+sub report_host_start
+{
+   my ($mark) = @_;
+   # Go through all reporting modules
+   foreach my $reporter (@REPORTS)
+   {
+      if (defined $reporter->{host_start})
+      {
+         &{$reporter->{host_start}}($reporter->{handle}, $mark);
+      }
+   }
+}
+###############################################################################
+sub report_host_end
+{
+   my ($mark) = @_;
+   # Go through all reporting modules
+   foreach my $reporter (@REPORTS)
+   {
+      if (defined $reporter->{host_end})
+      {
+         &{$reporter->{host_end}}($reporter->{handle}, $mark);
+      }
+   }
+}
+###############################################################################
+sub report_item
+{
+   my ($mark, $item) = @_;
+   # Go through all reporting modules
+   foreach my $reporter (@REPORTS)
+   {
+      if (defined $reporter->{item})
+      {
+         &{$reporter->{item}}($reporter->{handle}, $mark, $item);
+      }
+   }
+}
+###############################################################################
+sub report_close
+{
+   # Go through all reporting modules
+   foreach my $reporter (@REPORTS)
+   {
+      if (defined $reporter->{close})
+      {
+         &{$reporter->{close}}($reporter->{handle});
+      }
+   }
 }
 ###############################################################################
 sub check_updates
@@ -2131,6 +2197,8 @@ sub add_vulnerability
    );
    $mark->{total_vulns}++;
    push(@RESULTS,$resulthash);
+   # Now report it
+   report_item($mark, $resulthash);
 }
 #######################################################################
 sub nikto_core { return; } # trap for this plugin being called to run. lame.

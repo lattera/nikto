@@ -43,7 +43,7 @@ Getopt::Long::Configure('no_ignore_case');
 use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT $CURRENT_HOST_ID $CURRENT_PORT/;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS $STARTTIME/;
 use vars qw/%db_extensions %FoF %UPDATES $DIV %TARGETS @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
-use vars qw/@RESULTS @PLUGINS @MARKS/;
+use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS/;
 
 # setup
 $STARTTIME         = localtime();
@@ -113,6 +113,7 @@ if ($CLI{host} eq "")
 }
 
 $PROXYCHECKED = 0;    # only do proxy_check once
+$COUNTERS{hosts_total}=$COUNTERS{hosts_complete}=0;
 load_plugins();
 
 # Parse the supplied list of targets
@@ -141,10 +142,14 @@ foreach my $mark (@MARKS)
    $mark->{ssl}=$open-1;
 }
 
+# Open reporting
+report_head($CLI{format}, $CLI{file});
+
 # Now we've done the precursor, do the scan
 foreach my $mark (@MARKS)
 {
    next unless ($mark->{test});
+   $COUNTERS{hosts_total}++;
    $mark->{start_time} = time();
    # These should just be passed in the hash - but it's a lot of work to move to a local $request
    $request{whisker}->{host} = $mark->{hostname} || $mark->{ip};
@@ -163,6 +168,7 @@ foreach my $mark (@MARKS)
    %FoF = ();
    
    $mark->{banner}=get_banner($mark);
+   report_host_start($mark);
    
    if ($CLI{findonly})
    {
@@ -185,15 +191,16 @@ foreach my $mark (@MARKS)
    my $time=date_disp($mark->{end_time});
    my $elapsed=$mark->{end_time}-$mark->{start_time};
    nprint("+ $mark->{total_checks} items checked: $mark->{total_vulns} item(s) reported on remote host");
-   
    nprint("+ End Time:           $time ($elapsed seconds)");
    nprint("$DIV");
+   
+   $COUNTERS{hosts_completed}++;
+   report_host_end($mark);
 }
-run_report();
+report_close();
    
 nprint("+ $COUNTERS{hosts_total} host(s) tested");
 send_updates();
-#close_output();
 nprint("T:" . localtime() . ": Ending", "d");
 
 exit;
