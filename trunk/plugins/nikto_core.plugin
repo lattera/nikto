@@ -579,7 +579,7 @@ sub general_config
  # output file
  unless (defined $CLI{file})      { $CLI{file}="-"; }      # default to standard output
 
- unless (defined $CLI{format})    { $CLI{format}="txt"; }  # default to txt
+ unless (defined $CLI{format})    { $CLI{format}=""; }  # default to none
  elsif ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
  elsif ($CLI{format} =~ /html?/i) { $CLI{format}="htm"; }
  elsif ($CLI{format} =~ /csv/i)   { $CLI{format}="csv"; }

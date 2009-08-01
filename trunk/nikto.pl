@@ -40,13 +40,13 @@ Getopt::Long::Configure('no_ignore_case');
 #######################################################################
 
 # global var/definitions
-use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT /;
-use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS $STARTTIME/;
+use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT/;
+use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS/;
 use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @SERVERFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS/;
 
 # setup
-$STARTTIME         = localtime();
+my $starttime      = localtime();
 $DIV               = "-" x 75;
 $NIKTO{version}    = "2.1.0";
 $NIKTO{name}       = "Nikto";
@@ -79,7 +79,7 @@ if ($config_exists==0)
 
 setup_dirs();
 require "$NIKTOCONFIG{PLUGINDIR}/nikto_core.plugin";
-nprint("T:$STARTTIME: Starting", "d");
+nprint("T:$starttime: Starting", "d");
 require "$NIKTOCONFIG{PLUGINDIR}/nikto_single.plugin";
 require "$NIKTOCONFIG{PLUGINDIR}/LW2.pm";
 
@@ -102,7 +102,6 @@ $request{'User-Agent'} = $NIKTO{useragent};
 $request{'whisker'}->{'retry'} = 0;
 proxy_setup();
 
-#open_output();
 nprint($DIV);
 
 # No targets - quit while we're ahead
