@@ -27,49 +27,51 @@ sub nikto_report_text_init
 {
    my $id =
    {
-      name         => "reports_text",
-      full_name    => "Text reports",
-      author       => "Deity",
-      description  => "Produces a text report.",
-      report_method=> \&text_report,
-      report_cond  => '$CLI{format} eq "txt" && $CLI{file} ne "-"',
-      copyright    => "2008 CIRT Inc."
+      name         	=> "reports_text",
+      full_name    	=> "Text reports",
+      author       	=> "Deity",
+      description  	=> "Produces a text report.",
+      report_head  	=> \&text_open,
+      report_host_start => \&text_host,
+      report_item 	=> \&text_item,
+      report_format  	=> 'txt',
+      copyright    	=> "2008 CIRT Inc."
    };
    return $id;
 }
 
-sub text_report
+sub text_open
 {
+   my ($file) = @_;
    # Open file and produce header
-   open(OUT, ">>$CLI{file}") || die print STDERR "+ ERROR: Unable to open '$CLI{file}' for write: $@\n";
+   open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
 
    # Write header
    print OUT "- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}\n";
+   
+   return OUT;
+}
 
+sub text_host
+{
+   my ($handle, $mark) = @_;
    my $curr_host, $curr_port;
-   foreach my $item (@RESULTS)
+   print $handle "+ Target Host: $mark->{hostname}\n";
+   print $handle "+ Target Port: $mark->{port}\n";
+}
+
+sub text_item
+{
+   my ($handle, $mark, $item) = @_;
+
+   foreach my $uri (split(' ',$item->{uri}))
    {
-      if ($item->{mark}->{hostname} ne $curr_host)
-      {
-         $curr_host=$item->{mark}->{hostname};
-         print OUT "+ Target Host: $curr_host\n";
-      }
-      if ($item->{mark}->{port} ne $curr_port)
-      {
-         $curr_port=$item->{mark}->{port};
-         print OUT "+ Target Port: $curr_port\n";
-      }
-      foreach my $uri (split(' ',$item->{uri}))
-      {
-         my $line="+ ";
-         #$line.="$item->{mark}->{hostname}:";
-         #$line.="$item->{mark}->{port} ";
-         if ($item->{osvdb})  { $line.="OSVDB-$item->{osvdb}: " }; 
-         if ($item->{method}) { $line.="$item->{method} " }; 
-         if ($uri)            { $line.="${uri}: " }; 
-         $line.=$item->{message};
-         print OUT "$line\n";
-      }
+      my $line="+ ";
+      if ($item->{osvdb})  { $line.="OSVDB-$item->{osvdb}: " }; 
+      if ($item->{method}) { $line.="$item->{method} " }; 
+      if ($uri)            { $line.="${uri}: " }; 
+      $line.=$item->{message};
+      print $handle "$line\n";
    }
 }
 

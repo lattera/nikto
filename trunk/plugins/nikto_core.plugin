@@ -2173,6 +2173,9 @@ sub add_vulnerability
 {
    my ($mark, $message, $nikto_id, $osvdb, $method, $uri) = @_;
    $uri="/" unless (defined $uri);
+   $method="GET" unless (defined $method);
+   $osvdb="0" unless (defined $osvdb);
+
    my $result="";
    if (defined $_[7])
    {

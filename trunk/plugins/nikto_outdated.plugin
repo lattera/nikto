@@ -104,13 +104,13 @@ sub nikto_outdated
                     if ($k eq "tid") { next; }
                     $v = $k;
                 }
-                if (vereval($v, $BI, $V))    # version check
+                if (vereval($v, $BI, $V, $mark))    # version check
                 {
                     my $msg = $OVERS{$V}{$v};
                     $msg =~ s/\@RUNNING_VER/$BI/g;
                     $msg =~ s/\@CURRENT_VER/$v/g;
                     chomp($msg);
-                    add_vulnerability($mark,$msg, $OVERS{$V}{tid});
+                    add_vulnerability($mark,$msg, $OVERS{$V}{tid},0,"HEAD");
                 }
             }
         }
@@ -127,6 +127,7 @@ sub vereval
 
     $CURRENT = lc($_[0]);
     $RUNNING = lc($_[1]);
+    my $mark=$_[3];
 
     nprint("nikto_outdated.plugin: \$CURRENT:$CURRENT:\$RUNNING:$RUNNING:", "d");
 
@@ -160,7 +161,7 @@ sub vereval
     # Check to see whether the arrays both have the same length
     if (scalar(@RUN) != scalar(@CUR))
     {
-       add_vulnerability($mark, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING while the database has: $CURRENT. This may cause false positives.\n",699999);
+       add_vulnerability($mark, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING while the database has: $CURRENT. This may cause false positives.",699999,0,"HEAD");
     }
 
     # start with 0... eval each in turn...

@@ -66,13 +66,13 @@ sub nikto_httpoptions
    if ($allow_methods ne "")
    {
       add_vulnerability($mark,"Allowed HTTP Methods: $allow_methods $txt",999990,0);
-      foreach my $m (split /,? /, $allow_methods) { eval_methods($m, "Allow", $dbarray); }
+      foreach my $m (split /,? /, $allow_methods) { eval_methods($m, "Allow", $dbarray,$mark); }
    }
 
    if ($public_methods ne "")
    {
       add_vulnerability($mark,"Public HTTP Methods: $public_methods $txt",999985,0);
-      foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public", $dbarray); }
+      foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public", $dbarray,$mark); }
    }
 
    # Check for other weirdness
@@ -125,6 +125,7 @@ sub eval_methods
    my $method = $_[0] || return;
    my $type = $_[1];
    my $dbarray = $_[2];
+   my $mark = $_[3];
    my $message;
    $method = uc($method);
 

@@ -1,7 +1,7 @@
 2009-08-01 plugin/* nikto.pl
 	- Fixes for xml reporter to allow multiple hosts
-	- Currently reporting is broken for everything by XML, but I wanted to
-	  upload this before I forgot.
+	- Fixes for html, txt and csv exporters
+	- Fixes bugs #80 and #85
 2009-07-31 plugin/* nikto.pl
 	- Fix for ePO agent/HP iLO to not report for each known type of
 	  webserver
