@@ -40,9 +40,9 @@ sub nikto_headers_init
 sub nikto_headers
 {
    my ($mark)=@_; 
+   my $dbarray = initialise_db("db_headers");
    my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
    # Standard headers, whisker is added to stop false positives
-   my @standard_headers = qw /accept accept-charset accept-encoding accept-language accept-ranges age allow authorization cache-control connection content-encoding content-language content-length content-location content-md5 content-range content-type date etag expect expires from host if-match if-modified-since if-none-match if-range if-unmodified-since last-modified location max-forwards pragma proxy-authenticate proxy-authorization range referer retry-after server te trailer transfer-encoding upgrade user-agent vary via warning www-authenticate whisker/;
    # Host Pragma
 
    #######################################################################
@@ -143,6 +143,10 @@ sub nikto_headers
 
    #######################################################################
    # All other interesting headers
+   
+   # First let's hit something we know should return something
+   my ($res, $content)=fetch("/","GET");
+
    foreach my $header (@interesting_headers)
    {
       if ($result{$header} ne '')
@@ -160,9 +164,9 @@ sub nikto_headers
    {
       my $found = 0;
       my $reportnum = 999100;
-      foreach my $st_header (@standard_headers)
+      foreach my $st_header (@$dbarray)
       {
-         if ($header eq $st_header)
+         if ($header eq $st_header->{header})
          {
             $found=1;
          }
