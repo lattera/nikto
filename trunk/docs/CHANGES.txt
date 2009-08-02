@@ -1,3 +1,5 @@
+2009-08-02 plugin/nikto_multiple_index db_multiple_index
+	- Added check for multiple index files for request #16
 2009-08-01 plugin/* nikto.pl
 	- Fixes for xml reporter to allow multiple hosts
 	- Fixes for html, txt and csv exporters

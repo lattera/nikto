@@ -1,0 +1,61 @@
+#VERSION,1.00
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+sub nikto_multiple_index_init
+{
+   my $id =
+   {
+      name         => "mutiple_index",
+      full_name    => "Multiple Index",
+      author       => "deity",
+      description  => "Checks for multiple index files",
+      scan_method  => \&nikto_multiple_index,
+      copyright    => "2009 CIRT Inc"
+   };
+
+   return $id;
+}
+
+sub nikto_multiple_index
+{
+   my ($mark) = @_;
+   my $dbarray = initialise_db("db_multiple_index");
+
+   # Record the host for future use
+
+   my @found;
+   foreach my $item (@$dbarray)
+   {
+      # Use fetch to minimise extra code
+      # First we need to mangle the host.
+      my ($res, $content) = fetch("/$item->{index}", "GET");
+
+      if (($res == 200) || ($res == 302))
+      {
+         push(@found, $item->{index});
+      }
+   } # End foreach
+   if (scalar(@found) > 1)
+   {
+      add_vulnerability($mark,"Multiple index files found: @found", 740000, 0);
+   }
+}
+
+1;
