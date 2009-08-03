@@ -168,6 +168,14 @@ foreach my $mark (@MARKS)
    
    $mark->{banner}=get_banner($mark);
    report_host_start($mark);
+
+   # put a signal trap so we can close down reports properly
+   $SIG{'INT'} = sub
+   {
+      report_host_end($mark);
+      report_close($mark);
+      exit(1);
+   };
    
    if ($CLI{findonly})
    {

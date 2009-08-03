@@ -1,3 +1,8 @@
+2009-08-03 plugin/nikto.pl
+	- Put in a quick catch for port ranges (e.g. 80-90) if people use the
+	  old style of port entries
+	- Put in a simple signal handler to close reporting if a sigint is
+	  caught
 2009-08-02 plugin/nikto_multiple_index db_multiple_index
 	- Added check for multiple index files for request #16
 	- Turned standard headers into a database file to close off #22

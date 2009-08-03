@@ -733,6 +733,35 @@ sub set_targets
    my @results;
    my @marks;
    my $defaultport=($ssl)?443:80;
+
+   # Check for old style portlist and expand
+   my @newports;
+   foreach my $port (@ports)
+   {
+      if ($port =~ /-/)
+      {
+         my $start, $end;
+         my @temp=split(/-/,$port);
+         $start=$temp[0];
+         $end=$temp[1];
+         if ($start eq "") { $start=0; }
+         if ($end eq "") { $end=65535; }
+         if ($start > $end)
+         {
+            nprint("- ERROR port range $port doesn't make sense - assuming 80/tcp");
+            next;
+         }
+         for (my $i=$start;$i<=$end;$i++)
+         {
+            push(@newports,$i);
+         }
+      }
+      else
+      {
+         push(@newports, $ports);
+      }
+   }
+   @ports=@newports;
    
    nprint("- Getting targets","v");
    if (scalar(@ports) == 1)
