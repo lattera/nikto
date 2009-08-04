@@ -69,7 +69,7 @@ sub nikto_tests
             $result{'www-authenticate'} =~ /realm=\"(.+)\"/;
             my $R = $1;
             if ($R eq '') { $R = $result{'www-authenticate'} }
-            do_auth($request, $result);
+            do_auth($request, $result, $mark);
             nprint("+ $uri - Requires Authentication for realm '$R'") if $CLI{display} =~ /4/;
             $RES=$result{'whisker'}->{'code'};
             $CONTENT=$result{'whisker'}->{'data'};

@@ -1497,6 +1497,7 @@ sub do_auth
 {
    my $request = $_[0];
    my $result = $_[1];
+   my $mark = $_[2];
    my $authtype = "basic";
    my $realm = "";
 
@@ -1528,7 +1529,9 @@ sub do_auth
       next unless ($realm =~ /$REALMS{$REALM}{realm}/i || $REALMS{$REALM}{realm} eq '@ANY');
       if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq ""))
       { 
-         add_vulnerability($mark,"+ $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid},\%result); 
+         my $uridir=$request{whisker}->{uri};
+         $uridir =~ s#/[^/]*$#/#g;
+         add_vulnerability($mark,"Blank credentials found at $uridir, $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid},0,"GET",$uridir,\%result); 
       }
       else
       { 
@@ -1555,7 +1558,9 @@ sub do_auth
             unless ($REALMS{$REALM}{tid} == 700500 ||
                     $REALMS{$REALM}{checked} == 1)
             {
-               add_vulnerability($mark,"Default account found for '$realm' at $request{'uri'} (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0,\%result);
+               my $uridir=$request{whisker}->{uri};
+               $uridir =~ s#/[^/]*$#/#g;
+               add_vulnerability($mark,"Default account found for '$realm' at $uridir (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0,"GET",$uridir,\%result);
                $REALMS{$REALM}{checked}=1;
             }
             # Finally repeat the check
