@@ -76,6 +76,13 @@ sub nikto_httpoptions
    }
 
    # Check for other weirdness
+   # IIS Debug
+
+   ($RES, $CONTENT) = fetch("/","DEBUG",);
+   if ($RES == 200) 
+   {
+      add_vulnerability($mark,"DEBUG HTTP verb may show server debugging information",999972,0,"DEBUG");
+   }
    # IIS PROPFIND HEADER
    my %headers=(
       "Host" => "",
@@ -89,7 +96,7 @@ sub nikto_httpoptions
          my $ipfound=$CONTENT;
          $ipfound =~ s/^.*<a:href>//g;
          $ipfound =~ s/<\/a:href>.*$//g;
-         add_vulnerability($mark,"PROPFIND may show the server's internal IP address: $ipfound",999973,13431);
+         add_vulnerability($mark,"PROPFIND HTTP verb may show the server's internal IP address: $ipfound",999973,13431);
       }
    } 
 
@@ -108,7 +115,7 @@ sub nikto_httpoptions
          {
             if ($CONTENT =~ "Nikto")
             {
-               add_vulnerability($mark,"HTTP $method method is active, suggesting the host is vulnerable to XST",999974,877);
+               add_vulnerability($mark,"HTTP $method method is active, suggesting the host is vulnerable to XST",999971,877);
                # now we know its vulnerable stop testing
                last;
             }

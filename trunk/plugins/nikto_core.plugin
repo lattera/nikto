@@ -460,73 +460,73 @@ sub general_config
        -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -dbcheck            check database and other key files for syntax errors (cannot be abbreviated)
        -evasion+           ids evasion technique
-       -Format+         save file (-o) format
-       -host+           target host
-       -Help            Extended help information
+       -Format+            save file (-o) format
+       -host+              target host
+       -Help               Extended help information
        -id+                host authentication to use, format is userid:password
        -mutate+            Guess additional file names
-       -mutate-options+         Provide extra information for mutations
-       -output+            write output to this file
-       -nossl                   disables using SSL
-       -no404        disables 404 checks
-       -port+           port to use (default 80)
-       -Display+           turn on/off display outputs
-       -ssl             force ssl mode on port
+       -mutate-options+    Provide extra information for mutations
+       -output+            Write output to this file
+       -nossl              Disables using SSL
+       -no404              Disables 404 checks
+       -port+              Port to use (default 80)
+       -Display+           Turn on/off display outputs
+       -ssl                Force ssl mode on port
        -Single             Single request mode
-       -timeout+           timeout (default 2 seconds)
-       -Tuning+            scan tuning
-       -update          update databases and plugins from cirt.net (cannot be abbreviated)
-       -Version            print plugin and database versions
-       -vhost+             virtual host (for Host header)
+       -timeout+           Timeout (default 2 seconds)
+       -Tuning+            Scan tuning
+       -update             Update databases and plugins from cirt.net (cannot be abbreviated)
+       -Version            Print plugin and database versions
+       -vhost+             Virtual host (for Host header)
    + requires a value
    ";
 
  $NIKTO{options}="
    Options:
-       -config+            use this config file
-       -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
-       -Display+           turn on/off display outputs:\n";
+       -config+            Use this config file
+       -Cgidirs+           Scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
+       -Display+           Turn on/off display outputs:\n";
    foreach my $k (sort keys %{$NIKTO{display}}) 
       { $NIKTO{options} .= "                               $k     $NIKTO{display}{$k}\n"; }
 
- $NIKTO{options}.="       -dbcheck           check database and other key files for syntax errors (cannot be abbreviated)
-       -evasion+           ids evasion technique:\n";
+ $NIKTO{options}.="       -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
+       -evasion+          IDS evasion technique:\n";
    foreach my $k (sort keys %{$NIKTO{anti_ids}}) 
       { $NIKTO{options} .= "                               $k     $NIKTO{anti_ids}{$k}\n"; }
 
- $NIKTO{options}.="       -findonly          find http(s) ports only, don't perform a full scan
-       -Format+         save file (-o) format:
+ $NIKTO{options}.="       -findonly          Find http(s) ports only, don't perform a full scan
+       -Format+           Save file (-o) format:
                                 htm   HTML Format
                                 csv   Comma-separated-value
                                 txt   Plain text (default if not specified)
-                                   xml   XML Format
-       -host+           target host
-       -Help            Extended help information
-       -id+                host authentication to use, format is userid:password
-       -mutate+            Guess additional file names:\n";
+                                xml   XML Format
+       -host+             Target host
+       -Help              Extended help information
+       -id+               Host authentication to use, format is userid:password
+       -mutate+           Guess additional file names:\n";
    foreach my $k (sort keys %{$NIKTO{mutate_opts}}) 
       { $NIKTO{options} .= "                               $k     $NIKTO{mutate_opts}{$k}\n"; }
 
  $NIKTO{options}.="       -mutate-options    Provide information for mutates
-       -nolookup           skip name lookup
-       -nossl                   disables using SSL
-       -no404        disables nikto attempting to guess a 404 page
-       -output+            write output to this file
-       -port+           port to use (default 80)
-       -Pause+             pause between tests (seconds)\n";
+       -nolookup          Skip name lookup
+       -nossl             Disables using SSL
+       -no404             Disables nikto attempting to guess a 404 page
+       -output+           Write output to this file
+       -port+             Port to use (default 80)
+       -Pause+            Pause between tests (seconds)\n";
 
- $NIKTO{options}.="       -root+             prepend root value to all requests, format is /directory
-       -ssl             force ssl mode on port
-       -Single             Single request mode
-       -timeout+           timeout (default 2 seconds)
-       -Tuning+            scan tuning:\n";
+ $NIKTO{options}.="       -root+             Prepend root value to all requests, format is /directory
+       -ssl               Force ssl mode on port
+       -Single            Single request mode
+       -timeout+          Timeout (default 2 seconds)
+       -Tuning+           Scan tuning:\n";
    foreach my $k (sort keys %{$NIKTO{tuning}}) 
       { $NIKTO{options} .= "                               $k     $NIKTO{tuning}{$k}\n"; }
 
- $NIKTO{options}.="       -useproxy          use the proxy defined in config.txt
-       -update          update databases and plugins from cirt.net (cannot be abbreviated)
-       -Version            print plugin and database versions
-       -vhost+             virtual host (for Host header)
+ $NIKTO{options}.="       -useproxy          Use the proxy defined in config.txt
+       -update            Update databases and plugins from cirt.net (cannot be abbreviated)
+       -Version           Print plugin and database versions
+       -vhost+            Virtual host (for Host header)
    + requires a value
    ";
 

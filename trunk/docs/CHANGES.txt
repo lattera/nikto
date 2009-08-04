@@ -1,5 +1,6 @@
 2009-08-04 plugin/nikto_core
 	- Patch to actually report the URI when it works out a password
+	- Added test for DEBUG HTTP verb
 2009-08-03 plugin/nikto.pl
 	- Put in a quick catch for port ranges (e.g. 80-90) if people use the
 	  old style of port entries
