@@ -335,11 +335,6 @@
 
   <chapter>
     <title>All Options</title>
-
-    <para>Below are all of the Nikto command line options and explanations. A
-    brief version of this text is available by running Nikto with the -h
-    (-help) option.</para>
-
     &options;
   </chapter>
 
@@ -499,20 +494,12 @@
       completion will display both the request and the result of the
       operation.</para>
 
-      
-
       <para>Most options have a default value or can be left blank. The most
       common and required values are at the beginning of the "questions"
       section for slightly easier use. True and false are specified by numeric
       equivalents, 1 and 0 respectively. Please note that Single mode is not
       very user-friendly. Here is an example Nikto run with the -Single
       option.</para>
-
-      <graphic depth="469" fileref="single_1.jpg" format="JPG" width="445" />
-
-      <graphic depth="469" fileref="single_2.jpg" format="JPG" width="445" />
-
-      <graphic depth="469" fileref="single_3.jpg" format="JPG" width="445" />
     </sect1>
   </chapter>
   
@@ -524,7 +511,7 @@
         <para>Nikto, like any non-trivial program needs to know a few things
         about how to work with the current environment. For most situations the
         default configuration file will work. Sometimes, tuning may be required,
-        or some things may need to be changes.
+        or some things may need to be changes.</para>
      
         <para>Nikto will look for a configuration file in three places and if it
         finds one, will apply it in the strict order, listed below. A later found
@@ -561,12 +548,11 @@
            <varlistentry>
               <term>CLIOPTS</term>
               <listitem>
-                 <para>Default options that should always be passed to the command
-                 line. For example:</para>
+                 <para>Default options that should always be passed to the command line. For example:</para>
                  <blockquote>
                     <para>CLIOPTS=-output results.txt -Format text</para>
                  </blockquote>
-              </listiem>
+              </listitem>
            </varlistentry>
            <varlistentry>
               <term>NIKTODTD</term>
@@ -579,7 +565,7 @@
                  <blockquote>
                     <para>NIKTODTD=docs/nikto.dtd</para>
                  </blockquote>
-              </listiem>
+              </listitem>
            </varlistentry>
            <varlistentry>
               <term>NMAP</term>
@@ -589,33 +575,17 @@
                  <para>Location of nmap and default nmap options. Nikto used to use 
                  nmap to aid in checking for valid HTTP ports on any targets. From
                  Nikto 2.10, nmap is no longer used from within Nikto and this variable
-                 will do nothing. This option may be removed in a later version.
+                 will do nothing. This option may be removed in a later version.</para>
                  
                  <para>Default Setting</para>
                  <blockquote>
                     <para>NMAP=/usr/local/bin/nmap</para>
                     <para>NMPOPTS=-P0</para>
                  </blockquote>
-              </listiem>
+              </listitem>
            </varlistentry>
-           <varlistentry>
-              <term>NMAP</term>
-              <term>NMAPOPTS</term>
-              <listitem>
-                 <para>Deprecated</para>
-                 <para>Location of nmap and default nmap options. Nikto used to use 
-                 nmap to aid in checking for valid HTTP ports on any targets. From
-                 Nikto 2.10, nmap is no longer used from within Nikto and this variable
-                 will do nothing. This option may be removed in a later version.
-                 
-                 <para>Default Setting</para>
-                 <blockquote>
-                    <para>NMAP=/usr/local/bin/nmap</para>
-                    <para>NMPOPTS=-P0</para>
-                 </blockquote>
-              </listiem>
-           </varlistentry>
-        </sect1>
+        </variablelist>
+      </sect1>
    </chapter>           
      
      
