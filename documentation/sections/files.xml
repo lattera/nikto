@@ -7,12 +7,12 @@
     </term>
     <listitem>
       <para>The Nikto configuration file. This sets Nikto's global options. Several nikto.conf files may exist and are parsed
-      in the below order. As each configuration file is loaded is supersedes any previously set configurtion.</para>
-      <listitem>
-         <para>System wide (e.g. /etc/nikto.conf)</para>
-         <para>Home directory (e.g. $HOME/nikto.conf)</para>
-         <para>Current directory (e.g. ./nikto.conf)</para>
-      </listitem>
+      in the below order. As each configuration file is loaded is supersedes any previously set configuration:</para>
+      <itemizedlist>
+         <listitem>System wide (e.g. /etc/nikto.conf)</listitem>
+         <listitem>Home directory (e.g. $HOME/nikto.conf)</listitem>
+         <listitem>Current directory (e.g. ./nikto.conf)</listitem>
+      </itemizedlist>
     </listitem>
   </varlistentry>
   <varlistentry>

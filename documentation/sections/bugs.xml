@@ -3,6 +3,5 @@
 <para>The current features are not supported:</para>
 <itemizedlist>
   <listitem>SOCKS Proxies</listitem>
-  <listitem>NTLM Authentication</listitem>
 </itemizedlist>
 

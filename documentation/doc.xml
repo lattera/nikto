@@ -268,6 +268,10 @@
       <blockquote>
          <para>nmap -p80 192.168.0.0/24 -oG - | nikto.pl -h -</para>
       </blockquote>
+      
+      <para>Important note for win32 users: due to peculiaries in the way that cmd.exe
+      works with pipes, the above example may not work for you. In this case you'll
+      have to use a temporary file to store the output from nmap.</para>
     </sect1>
 
     <sect1>
@@ -511,6 +515,111 @@
       <graphic depth="469" fileref="single_3.jpg" format="JPG" width="445" />
     </sect1>
   </chapter>
+  
+  <chapter>
+     <title>Configuration Files</title>
+     
+     <sect1>
+        <title>Location</title>
+        <para>Nikto, like any non-trivial program needs to know a few things
+        about how to work with the current environment. For most situations the
+        default configuration file will work. Sometimes, tuning may be required,
+        or some things may need to be changes.
+     
+        <para>Nikto will look for a configuration file in three places and if it
+        finds one, will apply it in the strict order, listed below. A later found
+        configuration file will overwrite any variables set in an earlier
+        configuration file. The locations are:</para>
+     
+        <orderedlist>
+           <listitem>
+              <para>/etc/nikto.conf (this may be altered depending on
+                    platform)</para>
+           </listitem>
+           <listitem>
+              <para>$HOME/nikto.conf</para>
+           </listitem>
+           <listitem>
+              <para>nikto.conf</para>
+           </listitem>
+        </orderedlist>
+     </sect1>
+     
+     <sect1>
+        <title>Format</title>
+        <para>The configuration files are formated like a standard Unix
+        configuration file: blank lines are ignored, any line starting with a #
+        is ignored, variables are set with VariableName=Value line.</para>
+     </sect1>
+     
+     <sect1>
+        <title>Variables</title>
+        <para>The following variables may be set within the configuration
+        file:</para>
+        
+        <variablelist>
+           <varlistentry>
+              <term>CLIOPTS</term>
+              <listitem>
+                 <para>Default options that should always be passed to the command
+                 line. For example:</para>
+                 <blockquote>
+                    <para>CLIOPTS=-output results.txt -Format text</para>
+                 </blockquote>
+              </listiem>
+           </varlistentry>
+           <varlistentry>
+              <term>NIKTODTD</term>
+              <listitem>
+                 <para>Path to the location of the DTD used for XML output. If the
+                 path is not absolute then it will be relative to the directory where
+                 Nikto is executed.</para>
+                 
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para>NIKTODTD=docs/nikto.dtd</para>
+                 </blockquote>
+              </listiem>
+           </varlistentry>
+           <varlistentry>
+              <term>NMAP</term>
+              <term>NMAPOPTS</term>
+              <listitem>
+                 <para>Deprecated</para>
+                 <para>Location of nmap and default nmap options. Nikto used to use 
+                 nmap to aid in checking for valid HTTP ports on any targets. From
+                 Nikto 2.10, nmap is no longer used from within Nikto and this variable
+                 will do nothing. This option may be removed in a later version.
+                 
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para>NMAP=/usr/local/bin/nmap</para>
+                    <para>NMPOPTS=-P0</para>
+                 </blockquote>
+              </listiem>
+           </varlistentry>
+           <varlistentry>
+              <term>NMAP</term>
+              <term>NMAPOPTS</term>
+              <listitem>
+                 <para>Deprecated</para>
+                 <para>Location of nmap and default nmap options. Nikto used to use 
+                 nmap to aid in checking for valid HTTP ports on any targets. From
+                 Nikto 2.10, nmap is no longer used from within Nikto and this variable
+                 will do nothing. This option may be removed in a later version.
+                 
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para>NMAP=/usr/local/bin/nmap</para>
+                    <para>NMPOPTS=-P0</para>
+                 </blockquote>
+              </listiem>
+           </varlistentry>
+        </sect1>
+   </chapter>           
+     
+     
+     
 
   <chapter>
     <title>Output and Reports</title>

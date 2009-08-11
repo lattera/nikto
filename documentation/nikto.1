@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH nikto 1 "9 October 2008"  
+.TH nikto 1 "11 August 2009" "" ""
 .SH NAME
 nikto \- Scan web server for known vulnerabilities
 .SH SYNOPSIS
@@ -57,9 +57,24 @@ Specify an alternative config file to use instead of the
 config.txt located in the install directory.
 .TP 
 \*(T<\fB\-dbcheck\fR\*(T>
-Check the scan databases for syntax errors. Also checks the
-plugins to ensure they are called properly and have an entry in the
-plugins_order.txt.
+Check the scan databases for syntax errors.
+.TP 
+\*(T<\fB\-Display\fR\*(T>
+Control the output that Nikto shows. See Chapter 5 for
+detailed information on these options. Use the reference number or
+letter to specify the type, multiple may be used:
+
+1 - Show redirects
+
+2 - Show cookies received
+
+3 - Show all 200/OK responses
+
+4 - Show URLs which require authentication
+
+D - Debug Output
+
+V - Verbose Output
 .TP 
 \*(T<\fB\-evasion\fR\*(T>
 Specify the LibWhisker IDS evasion technique to use (see the
@@ -83,7 +98,7 @@ reference number to specify the type, multiple may be used:
 8 - Use Windows directory separator (\e)
 .TP 
 \*(T<\fB\-findonly\fR\*(T>
-Only discover the HTTP(S) ports, do not perform security scan.
+Only discover the HTTP(S) ports, do not perform a security scan.
 This will attempt to connect with HTTP or HTTPS, and report the
 Server header.
 .TP 
@@ -102,7 +117,8 @@ xml - an XML report
 .TP 
 \*(T<\fB\-host\fR\*(T>
 Host(s) to target. Can be an IP address, hostname or text file
-of hosts.
+of hosts. A single dash (-) maybe used for stdout. Can also parse nmap -oG
+style output
 .TP 
 \*(T<\fB\-Help\fR\*(T>
 Display extended help information.
@@ -127,9 +143,29 @@ requests)
 
 4 - Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user
 type requests)
+
+5 - Attempt to brute force sub-domain names, assume that
+the host name is the parent domain
+
+6 - Attempt to guess directory names from the supplied
+dictionary file
+.TP 
+\*(T<\fB\-mutate\-options\fR\*(T>
+Provide extra information for mutates, e.g. a dictionary
+file
 .TP 
 \*(T<\fB\-nolookup\fR\*(T>
 Do not perform name lookups on IP addresses.
+.TP 
+\*(T<\fB\-nossl\fR\*(T>
+Do not use SSL to connect to the server.
+.TP 
+\*(T<\fB\-no404\fR\*(T>
+Disable 404 (file not found) checking. This will reduce
+the total number of requests made to the webserver and may be
+preferable when checking a server over a slow link, or an embedded
+device. This will generally lead to more false positives being
+discovered.
 .TP 
 \*(T<\fB\-output\fR\*(T>
 Write output to the file specified. Format is defined in -F
@@ -144,23 +180,6 @@ be specified as a range (i.e., 80-90), or as a comma-delimited list,
 .TP 
 \*(T<\fB\-Pause\fR\*(T>
 Seconds to delay between each test.
-.TP 
-\*(T<\fB\-Display\fR\*(T>
-Control the output that Nikto shows. See Chapter 5 for
-detailed information on these options. Use the reference number or
-letter to specify the type, multiple may be used:
-
-1 - Show redirects
-
-2 - Show cookies received
-
-3 - Show all 200/OK responses
-
-4 - Show URLs which require authentication
-
-D - Debug Output
-
-V - Verbose Output
 .TP 
 \*(T<\fB\-root\fR\*(T>
 Prepend the value specified to the beginning of every request.
@@ -212,13 +231,17 @@ a - Authentication Bypass
 
 b - Software Identification
 
-g - Generic (Don't rely on banner)
+c - Remote Source Inclusion
 
 x - Reverse Tuning Options (i.e., include all except
 specified)
+
+The given string will be parsed from left to right, any x
+characters will apply to all characters to the right of the
+character.
 .TP 
 \*(T<\fB\-useproxy\fR\*(T>
-Use the HTTP proxy defined in the config.txt file.
+Use the HTTP proxy defined in the configuration file.
 .TP 
 \*(T<\fB\-update\fR\*(T>
 Update the plugins and databases directly from
@@ -232,17 +255,26 @@ versions.
 Specify the Host header to be sent to the target.
 .SH FILES
 .TP 
-\*(T<\fI${NIKTO_DIR}/config.txt\fR\*(T> 
-The nikto configuration file. This sets nikto's global options.
+\*(T<\fInikto.conf\fR\*(T> 
+The Nikto configuration file. This sets Nikto's global options. Several nikto.conf files may exist and are parsed
+in the below order. As each configuration file is loaded is supersedes any previously set configuration:
+.RS 
+.TP 0.2i
+\(bu
+System wide (e.g. /etc/nikto.conf)
+.TP 0.2i
+\(bu
+Home directory (e.g. $HOME/nikto.conf)
+.TP 0.2i
+\(bu
+Current directory (e.g. ./nikto.conf)
+.RE
 .TP 
 \*(T<\fI${NIKTO_DIR}/plugins/db*\fR\*(T> 
 db files are the databases that nikto uses to check for vulnerabilities and issues within the web server.
 .TP 
 \*(T<\fI${NIKTO_DIR}/plugins/*.plugin\fR\*(T> 
 All nikto's plugins exist here. Nikto itself is just a wrapper script to manage CLI and pass through to the plugins.
-.TP 
-\*(T<\fI${NIKTO_DIR}/plugins/nikto_plugin_order.txt\fR\*(T> 
-Specifies the order that nikto's plugins will be executed in.
 .TP 
 \*(T<\fI${NIKTO_DIR}/templates\fR\*(T> 
 Contains the templates for nikto's output formats.
@@ -251,12 +283,9 @@ The current features are not supported:
 .TP 0.2i
 \(bu
 SOCKS Proxies
-.TP 0.2i
-\(bu
-NTLM Authentication
 .SH AUTHORS
 Nikto was originally written and maintained by Sullo, CIRT, Inc. It is currently maintained by David Lodge. See the main documentation for other contributors.
 .PP
-All code is \(co CIRT, Inc., except LibWhisker which is \(co rfp.labs (wiretrip.net). Other portions of code may be \(co as specified.
+All code is (C) CIRT, Inc., except LibWhisker which is \(co rfp.labs (wiretrip.net). Other portions of code may be (C) as specified.
 .SH "SEE ALSO"
 .URL http://www.cirt.net/ "Nikto Homepage"

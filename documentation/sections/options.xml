@@ -226,7 +226,7 @@ number or letter to specify the type, multiple may be used:</para>
 specified)</para>
         <para>The given string will be parsed from left to right, any x
         characters will apply to all characters to the right of the
-        character.
+        character.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
