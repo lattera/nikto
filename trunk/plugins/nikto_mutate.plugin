@@ -46,7 +46,7 @@ sub nikto_mutate
     # build a hash of all the unique directories
     foreach $c (@CGIDIRS) { $DIRS{$c} = ""; }
 
-    nprint("-Loading root level files", "v");
+    nprint("- Loading root level files", "v");
 
     foreach my $checkid (keys %TESTS)
     {

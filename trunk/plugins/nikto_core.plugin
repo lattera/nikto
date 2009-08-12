@@ -626,6 +626,8 @@ sub general_config
     $CLI{evasion}=~s/[^0-9]//g;
  }
 
+ $NIKTO{timeout}=$CLI{timeout} || 10;
+
  $NIKTO{useragent}="Mozilla/4.75 ($NIKTO{name}/$NIKTO{version})";
  
  # SSL Test
@@ -1864,6 +1866,97 @@ sub fetch
     }
  }
  return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
+}
+#######################################################################
+sub setup_hash
+{
+   my ($reqhash) = @_;
+
+   # Do the standard set up for the hash 
+   LW2::http_init_request($reqhash);
+   $reqhash->{whisker}->{ssl_save_info}=1;
+   $reqhash->{whisker}->{lowercase_incoming_headers}=1;
+   $reqhash->{whisker}->{timeout}=$NIKTO{timeout};
+   if (defined $CLI{evasion})
+   {
+      $reqhash->{whisker}->{encode_anti_ids}=$CLI{evasion};
+   }
+   $reqhash->{User-Agent}=$NIKTO{useragent};
+   $reqhash->{whisker}->{retry}=0;
+
+   return $reqhash;
+}
+#######################################################################
+sub nfetch
+{
+   my ($uri, $method, $data, $headers, $noclean) = @_;
+   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+
+   my %request, %result;
+   setup_hash(\%request);
+ 
+   $request{whisker}->{uri} = $uri;
+   if (defined $CLI{root})
+   {
+      $request{whisker}->{uri} = $CLI{root} . $uri; # prepend -root option value
+   }
+   $request{whisker}->{method} = $method;
+   $request{whisker}->{http_eol}=$http_eol;
+   my $header_hash=$headers;
+
+   if (defined $data)
+   { 
+      my $r=$data;
+      $r =~ s/\\\"/\"/g; 
+      $request{whisker}->{data} = $r;
+   }
+  
+   # check for extra HTTP headers
+   if (defined $headers)
+   {
+      # loop through the hash ref passed and add each header to request
+      while (my($key, $value) = each(%$header_hash))
+      {
+         $request{$key}=$value;
+      }
+   } 
+   unless ($noclean) { LW2::http_fixup_request(\%request); }
+
+   # Cache
+   if (defined $CACHE{$uri} && !defined $CLI{nocache} &&
+     $CACHE{$uri}{method} eq $method)
+   {
+      # Get from cache
+      nprint("- Retrieving $request{whisker}->{uri} from cache.","v");
+      $result{whisker}->{code}=$CACHE{$request{whisker}->{uri}}{res};
+      $result{whisker}->{data}=$CACHE{$request{whisker}->{uri}}{content};
+   }
+   else
+   {
+      LW2::http_do_request_timeout(\%request,\%result);
+      $NIKTO{totalrequests}++;
+      unless (defined $CLI{nocache})
+      {
+         $CACHE{$request{whisker}->{uri}}{method}=$result{whisker}->{method};
+         $CACHE{$request{whisker}->{uri}}{res}=$result{whisker}->{code};
+         $CACHE{$request{whisker}->{uri}}{content}=$result{whisker}->{data};
+      }
+      if ($OUTPUT{debug})
+      {
+         dump_var("Request Hash", \%request);
+         dump_var("Result Hash", \%result);
+      }
+   }
+ 
+   if (defined $CLI{display} && ($CLI{display} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
+   { 
+      foreach my $c (@{$result{'whisker'}->{'cookies'}}) 
+      { 
+         nprint("+ $request{'whisker'}->{'uri'} sent cookie: $c");
+      }
+   }
+
+   return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
 }
 #######################################################################
 sub set_scan_items

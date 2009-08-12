@@ -1,4 +1,6 @@
 2009-08-12 plugins/nikto_core
+	- New fetch (nfetch) sub added which uses a local request/result hash.
+	  All requests should use this instead of fetch.
 	- Patch to add a URI cache within fetch, can be disabled with -nocache
 2009-08-04 plugins/nikto_core
 	- Patch to actually report the URI when it works out a password

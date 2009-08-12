@@ -64,7 +64,7 @@ sub nikto_cgi
    {
       foreach $possiblecgidir (@CFGCGI)
       {
-         ($res, $CONTENT)=fetch($possiblecgidir,"GET");
+         ($res, $CONTENT)=nfetch($possiblecgidir,"GET");
          nprint("Checked for CGI dir\t$possiblecgidir\tgot:$res","d");
          if (content_present($res) eq TRUE)
          {

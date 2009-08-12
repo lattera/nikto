@@ -58,7 +58,7 @@ sub nikto_tests
          if (defined $result{whisker}{error})
          {
             # An error occured, show in verbose mode and skip
-            nprint("- ERROR: $request{whisker}{uri} returned an error: $result{whisker}{error}\n");
+            nprint("- ERROR: $uri returned an error: $result{whisker}{error}\n");
             next;
          }
          $NIKTO{resp_counts}{$RES}{total}++;

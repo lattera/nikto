@@ -45,7 +45,7 @@ sub nikto_multiple_index
    {
       # Use fetch to minimise extra code
       # First we need to mangle the host.
-      my ($res, $content) = fetch("/$item->{index}", "GET");
+      my ($res, $content) = nfetch("/$item->{index}", "GET");
 
       if (($res == 200) || ($res == 302))
       {
