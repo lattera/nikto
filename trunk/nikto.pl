@@ -43,7 +43,7 @@ Getopt::Long::Configure('no_ignore_case');
 use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT/;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS/;
 use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
-use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS/;
+use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE/;
 
 # setup
 my $starttime      = localtime();

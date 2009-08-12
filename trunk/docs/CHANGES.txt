@@ -1,19 +1,21 @@
-2009-08-04 plugin/nikto_core
+2009-08-12 plugins/nikto_core
+	- Patch to add a URI cache within fetch, can be disabled with -nocache
+2009-08-04 plugins/nikto_core
 	- Patch to actually report the URI when it works out a password
 	- Added test for DEBUG HTTP verb
-2009-08-03 plugin/nikto.pl
+2009-08-03 plugins/nikto.pl
 	- Put in a quick catch for port ranges (e.g. 80-90) if people use the
 	  old style of port entries
 	- Put in a simple signal handler to close reporting if a sigint is
 	  caught
-2009-08-02 plugin/nikto_multiple_index db_multiple_index
+2009-08-02 plugins/nikto_multiple_index db_multiple_index
 	- Added check for multiple index files for request #16
 	- Turned standard headers into a database file to close off #22
-2009-08-01 plugin/* nikto.pl
+2009-08-01 plugins/* nikto.pl
 	- Fixes for xml reporter to allow multiple hosts
 	- Fixes for html, txt and csv exporters
 	- Fixes bugs #80 and #85
-2009-07-31 plugin/* nikto.pl
+2009-07-31 plugins/* nikto.pl
 	- Fix for ePO agent/HP iLO to not report for each known type of
 	  webserver
 	- Big changes to the way nikto assigns targets to remove globals, have

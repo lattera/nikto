@@ -467,6 +467,7 @@ sub general_config
        -mutate+            Guess additional file names
        -mutate-options+    Provide extra information for mutations
        -output+            Write output to this file
+       -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
        -port+              Port to use (default 80)
@@ -508,7 +509,7 @@ sub general_config
       { $NIKTO{options} .= "                               $k     $NIKTO{mutate_opts}{$k}\n"; }
 
  $NIKTO{options}.="       -mutate-options    Provide information for mutates
-       -nolookup          Skip name lookup
+       -nocache           Disables the URI cache
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
@@ -558,6 +559,7 @@ sub general_config
            "timeout=s"               => \$CLI{timeout},
            "Pause=s"                 => \$CLI{pause},
            "ssl"                     => \$CLI{ssl},
+           "nocache"                 => \$CLI{nocache},
            "nossl"                   => \$CLI{nossl},
            "no404"                   => \$CLI{nofof},
            "useproxy"                => \$CLI{useproxy},
@@ -1803,11 +1805,11 @@ sub fetch
  my $header_hash=$_[3];
 
  if (defined $_[2])
-  { 
-   my $r=$_[2];
-      $r =~ s/\\\"/\"/g; 
-      $request{'whisker'}->{'data'} = $r;
-  }
+ { 
+    my $r=$_[2];
+    $r =~ s/\\\"/\"/g; 
+    $request{'whisker'}->{'data'} = $r;
+ }
   
  # check for extra HTTP headers
  if (defined $_[3])
@@ -1820,11 +1822,27 @@ sub fetch
  } 
  $NIKTO{totalrequests}++;
  unless ($_[4]) { LW2::http_fixup_request(\%request); }
- LW2::http_do_request_timeout(\%request,\%result);
- if ($OUTPUT{debug})
+ # Cache
+ if (defined $CACHE{$request{whisker}->{uri}} && !defined $CLI{nocache})
  {
-    dump_var("Request Hash", \%request);
-    dump_var("Result Hash", \%result);
+    # Get from cache
+    nprint("- Retrieving $request{whisker}->{uri} from cache.");
+    $result{whisker}->{code}=$CACHE{$request{whisker}->{uri}}{res};
+    $result{whisker}->{data}=$CACHE{$request{whisker}->{uri}}{content};
+ }
+ else
+ {
+    LW2::http_do_request_timeout(\%request,\%result);
+    unless (defined $CLI{nocache})
+    {
+       $CACHE{$request{whisker}->{uri}}{res}=$result{whisker}->{code};
+       $CACHE{$request{whisker}->{uri}}{content}=$result{whisker}->{data};
+    }
+    if ($OUTPUT{debug})
+    {
+       dump_var("Request Hash", \%request);
+       dump_var("Result Hash", \%result);
+    }
  }
  
  if (defined $CLI{display} && ($CLI{display} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
