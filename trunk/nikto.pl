@@ -207,6 +207,7 @@ foreach my $mark (@MARKS)
 report_close();
    
 nprint("+ $COUNTERS{hosts_total} host(s) tested");
+nprint("+ $NIKTO{totalrequests} requests made","v");
 send_updates();
 nprint("T:" . localtime() . ": Ending", "d");
 

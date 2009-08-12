@@ -1820,19 +1820,19 @@ sub fetch
        $request{$key}=$value;
     }
  } 
- $NIKTO{totalrequests}++;
  unless ($_[4]) { LW2::http_fixup_request(\%request); }
  # Cache
  if (defined $CACHE{$request{whisker}->{uri}} && !defined $CLI{nocache})
  {
     # Get from cache
-    nprint("- Retrieving $request{whisker}->{uri} from cache.");
+    nprint("- Retrieving $request{whisker}->{uri} from cache.","v");
     $result{whisker}->{code}=$CACHE{$request{whisker}->{uri}}{res};
     $result{whisker}->{data}=$CACHE{$request{whisker}->{uri}}{content};
  }
  else
  {
     LW2::http_do_request_timeout(\%request,\%result);
+    $NIKTO{totalrequests}++;
     unless (defined $CLI{nocache})
     {
        $CACHE{$request{whisker}->{uri}}{res}=$result{whisker}->{code};
