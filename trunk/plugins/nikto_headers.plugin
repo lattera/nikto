@@ -42,6 +42,7 @@ sub nikto_headers
    my ($mark)=@_; 
    my $dbarray = initialise_db("db_headers");
    my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
+   my %headers;
    # Standard headers, whisker is added to stop false positives
    # Host Pragma
 
@@ -50,8 +51,8 @@ sub nikto_headers
    my %xpb;
    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
    {
-      (my $RES, $CONTENT) = fetch($f, "GET");
-      if (defined $result{'x-powered-by'}) { $xpb{ $result{'x-powered-by'} } = 1; }
+      (my $RES, $CONTENT) = nfetch($f, "GET", "", \%headers);
+      if (defined $headers{x-powered-by}) { $xpb{ $headers{x-powered-by} } = 1; }
    }
 
    foreach my $x (sort keys %xpb)
@@ -67,9 +68,9 @@ sub nikto_headers
 
    #######################################################################
    # Servlet-Engine info
-   if (defined $result{'servlet-engine'})
+   if (defined $headers{servlet-engine})
    {
-      my $x = $result{'servlet-engine'};
+      my $x = $headers{servlet-engine};
       $x = ~s/\(.*$//;
       $x =~ s/\s+//g;
       push(@BUILDITEMS, $x);
@@ -145,22 +146,22 @@ sub nikto_headers
    # All other interesting headers
    
    # First let's hit something we know should return something
-   my ($res, $content)=fetch("/","GET");
+   my ($res, $content)=nfetch("/","GET","",\%headers);
 
    foreach my $header (@interesting_headers)
    {
-      if ($result{$header} ne '')
+      if ($headers{$header} ne '')
       {
-         my $x = $result{$header};
+         my $x = $headers{$header};
          $x =~ s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($mark,"Retrieved $header header: $result{$header}",999986,0);
+         add_vulnerability($mark,"Retrieved $header header: $headers{$header}",999986,0);
       }
    }
 
    #######################################################################
    # Look for any non-standard headers
-   foreach my $header (sort keys %result)
+   foreach my $header (sort keys %headers)
    {
       my $found = 0;
       my $reportnum = 999100;
@@ -173,10 +174,10 @@ sub nikto_headers
       }
       if ($found == 0)
       {
-         my $x = $result{$header};
+         my $x = $headers{$header};
          $x =~s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($mark,"Non-standard header $header returned by server, with contents: $result{$header}",$reportnum,0);
+         add_vulnerability($mark,"Non-standard header $header returned by server, with contents: $headers{$header}",$reportnum,0);
          $reportnum++;
       }
    }
@@ -187,13 +188,13 @@ sub nikto_headers
    # Try to grab a standard file
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
-      (my $RES, $CONTENT) = fetch($f, "GET");
+      (my $RES, $CONTENT) = nfetch($f, "GET","", \%headers);
    }
-
+   
    # Now we have a header, let's check ETag for inode
-   if (defined $result{etag})
+   if (defined $headers{etag})
    {
-      my $etag=$result{etag};
+      my $etag=$headers{etag};
       $etag =~ s/"//g;
       my @fields = split("-",$etag);
       my $message = "ETag header found on server";

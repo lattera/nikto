@@ -1952,7 +1952,24 @@ sub nfetch
    { 
       foreach my $c (@{$result{'whisker'}->{'cookies'}}) 
       { 
-         nprint("+ $request{'whisker'}->{'uri'} sent cookie: $c");
+         nprint("+ $uri sent cookie: $c");
+      }
+   }
+
+   # If headers is defined, copy the whisker headers to the hash
+   if (defined $headers)
+   {
+      # First clear the hash
+      foreach my $header (keys %$headers)
+      {
+         delete($headers->{$header});
+      }
+      while (my ($key, $value) = each(%result))
+      {
+         if ($key ne "whisker" && $key ne "connection")
+         {
+            $headers->{$key}=$value;
+         }
       }
    }
 
