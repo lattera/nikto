@@ -1822,7 +1822,8 @@ sub fetch
  } 
  unless ($_[4]) { LW2::http_fixup_request(\%request); }
  # Cache
- if (defined $CACHE{$request{whisker}->{uri}} && !defined $CLI{nocache})
+ if (defined $CACHE{$request{whisker}->{uri}} && !defined $CLI{nocache} &&
+     $CACHE{$request{whisker}->{uri}}{method} eq $request{whisker}->{method})
  {
     # Get from cache
     nprint("- Retrieving $request{whisker}->{uri} from cache.","v");
@@ -1835,6 +1836,7 @@ sub fetch
     $NIKTO{totalrequests}++;
     unless (defined $CLI{nocache})
     {
+       $CACHE{$request{whisker}->{uri}}{method}=$result{whisker}->{method};
        $CACHE{$request{whisker}->{uri}}{res}=$result{whisker}->{code};
        $CACHE{$request{whisker}->{uri}}{content}=$result{whisker}->{data};
     }
