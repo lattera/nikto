@@ -42,18 +42,19 @@ sub nikto_httpoptions_init
 sub nikto_httpoptions
 {
    my ($mark) = @_;
+   my %headers;
    # test for both OPTIONS / and OPTIONS * as they may give different results
-   (my $RES, $CONTENT) = fetch("*", "OPTIONS");
-   my $aoptions = "$result{allow}, ";
-   my $poptions = "$result{public}, ";
+   (my $res, $content) = nfetch($mark,"*", "OPTIONS", "", \%headers);
+   my $aoptions = "$headers{allow}, ";
+   my $poptions = "$headers{public}, ";
    my ($allow_methods, $public_methods, $txt);
    my $dbarray;
 
    $dbarray=initialise_db("db_httpoptions");
 
-   ($RES, $CONTENT) = fetch("/", "OPTIONS");
-   $aoptions .= $result{allow};
-   $poptions .= $result{public};
+   ($res, $content) = nfetch($mark,"/", "OPTIONS", "", \%headers);
+   $aoptions .= $headers{allow};
+   $poptions .= $headers{public};
 
    foreach my $o (split(/,[ ]?/, $aoptions)) { $allow_methods .= ", $o" unless ($allow_methods =~ /\b$o\b/ || $o eq ''); }
    $allow_methods =~ s/^[ ]?, //;
@@ -78,8 +79,8 @@ sub nikto_httpoptions
    # Check for other weirdness
    # IIS Debug
 
-   ($RES, $CONTENT) = nfetch($mark,"/","DEBUG",);
-   if ($RES == 200) 
+   ($res, $content) = nfetch($mark,"/","DEBUG",);
+   if ($res == 200) 
    {
       add_vulnerability($mark,"DEBUG HTTP verb may show server debugging information",999972,0,"DEBUG");
    }
@@ -88,12 +89,12 @@ sub nikto_httpoptions
       "Host" => "",
       "Content-Length" => "0",
    );
-   ($RES, $CONTENT) = nfetch($mark,"/","PROPFIND","",\%headers,1);
-   if ($RES == 207)
+   ($res, $content) = nfetch($mark,"/","PROPFIND","",\%headers,1);
+   if ($res == 207)
    {
-      if ($CONTENT =~ "<a:href>http://")
+      if ($content =~ "<a:href>http://")
       {
-         my $ipfound=$CONTENT;
+         my $ipfound=$content;
          $ipfound =~ s/^.*<a:href>//g;
          $ipfound =~ s/<\/a:href>.*$//g;
          add_vulnerability($mark,"PROPFIND HTTP verb may show the server's internal IP address: $ipfound",999973,13431);
@@ -110,10 +111,10 @@ sub nikto_httpoptions
       foreach my $version (split(/ /,"1.0 1.1"))
       {
          $request{whisker}{version} = $version; 
-         ($RES, $CONTENT) = nfetch($mark,"/","$method","",\%headers);
-         if ($RES == 200)
+         ($res, $content) = nfetch($mark,"/","$method","",\%headers);
+         if ($res == 200)
          {
-            if ($CONTENT =~ "Nikto")
+            if ($content =~ "Nikto")
             {
                add_vulnerability($mark,"HTTP $method method is active, suggesting the host is vulnerable to XST",999971,877);
                # now we know its vulnerable stop testing
