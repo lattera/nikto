@@ -1,5 +1,6 @@
-2009-08-13 plugins/*
+2009-08-13 plugins/* plugins/nikto_embedded plugins/db_embedded
 	- Various fixes to use nfetch and fix proxy use
+	- New plugin added to identify embedded devices
 2009-08-12 plugins/nikto_core
 	- New fetch (nfetch) sub added which uses a local request/result hash.
 	  All requests should use this instead of fetch.
