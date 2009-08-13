@@ -44,21 +44,21 @@ sub nikto_put_del_test
 
     # PUT a page
     my $uri = "/nikto-test-" . LW2::utils_randstr(8) . ".html";
-    (my $RES, $CONTENT) = nfetch($uri, "PUT", "This was a Nikto test.");
+    (my $RES, $CONTENT) = nfetch($mark,$uri, "PUT", "This was a Nikto test.");
 
     # Request it back
     if ($RES eq 201)
     {
-        (my $RES, $CONTENT) = nfetch($uri, "GET");
+        (my $RES, $CONTENT) = nfetch($mark,$uri, "GET");
         if ($CONTENT =~ /This was a Nikto test/)
         {
             add_vulnerability($mark,"HTTP method 'PUT' allows clients to save files on the web server.", 999995, 397, "PUT", $uri);
 
             # we were able to put it there--can we delete it?
-            (my $RES, $CONTENT) = nfetch($uri, "DELETE");
+            (my $RES, $CONTENT) = nfetch($mark,$uri, "DELETE");
             if ($RES eq 200)
             {
-                (my $RES, $CONTENT) = nfetch($uri, "GET");
+                (my $RES, $CONTENT) = nfetch($mark,$uri, "GET");
                 if ($CONTENT !~ /This was a Nikto test/)    # gone now
                 {
                     add_vulnerability($mark,"HTTP method 'DELETE' allows clients to delete files on the web server.", 999994, 5646, "DELETE", $uri);

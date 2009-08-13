@@ -51,7 +51,7 @@ sub nikto_headers
    my %xpb;
    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
    {
-      (my $RES, $CONTENT) = nfetch($f, "GET", "", \%headers);
+      (my $RES, $CONTENT) = nfetch($mark,$f, "GET", "", \%headers);
       if (defined $headers{x-powered-by}) { $xpb{ $headers{x-powered-by} } = 1; }
    }
 
@@ -146,7 +146,7 @@ sub nikto_headers
    # All other interesting headers
    
    # First let's hit something we know should return something
-   my ($res, $content)=nfetch("/","GET","",\%headers);
+   my ($res, $content)=nfetch($mark,"/","GET","",\%headers);
 
    foreach my $header (@interesting_headers)
    {
@@ -188,7 +188,7 @@ sub nikto_headers
    # Try to grab a standard file
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
-      (my $RES, $CONTENT) = nfetch($f, "GET","", \%headers);
+      (my $RES, $CONTENT) = nfetch($mark,$f, "GET","", \%headers);
    }
    
    # Now we have a header, let's check ETag for inode

@@ -41,7 +41,7 @@ sub nikto_apache_expect_xss
 {
    my ($mark) = @_;
    my %headers=('Expect', '<script>alert(xss)</script>');
-   (my $RES, $CONTENT) = nfetch("/", "GET", "", \%headers);
+   (my $RES, $CONTENT) = nfetch($mark,"/", "GET", "", \%headers);
 
    if ($CONTENT =~ /<script>alert\(xss\)<\/script>/)
    {

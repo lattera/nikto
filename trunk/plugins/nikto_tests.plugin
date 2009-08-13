@@ -54,13 +54,6 @@ sub nikto_tests
       {
          (my $RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data});
          nprint("- $RES for $TESTS{$CHECKID}{method}:\t$request{whisker}{uri}","v");
-         # Check for errors to reduce false positives
-         if (defined $result{whisker}{error})
-         {
-            # An error occured, show in verbose mode and skip
-            nprint("- ERROR: $uri returned an error: $result{whisker}{error}\n");
-            next;
-         }
          $NIKTO{resp_counts}{$RES}{total}++;
    
          # do auth/redir first, independent of test pass/fail

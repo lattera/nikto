@@ -62,7 +62,7 @@ sub nikto_msgs
    # McAfee ePO 
    if ($mark->{banner} =~ /(Agent-ListenServer-HttpSvr\/1\.0)\b/i) 
    { 
-      my ($RES, $CONTENT) = nfetch("/","GET"); 
+      my ($RES, $CONTENT) = nfetch($mark,"/","GET"); 
       next unless ($RES == 200); 
       # Computer name 
       my $name=$CONTENT; 
@@ -74,7 +74,7 @@ sub nikto_msgs
    # HP WBEM 
    if ($mark->{banner} =~ /(CompaqHTTPServer)/i) 
    { 
-      my ($RES, $CONTENT) = nfetch("/cpqlogin.htm","GET"); 
+      my ($RES, $CONTENT) = nfetch($mark,"/cpqlogin.htm","GET"); 
       next unless ($RES == 200); 
       my $ipaddrs=""; 
       my $name; 

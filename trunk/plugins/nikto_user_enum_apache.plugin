@@ -75,7 +75,7 @@ sub nikto_user_enum_apache
          foreach my $cgidir (@CFGCGI)
          {
             my $curl = "$cgidir" . "cgiwrap";
-            (my $result, $content) = nfetch("$curl", "GET");
+            (my $result, $content) = nfetch($mark,"$curl", "GET");
             if ($content =~ /check your URL/i)
             {
                push(@cgiwraps, "$curl");
@@ -123,7 +123,7 @@ sub nikto_user_enum_apache_brute
    while (length($text) <= 5)
    {
       if (($ctr % 500) eq 0) { nprint("- User enumeration guess $ctr ($text)", "v"); }
-      (my $result, $content) = nfetch("/~" . $text, "HEAD");
+      (my $result, $content) = nfetch($mark,"/~" . $text, "HEAD");
       my $user = nikto_user_enum_apache_check($result, $text);
       if (defined $user)
       {
@@ -162,7 +162,7 @@ sub nikto_user_enum_apache_dictionary
       s/^~//;
       if ($_ eq "" ) { next };
       if (($ctr % 500) == 0) { nprint("- User enumeration guess $ctr ($_)", "v"); }
-      (my $result, $content) = nfetch("/~" . $_, "HEAD");
+      (my $result, $content) = nfetch($mark,"/~" . $_, "HEAD");
       my $user = nikto_user_enum_apache_check($result, $_);
       if ($user)
       {

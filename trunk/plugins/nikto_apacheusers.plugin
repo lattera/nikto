@@ -40,12 +40,12 @@ sub nikto_apacheusers_init
 sub nikto_apacheusers
 {
    my ($mark) = @_;
-   (my $RES, $CONTENT) = nfetch("/~root", "GET");
+   (my $RES, $CONTENT) = nfetch($mark,"/~root", "GET");
 
    $CONTENT = char_escape($CONTENT);
    if ($CONTENT =~ /forbidden/i)    # good on "root"
    {
-      (my $RES, $CONTENT) = nfetch("/~" . LW2::utils_randstr(8), "GET");
+      (my $RES, $CONTENT) = nfetch($mark,"/~" . LW2::utils_randstr(8), "GET");
 
       $CONTENT = char_escape($CONTENT);
       if ($CONTENT !~ /forbidden/i)    # Good, it gave an error instead of forbidden

@@ -78,7 +78,7 @@ sub nikto_httpoptions
    # Check for other weirdness
    # IIS Debug
 
-   ($RES, $CONTENT) = nfetch("/","DEBUG",);
+   ($RES, $CONTENT) = nfetch($mark,"/","DEBUG",);
    if ($RES == 200) 
    {
       add_vulnerability($mark,"DEBUG HTTP verb may show server debugging information",999972,0,"DEBUG");
@@ -88,7 +88,7 @@ sub nikto_httpoptions
       "Host" => "",
       "Content-Length" => "0",
    );
-   ($RES, $CONTENT) = nfetch("/","PROPFIND","",\%headers,1);
+   ($RES, $CONTENT) = nfetch($mark,"/","PROPFIND","",\%headers,1);
    if ($RES == 207)
    {
       if ($CONTENT =~ "<a:href>http://")
@@ -110,7 +110,7 @@ sub nikto_httpoptions
       foreach my $version (split(/ /,"1.0 1.1"))
       {
          $request{whisker}{version} = $version; 
-         ($RES, $CONTENT) = nfetch("/","$method","",\%headers);
+         ($RES, $CONTENT) = nfetch($mark,"/","$method","",\%headers);
          if ($RES == 200)
          {
             if ($CONTENT =~ "Nikto")
