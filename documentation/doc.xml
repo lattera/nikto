@@ -548,14 +548,19 @@
            <varlistentry>
               <term>CLIOPTS</term>
               <listitem>
-                 <para>Default options that should always be passed to the command line. For example:</para>
+                 <para>Default options that should always be passed to the command line.
+                 For example:</para>
                  <blockquote>
-                    <para>CLIOPTS=-output results.txt -Format text</para>
+                    <para><command>CLIOPTS=-output results.txt -Format text</command></para>
+                 </blockquote>
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>CLIOPTS=</command></para>
                  </blockquote>
               </listitem>
            </varlistentry>
            <varlistentry>
-              <term>NIKTODTD</term>
+              <term><command>NIKTODTD</command></term>
               <listitem>
                  <para>Path to the location of the DTD used for XML output. If the
                  path is not absolute then it will be relative to the directory where
@@ -571,7 +576,7 @@
               <term>NMAP</term>
               <term>NMAPOPTS</term>
               <listitem>
-                 <para>Deprecated</para>
+                 <para><emphasis>Deprecated</emphasis></para>
                  <para>Location of nmap and default nmap options. Nikto used to use 
                  nmap to aid in checking for valid HTTP ports on any targets. From
                  Nikto 2.10, nmap is no longer used from within Nikto and this variable
@@ -579,17 +584,207 @@
                  
                  <para>Default Setting</para>
                  <blockquote>
-                    <para>NMAP=/usr/local/bin/nmap</para>
-                    <para>NMPOPTS=-P0</para>
+                    <para><command>NMAP=/usr/local/bin/nmap</command></para>
+                    <para><command>NMPOPTS=-P0</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>SKIPPORTS</term>
+              <listitem>
+                 <para><emphasis>Deprecated</emphasis></para>
+                 <para>This configuration item originally defined ports that would never
+                 be scanned by Nikto. This is currently unused and deprecated.</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>SKIPPORTS=21 111</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>SKIPIDS</term>
+              <listitem>
+                 <para>Contains a space separated list of Test IDs (tids) that Nikto will
+                 not run on the system, for example:</para>
+                 <blockquote>
+                    <para><command>SKIPIDS=000045 000345</command></para>
+                 </blockquote>
+                 <para>Note, this filter only applies to tests in the db_tests database</para>
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>SKIPIDS=</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>DEFAULTHTTPVER</term>
+              <listitem>
+                 <para>Defines the default version of HTTP that Nikto will use, unless
+                 superceded by a specific test. Usually keeping this to the default will
+                 suffice, though some web servers may only work with later versions of the
+                 HTTP protocol.</para>
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>DEFAULTHTTPVER=1.0</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>UPDATES</term>
+              <listitem>
+                 <para>If the outdated Nikto plugin sees a web server it doesn't know of,
+                 or a version that is later than that defined in db_outdated, then it will
+                 send this information back to cirt.net for inclusion in future versions of
+                 Nikto. Server specific information (e.g. IP addresses or hostnames) are not
+                 sent.</para>
+
+                 <para>This item can be set to one of the below values:</para>
+                 <blockquote>
+                    <variablelist>
+                       <varlistentry>
+                          <term><command>UPDATES=yes</command></term>
+                          <listitem>
+                             <para>Display each submission and ask for permission before it is sent</para>
+                          </listitem>
+                       </varlistentry>
+                       <varlistentry>
+                          <term><command>UPDATES=no</command></term>
+                          <listitem>
+                             <para>Do not send any data back to cirt.net</para>
+                          </listitem>
+                       </varlistentry>
+                       <varlistentry>
+                          <term><command>UPDATES=auto</command></term>
+                          <listitem>
+                             <para>Send data back to cirt.net with no prompting</para>
+                          </listitem>
+                       </varlistentry>
+                    </variablelist>
+                 </blockquote>
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>UPDATES=yes</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>MAX_WARN</term>
+              <listitem>
+                 <para><emphasis>Unused</emphasis></para>
+                 <para>Produces a warning of a number of MOVED responses are retrieved. This
+                 is currently unused.</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>MAX_WARN=20</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>PROMPTS</term>
+              <listitem>
+                 <para><emphasis>Deprecated</emphasis></para>
+                 <para>Disables Nikto prompts if set to "no". This is currently unused and
+                 has been deprecated by the UPDATES item.</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>PROMPTS=</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>CIRT</term>
+              <listitem>
+                 <para>The IP address that Nikto will use to update the databases and
+                 plugins, or will send version information back to (as described in the
+                 UPDATES item).</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>CIRT=209.172.49.178</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>PROXYHOST</term>
+              <term>PROXYPORT</term>
+              <term>PROXYUSER</term>
+              <term>PROXYPASS</term>
+              <listitem>
+                 <para>Address, port and username password of a proxy to relay all
+                 requests through. Note, to use a proxy, you must set the configuration
+                 items in the configuration file and supply the -useproxy switch to
+                 the command line.</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>PROXYHOST=</command></para>
+                    <para><command>PROXYPORT=</command></para>
+                    <para><command>PROXYUSER=</command></para>
+                    <para><command>PROXYPASS=</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>STATIC-COOKIE</term>
+              <listitem>
+                 <para>Adds the supplied cookie to all requests made via Nikto, this
+                 is generally useful is an authentication cookie is required for a
+                 website. For example:</para>
+                 <blockquote>
+                    <para><command>STATIC-COOKIE=userid=0</command></para>
+                 </blockquote>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>STATIC-COOKIE=</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>CHECKMETHODS</term>
+              <listitem>
+                 <para>Nikto will attempt to identify targets as webservers by sending
+                 a request to fetch the / URI via certain HTTP methods. Some web
+                 servers do not implement all HTTP methods and may cause Nikto to fail
+                 to identify the web server correctly if it doesn't support the method
+                 being used.</para>
+
+                 <para>If this setting is missing from the configuration file, then
+                 Nikto will default back to the Nikto 2.02 default of HEAD.</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>CHECKMETHODS=HEAD GET</command></para>
+                 </blockquote>
+              </listitem>
+           </varlistentry>
+           <varlistentry>
+              <term>EXECDIR</term>
+              <term>PLUGINDIR</term>
+              <term>TEMPLATEDIR</term>
+              <term>DOCDIR</term>
+              <listitem>
+                 <para>Defines where to find the location of Nikto, its plugins,
+                 XML/HTML templates and documents. This should only normally be
+                 changed if repackaging Nikto to work with different file system
+                 standards. Nikto will use the EXECDIR item to guess the other
+                 directories.</para>
+
+                 <para>Default Setting</para>
+                 <blockquote>
+                    <para><command>EXECDIR=.</command></para>
+                    <para><command>PLUGINDIR=EXECDIR/plugins</command></para>
+                    <para><command>TEMPLATEDIR=EXECDIR/templates</command></para>
+                    <para><command>DOCDIR=EXECDIR/docs</command></para>
                  </blockquote>
               </listitem>
            </varlistentry>
         </variablelist>
       </sect1>
    </chapter>           
-     
-     
-     
 
   <chapter>
     <title>Output and Reports</title>
