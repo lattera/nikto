@@ -51,7 +51,7 @@ sub nikto_headers
    my %xpb;
    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
    {
-      (my $RES, $CONTENT) = nfetch($mark,$f, "GET", "", \%headers);
+      (my $res, $content) = nfetch($mark,$f, "GET", "", \%headers);
       if (defined $headers{x-powered-by}) { $xpb{ $headers{x-powered-by} } = 1; }
    }
 
@@ -64,6 +64,27 @@ sub nikto_headers
 
       $message .= " $x";
       add_vulnerability($mark,"Retrieved X-Powered-By header:$message", 999992, 0);
+   }
+   
+   #######################################################################
+   # look for to see whether its vulnerable to the Translate: f
+   my %transheaders;
+   foreach my $f (qw/\/index.asp \/junk999.asp \/index.aspx \/junk988.aspx \/login.asp \/login.aspx/ )
+   {
+      (my $res, $content) = nfetch($mark, $f , "GET", "", \%transheaders);
+      if ($res eq "200")
+      {
+         $transheaders{Translate}="f";
+         ($res, $content) = nfetch($mark,$f . "\\", "GET", "", \%transheaders);
+         if ($res eq "200")
+         {
+            if ($content =~ /<asp:/ || $content =~ /<\/asp:/)
+            {
+               add_vulnerability($mark, "Host may be vulnerable to a source disclosure using the Translate: header", 999983, 390, GET, $f, $content);
+               last;
+            }
+         }
+      }
    }
 
    #######################################################################
@@ -188,7 +209,7 @@ sub nikto_headers
    # Try to grab a standard file
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
-      (my $RES, $CONTENT) = nfetch($mark,$f, "GET","", \%headers);
+      (my $res, $content) = nfetch($mark,$f, "GET","", \%headers);
    }
    
    # Now we have a header, let's check ETag for inode

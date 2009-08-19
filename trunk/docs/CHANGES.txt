@@ -1,3 +1,6 @@
+2009-08-19 plugins/nikto_headers
+	- Added test for asp source code disclosure through the Translate
+	  header
 2009-08-13 plugins/* plugins/nikto_embedded plugins/db_embedded
 	- Various fixes to use nfetch and fix proxy use
 	- New plugin added to identify embedded devices
