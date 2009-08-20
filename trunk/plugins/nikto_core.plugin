@@ -1876,7 +1876,7 @@ sub setup_hash
    {
       $reqhash->{whisker}->{encode_anti_ids}=$CLI{evasion};
    }
-   $reqhash->{User-Agent}=$NIKTO{useragent};
+   $reqhash->{'User-Agent'}=$NIKTO{useragent};
    $reqhash->{whisker}->{retry}=0;
    $reqhash->{whisker}->{host} = $mark->{hostname} || $mark->{ip};
    if ($mark->{vhost})
