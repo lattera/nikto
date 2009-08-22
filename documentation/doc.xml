@@ -194,6 +194,24 @@
       it is an SSL server, specifying -s (-ssl) will speed up the test.</para>
 
       <screen>perl nikto.pl -h 192.168.0.1 -p 443 -ssl</screen>
+
+      <note>
+      <para><parameter>-mutate</parameter> 1 increases the number of tests so
+      that all filenames are tested against all databases inc 
+      <filename>db_tests</filename>. This will produce over 2,000,000 extra
+      tests, which will use up a massive amount of resource.</para>
+      </note>
+
+      <para>More complex tests can be performed using the
+      <parameter>-mutate</parameter> parameter, as detailed later. This can
+      produce extra tests, some of which may be provided with extra parameters
+      through the <parameter>-mutate-options</parameter> parameter. For example,
+      using <parameter>-mutate</parameter> 3, with or without a file attempts
+      to brute force usernames if the web server allows
+      ~<replaceable>user</replaceable> URIs:</para>
+ 
+      <screen>perl nikto.pl -h 192.168.0.1 -mutate 3 -mutate-options user-list.txt</screen>
+   
    </section>
 
    <section>
@@ -220,9 +238,12 @@
 
       <para>This is an example of a valid hosts file:</para>
 
+      <example>
+      <title>Valid Hosts File</title>
       <programlisting>192.168.0.1:80
 http://192.168.0.1:8080/
 192.168.0.3</programlisting>
+      </example>
 
       <note>
          <para>For win32 users: due to peculiaries in the way that cmd.exe
@@ -600,7 +621,7 @@ http://192.168.0.1:8080/
    </section>
 </chapter>
 
-<chapter>
+<chapter id="configuration">
    <title>Configuration Files</title>
 
    <section>
@@ -861,7 +882,7 @@ DOCDIR=EXECDIR/docs</screen>
    </section>
 </chapter>           
 
-<chapter>
+<chapter id="reports">
    <title>Output and Reports</title>
 
    <section>
@@ -900,7 +921,7 @@ DOCDIR=EXECDIR/docs</screen>
    </section>
 </chapter>
 
-<chapter>
+<chapter id="expanding">
    <title>Test and Code Writing</title>
 
    <section>
@@ -1257,7 +1278,7 @@ DOCDIR=EXECDIR/docs</screen>
 
          <example>
          <title>Example initialisation function</title>
-         <programlisting> <![CDATA[  sub nikto_dictionary_attack_init
+         <programlisting> <![CDATA[sub nikto_dictionary_attack_init
 {
    my $id =
    {
@@ -2039,7 +2060,7 @@ $TESTS{999999}{osvdb}=637;</screen>
    </section>
 </chapter>
 
-<chapter>
+<chapter id="troubleshooting">
    <title>Troubleshooting</title>
    <section>
       <title>SOCKS Proxies</title>
@@ -2056,7 +2077,7 @@ $TESTS{999999}{osvdb}=637;</screen>
    </section>
 </chapter>
 
-<chapter>
+<chapter id="licences">
    <title>Licences</title>
 
    <section>
@@ -2081,7 +2102,7 @@ $TESTS{999999}{osvdb}=637;</screen>
    </section>
 </chapter>
 
-<chapter>
+<chapter id="credits">
    <title>Credits</title>
    <section>
       <title>Nikto</title>
