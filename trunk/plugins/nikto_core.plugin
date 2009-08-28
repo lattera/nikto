@@ -1127,7 +1127,6 @@ sub port_check
 
    # test for proxy
    proxy_check() unless $PROXYCHECKED;
-   setup_hash(\%request,\%mark);
 
    my @checktypes=('HTTP', 'HTTPS');
    if ($CLI{ssl}) { shift(@checktypes); }
@@ -1883,8 +1882,8 @@ sub setup_hash
    {
       $request{Host} = $mark->{vhost};
    }
-   $request->{whisker}->{port}    = $mark->{port};
-   $request->{whisker}->{ssl}     = $mark->{ssl};
+   $reqhash->{whisker}->{port}    = $mark->{port};
+   $reqhash->{whisker}->{ssl}     = $mark->{ssl};
    
    # Proxy stuff
    if ($PROXYCHECKED && defined $NIKTOCONFIG{PROXYHOST} &&
@@ -1986,7 +1985,7 @@ sub nfetch
       }
    }
 
-   return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
+   return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'}, $result{'whisker'}->{'error'};
 }
 #######################################################################
 sub set_scan_items

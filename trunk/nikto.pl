@@ -132,7 +132,7 @@ foreach my $mark (@MARKS)
    }
 
    # Check that the port is open
-   my $open=port_check($mark->{ip}, $mark->{port});
+   my $open=port_check($mark->{hostname}, $mark->{ip}, $mark->{port});
    if ($open == 0) 
    {
       $mark->{test} = 0;
