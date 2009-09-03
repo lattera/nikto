@@ -452,7 +452,7 @@
 "000441","0","3","@CGIDIRSquery","GET","200","","","","","Echoes back result of your GET","",""
 "000442","0","3","@CGIDIRStest-cgi.tcl","GET","200","","","","","May echo environment variables or give directory listings","",""
 "000443","0","3","@CGIDIRStest-env","GET","200","","","","","May echo environment variables or give directory listings","",""
-"000444","0","3","/.perf","GET","ListenSocket","","","","","Contains Netscape/iPlanet server performance information","",""
+"000444","57612","3","/.perf","GET","ListenSocket","","","","","Contains Netscape/iPlanet server performance information","",""
 "000445","0","3","/","get","Index of ","","","","","Fasttrack can give a directory listing if issued 'get' instead of 'GET'","",""
 "000446","0","3","/","INDEX","Index of ","","","","","Netscape web publisher can give directory listings with the INDEX tag. Disable INDEX or Web Publisher.","",""
 "000447","0","3","//","GET","Proxy autoconfig","","","","","Proxy auto configuration file retrieved.","",""
