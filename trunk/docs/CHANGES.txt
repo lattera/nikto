@@ -1,3 +1,5 @@
+2009-08-25 plugins/db_httpoptions
+	- Fix for #89 - remove TRACE and TRACK from the db
 2009-08-19 plugins/nikto_headers
 	- Added test for asp source code disclosure through the Translate
 	  header
