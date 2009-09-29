@@ -1,4 +1,4 @@
-<!ELEMENT niktoscan (scandetails*)>
+<!ELEMENT niktoscan (scandetails*,statistics)>
 <!ATTLIST niktoscan hoststest CDATA #IMPLIED>
 <!ATTLIST niktoscan options CDATA #REQUIRED>
 <!ATTLIST niktoscan version CDATA #REQUIRED>
@@ -12,8 +12,6 @@
 <!ATTLIST scandetails starttime CDATA #REQUIRED>
 <!ATTLIST scandetails sitename CDATA #REQUIRED>
 <!ATTLIST scandetails siteip CDATA #REQUIRED>
-<!ATTLIST scandetails itemstested CDATA #IMPLIED>
-<!ATTLIST scandetails itemsfound CDATA #IMPLIED>
 <!ATTLIST scandetails hostheader CDATA #IMPLIED>
 
 <!ELEMENT item (description,uri?,namelink?,iplink?)>
