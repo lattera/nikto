@@ -1,10 +1,10 @@
-<!ELEMENT niktoscan (scandetails*,statistics)>
+<!ELEMENT niktoscan (scandetails*,statistics?)>
 <!ATTLIST niktoscan hoststest CDATA #IMPLIED>
 <!ATTLIST niktoscan options CDATA #REQUIRED>
 <!ATTLIST niktoscan version CDATA #REQUIRED>
 <!ATTLIST niktoscan nxmlversion CDATA #REQUIRED>
 
-<!ELEMENT scandetails (item*)>
+<!ELEMENT scandetails (item*,statistics?)>
 <!ATTLIST scandetails targetip CDATA #REQUIRED>
 <!ATTLIST scandetails targethostname CDATA #REQUIRED>
 <!ATTLIST scandetails targetport CDATA #REQUIRED>
@@ -25,10 +25,10 @@
 <!ELEMENT namelink ANY>
 <!ELEMENT iplink ANY>
 
-<!ELEMENT statistics ANY>
+<!ELEMENT statistics EMPTY>
 <!ATTLIST statistics itemstested CDATA #IMPLIED>
 <!ATTLIST statistics itemsfound CDATA #IMPLIED>
-<!ATTLIST statistics elasped CDATA #IMPLIED>
+<!ATTLIST statistics elapsed CDATA #IMPLIED>
 <!ATTLIST statistics hoststotal CDATA #IMPLIED>
 <!ATTLIST statistics endtime CDATA #IMPLIED>
 
