@@ -1,3 +1,5 @@
+2009-08-29 templates/xml* docs/nikto.dtd
+	- Added <statistics /> tag for scan/host statistics
 2009-08-25 plugins/db_httpoptions
 	- Fix for #89 - remove TRACE and TRACK from the db
 2009-08-19 plugins/nikto_headers
