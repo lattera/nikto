@@ -10,8 +10,6 @@
 <!ATTLIST scandetails targetport CDATA #REQUIRED>
 <!ATTLIST scandetails targetbanner CDATA #REQUIRED>
 <!ATTLIST scandetails starttime CDATA #REQUIRED>
-<!ATTLIST scandetails endtime CDATA #IMPLIED>
-<!ATTLIST scandetails elasped CDATA #IMPLIED>
 <!ATTLIST scandetails sitename CDATA #REQUIRED>
 <!ATTLIST scandetails siteip CDATA #REQUIRED>
 <!ATTLIST scandetails itemstested CDATA #IMPLIED>
