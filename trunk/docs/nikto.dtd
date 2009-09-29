@@ -34,4 +34,5 @@
 <!ATTLIST statistics itemsfound CDATA #IMPLIED>
 <!ATTLIST statistics elasped CDATA #IMPLIED>
 <!ATTLIST statistics hoststotal CDATA #IMPLIED>
+<!ATTLIST statistics endtime CDATA #IMPLIED>
 
