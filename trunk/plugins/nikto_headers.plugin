@@ -41,7 +41,7 @@ sub nikto_headers
 {
    my ($mark)=@_; 
    my $dbarray = initialise_db("db_headers");
-   my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
+   my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server x-aspnet-version/;
    my %headers;
    # Standard headers, whisker is added to stop false positives
    # Host Pragma
