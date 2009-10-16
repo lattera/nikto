@@ -21,7 +21,6 @@
 ###############################################################################
 # Nikto core functionality
 ###############################################################################
-
 sub change_variables
 {
    # $line is the unfiltered variable
@@ -95,6 +94,13 @@ sub nprint
    } 
    # print errors to STDERR
    if ($line =~ /ERROR\:/) { print STDERR "$line\n"; return; }
+   
+   # don't print to STDOUT if output file is "-"
+   if ($CLI{format} =~ /^xml$/i and $CLI{file} eq "-") { return; }
+ 
+   # don't print to STDOUT if output file is "-"
+   if ($CLI{format} =~ /^html?$/i and $CLI{file} eq "-") { return; }
+   
 
    # print to scan details to standard output if the users wants another format and is saving results to a file
    $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
