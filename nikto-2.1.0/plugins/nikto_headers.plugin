@@ -1,0 +1,242 @@
+#VERSION,2.03
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# General HTTP headers checks
+###############################################################################
+sub nikto_headers_init
+{
+   my $id =
+   {
+      name         => "headers",
+      full_name    => "HTTP Headers",
+      author       => "Sullo",
+      description  => "Performs various checks against the headers returned from a HTTP request.",
+      scan_method  => \&nikto_headers,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
+
+sub nikto_headers
+{
+   my ($mark)=@_; 
+   my $dbarray = initialise_db("db_headers");
+   my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server x-aspnet-version/;
+   my %headers;
+   # Standard headers, whisker is added to stop false positives
+   # Host Pragma
+
+   #######################################################################
+   # look for a powered-by header...could require a valid file, maybe not
+   my %xpb;
+   foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
+   {
+      (my $res, $content) = nfetch($mark,$f, "GET", "", \%headers);
+      if (defined $headers{x-powered-by}) { $xpb{ $headers{x-powered-by} } = 1; }
+   }
+
+   foreach my $x (sort keys %xpb)
+   {
+      my $message;
+
+      # push version to BUILDITEMS so it can be evaluated later
+      push(@BUILDITEMS, $x);
+
+      $message .= " $x";
+      add_vulnerability($mark,"Retrieved X-Powered-By header:$message", 999992, 0);
+   }
+   
+   #######################################################################
+   # look for to see whether its vulnerable to the Translate: f
+   my %transheaders;
+   foreach my $f (qw/\/index.asp \/junk999.asp \/index.aspx \/junk988.aspx \/login.asp \/login.aspx/ )
+   {
+      (my $res, $content) = nfetch($mark, $f , "GET", "", \%transheaders);
+      if ($res eq "200")
+      {
+         $transheaders{Translate}="f";
+         ($res, $content) = nfetch($mark,$f . "\\", "GET", "", \%transheaders);
+         if ($res eq "200")
+         {
+            if ($content =~ /<asp:/ || $content =~ /<\/asp:/)
+            {
+               add_vulnerability($mark, "Host may be vulnerable to a source disclosure using the Translate: header", 999983, 390, GET, $f, $content);
+               last;
+            }
+         }
+      }
+   }
+
+   #######################################################################
+   # Servlet-Engine info
+   if (defined $headers{servlet-engine})
+   {
+      my $x = $headers{servlet-engine};
+      $x = ~s/\(.*$//;
+      $x =~ s/\s+//g;
+      push(@BUILDITEMS, $x);
+
+      add_vulnerability($mark, "Retrieved servlet-engine headers: $x",999991,0);
+
+      my @bits = split(/;/, $x);
+      foreach my $bit (@bits)
+      {
+         push(@BUILDITEMS, $bit);
+      }
+   }
+
+   #######################################################################
+   # Content-Location header in IIS
+   LW2::http_close(\%request);    # force-close any old connections
+   LW2::http_fixup_request(\%request);
+   LW2::http_reset();
+   my $wh = $request{'whisker'}{'Host'};
+   my $h  = $request{'Host'};
+   delete $request{'whisker'}{'Host'};
+   delete $request{'Host'};
+   $request{'whisker'}->{'uri'}    = "/";
+   $request{'whisker'}->{'method'} = "GET";
+   $request{'whisker'}{'version'}  = "1.0";
+   
+   LW2::http_do_request_timeout(\%request, \%result);
+   if (   ($result{'content-location'} ne "")
+      && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
+      && ($result{'content-location'} !~ /$mark->{ip}/))
+   {
+      add_vulnerability($mark,"IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".", 999989, 630);
+   }
+   
+   LW2::http_close(\%request);    # force-close any old connections
+   LW2::http_fixup_request(\%request);
+   LW2::http_reset();
+   $request{'whisker'}->{'uri'}    = "/images";
+   $request{'whisker'}->{'method'} = "GET";
+   $request{'whisker'}{'version'}  = "1.0";
+   delete $request{'whisker'}{'Host'};
+   delete $request{'Host'};
+   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   LW2::http_do_request_timeout(\%request, \%result);
+
+   if (($result{'location'} ne "")
+      && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
+      && ($result{'location'} !~ /$mark->{ip}/))
+   {
+      add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630);
+   }
+
+   $request{'whisker'}{'Host'} = $wh;
+   $request{'Host'} = $h;
+
+   #######################################################################
+   # Location header in WebLogic
+   LW2::http_close(\%request);    # force-close any old connections
+   LW2::http_fixup_request(\%request);
+   LW2::http_reset();
+   $request{'whisker'}->{'uri'}    = ".";
+   $request{'whisker'}->{'method'} = "GET";
+   $request{'whisker'}{'version'}  = "1.0";
+   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   LW2::http_do_request_timeout(\%request, \%result);
+
+   if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//))
+   {
+      add_vulnerability($mark,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737);
+   }
+
+   #######################################################################
+   # All other interesting headers
+   
+   # First let's hit something we know should return something
+   my ($res, $content)=nfetch($mark,"/","GET","",\%headers);
+
+   foreach my $header (@interesting_headers)
+   {
+      if ($headers{$header} ne '')
+      {
+         my $x = $headers{$header};
+         $x =~ s/\s+.*$//;
+         push(@BUILDITEMS, $x);
+         add_vulnerability($mark,"Retrieved $header header: $headers{$header}",999986,0);
+      }
+   }
+
+   #######################################################################
+   # Look for any non-standard headers
+   foreach my $header (sort keys %headers)
+   {
+      my $found = 0;
+      my $reportnum = 999100;
+      foreach my $st_header (@$dbarray)
+      {
+         if ($header eq $st_header->{header})
+         {
+            $found=1;
+         }
+      }
+      if ($found == 0)
+      {
+         my $x = $headers{$header};
+         $x =~s/\s+.*$//;
+         push(@BUILDITEMS, $x);
+         add_vulnerability($mark,"Non-standard header $header returned by server, with contents: $headers{$header}",$reportnum,0);
+         $reportnum++;
+      }
+   }
+
+   #######################################################################
+   # ETag header
+   
+   # Try to grab a standard file
+   foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
+   {
+      (my $res, $content) = nfetch($mark,$f, "GET","", \%headers);
+   }
+   
+   # Now we have a header, let's check ETag for inode
+   if (defined $headers{etag})
+   {
+      my $etag=$headers{etag};
+      $etag =~ s/"//g;
+      my @fields = split("-",$etag);
+      my $message = "ETag header found on server";
+      if ($#fields == 2)
+      {
+         my $inode="0x$fields[0]";
+         my $size="0x$fields[1]";
+         my $mtime="0x$fields[2]";
+         # for some reason $mtime is mangled
+         $message .= sprintf(", inode: %d, size: %d, mtime: %s", hex($inode), hex($size),  $mtime);
+      }
+      else
+      {
+         $message .= ", fields: ";
+         foreach my $field (@fields)
+         {
+            $message .= "0x$field ";
+         }
+      }
+      add_vulnerability($mark, $message, 999984, 0);
+   }
+}
+
+1;
