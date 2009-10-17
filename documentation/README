@@ -20,6 +20,6 @@ DocBook:  http://www.docbook.org/
 XML Mind: http://www.xmlmind.com/xmleditor/
 
 - Commands -
-Manual page: db2x_docbook2man manpage.xml
-Single HTML: docbook2html -V nochunks=1 doc.xml
-Paged HTML:  docbook2html doc.xml
+Manual page: xmlto man manpage.xml
+Single HTML: xmlto html-nochunks -m config.xsl doc.xml
+Paged HTML:  xmlto html -m config.xsl doc.xml
