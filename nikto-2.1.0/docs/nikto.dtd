@@ -1,0 +1,30 @@
+<!ELEMENT niktoscan (scandetails*)>
+<!ATTLIST niktoscan hoststest CDATA #IMPLIED>
+<!ATTLIST niktoscan options CDATA #REQUIRED>
+<!ATTLIST niktoscan version CDATA #REQUIRED>
+<!ATTLIST niktoscan nxmlversion CDATA #REQUIRED>
+
+<!ELEMENT scandetails (item*)>
+<!ATTLIST scandetails targetip CDATA #REQUIRED>
+<!ATTLIST scandetails targethostname CDATA #REQUIRED>
+<!ATTLIST scandetails targetport CDATA #REQUIRED>
+<!ATTLIST scandetails targetbanner CDATA #REQUIRED>
+<!ATTLIST scandetails starttime CDATA #REQUIRED>
+<!ATTLIST scandetails endtime CDATA #IMPLIED>
+<!ATTLIST scandetails elasped CDATA #IMPLIED>
+<!ATTLIST scandetails sitename CDATA #REQUIRED>
+<!ATTLIST scandetails siteip CDATA #REQUIRED>
+<!ATTLIST scandetails itemstested CDATA #IMPLIED>
+<!ATTLIST scandetails itemsfound CDATA #IMPLIED>
+<!ATTLIST scandetails hostheader CDATA #IMPLIED>
+
+<!ELEMENT item (description,uri?,namelink?,iplink?)>
+<!ATTLIST item id CDATA #REQUIRED>
+<!ATTLIST item osvdbid CDATA #IMPLIED>
+<!ATTLIST item osvdblink CDATA #IMPLIED>
+<!ATTLIST item method CDATA #IMPLIED>
+
+<!ELEMENT description ANY>
+<!ELEMENT uri ANY>
+<!ELEMENT namelink ANY>
+<!ELEMENT iplink ANY>
