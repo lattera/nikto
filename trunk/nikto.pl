@@ -172,6 +172,7 @@ foreach my $mark (@MARKS)
    # put a signal trap so we can close down reports properly
    $SIG{'INT'} = sub
    {
+      $mark->{end_time} = time();
       report_host_end($mark);
       report_close($mark);
       exit(1);
