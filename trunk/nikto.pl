@@ -223,7 +223,7 @@ sub load_config
 {
    my $configfile=$_[0];
 
-   open(CONF, "<$configfile") || return "- ERROR: Unable to open config file '$configfile'";
+   open(CONF, "<$configfile") || return "+ ERROR: Unable to open config file '$configfile'";
    my @CONFILE = <CONF>;
    close(CONF);
 

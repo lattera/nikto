@@ -141,7 +141,7 @@ sub single
     if ($request{'whisker'}->{'host'}         eq "") { delete $request{'whisker'}->{'host'}; }
 
     my ($hostname, $ip) = resolve($request{'whisker'}{'host'});
-    if ($ip eq "") { print STDERR "ERROR: could not resolve host name\n"; exit; }
+    if ($ip eq "") { print STDERR "+ ERROR: could not resolve host name\n"; exit; }
 
 #### do request
     LW2::http_reset();    # force-close any old connections

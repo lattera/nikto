@@ -150,7 +150,7 @@ sub nikto_user_enum_apache_dictionary
    nprint("- Enumerating Apache users (using dictionary $filename).", "v");
    unless (open(IN, "<$filename"))
    {
-      nprint("- ERROR: Unable to open dictionary file $filename: $!.");
+      nprint("+ ERROR: Unable to open dictionary file $filename: $!.");
    }
 
    # Now attempt on each entry

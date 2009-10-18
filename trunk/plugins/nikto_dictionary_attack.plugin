@@ -53,7 +53,7 @@ sub nikto_dictionary_attack
    nprint("- Guessing directories/files (using dictionary $dictfile).", "v");
    unless (open(IN, "<$dictfile"))
    {
-      nprint("- ERROR: Unable to open dictionary file $dictfile: $!.");
+      nprint("+ ERROR: Unable to open dictionary file $dictfile: $!.");
    }
 
    # Now attempt on each entry

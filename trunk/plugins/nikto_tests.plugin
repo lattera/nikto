@@ -65,7 +65,7 @@ sub nikto_tests
             
             if (defined $result{whisker}->{error}) 
             {
-               nprint("- ERROR: $uri returned an error: $result{whisker}{error}\n"); 
+               nprint("+ ERROR: $uri returned an error: $result{whisker}{error}\n"); 
                next; 
             }
          }          

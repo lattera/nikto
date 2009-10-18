@@ -93,14 +93,10 @@ sub nprint
       return;
    } 
    # print errors to STDERR
-   if ($line =~ /ERROR\:/) { print STDERR "$line\n"; return; }
+   if ($line =~ /^+ ERROR\:/) { print STDERR "$line\n"; return; }
    
    # don't print to STDOUT if output file is "-"
-   if ($CLI{format} =~ /^xml$/i and $CLI{file} eq "-") { return; }
- 
-   # don't print to STDOUT if output file is "-"
-   if ($CLI{format} =~ /^html?$/i and $CLI{file} eq "-") { return; }
-   
+   if ($CLI{file} eq "-") { return; }
 
    # print to scan details to standard output if the users wants another format and is saving results to a file
    $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
@@ -595,7 +591,7 @@ sub general_config
  else                             { nprint("+ ERROR: Invalid output format '$CLI{format}'"); exit; }
  
  # verify readable dtd 
- if ($CLI{format} =~ /xml/i and !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
+ if ($CLI{format} eq 'xml' && !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
 
  # screen output
  if (defined $CLI{display})
@@ -758,7 +754,7 @@ sub set_targets
          if ($end eq "") { $end=65535; }
          if ($start > $end)
          {
-            nprint("- ERROR port range $port doesn't make sense - assuming 80/tcp");
+            nprint("+ ERROR port range $port doesn't make sense - assuming 80/tcp");
             next;
          }
          for (my $i=$start;$i<=$end;$i++)
@@ -1039,12 +1035,12 @@ sub dbcheck
            chomp($line);
            if ($line eq "") { next; }
            my @L=parse_csv($line);
-           if ($line !~ /^\".*\"\,\".*\"\,\".*\"$/) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
-           if ($#L ne 3) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+           if ($line !~ /^\".*\"\,\".*\"\,\".*\"$/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
+           if ($#L ne 3) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            $ENTRIES{"$L[0]"}++;
          }
 
-          foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
+          foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
           nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
    elsif ($file eq 'db_tests') 
@@ -1054,15 +1050,15 @@ sub dbcheck
          {
            if ($line !~ /^\"/)  { next; }
            my @L=parse_csv($line);
-           if ($L[4] !~ /(GET|POST|TRACE|TRACK|OPTIONS|SEARCH|INDEX)/i) { print STDERR "\tERROR: Possibly invalid method: $L[4] on ($line)\n"; }
-           if ($L[5] eq "") { print STDERR "\tERROR: blank conditional: $line"; next; }
-           if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
-           if ($line !~ /^(\".*\",){11}\".*\"/) { print STDERR "\tERROR: Invalid syntax ($#L): $line\n"; next; }
-           if (($L[3] =~ /^\@CGI/) && ($L[3] !~ /^\@CGIDIRS/)) { print STDERR "\tERROR: Possible \@CGIDIRS misspelling: $line"; }
+           if ($L[4] !~ /(GET|POST|TRACE|TRACK|OPTIONS|SEARCH|INDEX)/i) { print STDERR "\t+ ERROR: Possibly invalid method: $L[4] on ($line)\n"; }
+           if ($L[5] eq "") { print STDERR "\t+ ERROR: blank conditional: $line"; next; }
+           if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
+           if ($line !~ /^(\".*\",){11}\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
+           if (($L[3] =~ /^\@CGI/) && ($L[3] !~ /^\@CGIDIRS/)) { print STDERR "\t+ ERROR: Possible \@CGIDIRS misspelling: $line"; }
            $ENTRIES{"$L[3],$L[4],$L[5],$L[6],$L[7],$L[8],$L[9],$L[10],$L[12]"}++;
          }
 
-       foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
+       foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
        nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
    elsif ($file eq 'db_variables') 
@@ -1071,7 +1067,7 @@ sub dbcheck
        foreach $line (<IN>)
          {
            if ($line !~ /^\@/)  { next; }
-           if ($line !~ /^\@.+\=.+$/i ) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
+           if ($line !~ /^\@.+\=.+$/i ) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
         nprint "\t$ctr entries\n";
@@ -1084,7 +1080,7 @@ sub dbcheck
            if ($line !~ /^\"/)  { next; }
            chomp($line);
            my @L=parse_csv($line);
-           if ($#L ne 4) { print STDERR "\tERROR: Invalid syntax: $line\n"; }
+           if ($#L ne 4) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
            $ctr++;
          }
         nprint "\t$ctr entries\n";
@@ -1697,7 +1693,7 @@ sub proxy_check
   {
      if ($result{'whisker'}{'error'} =~ "Transport endpoint is not connected")
      {
-        nprint("ERROR: Could not connect to the defined proxy $NIKTOCONFIG{PROXYHOST}");
+        nprint("+ ERROR: Could not connect to the defined proxy $NIKTOCONFIG{PROXYHOST}");
         exit 1;
      }
   }
@@ -2164,7 +2160,7 @@ sub version
 
    foreach my $FILE (sort @NIKTOFILES)
    {
-      open(FI,"<$NIKTOCONFIG{PLUGINDIR}/$FILE") || die print STDERR "- ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$FILE': $!\n";;;
+      open(FI,"<$NIKTOCONFIG{PLUGINDIR}/$FILE") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$FILE': $!\n";;;
       my @F=<FI>;
       close(FI);
       my @VERS=grep(/^#VERSION/,@F);
@@ -2203,7 +2199,7 @@ sub send_updates
  if ($updated_version eq "") { return; }
  
  # make sure the db_outdatedb isn't *too* old
- open(OD,"<$NIKTOCONFIG{PLUGINDIR}/db_outdated") || die print STDERR "- ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/db_outdated': $!\n";;
+ open(OD,"<$NIKTOCONFIG{PLUGINDIR}/db_outdated") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/db_outdated': $!\n";;
  @F=<OD>;
  close(OD);
  
@@ -2295,7 +2291,7 @@ sub send_updates
 
  if ($CONTENT !~ /SUCCESS/) 
   { 
-   print STDERR "- ERROR: ($RES, $CONTENT): Unable to send updated version string(s) to CIRT.net\n"; 
+   print STDERR "+ ERROR: ($RES, $CONTENT): Unable to send updated version string(s) to CIRT.net\n"; 
   }
  else
   {
@@ -2322,7 +2318,7 @@ sub initialise_db
    # Check that the database exists
    unless (open(IN, "<$filename"))
    {
-      nprint("- ERROR: Unable to open database file $dbname: $!.");
+      nprint("+ ERROR: Unable to open database file $dbname: $!.");
       return $dbarray;
    }
 
