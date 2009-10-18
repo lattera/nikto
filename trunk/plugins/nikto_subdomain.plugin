@@ -63,9 +63,9 @@ sub nikto_subdomain
       # First we need to mangle the host.
       my $newhost=$item->{subdomain} . "." . $host;
       $request{whisker}{host} = $newhost;
-      my ($res, $content) = nfetch($mark,"/", "HEAD");
+      my ($res, $content) = fetch("/", "HEAD");
 
-      if (($res == 200) || ($res == 302))
+      if ($result{whisker}{error} eq "")
       {
          add_vulnerability($mark,"Subdomain $item->{subdomain} found", $item->{nikto_id}, 0);
       } # End if
