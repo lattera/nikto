@@ -581,7 +581,7 @@ sub general_config
  elsif ($CLI{Single})   { single();  }
  
  # output file
- unless (defined $CLI{file})      { $CLI{file}="-"; }      # default to standard output
+ unless (defined $CLI{file})      { $CLI{file}=""; }      # default is standard output
 
  unless (defined $CLI{format})    { $CLI{format}=""; }  # default to none
  elsif ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
