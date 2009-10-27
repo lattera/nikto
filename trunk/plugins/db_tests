@@ -1,4 +1,4 @@
-#VERSION,2.005
+#VERSION,2.006
 # $Id$ 
 # http://www.cirt.net
 
@@ -1442,8 +1442,7 @@
 "001437","2117","2","/","GET","body text=\"#000000\" bgcolor=\"#000000\" style=","","","","","Appears to be a default Domino 6 install.","",""
 "001438","2117","2","/","GET","Domino 5","","","","","Default Lotus Domino server running.","",""
 "001439","2117","2","/","GET","<TITLE>Sambar Server</TITLE>","","","","","Appears to be a default Sambar install.","",""
-"001440","2117","2","/","GET","deafult Tomcat","","","","","Appears to be a default Apache Tomcat install.","",""
-"001441","2117","2","/","GET","instead of the website","","","","","Appears to be a default Apache install.","",""
+"001441","2117","2","/","GET","(?:default Tomcat|instead of the website)","","","","","Appears to be a default Apache install.","",""
 "001442","2117","2","/","GET","Test Page for Apache","","","","","Appears to be a default Apache install.","",""
 "001443","2117","2","/","GET","The site you were trying to reach does not currently have a default page","","","","","Appears to be a default IIS install.","",""
 "001444","2117","2","/","GET","Welcome to IIS 4.0","","","","","Appears to be a default IIS 4.0 install.","",""
