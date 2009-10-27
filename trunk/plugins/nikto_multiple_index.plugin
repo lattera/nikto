@@ -48,7 +48,7 @@ sub nikto_multiple_index
       	# First we need to mangle the host.
       	my ($res, $content) = nfetch($mark,"/$item->{index}", "GET");
 
-      	if (($res == 200) || ($res == 404))
+      	if (($res == 200) || ($res == 302))
       	{
        		$content=rm_active_content($result{'whisker'}->{'data'});
        		my $hash=LW2::md4($content);
