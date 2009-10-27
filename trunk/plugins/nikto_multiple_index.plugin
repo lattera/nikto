@@ -1,4 +1,4 @@
-#VERSION,1.00
+#VERSION,1.01
 # $Id$
 
 ###############################################################################
@@ -40,21 +40,43 @@ sub nikto_multiple_index
 
    # Record the host for future use
 
-   my @found;
+   my $found;
+   my %hashes;
    foreach my $item (@$dbarray)
    {
-      # Use fetch to minimise extra code
-      # First we need to mangle the host.
-      my ($res, $content) = nfetch($mark,"/$item->{index}", "GET");
+      	# Use fetch to minimise extra code
+      	# First we need to mangle the host.
+      	my ($res, $content) = nfetch($mark,"/$item->{index}", "GET");
 
-      if (($res == 200) || ($res == 302))
-      {
-         push(@found, $item->{index});
-      }
+      	if (($res == 200) || ($res == 404))
+      	{
+       		$content=rm_active_content($result{'whisker'}->{'data'});
+       		my $hash=LW2::md4($content);
+		$found{$item->{index}}=$hash;
+		$hashes{$hash} .= "$item->{index}, ";
+      	}
+
    } # End foreach
-   if (scalar(@found) > 1)
+
+   # report, if necessary
+   if (keys(%found) > 1)
    {
-      add_vulnerability($mark,"Multiple index files found: @found", 740000, 0);
+	# one unique hash... bogus responses
+	if (keys(%hashes) <= 1)
+	{ 
+		return; 
+	}
+
+	my $tempstring;
+	my $group_count=0;
+	foreach my $h (keys %hashes)
+	{
+		$group_count++;
+		$tempstring .= "\#$group_count: $hashes{$h}";	
+	}
+	$tempstring=~s/,\s$//;
+
+	add_vulnerability($mark,"Multiple distinct index files found: $tempstring", 740000, 0);
    }
 }
 
