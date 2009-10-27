@@ -181,7 +181,7 @@ sub nikto_headers
    }
 
    #######################################################################
-   # Look for any non-standard headers
+   # Look for any uncommon headers
    foreach my $header (sort keys %headers)
    {
       my $found = 0;
@@ -198,7 +198,7 @@ sub nikto_headers
          my $x = $headers{$header};
          $x =~s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($mark,"Non-standard header '$header' returned by server, with contents: $headers{$header}",$reportnum,0);
+         add_vulnerability($mark,"Uncommon header '$header' found, with contents: $headers{$header}",$reportnum,0);
          $reportnum++;
       }
    }
