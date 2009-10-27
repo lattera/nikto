@@ -1,4 +1,4 @@
-#VERSION,2.003
+#VERSION,2.004
 # $Id: db_headers 72 2008-09-12 13:02:56Z deity $ 
 # http://www.cirt.net
 #######################################################################
@@ -25,6 +25,7 @@
 "expect"
 "expires"
 "from"
+"keep-alive"
 "host"
 "if-match"
 "if-modified-since"
@@ -41,6 +42,7 @@
 "referer"
 "retry-after"
 "server"
+"set-cookie"
 "te"
 "trailer"
 "transfer-encoding"

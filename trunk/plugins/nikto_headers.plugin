@@ -1,4 +1,4 @@
-#VERSION,2.03
+#VERSION,2.04
 # $Id$
 
 ###############################################################################
@@ -198,7 +198,7 @@ sub nikto_headers
          my $x = $headers{$header};
          $x =~s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($mark,"Non-standard header $header returned by server, with contents: $headers{$header}",$reportnum,0);
+         add_vulnerability($mark,"Non-standard header '$header' returned by server, with contents: $headers{$header}",$reportnum,0);
          $reportnum++;
       }
    }
