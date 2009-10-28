@@ -91,7 +91,7 @@ die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 general_config();
 load_databases();
 load_databases('u');
-nprint("- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}");
+nprint("- $NIKTO{name} v$NIKTO{version}");
 
 LW2::http_init_request(\%request);
 $request{'whisker'}->{'ssl_save_info'}              = 1;
