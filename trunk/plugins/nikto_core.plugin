@@ -151,6 +151,7 @@ sub map_codes
  dump_var("Request Hash", \%request);
  if ($CLI{pause} > 0) { sleep $CLI{pause}; }
  LW2::http_do_request_timeout(\%request,\%result);
+ $NIKTO{totalrequests}++;
  dump_var("Result Hash", \%result);
  if (defined $result{location}) 
   { 
@@ -165,6 +166,7 @@ sub map_codes
       dump_var("Request Hash", \%request);
       if ($CLI{pause} > 0) { sleep $CLI{pause}; }
       LW2::http_do_request_timeout(\%request,\%result);
+      $NIKTO{totalrequests}++;
       dump_var("Result Hash", \%result);
      }
     else  # different host... ugh... guess
@@ -217,6 +219,7 @@ sub map_codes
    dump_var("Request Hash", \%request);
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
    LW2::http_do_request_timeout(\%request,\%result);
+   $NIKTO{totalrequests}++;
    dump_var("Result Hash", \%result);
 
    $ext=$REQS{$file};
@@ -292,6 +295,7 @@ sub map_codes
    dump_var("Request Hash", \%request);
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
    LW2::http_do_request_timeout(\%request,\%result);
+   $NIKTO{totalrequests}++;
    dump_var("Result Hash", \%result);
 
    my $content=rm_active_content($result{'whisker'}->{'data'});
@@ -1541,6 +1545,7 @@ sub do_auth
          LW2::http_fixup_request(\%request);
          if ($CLI{pause} > 0) { sleep $CLI{pause}; }
          LW2::http_do_request_timeout(\%request,\%result); # test auth
+	 $NIKTO{totalrequests}++;
          dump_var("Auth Request",\%request);
          dump_var("Auth Response",\%result);
          if ($result{'www-authenticate'} =~ /^ntlm/i)
@@ -1550,6 +1555,7 @@ sub do_auth
             if ($#ntlm_x == 1)
             {
                LW2::http_do_request_timeout(\%request,\%result);
+	       $NIKTO{totalrequests}++;
             }
          }
          if ($result{'www-authenticate'} eq "")
@@ -1564,6 +1570,7 @@ sub do_auth
             }
             # Finally repeat the check
             LW2::http_do_request_timeout(\%request,\%result); # test auth
+	    $NIKTO{totalrequests}++;
             # and leave
             last;
          }
@@ -1687,6 +1694,7 @@ sub proxy_check
   LW2::http_fixup_request(\%request);
   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
   LW2::http_do_request_timeout(\%request,\%result);
+  $NIKTO{totalrequests}++;
 
   # First check that we can connect to the proxy
   if (exists $result{'whisker'}{'error'})
@@ -1719,6 +1727,7 @@ sub proxy_check
    LW2::http_fixup_request(\%request);
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
    LW2::http_do_request_timeout(\%request,\%result);
+   $NIKTO{totalrequests}++;
    if ($result{'proxy-authenticate'} ne "") 
     { 
      my @pauthinfo=split(/ /,$result{'proxy-authenticate'});
