@@ -53,3 +53,5 @@
 "warning"
 "www-authenticate"
 "whisker"
+"x-aspnet-version"
+"x-powered-by"
