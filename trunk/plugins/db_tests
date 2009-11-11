@@ -404,7 +404,7 @@
 "000393","0","1","@CGIDIRSredirect","GET","200","","","","","Redirects via URL from form","",""
 "000394","0","1","@CGIDIRSuptime","GET","200","","","","","Gateway to the unix command, may be able to submit extra commands","",""
 "000395","0","1","@CGIDIRSwais.pl","GET","200","","","","","Gateway to the unix command, may be able to submit extra commands","",""
-"000396","0","2","//","GET","index of","","","","","Apache on Red Hat Linux release 9 reveals the root directory listing by default if there is no index page.","",""
+"000396","0","2","//","GET","index of /","","","","","Apache on Red Hat Linux release 9 reveals the root directory listing by default if there is no index page.","",""
 "000397","0","2","/webtop/wdk/","GET","Directory Listing for /wdk/","","","","","Documentum Webtop Server appears to be installed","",""
 "000398","0","2","/SilverStream","GET","/Pages","","","","","SilverStream allows directory listing","",""
 "000399","0","2","/signon","GET","Administrator Login","","","","","Tivoli administrator login found. Test the default login of admin/admin.  Tivoli allows system administration.","",""
