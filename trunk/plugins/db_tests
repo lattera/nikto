@@ -3591,4 +3591,4 @@
 "003590","0","b","/webservices/IlaWebServices","GET","200","","","","","Host has the Oracle iLearning environment installed.","",""
 "003591","0","a","/SoundBridgeStatus.html","GET","200","SoundBridge is running software version","","","","Host is running the SoundBridge web server which doesn't support identification.","",""
 "003592","54339","4b","@CGIDIRSFormMail.pl","GET","Version 1.92","","","","","Matt Wright's FormMail 1.92 is vulnerable to HTTP response splitting and Cross-Site Scripting","",""
-
+"003592","","b","/CFIDE/componentutils/cfcexplorer.cfc","GET","Component Browser Login","","","","","Coldfusion Component Browser. Default password may be 'admin'.","",""
