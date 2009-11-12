@@ -556,7 +556,7 @@ sub general_config
            "config=s"                => \$CLI{config},
            "Cgidirs=s"               => \$CLI{forcecgi},
            "mutate=s"                => \$CLI{mutate},
-           "mutate-options=s"      => \$CLI{mutate-options},
+           "mutate-options=s"        => \$CLI{mutate-options},
            "id=s"                    => \$CLI{hostauth},
            "evasion=s"               => \$CLI{evasion},
            "port=s"                  => \$CLI{ports},
@@ -587,12 +587,14 @@ sub general_config
  # output file
  unless (defined $CLI{file})      { $CLI{file}=""; }      # default is standard output
 
- unless (defined $CLI{format})    { $CLI{format}="txt"; }  # default to txt
+ unless (defined $CLI{format})    { $CLI{format}=""; }    # default to none
  elsif ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
  elsif ($CLI{format} =~ /html?/i) { $CLI{format}="htm"; }
  elsif ($CLI{format} =~ /csv/i)   { $CLI{format}="csv"; }
  elsif ($CLI{format} =~ /xml/i)   { $CLI{format}="xml"; }
- else                             { nprint("+ ERROR: Invalid output format '$CLI{format}'"); exit; }
+ else                             { nprint("+ ERROR: Invalid output format"); exit; }
+
+ if (($CLI{file} ne "") && ($CLI{format} eq "")) { nprint("+ERROR: Output file specified without a format"); exit; }
  
  # verify readable dtd 
  if ($CLI{format} eq 'xml' && !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
