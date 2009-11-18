@@ -3595,3 +3595,4 @@
 "003592","54339","4b","@CGIDIRSFormMail.pl","GET","Version 1.92","","","","","Matt Wright's FormMail 1.92 is vulnerable to HTTP response splitting and Cross-Site Scripting","",""
 "003592","0","b","/CFIDE/componentutils/cfcexplorer.cfc","GET","Component Browser Login","","","","","Coldfusion Component Browser. Default password may be 'admin'.","",""
 "003593","0","1","/phone/","GET","200","","","","","This may be interesting...","",""
+"003594","0","b","/Host/Portals/tabid/19/ctl/Login/portalid/0/Default.aspx","GET","dnn_ctr-1_Signin_txtUsername","","","","","DotNetNuke is running on the web server."
