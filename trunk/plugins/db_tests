@@ -3598,4 +3598,5 @@
 "003594","0","b","/Host/Portals/tabid/19/ctl/Login/portalid/0/Default.aspx","GET","dnn_ctr-1_Signin_txtUsername","","","","","DotNetNuke is running on the web server.","",""
 "003595","34879","24","/jsp-examples/jsp2/jspx/textRotate.jspx?name=<script>alert('nikto')</script>","GET","200","<script>alert('nikto')</script>","","","","The tomcat demo files are installed, which are vulnerable to an XSS attack","",""
 "003596","34878","24","/jsp-examples/jsp2/el/implicit-objects.jsp?foo=<script>alert('nikto')</script>","GET","200","<script>alert('nikto')</script>","","","","The tomcat demo files are installed, which are vulnerable to an XSS attack","",""
-"003597","12721","24","/jsp-examples/jsp2/el/functions.jsp?foo=<script>alert('nikto')</script>","GET","200","<script>alert('nikto')</script>","","","","The tomcat demo files are installed, which are vulnerable to an XSS attack","",""
+"003597","12721","24","/jsp-examples/jsp2/el/functions.jsp?foo=<script>alert('nikto')</script>","GET","200","<script>alert('nikto')</script>","","","","The Tomcat demo files are installed, which are vulnerable to an XSS attack","",""
+"003598","0","b","/aspnet_files/","GET","403","Index of /","","","",".NET client side script files indicate .NET may be running. See http://msdn.microsoft.com/en-us/library/aa479045.aspx#aspplusvalid_clientside","",""
