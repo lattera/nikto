@@ -1579,6 +1579,7 @@ sub do_auth
          else { $result->{'www-authenticate'}=$save_auth; }
       }
    }
+   LW2::unset_auth(\%request);
    return $result;
 }
 
