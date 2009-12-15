@@ -80,7 +80,7 @@ sub nikto_headers
          {
             if ($content =~ /<asp:/ || $content =~ /<\/asp:/)
             {
-               add_vulnerability($mark, "Host may be vulnerable to a source disclosure using the Translate: header", 999983, 390, GET, $f, $content);
+               add_vulnerability($mark, "Host may be vulnerable to a source disclosure using the Translate: header", 999983, 390, "GET", $f, $content);
                last;
             }
          }
@@ -143,7 +143,7 @@ sub nikto_headers
       && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
       && ($result{'location'} !~ /$mark->{ip}/))
    {
-      add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630);
+      add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630,"GET","/images");
    }
 
    $request{'whisker'}{'Host'} = $wh;
@@ -163,7 +163,7 @@ sub nikto_headers
 
    if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//))
    {
-      add_vulnerability($mark,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737);
+      add_vulnerability($mark,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737,"GET",".");
    }
 
    #######################################################################
