@@ -1730,7 +1730,7 @@ DOCDIR=EXECDIR/docs</screen>
 
          <funcsynopsis>
             <funcprototype>
-               <funcdef>arrayref <function>initialize_db</function></funcdef>
+               <funcdef>arrayref <function>init_db</function></funcdef>
                <paramdef>string <parameter>dbname</parameter></paramdef>
             </funcprototype>
          </funcsynopsis>
