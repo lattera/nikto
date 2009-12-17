@@ -1,4 +1,4 @@
-#VERSION,2.04
+#VERSION,2.05
 # $Id$
 
 ###############################################################################
@@ -213,6 +213,7 @@ sub nikto_headers
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
       (my $res, $content) = nfetch($mark,$f, "GET","", \%headers);
+      last if (defined $headers{'etag'});
    }
    
    # Now we have a header, let's check ETag for inode
