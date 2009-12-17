@@ -2320,7 +2320,7 @@ sub usage
    exit;
 }
 #######################################################################
-sub initialise_db
+sub initialize_db
 {
    my $dbname=$_[0];
    my $filename="$NIKTOCONFIG{PLUGINDIR}/" . $dbname;

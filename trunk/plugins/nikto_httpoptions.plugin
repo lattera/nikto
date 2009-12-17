@@ -50,7 +50,7 @@ sub nikto_httpoptions
    my ($allow_methods, $public_methods, $txt);
    my $dbarray;
 
-   $dbarray=initialise_db("db_httpoptions");
+   $dbarray=initialize_db("db_httpoptions");
 
    ($res, $content) = nfetch($mark,"/", "OPTIONS", "", \%headers);
    $aoptions .= $headers{allow};

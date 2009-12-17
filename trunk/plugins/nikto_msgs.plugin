@@ -48,7 +48,7 @@ sub nikto_msgs
 {
    my ($mark) = @_;
    my $dbarray;
-   $dbarray=initialise_db("db_server_msgs");
+   $dbarray=initialize_db("db_server_msgs");
 
    foreach my $item (@$dbarray)
    {
