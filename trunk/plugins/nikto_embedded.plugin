@@ -48,7 +48,7 @@ sub nikto_embedded
 {
    my ($mark) = @_;
    my $dbarray;
-   $dbarray=initialize_db("db_embedded");
+   $dbarray=init_db("db_embedded");
 
    foreach my $item (@$dbarray)
    {

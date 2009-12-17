@@ -41,7 +41,7 @@ sub nikto_favicon
 {
    my ($mark)=@_;
    my ($RES, $CONTENT) = nfetch($mark,"/favicon.ico","GET");
-   my $dbarray = initialize_db("db_favicon");
+   my $dbarray = init_db("db_favicon");
 
    if ($RES eq "200" && $CONTENT ne "")
    {
