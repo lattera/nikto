@@ -1172,6 +1172,7 @@ sub port_check
    return 0;
 }
 
+###############################################################################
 sub load_plugins
 {
    my @pluginlist=dirlist("$NIKTOCONFIG{PLUGINDIR}",'\.plugin$');
@@ -2020,12 +2021,15 @@ sub set_scan_items
   if ($line =~ /^\"/)  # check
   {
    chomp($line);
-   # substitute for @IP, @HOSTNAME in check
+
+   # substitute for @IP, @HOSTNAME and JUNK() in check
    $line =~ s/\@IP/$mark->{ip}/g;
    $line =~ s/\@HOSTNAME/$shname/g;
+   $line =~ s/JUNK\(([0-9]+)\)/LW2::utils_randstr($1)/e;
+
    my @item=parse_csv($line);
    my $add=1;
-     
+
    # check tuning options
    if ((defined $CLI{tuning}) && (defined $item[2]))
    {
@@ -2052,26 +2056,17 @@ sub set_scan_items
     # Skip list
     foreach my $id (@SKIPLIST) { if ($id eq $item[0]) { $add=0; } }
 
-    # Add random text
     if ($add)
     {
-     for (my $i=3;$i<=$#item;$i++)
-     {
-      if ($item[$i] =~ /JUNK\([0-9]+\)/)  # junk text
-       {
-        $item[$i]=~/JUNK\(([0-9]+)\)/;
-        $item[$i] =~ s/JUNK\(([0-9]+)\)/LW2::utils_randstr($1)/e;
-       }
-     }
-    
-    # Build the check items. First check for any @ values to replace. this nasty set of loops allows for multiple values per line
-    my $ext = get_ext($item[3]);
-    $db_extensions{$ext}=1;
-    # This escapes regex characters in the conditionals. This will have to change if regex is ever allowed in the db
-    for (my $y=5;$y<=9;$y++) { $item[$y] =~ s/([^a-zA-Z0-9\s])/\\$1/g; }
+     # This nasty set of loops allows for multiple values per line
+     my $ext = get_ext($item[3]);
+     $db_extensions{$ext}=1;
 
-    #if ($item[3] =~ /^\@/)  # multiple checks in one
-    if ($item[3] =~ /^stop this happening/)  # multiple checks in one
+     # This escapes regex characters in the conditionals. This will have to change if regex is ever allowed in the db
+     for (my $y=5;$y<=9;$y++) { $item[$y] =~ s/([^a-zA-Z0-9\s])/\\$1/g; }
+
+     #if ($item[3] =~ /^\@/)  # multiple checks in one
+     if ($item[3] =~ /^stop this happening/)  # multiple checks in one
      {
       my @clones=();
       my $todelete="";
