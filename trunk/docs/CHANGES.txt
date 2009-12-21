@@ -1,3 +1,6 @@
+2009-12-21 nikto.pl
+	- Fix for ticket #100
+	- Some new additions to db_realms and db_embedded
 2009-08-29 templates/xml* docs/nikto.dtd
 	- Added <statistics /> tag for scan/host statistics
 2009-08-25 plugins/db_httpoptions

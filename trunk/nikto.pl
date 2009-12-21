@@ -67,7 +67,13 @@ my $error;
 my $config_exists=0;
 $error=load_config("$NIKTO{configfile}");
 $config_exists=1 if ($error eq "");
-$error=load_config("$ENV{HOME}/nikto.conf");
+# Guess home directory -- to support Windows
+my $home="";
+foreach my $var (split(/ /,"HOME USERPROFILE"))
+{
+   $home=$ENV{$var} if ($ENV{$var});
+}
+$error=load_config("$home/nikto.conf");
 $config_exists=1 if ($error eq "");
 $error=load_config("nikto.conf");
 $config_exists=1 if ($error eq "");
