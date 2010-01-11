@@ -25,9 +25,13 @@ sub change_variables
 {
    # $line is the unfiltered variable
    my $line=$_[0];
-   # @subtests is the returned array of expanded variables
-   my @subtests;
+   my @subtests; # @subtests is the returned array of expanded variables
    my $cooked;
+
+   my $shname=$mark->{hostname} || $mark->{ip};
+   $line =~ s/\@IP/$mark->{ip}/g;
+   $line =~ s/\@HOSTNAME/$shname/g;
+   $line =~ s/JUNK\(([0-9]+)\)/LW2::utils_randstr($1)/e;
 
    if ($line !~ "\@")
    {
@@ -2021,12 +2025,6 @@ sub set_scan_items
   if ($line =~ /^\"/)  # check
   {
    chomp($line);
-
-   # substitute for @IP, @HOSTNAME and JUNK() in check
-   $line =~ s/\@IP/$mark->{ip}/g;
-   $line =~ s/\@HOSTNAME/$shname/g;
-   $line =~ s/JUNK\(([0-9]+)\)/LW2::utils_randstr($1)/e;
-
    my @item=parse_csv($line);
    my $add=1;
 

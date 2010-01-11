@@ -40,14 +40,13 @@ sub nikto_mutate_init
 
 sub nikto_mutate
 {
-   my ($mark)=@_;
+    my ($mark)=@_;
     my ($c, %DIRS, %FS) = "";
 
     # build a hash of all the unique directories
     foreach $c (@CGIDIRS) { $DIRS{$c} = ""; }
 
     nprint("- Loading root level files", "v");
-
     foreach my $checkid (keys %TESTS)
     {
         my $dir  = LW2::uri_get_dir($TESTS{$checkid}{uri});
@@ -69,6 +68,7 @@ sub nikto_mutate
     my $new_tests = 0;
     my $m_test    = max_test_id();
 
+    nprint("- Generating tests", "v");
     foreach my $root (keys %DIRS)
     {
         foreach my $file (keys %FS)
@@ -76,11 +76,9 @@ sub nikto_mutate
             # skip self referencing stuff
             if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
 
-            # args with no file
             $mark->{total_checks}++;
             $m_test++;
             $new_tests++;
-
             if (($new_tests % 100000) eq 0) { nprint("-Added test ($new_tests of many):$root$file:", "d"); }
 
             $TESTS{$m_test}{uri}         = "$root$file";
