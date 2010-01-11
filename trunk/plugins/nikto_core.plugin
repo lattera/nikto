@@ -2065,63 +2065,18 @@ sub set_scan_items
      # This escapes regex characters in the conditionals. This will have to change if regex is ever allowed in the db
      for (my $y=5;$y<=9;$y++) { $item[$y] =~ s/([^a-zA-Z0-9\s])/\\$1/g; }
 
-     #if ($item[3] =~ /^\@/)  # multiple checks in one
-     if ($item[3] =~ /^stop this happening/)  # multiple checks in one
-     {
-      my @clones=();
-      my $todelete="";
-      push(@clones,$item[3]);
-      foreach my $varname (keys %VARIABLES)
-       {
-        for (my $i=0;$i<=$#clones;$i++)
-         {
-          if ($clones[$i] =~ /$varname/)
-           {
-            my @values=split(/ /,$VARIABLES{$varname});
-            foreach my $val (@values) 
-             {
-              my $temp=$clones[$i];
-              $temp =~ s/$varname/$val/g;
-              push(@clones,$temp);
-              $todelete=$i;
-             }
-           splice(@clones,$todelete,1);
-           $i--; # step back in the @clones 'cause we deleted one. more work, but it guarantees it's complete
-           }
-         }
-       }
-      # now actually populate the checks 
-      for (my $i=0;$i<=$#clones;$i++)
-      {
-       $mark->{total_checks}++;
-       $TESTS{$item[0]}{uri}=$clones[$i];
-       $TESTS{$item[0]}{osvdb}=$item[1];
-       $TESTS{$item[0]}{method}=$item[4];
-       $TESTS{$item[0]}{match_1}=$item[5];
-       $TESTS{$item[0]}{match_1_or}=$item[6];
-       $TESTS{$item[0]}{match_1_and}=$item[7];
-       $TESTS{$item[0]}{fail_1}=$item[8];
-       $TESTS{$item[0]}{fail_2}=$item[9];
-       $TESTS{$item[0]}{message}=$item[10];
-       $TESTS{$item[0]}{data}=$item[11];
-       $TESTS{$item[0]}{headers}=$item[12];
-      }
-     }
-    else # normal, single check
-     {
-       $mark->{total_checks}++;
-       $TESTS{$item[0]}{uri}=$item[3];
-       $TESTS{$item[0]}{osvdb}=$item[1];
-       $TESTS{$item[0]}{method}=$item[4];
-       $TESTS{$item[0]}{match_1}=$item[5];
-       $TESTS{$item[0]}{match_1_or}=$item[6];
-       $TESTS{$item[0]}{match_1_and}=$item[7];
-       $TESTS{$item[0]}{fail_1}=$item[8];
-       $TESTS{$item[0]}{fail_2}=$item[9];
-       $TESTS{$item[0]}{message}=$item[10];
-       $TESTS{$item[0]}{data}=$item[11];
-       $TESTS{$item[0]}{headers}=$item[12];
-     }
+     $mark->{total_checks}++;
+     $TESTS{$item[0]}{uri}=$item[3];
+     $TESTS{$item[0]}{osvdb}=$item[1];
+     $TESTS{$item[0]}{method}=$item[4];
+     $TESTS{$item[0]}{match_1}=$item[5];
+     $TESTS{$item[0]}{match_1_or}=$item[6];
+     $TESTS{$item[0]}{match_1_and}=$item[7];
+     $TESTS{$item[0]}{fail_1}=$item[8];
+     $TESTS{$item[0]}{fail_2}=$item[9];
+     $TESTS{$item[0]}{message}=$item[10];
+     $TESTS{$item[0]}{data}=$item[11];
+     $TESTS{$item[0]}{headers}=$item[12];
     }
    }
   }
