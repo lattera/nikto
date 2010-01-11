@@ -52,11 +52,14 @@ sub nikto_mutate
     {
         my $dir  = LW2::uri_get_dir($TESTS{$checkid}{uri});
         my $file = $TESTS{$checkid}{uri};
-        my $rdir = $dir;
-        $rdir =~ s/([^a-zA-Z0-9])/\\$1/g;
-        $file =~ s/$rdir//;
-        $DIRS{$dir} = "" unless $dir  eq "";
-        $FS{$file}  = "" unless $file eq "";
+        if ($dir ne "") {
+                $DIRS{$dir} = "";
+                $dir =~ s/([^a-zA-Z0-9])/\\$1/g;
+                $file =~ s/$dir//;
+                }
+        if (($file ne "") && ($file !~ /^\?/)) {
+                $FS{$file}  = "";
+                }
     }
 
     foreach my $c ((split(/ /, $VARIABLES{"\@MUTATEDIRS"})))  { $DIRS{$c} = ""; }
@@ -74,8 +77,6 @@ sub nikto_mutate
             if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
 
             # args with no file
-            if (($root eq "/") && ($file =~ /^\?/)) { next; }
-            if (($root eq "")  && ($file =~ /^\?/)) { next; }
             $mark->{total_checks}++;
             $m_test++;
             $new_tests++;
