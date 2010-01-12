@@ -68,7 +68,7 @@ sub nikto_tests
                nprint("+ ERROR: $uri returned an error: $result{whisker}{error}\n"); 
                next; 
             }
-         }          
+         }
          $NIKTO{resp_counts}{$RES}{total}++;
    
          # do auth/redir first, independent of test pass/fail
@@ -82,13 +82,13 @@ sub nikto_tests
             $RES=$result{'whisker'}->{'code'};
             $CONTENT=$result{'whisker'}->{'data'};
          }
-         elsif (($RES eq 300) || ($RES eq 301) || ($RES eq 302) || ($RES eq 303) || ($RES eq 307))
-         {
-            nprint("+ $uri - Redirects ($RES) to " . $result{'location'} . " , $TESTS{$CHECKID}{message}") if $CLI{display} =~ /1/;
-         }
          elsif ($RES eq 200)
          {
             nprint("+ $uri - 200/OK Response could be $TESTS{$CHECKID}{message}") if $CLI{display} =~ /3/;
+         }
+	 elseif ($RES =~ /30([0-3]|7)/)
+         {
+            nprint("+ $uri - Redirects ($RES) to " . $result{'location'} . " , $TESTS{$CHECKID}{message}") if $CLI{display} =~ /1/;
          }
    
          my $m1_method= my $m1o_method= my $m1a_method= my $f2_method= my $f1_method ="content";
