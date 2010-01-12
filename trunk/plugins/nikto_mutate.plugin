@@ -44,22 +44,35 @@ sub nikto_mutate
     my ($c, %DIRS, %FS) = "";
 
     # build a hash of all the unique directories
-    foreach $c (@CGIDIRS) { $DIRS{$c} = ""; }
-
     nprint("- Loading root level files", "v");
-    foreach my $checkid (keys %TESTS)
-    {
-        my $dir  = LW2::uri_get_dir($TESTS{$checkid}{uri});
-        my $file = $TESTS{$checkid}{uri};
-        if ($dir ne "") {
-                $DIRS{$dir} = "";
-                $dir =~ s/([^a-zA-Z0-9])/\\$1/g;
-                $file =~ s/$dir//;
-                }
-        if (($file ne "") && ($file !~ /^\?/)) {
-                $FS{$file}  = "";
-                }
-    }
+    foreach my $checkid (keys %TESTS) {
+	# split out vars. this would normally get done JIT for running the test,
+	# but here we need to split on the varnames for proper mutating (still expanded later)
+        if ($TESTS{$checkid}{uri} =~ /\@/) {
+      		foreach my $varname (keys %VARIABLES) {
+         		if ($TESTS{$checkid}{uri} =~ "$varname") {
+				$DIRS{$varname} = "";
+				my $f=$TESTS{$checkid}{uri};
+				$f =~ s/$varname//g;
+				$FS{$f}="" unless $f eq "";
+				last;
+				}
+			}
+		}
+	else {
+
+        	my $dir  = LW2::uri_get_dir($TESTS{$checkid}{uri});
+        	my $file = $TESTS{$checkid}{uri};
+        	if ($dir ne "") {
+               		$DIRS{$dir} = "";
+               	 	$dir =~ s/([^a-zA-Z0-9])/\\$1/g;
+               	 	$file =~ s/$dir//;
+                	}
+        	if (($file ne "") && ($file !~ /^\?/)) {
+                	$FS{$file}  = "";
+                	}
+    		}
+	}
 
     foreach my $c ((split(/ /, $VARIABLES{"\@MUTATEDIRS"})))  { $DIRS{$c} = ""; }
     foreach my $c ((split(/ /, $VARIABLES{"\@MUTATEFILES"}))) { $FS{$c}   = ""; }
@@ -79,7 +92,9 @@ sub nikto_mutate
             $mark->{total_checks}++;
             $m_test++;
             $new_tests++;
-            if (($new_tests % 100000) eq 0) { nprint("-Added test ($new_tests of many):$root$file:", "d"); }
+	    # This is a little non-standard but much faster than mod on every test
+            if ($OUTPUT{verbose} && (($new_tests % 100000) eq 0))
+		{ nprint("-Added test ($new_tests of many):$root$file:", "d"); }
 
             $TESTS{$m_test}{uri}         = "$root$file";
             $TESTS{$m_test}{message}     = "URL created via mutate option.";
