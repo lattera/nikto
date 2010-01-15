@@ -1138,7 +1138,7 @@ sub port_check
    if (defined $CLI{vhost}) { $mark{vhost} = $CLI{vhost} };
 
    # test for proxy
-   proxy_check() unless $PROXYCHECKED;
+   proxy_check(%mark) unless $PROXYCHECKED;
 
    my @checktypes=('HTTP', 'HTTPS');
    if ($CLI{ssl}) { shift(@checktypes); }
@@ -1691,9 +1691,13 @@ sub proxy_setup
 ###############################################################################
 sub proxy_check
 {
+ my (%m) = @_;
  $request{'whisker'}->{'method'}="GET";
  $request{'whisker'}->{'uri'}="/";
- $request{'whisker'}->{host}="www.cirt.net";
+ $request{'whisker'}->{port}=$m{port};
+ $request{'whisker'}->{host}=$m{hostname};
+ if ($m{vhost} ne '') { $request{'whisker'}->{host}=$m{vhost}; }
+ if ($request{'whisker'}->{host} eq '') { $request{'whisker'}->{host}=$m{ip}; }
 
  if (defined $request{'whisker'}->{'proxy_host'})  # proxy is set up
  {
