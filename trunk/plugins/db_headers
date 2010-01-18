@@ -35,6 +35,7 @@
 "last-modified"
 "location"
 "max-forwards"
+"p3p"
 "pragma"
 "proxy-authenticate"
 "proxy-authorization"
