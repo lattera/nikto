@@ -1,5 +1,5 @@
-#VERSION,2.003
-# $Id: db_favicon 72 2008-09-12 13:02:56Z deity $ 
+#VERSION,2.004
+# $Id: db_subdomains 72 2008-09-12 13:02:56Z deity $ 
 #######################################################################
 # Source: http://cirt.net
 # This file may only be distributed and used with the full Nikto package.
@@ -301,4 +301,6 @@
 "750286","ws3"
 "750287","www1"
 "750288","www2"
+"750289","www3"
+"750290","error"
 "750289","www3"
