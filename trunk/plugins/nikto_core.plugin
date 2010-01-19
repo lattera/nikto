@@ -377,11 +377,9 @@ sub rm_active_content
 sub dump_target_info
 {
    my ($mark) = @_;
-   # print out initial connection info
    my $sslprint="";
 
-   if ($mark->{ssl}) 
-   { 
+   if ($mark->{ssl}) { 
       my $sslcyphers=$result{whisker}->{ssl_cipher}      || "Unknown"; 
       my $sslissuers=$result{whisker}->{ssl_cert_issuer} || "Unknown";
       my $sslinfo=$result{whisker}->{ssl_cert_subject}   || "Unknown";
@@ -389,35 +387,48 @@ sub dump_target_info
       $sslprint.="+ SSL Info:        Ciphers: $sslcyphers\n                   Info:    $sslissuers\n                   Subject: $sslinfo";
    }
 
-   if ($mark->{ip} =~ /[a-z]/i) { nprint("+ Target IP:       (proxied)"); }
-   else { nprint("+ Target IP:          $mark->{ip}"); }
+   if ($mark->{ip} =~ /[a-z]/i) { 
+   		nprint("+ Target IP:       (proxied)"); 
+   }
+   else { 
+   		nprint("+ Target IP:          $mark->{ip}"); 
+   }
 
    nprint("+ Target Hostname:    $mark->{hostname}"); 
    nprint("+ Target Port:        $mark->{port}");
-   if ((defined $CLI{vhost}) && ($CLI{vhost} ne $mark->{hostname}))
-   { nprint("+ Virtual Host:   $CLI{vhost}"); }
-   if (defined $request{'whisker'}->{'proxy_host'}) 
-   { nprint("- Proxy:       $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); }
-   if (defined $NIKTO{hostid}) { nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); }
-   if ($mark->{ssl}) { nprint($sslprint); }
-   if (defined $NIKTO{anti_ids} && defined $CLI{evasion})
-   {
-      for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { if ($CLI{evasion} =~ /$i/) { nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); }}
+   if ((defined $CLI{vhost}) && ($CLI{vhost} ne $mark->{hostname})) { 
+   		nprint("+ Virtual Host:   $CLI{vhost}"); 
    }
-      if (defined $NIKTO{mutate_opts} && defined $CLI{mutate})
-   {
-      for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { if ($CLI{mutate} =~ /$i/) { nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); }}
+   if (defined $request{'whisker'}->{'proxy_host'}) { 
+   		nprint("- Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); 
+   }
+   if (defined $NIKTO{hostid}) { 
+   		nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); 
+   }
+   if ($mark->{ssl}) { 
+   		nprint($sslprint); 
+   }
+   if (defined $NIKTO{anti_ids} && defined $CLI{evasion}) {
+      for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { 
+      	if ($CLI{evasion} =~ /$i/) { 
+      		nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); 
+      		}
+      	}
+   }
+      if (defined $NIKTO{mutate_opts} && defined $CLI{mutate}) {
+      for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { 
+      		if ($CLI{mutate} =~ /$i/) { 
+      			nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); 
+      		}
+      	}
    }
    my $time=date_disp($mark->{start_time});
    nprint("+ Start Time:         $time");
    nprint($DIV);
 
-   if ($mark->{banner} ne "") 
-   { 
+   if ($mark->{banner} ne "") { 
       nprint("+ Server: $mark->{banner}");
-   }
-   else 
-   {
+   } else {
       nprint("+ Server: No banner retrieved");
    }
 
@@ -1128,17 +1139,12 @@ sub get_banner
 sub port_check
 {
    my ($hostname, $ip, $port) = @_;
-   my %mark, %headers;
-   
-   $mark{hostname}=$hostname;
-   $mark{ip}=$ip;
-   $mark{port}=$port;
-   $mark{ssl}=0;
-   
-   if (defined $CLI{vhost}) { $mark{vhost} = $CLI{vhost} };
+   my %m, %headers;
 
-   # test for proxy
-   proxy_check(%mark) unless $PROXYCHECKED;
+   $m->{hostname}=$hostname;
+   $m->{ip}=$ip;
+   $m->{port}=$port;
+   $m->{ssl}=0;
 
    my @checktypes=('HTTP', 'HTTPS');
    if ($CLI{ssl}) { shift(@checktypes); }
@@ -1150,21 +1156,21 @@ sub port_check
       foreach my $checkssl (@checktypes)
       {
          nprint("- Checking for $checkssl on port $ip:$port, using $method","v");
-         
-         $mark{ssl}=($checkssl eq "HTTP")?0:1;
-         my ($res, $content)=nfetch(\%mark, "/", $method, "", \%headers);
+         $m->{ssl}=($checkssl eq "HTTP")?0:1;
+         proxy_check($m);
+         my ($res, $content)=nfetch($m, "/", $method, "", \%headers);
 
-         if ($res) 
-         { 
+         if ($res)
+         {
             # this will fix for some Apaches that are smart enough to answer non ssl reqs on an ssl server
             if (defined $content &&
-                $content =~ /speaking plain HTTP to an SSL/) 
+                $content =~ /speaking plain HTTP to an SSL/)
             {
                dump_var("Result Hash", \%result);
                next;
             }
-            nprint("- $checkssl Server found: $ip:$port \t$headers{server}","d"); 
-            return $mark{ssl}+1;
+            nprint("- $checkssl Server found: $ip:$port \t$headers{server}","d");
+            return $m->{ssl}+1;
          }
       }
    }
@@ -1552,7 +1558,7 @@ sub do_auth
          LW2::http_fixup_request(\%request);
          if ($CLI{pause} > 0) { sleep $CLI{pause}; }
          LW2::http_do_request_timeout(\%request,\%result); # test auth
-	 $NIKTO{totalrequests}++;
+	     $NIKTO{totalrequests}++;
          dump_var("Auth Request",\%request);
          dump_var("Auth Response",\%result);
          if ($result{'www-authenticate'} =~ /^ntlm/i)
@@ -1691,18 +1697,15 @@ sub proxy_setup
 ###############################################################################
 sub proxy_check
 {
- my (%m) = @_;
- $request{'whisker'}->{'method'}="GET";
- $request{'whisker'}->{'uri'}="/";
- $request{'whisker'}->{port}=$m{port};
- $request{'whisker'}->{host}=$m{hostname};
- if ($m{vhost} ne '') { $request{'whisker'}->{host}=$m{vhost}; }
- if ($request{'whisker'}->{host} eq '') { $request{'whisker'}->{host}=$m{ip}; }
-
- if (defined $request{'whisker'}->{'proxy_host'})  # proxy is set up
+  my ($mark) = @_;
+  
+ if (defined $request{'whisker'}->{'proxy_host'} && $CLI{useproxy})  # proxy is set up
  {
+  setup_hash(\%request, $mark);
+  $request{'whisker'}->{'method'}="GET";
+  $request{'whisker'}->{'uri'}="/";
+ 
   LW2::http_close(\%request);  # force-close any old connections
-  $request{'whisker'}->{'http_eol'}=$http_eol;
   LW2::http_fixup_request(\%request);
   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
   LW2::http_do_request_timeout(\%request,\%result);
@@ -1752,7 +1755,6 @@ sub proxy_check
   }
  }
  
- $PROXYCHECKED=1;
  return;
 }
 ###############################################################################
@@ -1817,7 +1819,6 @@ sub fetch
     $request{'whisker'}->{'uri'}    = $CLI{root} . $_[0];   # prepend -root option value
  }
  $request{'whisker'}->{'method'} = $_[1];
- $request{'whisker'}->{'http_eol'}=$http_eol;
  delete $request{'whisker'}->{'data'};
  delete $request{'Content-Encoding'};
  delete $request{'Content-Length'};
@@ -1905,12 +1906,12 @@ sub setup_hash
    {
       $request{Host} = $mark->{vhost};
    }
-   $reqhash->{whisker}->{port}    = $mark->{port};
-   $reqhash->{whisker}->{ssl}     = $mark->{ssl};
+   $reqhash->{whisker}->{port} = $mark->{port};
+   $reqhash->{whisker}->{ssl} = $mark->{ssl};
+   $request{'whisker'}->{'http_eol'} =$http_eol;
    
    # Proxy stuff
-   if ($PROXYCHECKED && defined $NIKTOCONFIG{PROXYHOST} &&
-       defined $CLI{useproxy})
+   if (defined $NIKTOCONFIG{PROXYHOST} && defined $CLI{useproxy})
    {
       $reqhash->{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
       $reqhash->{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
@@ -1925,7 +1926,6 @@ sub nfetch
 {
    my ($mark, $uri, $method, $data, $headers, $noclean) = @_;
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
-
    my %request, %result;
    setup_hash(\%request, $mark);
  

@@ -42,7 +42,7 @@ Getopt::Long::Configure('no_ignore_case');
 # global var/definitions
 use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT/;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS/;
-use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @BUILDITEMS $PROXYCHECKED $http_eol/;
+use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @BUILDITEMS $http_eol/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE/;
 
 # setup
@@ -117,7 +117,6 @@ if ($CLI{host} eq "")
    usage(); 
 }
 
-$PROXYCHECKED = 0;    # only do proxy_check once
 $COUNTERS{hosts_total}=$COUNTERS{hosts_complete}=0;
 load_plugins();
 
@@ -139,8 +138,8 @@ foreach my $mark (@MARKS)
 
    # Check that the port is open
    my $open=port_check($mark->{hostname}, $mark->{ip}, $mark->{port});
-   if ($open == 0) 
-   {
+   if (defined $CLI{vhost}) { $mark->{vhost} = $CLI{vhost} };
+   if ($open == 0) {
       $mark->{test} = 0;
       next;
    }
@@ -151,8 +150,7 @@ foreach my $mark (@MARKS)
 report_head($CLI{format}, $CLI{file});
 
 # Now we've done the precursor, do the scan
-foreach my $mark (@MARKS)
-{
+foreach my $mark (@MARKS) {
    next unless ($mark->{test});
    $COUNTERS{hosts_total}++;
    $mark->{start_time} = time();
