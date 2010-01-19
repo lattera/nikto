@@ -102,14 +102,14 @@ Format is "id:password".</para>
       <term><option>-list-plugins</option></term>
       <listitem>
         <para>Will list all plugins that Nikto can run against targets and
-		then will exit without performing a scan. These can be tuned for a
-		session using the -plugins option.</para>
-		<para>The output format is:</para>
-		<para>Plugin <varname>name</varname></para>
-		<para>&nbsp;<varname>full name</varname> - <varname>description</varname>
-		</para>
-		<para>&nbsp;Written by <varname>author</varname>, Copyright (C)
-		<varname>copyright</varname></para>
+	    then will exit without performing a scan. These can be tuned for a
+	    session using the -plugins option.</para>
+	    <para>The output format is:</para>
+	    <para>Plugin <varname>name</varname></para>
+	    <para>&nbsp;<varname>full name</varname> - <varname>description</varname>
+	    </para>
+	    <para>&nbsp;Written by <varname>author</varname>, Copyright (C)
+	    <varname>copyright</varname></para>
       </listitem>
     </varlistentry>
 

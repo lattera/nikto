@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<para>Examine a web server to find potential problems and security vulnerabilities, including:
+<para>Examine a web server to find potential problems and security vulnerabilities,
+including:</para>
 <itemizedlist>
    <listitem>
       <para>Server and software misconfigurations</para>
@@ -14,8 +15,7 @@
    <listitem>
       <para>Outdated servers and programs</para>
    </listitem>
-   </itemizedlist>
-</para>
+</itemizedlist>
 
 <para>Nikto is built on LibWhisker (by RFP) and can run on any platform
 which has a PERL environment. It supports SSL, proxies, host
