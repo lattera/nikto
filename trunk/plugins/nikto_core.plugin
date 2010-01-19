@@ -483,12 +483,14 @@ sub general_config
        -host+              target host
        -Help               Extended help information
        -id+                host authentication to use, format is userid:password
+       -list-plugins       List all available plugins
        -mutate+            Guess additional file names
        -mutate-options+    Provide extra information for mutations
        -output+            Write output to this file
        -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
+       -plugins		   List of plugins to run (default ALL)
        -port+              Port to use (default 80)
        -Display+           Turn on/off display outputs
        -ssl                Force ssl mode on port
@@ -523,6 +525,7 @@ sub general_config
        -host+             Target host
        -Help              Extended help information
        -id+               Host authentication to use, format is userid:password
+       -list-plugins      List all available plugins, perform no testing
        -mutate+           Guess additional file names:\n";
    foreach my $k (sort keys %{$NIKTO{mutate_opts}}) 
       { $NIKTO{options} .= "                               $k     $NIKTO{mutate_opts}{$k}\n"; }
@@ -532,6 +535,7 @@ sub general_config
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
+       -plugins		   List of plugins to run (default ALL)
        -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds)\n";
 
@@ -569,7 +573,7 @@ sub general_config
            "config=s"                => \$CLI{config},
            "Cgidirs=s"               => \$CLI{forcecgi},
            "mutate=s"                => \$CLI{mutate},
-           "mutate-options=s"        => \$CLI{mutate-options},
+           "mutate-options=s"        => \$CLI{'mutate-options'},
            "id=s"                    => \$CLI{hostauth},
            "evasion=s"               => \$CLI{evasion},
            "port=s"                  => \$CLI{ports},
@@ -591,11 +595,14 @@ sub general_config
            "Single"                  => \$CLI{Single},
            "Tuning=s"                => \$CLI{tuning},
            "Version"                 => \$CLI{version},
+           "plugins=s"               => \$CLI{plugins},
+           "list-plugins"            => \$CLI{'list-plugins'},
  ) or usage(0);
 
- if    ($CLI{help})     { usage(2);  }
- elsif ($CLI{version})  { version(); }
- elsif ($CLI{Single})   { single();  }
+ if    ($CLI{help})         { usage(2);  }
+ elsif ($CLI{version})      { version(); }
+ elsif ($CLI{Single})       { single();  }
+ elsif ($CLI{'list-plugins'}) { list_plugins(); }
  
  # output file
  unless (defined $CLI{file})      { $CLI{file}=""; }      # default is standard output
@@ -645,6 +652,11 @@ sub general_config
  if (defined $CLI{evasion})
  {
     $CLI{evasion}=~s/[^0-9]//g;
+ }
+
+ if (!defined $CLI{plugins})
+ {
+    $CLI{plugins}="ALL";
  }
 
  $NIKTO{timeout}=$CLI{timeout} || 10;
@@ -1184,32 +1196,45 @@ sub port_check
 sub load_plugins
 {
    my @pluginlist=dirlist("$NIKTOCONFIG{PLUGINDIR}",'\.plugin$');
+   
+   # Check if running plugins is NONE - if so, don't bother initalising
+   # plugins
+   if ($CLI{plugins} eq "NONE") {
+      return;
+   }
+   my @torun=split(/,/,$CLI{plugins});
+   nprint("@torun");
 
-   foreach my $plugin (@pluginlist)
-   {
+   foreach my $plugin (@pluginlist) {
       my $plugin_name = $plugin;
       $plugin_name =~ s/\.plugin$//;
       my $plugin_init = $plugin_name . "_init";
       eval {
          require "$NIKTOCONFIG{PLUGINDIR}/$plugin";
       };
-      if ($@)
-      {
+      if ($@) {
          nprint("- Could not load or parse plugin: $plugin_name\n Error: ");
          warn $@;
          nprint("- The plugin could not be run.");
       }
-      else
-      {
+      else {
          nprint("- Initialising plugin $plugin_name","v");
          # Call initialisation method
-         if (defined &$plugin_init)
-         {
+         if (defined &$plugin_init) {
             my $pluginhash=&$plugin_init;
             # Add default weights if not already assigned
             $pluginhash->{recon_weight}=50 unless (defined $pluginhash->{recon_weight});
             $pluginhash->{scan_weight}=50 unless (defined $pluginhash->{scan_weight});
             $pluginhash->{report_weight}=50 unless (defined $pluginhash->{report_weight});
+            # Check that the plugin is to be run
+            # Perl doesn't allow us to use "in", pity
+            foreach my $torun_plugin (@torun) {
+               if ($torun_plugin eq "ALL" ||
+                   $pluginhash->{name} eq $torun_plugin) {
+                  $pluginhash->{run}=true;
+               }
+            }
+               
             push(@PLUGINS, $pluginhash);
             nprint("- Loaded \"$pluginhash->{full_name}\" plugin.","v");
          }
@@ -1229,7 +1254,7 @@ sub run_plugins
    {
       foreach my $plugin (@PLUGINS)
       {
-         if (defined $plugin->{recon_method} && $plugin->{recon_weight} == $i)
+         if ($plugin->{run} && defined $plugin->{recon_method} && $plugin->{recon_weight} == $i)
          {
             my $run=1;
             # first check for conditionals
@@ -1253,7 +1278,7 @@ sub run_plugins
    {
       foreach my $plugin (@PLUGINS)
       {
-         if (defined $plugin->{scan_method} && $plugin->{scan_weight} == $i)
+         if ($plugin->{run} && defined $plugin->{scan_method} && $plugin->{scan_weight} == $i)
          {
             my $run=1;
             # first check for conditionals
@@ -1286,7 +1311,7 @@ sub report_head
    {
       foreach my $plugin (@PLUGINS)
       {
-         if (defined $plugin->{report_item} && $plugin->{report_weight} == $i)
+         if ($plugin->{run} && defined $plugin->{report_item} && $plugin->{report_weight} == $i)
          {
             my $run=1;
             # first check for conditionals
@@ -2343,6 +2368,22 @@ sub add_vulnerability
    push(@RESULTS,$resulthash);
    # Now report it
    report_item($mark, $resulthash);
+}
+
+sub list_plugins {
+   # Just do a load_plugins, then loop through the array and print out name,
+   # description and copyright
+
+   load_plugins();
+
+   foreach my $plugin (@PLUGINS) {
+      nprint("Plugin $plugin->{name}");
+      nprint(" $plugin->{full_name} - $plugin->{description}");
+      nprint(" Written by $plugin->{author}, Copyright (C) $plugin->{copyright}");
+      nprint("\n");
+   }
+
+   exit(0);
 }
 #######################################################################
 sub nikto_core { return; } # trap for this plugin being called to run. lame.
