@@ -1,20 +1,18 @@
 #VERSION,2.000
 # $Id$
-# http://cirt.net
-
+#######################################################################
+# Source: http://cirt.net
 # This file may only be distributed and used with the full Nikto package.
 # This file may not be used with any software product without written permission from CIRT, Inc.
 # (c) 2007 CIRT, Inc., All Rights Reserved.
-
-# By sending any database updates to CIRT, Inc., it is assumed that you
+#
+# NOTE: By sending any database updates to CIRT, Inc., it is assumed that you
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
-
 #######################################################################
-# Strings to be used for 404 content match, if HTTP code is not 404
-# one per line
-
-# many of these were borrowed from the Nessus Project's no_404.nasl, many thanks.
-
+# Notes:
+# Strings to be used for 404 content match, if HTTP code is not 404, one per line
+# Many of these were borrowed from the Nessus Project's no_404.nasl, many thanks.
+#######################################################################
 404
 Access Failed
 an error

@@ -1,6 +1,5 @@
 #VERSION,2.02
 # $Id$
-
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
 #
@@ -18,12 +17,10 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ###############################################################################
-
-###############################################################################
-# PURPOSE
+# PURPOSE:
 # Various messages relating to the server banner
 ###############################################################################
-# NOTES
+# NOTES:
 # versions are loaded from the "db_server_msgs" file, which should be in the
 # plugins directory this plugin checks the server version to see if there are
 # any version specific items in the4 db_server_msgs this differs from

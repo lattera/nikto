@@ -1,6 +1,5 @@
 #VERSION,2.1
 # $Id$
-
 ###############################################################################
 #  Copyright (C) 2004 CIRT, Inc.
 #
@@ -18,12 +17,10 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ###############################################################################
-
-###############################################################################
-# PURPOSE
+# PURPOSE:
 # Enumeration of users and directories in system (as Apache's ~username)
 ###############################################################################
-# NOTES
+# NOTES:
 # This plugin tries to enumerate all the users and directories
 # in the system (of course the bruteforce attack is limited to a given range).
 # In some Apache/UNIX systems this might give out many local users

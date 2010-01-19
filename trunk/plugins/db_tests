@@ -1,16 +1,17 @@
 #VERSION,2.007
 # $Id$ 
-# http://cirt.net
-
+#######################################################################
+# Source: http://cirt.net
 # This file may only be distributed and used with the full Nikto package.
 # This file may not be used with any software product without written permission from CIRT, Inc.
 # (c) 2007 CIRT, Inc., All Rights Reserved.
-
-# By sending any database updates to CIRT, Inc., it is assumed that you
+#
+# NOTE: By sending any database updates to CIRT, Inc., it is assumed that you
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
-
+#######################################################################
+# Notes:
 # Tuning option (3rd field) values can be found here: http://cirt.net/nikto2-docs/options.html#id2838127
-
+#######################################################################
 "000001","0","b","/TiVoConnect?Command=QueryServer","GET","Calypso Server","","","","","The Tivo Calypso server is running. This page will display the version and platform it is running on. Other URLs may allow download of media.","",""
 "000002","0","b","/TiVoConnect?Command=QueryContainer&Container=/&Recurse=Yes","GET","TiVoContainer","","","","","TiVo client service is running and may allow download of mp3 or jpg files.","",""
 "000003","0","1234576890ab","@CGIDIRScart32.exe","GET","200","","","","","request cart32.exe/cart32clientlist","",""

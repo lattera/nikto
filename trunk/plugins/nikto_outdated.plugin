@@ -1,6 +1,5 @@
 #VERSION,2.04
 # $Id$
-
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
 #
@@ -18,9 +17,7 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 ###############################################################################
-
-###############################################################################
-# PURPOSE
+# PURPOSE:
 # Check for outdated items in banner
 ###############################################################################
 sub nikto_outdated_init

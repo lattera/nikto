@@ -1,14 +1,16 @@
 #VERSION,2.002
-# $Id$
-# http://cirt.net/
-
+# $Id: db_embedded 239 2010-01-19 05:22:50Z sullo $
+#######################################################################
+# Source: http://cirt.net
 # This file may only be distributed and used with the full Nikto package.
 # This file may not be used with any software product without written permission from CIRT, Inc.
 # (c) 2007 CIRT, Inc., All Rights Reserved.
-
-# By sending any database updates to CIRT, Inc., it is assumed that you
+#
+# NOTE: By sending any database updates to CIRT, Inc., it is assumed that you
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
-
+#######################################################################
+# Notes:
+#######################################################################
 "nikto_id","uri","match","model","message"
 "300000","/","^(.*office.xerox.com.*Model=)([A-Za-z0-9+]+)(&.*)$","$2","Host seems to be a Xerox printer, model:"
 "300001","/","^(.*HEAD_NODE.*)([Xx][Ee][Rr][Oo][Xx][ A-Z0-9a-z]+)(['\"]\);)","$2","Host seems to be a Xerox printer, model:"
