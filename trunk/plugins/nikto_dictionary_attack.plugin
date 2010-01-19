@@ -40,7 +40,7 @@ sub nikto_dictionary_attack_init
 sub nikto_dictionary_attack
 {
    my ($mark) = @_;
-   my $dictfile=$CLI{mutate-options};
+   my $dictfile=$CLI{'mutate-options'};
    my $ctr=0;
    
    if (!defined $dictfile)

@@ -24,7 +24,7 @@ sub nikto_report_xml_init
 {
    my $id =
    {
-      name         	=> "reportxml",
+      name         	=> "report_xml",
       full_name    	=> "Report as XML",
       author       	=> "Sullo/Jabra",
       description  	=> "Produces an XML report.",

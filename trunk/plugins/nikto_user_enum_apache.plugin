@@ -56,7 +56,7 @@ sub nikto_user_enum_apache
       {
          $url="/~";
          # First check whether we use a dictionary attack of brute force it
-         if (defined $CLI{mutate-options})
+         if (defined $CLI{'mutate-options'})
          {
             # We have options - assume it is a dictionary attack
             nikto_user_enum_apache_dictionary($url);
@@ -84,7 +84,7 @@ sub nikto_user_enum_apache
          {
             $url="$cgiwrap/~";
             # First check whether we use a dictionary attack of brute force it
-            if (defined $CLI{mutate-options})
+            if (defined $CLI{'mutate-options'})
             {
                # We have options - assume it is a dictionary attack
                nikto_user_enum_apache_dictionary($url);
@@ -138,7 +138,7 @@ sub nikto_user_enum_apache_brute
 
 sub nikto_user_enum_apache_dictionary
 {
-   my $filename=$CLI{mutate-options};
+   my $filename=$CLI{'mutate-options'};
    my $message="Valid users found via Apache enumeration: ";
    my @foundusers=();
    my $result, $content;

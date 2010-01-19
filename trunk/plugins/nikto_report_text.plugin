@@ -24,7 +24,7 @@ sub nikto_report_text_init
 {
    my $id =
    {
-      name         	=> "reports_text",
+      name         	=> "report_text",
       full_name    	=> "Text reports",
       author       	=> "Deity",
       description  	=> "Produces a text report.",

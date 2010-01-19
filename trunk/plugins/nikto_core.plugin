@@ -535,7 +535,7 @@ sub general_config
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
-       -plugins		   List of plugins to run (default ALL)
+       -plugins           List of plugins to run (default ALL)
        -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds)\n";
 
@@ -605,9 +605,14 @@ sub general_config
  elsif ($CLI{'list-plugins'}) { list_plugins(); }
  
  # output file
- unless (defined $CLI{file})      { $CLI{file}=""; }      # default is standard output
-
- unless (defined $CLI{format})    { $CLI{format}=""; }    # default to none
+ if (!defined $CLI{format}) {
+    # Check what output has
+    $CLI{format} = "none";
+    if (defined $CLI{file}) {
+       $CLI{format} = lc($CLI{file});
+       $CLI{format} =~ s/(^.*\.)([^.]*$)/$2/g;
+    }
+ }
  elsif ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
  elsif ($CLI{format} =~ /html?/i) { $CLI{format}="htm"; }
  elsif ($CLI{format} =~ /csv/i)   { $CLI{format}="csv"; }
@@ -1203,7 +1208,6 @@ sub load_plugins
       return;
    }
    my @torun=split(/,/,$CLI{plugins});
-   nprint("@torun");
 
    foreach my $plugin (@pluginlist) {
       my $plugin_name = $plugin;

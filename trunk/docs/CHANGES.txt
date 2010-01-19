@@ -1,4 +1,5 @@
 2010-01-19 Nikto 2.1.1
+        - Ticket 98: Default output so that if -Format is missed it will guess the format from the extension on the file in -output. If there is no -output switch the default will be none.
 	- Added support to select plugins via -plugins and -list-plugins option to list current plugins
 	- Major fix for proxy usage
 	- Ticket 96: Multiple index file enhancements for groups and better unique file identification
