@@ -1,4 +1,4 @@
-#VERSION,1.01
+#VERSION,1.02
 # $Id$
 
 ###############################################################################
@@ -37,46 +37,49 @@ sub nikto_multiple_index
 {
    my ($mark) = @_;
    my $dbarray = init_db("db_multiple_index");
-
-   # Record the host for future use
-
-   my $found;
-   my %hashes;
-   foreach my $item (@$dbarray)
-   {
+   my ($found, $hashes);
+   foreach my $item (@$dbarray) {
       	# Use fetch to minimise extra code
       	# First we need to mangle the host.
       	my ($res, $content) = nfetch($mark,"/$item->{index}", "GET");
 
-      	if (($res == 200) || ($res == 302))
-      	{
-       		$content=rm_active_content($result{'whisker'}->{'data'});
+      	if (($res == 200) || ($res == 404)) {
+       		$content=rm_active_content($result{'whisker'}->{'data'}, "/$item->{index}");
        		my $hash=LW2::md4($content);
 		$found{$item->{index}}=$hash;
-		$hashes{$hash} .= "$item->{index}, ";
+		$hashes{$hash}++;
       	}
 
    } # End foreach
 
-   # report, if necessary
    if (keys(%found) > 1)
    {
+	# make sure we have unique pages
+	$total_unique=0;
+	foreach my $hash (keys %hashes) {
+		if ($hashes{$hash} eq 1) {
+			$total_unique++;
+		}
+	}
+
 	# one unique hash... bogus responses
-	if (keys(%hashes) <= 1)
-	{ 
+	if ($total_unique <= 1) { 
 		return; 
 	}
 
 	my $tempstring;
-	my $group_count=0;
-	foreach my $h (keys %hashes)
-	{
-		$group_count++;
-		$tempstring .= "\#$group_count: $hashes{$h}";	
-	}
-	$tempstring=~s/,\s$//;
+	foreach my $f (keys %found) { $tempstring .= "$f, "; }
+	$f =~ s/,$//;
 
-	add_vulnerability($mark,"Multiple distinct index files found: $tempstring", 740000, 0);
+	# some unique... report slightly differently
+	if ($total_unique < keys(%found)) {
+      		add_vulnerability($mark,"Multiple index files found (note, these may not all be unique): $found", 740000, 0);
+	}
+
+	# all unique... report
+	if ($total_unique eq keys(%found)) {
+      		add_vulnerability($mark,"Multiple index files found: $tempstring", 740000, 0);
+	}
    }
 }
 

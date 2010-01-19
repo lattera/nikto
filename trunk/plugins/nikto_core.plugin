@@ -330,16 +330,15 @@ sub rm_active_content
  # URI, if provided, plus encoded versions of it
  if (defined $_[1]) 
    { 
-      my $e = $_[1];
-
       # match pages which link to themselves w/diff args
-      $e =~ s/^\/index.php\??//;  
-      $e =~ s/([^a-zA-Z0-9\s])/\\$1/g;
+      my $e = $_[1];
+      $e =~ s/^\/$_[1]\??//;  
+      $e =~ s/([^a-zA-Z0-9\s])/\\$1/g; # escaping
       $cont =~ s/$e//gs; 
 
-      # again but with the index.php in place
+      # again but with the index in place
       $e = $_[1];
-      $e =~ s/([^a-zA-Z0-9\s])/\\$1/g;
+      $e =~ s/([^a-zA-Z0-9\s])/\\$1/g; # escaping
       $cont =~ s/$e//gs; 
 
       # base 64
