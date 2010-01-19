@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
-#VERSION,2.1.0
+#VERSION,2.1.1
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 
@@ -48,7 +48,7 @@ use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE/;
 # setup
 my $starttime      = localtime();
 $DIV               = "-" x 75;
-$NIKTO{version}    = "2.1.0";
+$NIKTO{version}    = "2.1.1";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
 $http_eol          = "\r\n";
