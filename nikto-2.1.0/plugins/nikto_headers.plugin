@@ -1,4 +1,4 @@
-#VERSION,2.03
+#VERSION,2.05
 # $Id$
 
 ###############################################################################
@@ -80,7 +80,7 @@ sub nikto_headers
          {
             if ($content =~ /<asp:/ || $content =~ /<\/asp:/)
             {
-               add_vulnerability($mark, "Host may be vulnerable to a source disclosure using the Translate: header", 999983, 390, GET, $f, $content);
+               add_vulnerability($mark, "Host may be vulnerable to a source disclosure using the Translate: header", 999983, 390, "GET", $f, $content);
                last;
             }
          }
@@ -119,6 +119,7 @@ sub nikto_headers
    $request{'whisker'}{'version'}  = "1.0";
    
    LW2::http_do_request_timeout(\%request, \%result);
+   $NIKTO{totalrequests}++;
    if (   ($result{'content-location'} ne "")
       && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
       && ($result{'content-location'} !~ /$mark->{ip}/))
@@ -136,12 +137,13 @@ sub nikto_headers
    delete $request{'Host'};
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
    LW2::http_do_request_timeout(\%request, \%result);
+   $NIKTO{totalrequests}++;
 
    if (($result{'location'} ne "")
       && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
       && ($result{'location'} !~ /$mark->{ip}/))
    {
-      add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630);
+      add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630,"GET","/images");
    }
 
    $request{'whisker'}{'Host'} = $wh;
@@ -157,10 +159,11 @@ sub nikto_headers
    $request{'whisker'}{'version'}  = "1.0";
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
    LW2::http_do_request_timeout(\%request, \%result);
+   $NIKTO{totalrequests}++;
 
    if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//))
    {
-      add_vulnerability($mark,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737);
+      add_vulnerability($mark,"WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".",999987,5737,"GET",".");
    }
 
    #######################################################################
@@ -181,7 +184,7 @@ sub nikto_headers
    }
 
    #######################################################################
-   # Look for any non-standard headers
+   # Look for any uncommon headers
    foreach my $header (sort keys %headers)
    {
       my $found = 0;
@@ -198,7 +201,7 @@ sub nikto_headers
          my $x = $headers{$header};
          $x =~s/\s+.*$//;
          push(@BUILDITEMS, $x);
-         add_vulnerability($mark,"Non-standard header $header returned by server, with contents: $headers{$header}",$reportnum,0);
+         add_vulnerability($mark,"Uncommon header '$header' found, with contents: $headers{$header}",$reportnum,0);
          $reportnum++;
       }
    }
@@ -210,6 +213,7 @@ sub nikto_headers
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
       (my $res, $content) = nfetch($mark,$f, "GET","", \%headers);
+      last if (defined $headers{'etag'});
    }
    
    # Now we have a header, let's check ETag for inode
