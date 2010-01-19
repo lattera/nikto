@@ -5,7 +5,7 @@
 ]>
 
 <book>
-<title>Nikto v2.1.0 - The Manual</title>
+<title>Nikto v2.1.1 - The Manual</title>
 
 <chapter id="introduction">
    <title>Introduction</title>
@@ -525,7 +525,7 @@ http://192.168.0.1:8080/
 <screen>
 <![CDATA[
 [dave@yggdrasil nikto-2.03]$ ./nikto.pl -Single
---------------------------------------------  Nikto 2.1.0
+--------------------------------------------  Nikto 2.1.1
 --------------------------------------------  Single Request Mode
                               Hostname or IP: localhost
                                    Port (80):
@@ -536,7 +536,7 @@ http://192.168.0.1:8080/
                       Show HTML Response (1):
                           HTTP Version (1.1):
                            HTTP Method (GET):
-      User-Agent (Mozilla/4.75 (Nikto/2.1.0):
+      User-Agent (Mozilla/4.75 (Nikto/2.1.1):
                      Connection (Keep-Alive):
                                         Data:
                         force_bodysnatch (0):
@@ -563,7 +563,7 @@ http://192.168.0.1:8080/
 --------------------------------------------  Connection Details
         Connection: Keep-Alive
         Host: localhost
-        User-Agent: Mozilla/4.75 (Nikto/2.1.0
+        User-Agent: Mozilla/4.75 (Nikto/2.1.1
         data:
         force_bodysnatch: 0
         force_close: 1
