@@ -1,5 +1,16 @@
+2010-01-19 Nikto 2.1.1
+	- Major fix for proxy usage
+	- Ticket 96: Multiple index file enhancements for groups and better unique file identification
+	- Ticket 103: <description> content in xml report is now wrapped in CDATA 
+	- Ticket 110: Mutate now respects db variables
+	- Ticket 97: Fix for response caching
+	- Ticket 99: Spelling disagreements between Brits and Americans
+	- Don't report p3p header as unusual
+	- Various changes to aid future binary db usage for mutates
+	- Various changes to aid future multi-threading
+	- Fix for multiple index files
 2009-12-21 nikto.pl
-	- Fix for ticket #100
+	- Ticket 100: Fix for reading home directory on Windows
 	- Some new additions to db_realms and db_embedded
 2009-08-29 templates/xml* docs/nikto.dtd
 	- Added <statistics /> tag for scan/host statistics
