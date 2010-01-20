@@ -1090,8 +1090,8 @@ sub dbcheck
            if ($L[5] eq "") { print STDERR "\t+ ERROR: blank conditional: $line"; next; }
            if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            if ($line !~ /^(\".*\",){11}\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
-           if (($L[3] =~ /^\@CGI/) && ($L[3] !~ /^\@CGIDIRS/)) { print STDERR "\t+ ERROR: Possible \@CGIDIRS misspelling: $line"; }
-           $ENTRIES{"$L[3],$L[4],$L[5],$L[6],$L[7],$L[8],$L[9],$L[10],$L[12]"}++;
+           if (($L[3] =~ /^\@CG/) && ($L[3] !~ /^\@CGIDIRS/)) { print STDERR "\t+ ERROR: Possible \@CGIDIRS misspelling: $line"; }
+           $ENTRIES{"$L[3],$L[4],$L[5],$L[6],$L[7],$L[8],$L[9],$L[11],$L[12]"}++;
          }
 
        foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
