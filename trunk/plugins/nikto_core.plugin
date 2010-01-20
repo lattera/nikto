@@ -383,6 +383,10 @@ sub dump_target_info
       my $sslinfo=$result{whisker}->{ssl_cert_subject}   || "Unknown";
       $sslprint="$DIV\n";
       $sslprint.="+ SSL Info:        Ciphers: $sslcyphers\n                   Info:    $sslissuers\n                   Subject: $sslinfo";
+
+     $mark->{sslcyphers}=$sslcyphers;
+     $mark->{sslissuers}=$sslissuers;
+     $mark->{sslinfo}=$sslinfo;
    }
 
    if ($mark->{ip} =~ /[a-z]/i) { 

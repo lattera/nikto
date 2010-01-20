@@ -4,7 +4,7 @@
 <!ATTLIST niktoscan version CDATA #REQUIRED>
 <!ATTLIST niktoscan nxmlversion CDATA #REQUIRED>
 
-<!ELEMENT scandetails (item*,statistics?)>
+<!ELEMENT scandetails (item*,statistics?,ssl?)>
 <!ATTLIST scandetails targetip CDATA #REQUIRED>
 <!ATTLIST scandetails targethostname CDATA #REQUIRED>
 <!ATTLIST scandetails targetport CDATA #REQUIRED>
@@ -13,6 +13,11 @@
 <!ATTLIST scandetails sitename CDATA #REQUIRED>
 <!ATTLIST scandetails siteip CDATA #REQUIRED>
 <!ATTLIST scandetails hostheader CDATA #IMPLIED>
+
+<!ELEMENT ssl EMPTY>
+<!ATTLIST ssl cyphers CDATA #REQUIRED>
+<!ATTLIST ssl issuers CDATA #REQUIRED>
+<!ATTLIST ssl info CDATA #REQUIRED>
 
 <!ELEMENT item (description,uri?,namelink?,iplink?)>
 <!ATTLIST item id CDATA #REQUIRED>

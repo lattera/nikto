@@ -171,7 +171,6 @@ foreach my $mark (@MARKS) {
    %FoF = ();
    
    $mark->{banner}=get_banner($mark);
-   report_host_start($mark);
 
    # put a signal trap so we can close down reports properly
    $SIG{'INT'} = sub
@@ -195,6 +194,7 @@ foreach my $mark (@MARKS) {
    else
    {
       dump_target_info($mark);
+      report_host_start($mark);
       set_scan_items($mark);
       unless (defined $CLI{nofof}) { map_codes() };
       run_plugins($mark);
