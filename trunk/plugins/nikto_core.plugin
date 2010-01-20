@@ -490,7 +490,7 @@ sub general_config
        -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
-       -plugins		   List of plugins to run (default ALL)
+       -Plugins		   List of plugins to run (default ALL)
        -port+              Port to use (default 80)
        -Display+           Turn on/off display outputs
        -ssl                Force ssl mode on port
@@ -535,7 +535,7 @@ sub general_config
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
-       -plugins           List of plugins to run (default ALL)
+       -Plugins           List of plugins to run (default ALL)
        -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds)\n";
 
@@ -595,7 +595,7 @@ sub general_config
            "Single"                  => \$CLI{Single},
            "Tuning=s"                => \$CLI{tuning},
            "Version"                 => \$CLI{version},
-           "plugins=s"               => \$CLI{plugins},
+           "Plugins=s"               => \$CLI{plugins},
            "list-plugins"            => \$CLI{'list-plugins'},
  ) or usage(0);
 
