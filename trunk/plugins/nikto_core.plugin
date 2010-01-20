@@ -1581,6 +1581,8 @@ sub do_auth
          my $save_auth=$result{'www-authenticate'};
          LW2::http_close(\%request);  # force-close any old connections
          LW2::auth_set($authtype,\%request,$REALMS{$REALM}{id},$REALMS{$REALM}{pw});
+         # Path to fix short reads
+         $request{'whisker'}->{allow_short_reads}=1;
          $request{'whisker'}->{'http_eol'}=$http_eol;
          LW2::http_fixup_request(\%request);
          if ($CLI{pause} > 0) { sleep $CLI{pause}; }
@@ -1598,11 +1600,10 @@ sub do_auth
 	       $NIKTO{totalrequests}++;
             }
          }
-         if ($result{'www-authenticate'} eq "")
-         {  
+         if ($result{'www-authenticate'} eq "" &&
+             !defined $result{'whisker'}->{'error'}) {  
             unless ($REALMS{$REALM}{tid} == 700500 ||
-                    $REALMS{$REALM}{checked} == 1)
-            {
+                    $REALMS{$REALM}{checked} == 1) {
                my $uridir=$request{whisker}->{uri};
                $uridir =~ s#/[^/]*$#/#g;
                add_vulnerability($mark,"Default account found for '$realm' at $uridir ($request{whisker}->{uri}) (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0,"GET",$uridir,\%result);
