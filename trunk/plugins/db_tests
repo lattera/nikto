@@ -3843,3 +3843,5 @@
 "003843","3092","1","/ye/","GET","200","","","","","This might be interesting... potential country code (Yemen)","",""
 "003844","3092","1","/zm/","GET","200","","","","","This might be interesting... potential country code (Zambia)","",""
 "003845","3092","1","/zw/","GET","200","","","","","This might be interesting... potential country code (Zimbabwe)","",""
+"003846","61059","3b","/jmx-console/","GET","ObjectName","","","","","JBoss JMX Agent View found. See http://www.redteam-pentesting.de/publications/2009-11-30-Whitepaper_Whos-the-JBoss-now_RedTeam-Pentesting_EN.pdf","",""
+"003846","61059","3b","/jmx-console/HtmlAdaptor?action=inspectMBean&name=Catalina%3Atype%3DServer","GET","Shutdown password","","","","","JBoss JMX Agent reveals the shutdown password and port information","",""
