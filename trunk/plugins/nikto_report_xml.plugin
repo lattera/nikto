@@ -135,7 +135,7 @@ sub xml_change_vars
     $variables{"#TEMPL_SSL_INFO"}           = "";
     if (defined $mark->{sslcyphers})
     {
-       $variables{"#TEMPL_SSL_INFO"}        = "<ssl cyphers=\"$mark->{sslcyphers}\" issuers=\"$mark->{sslissuers}\" info=\"$mark->{sslinfo}\" />";
+       $variables{"#TEMPL_SSL_INFO"}        = "<ssl ciphers=\"$mark->{sslcyphers}\" issuers=\"$mark->{sslissuers}\" info=\"$mark->{sslinfo}\" />";
     }
     $variables{"#TEMPL_IP"}                 = simple_enc($mark->{ip});
     $variables{"#TEMPL_ITEMS_TESTED"}       = $mark->{total_checks};

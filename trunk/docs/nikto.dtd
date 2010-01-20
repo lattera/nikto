@@ -15,7 +15,8 @@
 <!ATTLIST scandetails hostheader CDATA #IMPLIED>
 
 <!ELEMENT ssl EMPTY>
-<!ATTLIST ssl cyphers CDATA #REQUIRED>
+<!ATTLIST ssl cyphers CDATA #IMPLIED>
+<!ATTLIST ssl ciphers CDATA #IMPLIED>
 <!ATTLIST ssl issuers CDATA #REQUIRED>
 <!ATTLIST ssl info CDATA #REQUIRED>
 
