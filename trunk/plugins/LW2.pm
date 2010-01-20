@@ -1,23 +1,35 @@
-#!/usr/bin/perl
-# LW2 version 2.4
-# $Id$
+#!perl
+# LW2 version 2.5
+#   LW2 Copyright (c) 2009, Jeff Forristal (wiretrip.net)
+#   All rights reserved.
 #
-#  LW2 copyright 2000-2006 by rain forest puppy, rfp.labs
+#   Redistribution and use in source and binary forms, with or without 
+#   modification, are permitted provided that the following conditions 
+#   are met:
 #
-#  This program is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU General Public License
-#  as published by the Free Software Foundation; either version 2
-#  of the License, or (at your option) any later version.
+#   - Redistributions of source code must retain the above copyright 
+#   notice, this list of conditions and the following disclaimer.
 #
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#   - Redistributions in binary form must reproduce the above copyright 
+#   notice, this list of conditions and the following disclaimer in the 
+#   documentation and/or other materials provided with the distribution.
 #
+#   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+#   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+#   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
+#   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
+#   COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
+#   INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#   BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+#   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
+#   CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT 
+#   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN 
+#   ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+#   POSSIBILITY OF SUCH DAMAGE.
 
 =head1 NAME
 
-LW2 - Perl HTTP library version 2.4
+LW2 - Perl HTTP library version 2.5
 
 =head1 SYNOPSIS
 
@@ -48,7 +60,7 @@ The following are the functions contained in Libwhisker:
 
 
 package LW2;
-$LW2::VERSION="2.4";
+$LW2::VERSION="2.5";
 $PACKAGE='LW2';
 
 BEGIN {
@@ -142,7 +154,7 @@ sub auth_brute_force {
 
     map {
         ( $P = $_ ) =~ tr/\r\n//d;
-        auth_set_header( $auth_method, $hrin, $user, $P, $dom );
+        auth_set( $auth_method, $hrin, $user, $P, $dom );
         return undef if ( http_do_request( $hrin, \%hout ) );
         return $P if ( $hout{whisker}->{code} != $fail_code );
     } @$pwordref;
@@ -343,7 +355,9 @@ sub cookie_parse {
     while( length($header) ){
     	$header =~ s/^[ \t]+//;
     	last if(!($header =~ s/^([^ \t=;]+)//));
-    	my $an = lc($1);
+			# LW2.5 change: cookie name is no longer lower-cased
+    	# my $an = lc($1);
+    	my $an = $1;
 			my $av = undef;
     	$header =~ s/^[ \t]+//;
     	if(substr($header,0,1) eq '='){
@@ -1454,6 +1468,10 @@ Valid modes are (the mode numbers are the same as those found in whisker
 
 =item 9 Session splicing [NOTE: not currently available]
 
+=item A Use a carriage return (0x0d) as a request spacer
+
+=item B Use binary value 0x0b as a request spacer
+
 =back
 
 You can set multiple modes by setting the string to contain all the modes
@@ -1530,6 +1548,16 @@ sub encode_anti_ids {
     # mode 6 - TAB as request spacer
     if ( $modes =~ /6/ ) {
         $$W{'http_space1'} = "\t";
+    }
+
+    # mode A - CR as request spacer
+    if ( $modes =~ /A/i ) {
+        $$W{'http_space1'} = $$W{'http_space2'} = "\x0d";
+    }
+
+    # mode B - 0x0b as request spacer
+    if ( $modes =~ /B/i ) {
+        $$W{'http_space1'} = $$W{'http_space2'} = "\x0b";
     }
 
 }
@@ -2559,7 +2587,10 @@ sub _http_do_request_ex {
         $H[3]                           = 'close';
     }
 
-    if ( defined $$W{data_sock} ) {
+    if ( $$hout{whisker}->{code}==404 && defined $$W{'shortcut_on_404'} ) {
+        $stream->{'close'}->();
+    }
+    elsif ( defined $$W{data_sock} ) {
         $$hout{whisker}->{data_sock}   = $stream->{sock};
         $$hout{whisker}->{data_stream} = $stream;
     }
@@ -2818,13 +2849,13 @@ sub http_fixup_request {
     $$hin{whisker}->{uri_param_sep}= '?';
 
     if ( $$hin{whisker}->{'version'} eq '1.1' ) {
-my ($host) = utils_find_lowercase_key($hin,'host');
-if(!defined $host || $host eq ''){
-  $$hin{'Host'} = $$hin{whisker}->{'host'};
-  $$hin{'Host'} .= ':' . $$hin{whisker}->{'port'} if (
-  $$hin{whisker}->{port} != 80 || ( $$hin{whisker}->{ssl}==1 &&
-  $$hin{whisker}->{port} != 443 ) );
-}
+        my ($host) = utils_find_lowercase_key($hin,'host');
+        $$hin{'Host'} = $$hin{whisker}->{'host'} 
+            if(!defined $host || $host eq '');
+        $$hin{'Host'} .= ':' . $$hin{whisker}->{'port'}
+          if ( index($$hin{'Host'},':') == -1 && 
+          	( $$hin{whisker}->{port} != 80 || ( $$hin{whisker}->{ssl}==1 &&
+              $$hin{whisker}->{port} != 443 ) ) );
         my ($conn) = utils_find_lowercase_key($hin,'connection');
         $$hin{'Connection'} = 'Keep-Alive' 
             if(!defined $conn || $conn eq '');
@@ -3131,9 +3162,22 @@ sub http_read_body {
                 )
               )
             {
+                $stream->{'close'}->();
+
+								# New LW2.5 feature: allow_short_reads will still return
+								# success, even if all the data wasn't read.  This was
+								# per request due to some 3Com switches sending out
+								# the wrong content-length in HTTP response
+								my $s = $$hin{whisker}->{allow_short_reads} || 0;
+								if ( $s != 0 && length($stream->{'bufin'}) > 0 ) {
+									# short read is requested, and there is some data, so
+									# copy it over and return a non-error
+									$$hout{whisker}->{'data'} = $stream->{'bufin'};
+									return 1;
+								}
+
                 $$hout{whisker}->{'error'} =
                   'Error reading data: ' . $stream->{error};
-                $stream->{'close'}->();
                 return 0;
             }
         }
@@ -4386,7 +4430,7 @@ EOT
         $code .= '}}}';
 
         eval "$code";
-        #print "DEBUG: $code\n\n";
+        print "DEBUG: $code\n\n";
         $generated++;
     }
 
@@ -4782,7 +4826,7 @@ sub _stream_ssl_read {
             $t = Net::SSLeay::read( $xr->{sock} );
             eval { alarm(0) };
         };
-        return 0 if ( $@ || !defined $t || $t eq '' );
+        return 0 if ( $@ || __bad_netssleay_error() || !defined $t || $t eq '' );
     }
     elsif ( $xr->{streamtype} == 5 ) {
         return 0 if ( !$xr->{sock}->read( $t, 4096 ) );
@@ -4852,7 +4896,7 @@ sub _stream_ssl_write {
     if ( $xr->{streamtype} == 4 ) {
         ( $wrote, $err ) =
           Net::SSLeay::ssl_write_all( $xr->{sock}, \$xr->{bufout} );
-        if ( !$wrote ) {
+        if ( __bad_netssleay_error() || !$wrote ) {
             $xr->{error} = "SSL error: $err";
             return 0;
         }
@@ -5082,6 +5126,10 @@ sub _stream_ssl_open {
         }
     }
 
+		# just to be safe, catch any errors that didn't get returned
+		return _stream_err($xr, 0, 'ssl setup error' )
+			if( __bad_netssleay_error() );
+
     return _stream_err( $xr, 0, 'ssl create new' )
       if ( !( $xr->{sslobj} = Net::SSLeay::new( $xr->{ctx} ) ) );
     if ( defined $W->{ssl_ciphers} ) {
@@ -5102,7 +5150,7 @@ sub _stream_ssl_open {
     $xr->{state} = 1;
 
     if ( $xr->{proxy} ) {
-        my $C = 'CONNECT ' . $W->{chost} . ':' . $W->{cport} . " HTTP/1.0\r\n";
+        my $C = 'CONNECT ' . $W->{host} . ':' . $W->{port} . " HTTP/1.0\r\n";
         $C .= 'Proxy-Authorization: ' . $wh->{'Proxy-Authorization'} . "\r\n"
           if ( defined $wh->{'Proxy-Authorization'} );
         $C .= "\r\n";
@@ -5128,9 +5176,10 @@ sub _stream_ssl_open {
     Net::SSLeay::set_session( $xr->{sslobj}, $xr->{sslsession} )
       if ( defined $xr->{sslsession} );
     return _stream_err( $xr, 1, 'ssl connect failed' )
-      if ( !( Net::SSLeay::connect( $xr->{sslobj} ) ) );
+      if ( !( Net::SSLeay::connect( $xr->{sslobj} ) ) ||
+      	__bad_netssleay_error() );
 
-#    my $x = Net::SSLeay::ctrl( $xr->{sslobj}, 6, 0, '' );
+    # my $x = Net::SSLeay::ctrl( $xr->{sslobj}, 6, 0, '' );
     $xr->{sslsession} = Net::SSLeay::get_session( $xr->{sslobj} )
       if ( defined $W->{ssl_resume} && $W->{ssl_resume} > 0 );
 
@@ -5445,7 +5494,7 @@ provides a compatibility similar to that found in the URI
 subpackage.
 
 If $normalize_flag is set to 1, then the output will be passed
-through utils_normalize_uri before being returned.
+through uri_normalize before being returned.
 
 =cut
 
@@ -6394,371 +6443,6 @@ sub utils_croak {
 	die _utils_carp_common(@_);
 }
 
-################################################################
-
-{    # static variable container:
-    $XML              = undef;          # current document hash ptr
-    @tag_stack        = ("/\t/\t0");    # current tag stack order
-    $XML_IGNORING_XSL = 0;
-
-    sub _xml_callback {
-        my ( $TAG, $hr, $dr, $start, $len ) = @_;
-
-        # tags we don't care about
-        return if ( $TAG =~ /^(!--|\?xml|!doctype)/ );
-
-        # ignore all XSL
-        $XML_IGNORING_XSL++ if ( $TAG eq 'xsl:stylesheet' );
-        if ( $TAG eq '/xsl:stylesheet' ) {
-            $XML_IGNORING_XSL = 0;
-            return;
-        }
-        return if ($XML_IGNORING_XSL);
-
-        my $ns = undef;
-        $ns = $1 if ( $TAG =~ s/^(.+?):// );
-
-        if ( substr( $TAG, 0, 1 ) ne '/' ) {
-            my ( $n, $cur, $end ) = split( /\t/, $tag_stack[-1] );
-            my $ab = _xml_join_name( $TAG, $cur );
-            my $flag = 0;
-            if ( defined( $$hr{'/'} ) ) {
-                $flag++;
-                delete $$hr{'/'};
-            }
-
-            # indicate previous element has children
-            $tag_stack[-1] = "$n\t$cur\t0";
-
-            my $rname = _xml_add_tag( $XML, $ab, undef, %$hr, $ns );
-            my $e = $start + $len;
-            push( @tag_stack, "$TAG\t$rname\t$e" ) unless $flag;
-
-            # for some reason, we need to reset the array ptr for
-            # push and pop to work correctly; might have something to
-            # do with it being a static variable
-            foreach (@tag_stack) { }
-        }
-        else {
-            my ( $n, $path, $end ) = split( /\t/, pop(@tag_stack) );
-            if ( "/$n" ne $TAG ) {
-
-                # WHOA, bad XML?  We are now going to puke.
-                %$XML = ();
-                $XML->{'ERROR'} =
-                  "Closing tag <$TAG> not expected" . " (expecting </$n>)";
-
-                # short circuit parsing to the end
-                _html_find_tags_adjust( 0, 0 );
-            }
-
-            if ( $end > 0 ) {    # set value
-                my $val = substr( $$dr, $end, $start - $end );
-                _xml_set_value( $XML, $path, _xml_deentify($val) );
-            }
-        }
-        return;
-    }
-
-################################################################
-
-    sub _xml_deentify {          # /* INTERNAL */
-        my $val = shift;
-        $val =~ s/&lt;/</g;
-        $val =~ s/&gt;/>/g;
-        $val =~ s/&quot;/"/g;
-        $val =~ s/&#([0-9]{1,3});/chr($1)/eg;
-        $val =~ s/&amp;/&/g;                    # must be last
-        return $val;
-    }
-
-################################################################
-
-=item B<xml_read_data>
-
-Params: \$data
-
-Return: $XML_object, undef on error
-
-This function takes a reference to a scalar containing XML
-markup and parses it into the %XML hash format used by the
-other XML functions.
-
-If a parsing error is encountered, the returned hash only has 
-one element, 'ERROR', which contains an error message.
-
-=cut
-
-    sub xml_read_data {
-        my $p = shift;
-        return undef if ( !defined $p );
-        $p         = \$p if ( !ref($p) );
-        $XML       = {};                    # new anonymous hash
-        @tag_stack = ("/\t/\t0");           # reset the tag stack
-        html_find_tags( $p, \&_xml_callback, 1 );
-        return $XML;                        # return new document
-    }
-
-################################################################
-
-=item B<xml_read_file>
-
-Params: $filename
-
-Return: $XML_object, undef on error
-
-xml_read_file opens the given $filename and attempts to
-parse the XML data found within.
-
-If a parsing error is encountered, the returned hash only has 
-one element, 'ERROR', which contains an error message.
-
-=cut
-
-    sub xml_read_file {
-        my $filename = shift;
-        return undef if ( !defined $filename || $filename eq '' );
-        return undef if ( !-e $filename || !-f $filename );
-
-        my $data = '';
-        open( IN, "<$filename" ) or return undef;
-	binmode(IN); # Stupid Windows
-        $data .= $_ while (<IN>);
-        close(IN);
-
-        return xml_read_data( \$data );
-    }
-
-}    # end of static variable container
-
-################################################################
-
-sub _xml_add_tag {
-    my ( $hr, $name, $value, %e, $ns ) = @_;
-    my $realname = $name;
-
-    if ( exists $$hr{$name} ) {
-
-        # already have a tag named that; make array
-        my @t = _xml_get_4arr( $hr, $name );
-        $t[0]++;
-        $$hr{$name} = [ $t[0], $t[1], $t[2], $t[3] ];
-        $realname .= '[' . $t[0] . ']';
-    }
-
-    # there's three different storage formats, in order
-    # to reduce the amount of anonymous structures in
-    # the main hash
-    if ( ( scalar keys %e ) > 0 || defined $ns ) {   # we need a full anon array
-        my $p = undef;
-        if ( ( scalar keys %e ) > 0 ) {
-            $p = [];
-            foreach ( keys %e ) {                    # need to add each param
-                $_ =~ s/^.+?://;                     # remove namespace
-                next if ( $_ eq '' );
-                push @$p, $_;
-                $$hr{ _xml_join_name( "\@$_", $realname ) } = $e{$_};
-            }
-        }
-        $$hr{$realname} = [ 0, $p, $value, $ns ];
-    }
-    elsif ( defined $value ) {                       # simple value
-        $$hr{$realname} = $value;
-    }
-    else {    # empty tag with no value or elements
-        $$hr{$realname} = undef;
-    }
-
-    return $realname;
-}
-
-################################################################
-
-sub _xml_get_4arr {
-    my ( $hr, $name ) = @_;
-    return undef if ( !exists $$hr{$name} );
-    return ( 0, undef, undef, undef ) if ( !defined $$hr{$name} );
-    return ( 0, undef, $$hr{$name}, undef ) if ( !ref( $$hr{$name} ) );
-    return @{ $$hr{$name} };
-}
-
-################################################################
-
-sub _xml_check {
-    my ( $hr, $name, $root ) = @_;
-    return undef if ( !defined $hr || !ref($hr) );
-    return undef if ( !defined $name || $name eq '' );
-    $name = _xml_join_name( $name, $root ) if ( defined $root );
-    return undef if ( !exists( $$hr{$name} ) );
-    return $name;
-}
-
-################################################################
-
-sub _xml_set_value {
-    my ( $hr, $name, $value, $root ) = @_;
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    if ( ref( $$hr{$name} ) ) {
-        $$hr{$name}->[2] = $value;
-    }
-    else {
-        $$hr{$name} = $value;
-    }
-    return 1;
-}
-
-################################################################
-
-=item B<xml_get_multi>
-
-Params: $XML_obj, $name [, $root] 
-
-Return: @elements, undef on error
-
-xml_get_multi() returns an array of absolute element pathnames for
-the given named element, which can then be iterated over to access
-child elements/parameters of each element.
-
-=cut
-
-sub xml_get_multi {
-    my ( $count, $c, $hr, $name, $root ) = ( 0, 1, @_ );
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    my @ret = ($name);
-    return @ret if ( !defined $$hr{$name} || !ref( $$hr{$name} ) );
-    $count = $$hr{$name}->[0];
-    return @ret if ( $count == 0 );
-    for ( $c = 1 ; $c <= $count ; $c++ ) {
-        push @ret, $name . "[$c]";
-    }
-    return @ret;
-}
-
-################################################################
-
-=item B<xml_is_multi>
-
-Params: $XML_obj, $name [, $root] 
-
-Return: 1 if multi, 0 if not, undef on error
-
-This function checks to see if the named element has multiple elements
-present in the given $XML_object.
-
-=cut
-
-sub xml_is_multi {
-    my ( $hr, $name, $root ) = @_;
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    return 0 if ( !ref( $$hr{$name} ) );
-    return $$hr{$name}->[0];
-}
-
-################################################################
-
-sub _xml_join_name {
-    my ( $name, $root ) = @_;
-    return undef if ( !defined $name );
-    $root = '/' if ( !defined $root || $root eq '' );
-    my $join = "$root/$name";
-    $join =~ s#/{2,}#/#g;
-    chop $join if ( substr( $join, -1, 1 ) eq '/' );
-    return $join;
-}
-
-################################################################
-
-=item B<xml_get_element_value>
-
-Params: $XML_obj, $name [, $root] 
-
-Return: $value, undef on error/not found
-
-Fetches the value of the element of name $name.
-
-=cut
-
-sub xml_get_element_value {
-    my ( $hr, $name, $root ) = @_;
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    my @x = _xml_get_4arr( $hr, $name );
-    return $x[2];
-}
-
-sub xml_gev {    # typing laziness shortcut
-    goto &xml_get_element_value;
-}
-
-################################################################
-
-=item B<xml_get_element_namespace>
-
-Params: $XML_obj, $name [, $root] 
-
-Return: $value, undef on error/not found/unknown
-
-Returns the namespace of an element, if it was present in the XML
-document.  If not known, then undef is returned.
-
-=cut
-
-sub xml_get_element_namespace {
-    my ( $hr, $name, $root ) = @_;
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    my @x = _xml_get_4arr( $hr, $name );
-    return $x[3];
-}
-
-sub xml_gens {    # typing laziness shortcut
-    goto &xml_get_element_namespace;
-}
-
-################################################################
-
-=item B<xml_get_element_parameters>
-
-Params: $XML_obj, $name [, $root] 
-
-Return: @parameter_names, undef on error/not found
-
-Returns a list of parameter names set for the named element.
-
-=cut
-
-sub xml_get_element_parameters {
-    my ( $hr, $name, $root ) = @_;
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    return undef if ( !ref( $$hr{$name} ) );
-    my @t = _xml_get_4arr( $hr, $name );
-    return undef if ( !defined( $t[1] ) );
-    return @{ $t[1] };
-}
-
-sub xml_gep {    # typing laziness shortcut
-    goto &xml_get_element_parameters;
-}
-
-################################################################
-
-=item B<xml_if_exist>
-
-Params: $XML_obj, $name [, $root] 
-
-Return: 1 if found, undef if not found/error
-
-Check to see if the named element exists.
-
-=cut
-
-sub xml_if_exist {
-    my ( $hr, $name, $root ) = @_;
-    return undef unless ( $name = _xml_check( $hr, $name, $root ) );
-    return 1;
-}
-
-################################################################
-
-
 =back
 
 =head1 SEE ALSO
@@ -6767,10 +6451,7 @@ L<LWP>
 
 =head1 COPYRIGHT
 
-Copyright 2001-2006 Rain Forest Puppy
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the GPL.
+Copyright 2009 Jeff Forristal
 
 =cut
 
