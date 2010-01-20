@@ -1733,24 +1733,28 @@ sub proxy_check
   
  if (defined $request{'whisker'}->{'proxy_host'} && $CLI{useproxy})  # proxy is set up
  {
+  LW2::http_close(\%request);  # force-close any old connections
   setup_hash(\%request, $mark);
   $request{'whisker'}->{'method'}="GET";
   $request{'whisker'}->{'uri'}="/";
  
-  LW2::http_close(\%request);  # force-close any old connections
   LW2::http_fixup_request(\%request);
+  
   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
   LW2::http_do_request_timeout(\%request,\%result);
   $NIKTO{totalrequests}++;
+  dump_var("Request Hash", \%request);
+  dump_var("Result Hash", \%result);
 
   # First check that we can connect to the proxy
   if (exists $result{'whisker'}{'error'})
   {
-     if ($result{'whisker'}{'error'} =~ "Transport endpoint is not connected")
+     if ($result{'whisker'}{'error'} =~ /Transport endpoint is not connected/)
      {
         nprint("+ ERROR: Could not connect to the defined proxy $NIKTOCONFIG{PROXYHOST}");
         exit 1;
      }
+     nprint("+ ERROR: Proxy error: $result{'whisker'}{'error'}", "v");
   }
   if ($result{'whisker'}{'code'} eq "407")       # proxy requires auth
   { 
@@ -1775,6 +1779,8 @@ sub proxy_check
    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
    LW2::http_do_request_timeout(\%request,\%result);
    $NIKTO{totalrequests}++;
+   dump_var("Request Hash", \%request);
+   dump_var("Result Hash", \%result);
    if ($result{'proxy-authenticate'} ne "") 
     { 
      my @pauthinfo=split(/ /,$result{'proxy-authenticate'});
@@ -1934,6 +1940,7 @@ sub setup_hash
    $reqhash->{'User-Agent'}=$NIKTO{useragent};
    $reqhash->{whisker}->{retry}=0;
    $reqhash->{whisker}->{host} = $mark->{hostname} || $mark->{ip};
+
    if ($mark->{vhost})
    {
       $request{Host} = $mark->{vhost};
