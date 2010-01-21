@@ -313,7 +313,7 @@
 "600299","iPlanet-Enterprise/","4.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600300","iPlanet-Web-Proxy-Server/","3.6","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600301","iPlanetEnterprise/","4.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600302","ipMonitor ","8.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600302","ipMonitor ","9.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600303","iPrism-httpd/","v3","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600304","Ipswitch-IMail/","8.22","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600305","IpswitchWebCalendaring/","8.12","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -979,4 +979,3 @@
 "600966","Mbedthis-AppWeb/","2.4.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600967","WebProxy/","3.1.1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600968","MicrosoftIIS/",".6.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600969","ipMonitor","9.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
