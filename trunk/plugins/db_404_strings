@@ -33,6 +33,7 @@ name=qt id="search" size=40 value=" "
 No web site is configured at this address
 not found
 parameter is incorrect                                   # IIS 5.0 500 error
+Page Not Found
 PHP Fatal error:  Unable to open
 Please identify yourself:
 Reload acp_userinfo database
