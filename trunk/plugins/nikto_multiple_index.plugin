@@ -71,11 +71,11 @@ sub nikto_multiple_index
 
 	my $tempstring;
 	foreach my $f (keys %found) { $tempstring .= "$f, "; }
-	$f =~ s/,$//;
+	$tempstring =~ s/,$//;
 
 	# some unique... report slightly differently
 	if ($total_unique < keys(%found)) {
-      		add_vulnerability($mark,"Multiple index files found (note, these may not all be unique): $found", 740000, 0);
+      		add_vulnerability($mark,"Multiple index files found (note, these may not all be unique): $tempstring", 740000, 0);
 	}
 
 	# all unique... report
