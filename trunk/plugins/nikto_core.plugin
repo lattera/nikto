@@ -617,7 +617,8 @@ sub general_config
        $CLI{format} =~ s/(^.*\.)([^.]*$)/$2/g;
     }
  }
- elsif ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
+
+ if    ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
  elsif ($CLI{format} =~ /html?/i) { $CLI{format}="htm"; }
  elsif ($CLI{format} =~ /csv/i)   { $CLI{format}="csv"; }
  elsif ($CLI{format} =~ /xml/i)   { $CLI{format}="xml"; }
@@ -640,7 +641,6 @@ sub general_config
  {
     $CLI{ports}=~s/^\s+//;
     $CLI{ports}=~s/\s+$//;
-    #if ($CLI{ports} eq "") { $CLI{ports}=80; }
     if ($CLI{ports} =~ /[^0-9\-\, ]/) { nprint("+ ERROR: Invalid port option '$CLI{ports}'"); exit; }
  }
 
@@ -702,7 +702,6 @@ sub general_config
 sub resolve
 {
    my $ident=$_[0] || return;
-
    my ($name, $ip, $dn)="";
 
    # ident is name, lookup IP
