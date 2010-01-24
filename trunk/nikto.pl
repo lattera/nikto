@@ -31,7 +31,6 @@ Getopt::Long::Configure('no_ignore_case');
 #     Sullo (sullo@cirt.net)
 #     http://cirt.net/
 #######################################################################
-# See the README.txt and/or help files for more information on how to use & config.
 # See the LICENSE.txt file for more information on the License Nikto is distributed under.
 #
 # This program is intended for use in an authorized manner only, and the author
@@ -42,15 +41,15 @@ Getopt::Long::Configure('no_ignore_case');
 # global var/definitions
 use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT/;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS/;
-use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @BUILDITEMS/;
+use vars qw/%db_extensions %FoF %UPDATES @DBFILE @BUILDITEMS/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE/;
 
 # setup
-my $starttime      = localtime();
-$DIV               = "-" x 75;
-$NIKTO{version}    = "2.1.1";
-$NIKTO{name}       = "Nikto";
-$NIKTO{configfile} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
+my $starttime        = localtime();
+$NIKTO{'DIV'}        = "-" x 75;
+$NIKTO{'version'}    = "2.1.1";
+$NIKTO{'name'}       = "Nikto";
+$NIKTO{'configfile'} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
 
 # read the --config option
 {
@@ -58,13 +57,13 @@ $NIKTO{configfile} = "/etc/nikto.conf";    ### Change this line if your setup is
     Getopt::Long::Configure('pass_through', 'noauto_abbrev');
     GetOptions(\%optcfg, "config=s");
     Getopt::Long::Configure('nopass_through', 'auto_abbrev');
-    if (defined $optcfg{'config'}) { $NIKTO{configfile} = $optcfg{'config'}; }
+    if (defined $optcfg{'config'}) { $NIKTO{'configfile'} = $optcfg{'config'}; }
 }
 
 # Read the config files in order
 my $error;
 my $config_exists=0;
-$error=load_config("$NIKTO{configfile}");
+$error=load_config("$NIKTO{'configfile'}");
 $config_exists=1 if ($error eq "");
 # Guess home directory -- to support Windows
 my $home="";
@@ -96,18 +95,18 @@ die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 general_config();
 load_databases();
 load_databases('u');
-nprint("- $NIKTO{name} v$NIKTO{version}");
+nprint("- $NIKTO{'name'} v$NIKTO{'version'}");
 
 LW2::http_init_request(\%request);
 $request{'whisker'}->{'ssl_save_info'}              = 1;
 $request{'whisker'}->{'lowercase_incoming_headers'} = 1;
 $request{'whisker'}->{'timeout'}                    = $CLI{'timeout'} || 10;
 if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'}; }
-$request{'User-Agent'} = $NIKTO{useragent};
+$request{'User-Agent'} = $NIKTO{'useragent'};
 $request{'whisker'}->{'retry'} = 0;
 proxy_setup();
 
-nprint($DIV);
+nprint($NIKTO{'DIV'});
 
 # No targets - quit while we're ahead
 if ($CLI{'host'} eq "") 
@@ -203,7 +202,7 @@ foreach my $mark (@MARKS) {
    my $elapsed=$mark->{end_time}-$mark->{start_time};
    nprint("+ $mark->{total_checks} items checked: $mark->{total_vulns} item(s) reported on remote host");
    nprint("+ End Time:           $time ($elapsed seconds)");
-   nprint("$DIV");
+   nprint($NIKTO{'DIV'});
    
    $COUNTERS{hosts_completed}++;
    report_host_end($mark);
@@ -211,7 +210,7 @@ foreach my $mark (@MARKS) {
 report_close();
    
 nprint("+ $COUNTERS{hosts_total} host(s) tested");
-nprint("+ $NIKTO{totalrequests} requests made","v");
+nprint("+ $NIKTO{'totalrequests'} requests made","v");
 send_updates();
 nprint("T:" . localtime() . ": Ending", "d");
 

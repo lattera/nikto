@@ -66,7 +66,7 @@ sub nikto_tests
                next; 
             }
          }
-         $NIKTO{resp_counts}{$RES}{total}++;
+         $NIKTO{'resp_counts'}{$RES}{total}++;
    
          # do auth/redir first, independent of test pass/fail
          if ($RES eq 401)
@@ -75,17 +75,17 @@ sub nikto_tests
             my $R = $1;
             if ($R eq '') { $R = $result{'www-authenticate'} }
             do_auth($request, $result, $mark);
-            nprint("+ $uri - Requires Authentication for realm '$R'") if $CLI{display} =~ /4/;
+            nprint("+ $uri - Requires Authentication for realm '$R'") if $CLI{'display'} =~ /4/;
             $RES=$result{'whisker'}->{'code'};
             $CONTENT=$result{'whisker'}->{'data'};
          }
          elsif ($RES eq 200)
          {
-            nprint("+ $uri - 200/OK Response could be $TESTS{$CHECKID}{message}") if $CLI{display} =~ /3/;
+            nprint("+ $uri - 200/OK Response could be $TESTS{$CHECKID}{message}") if $CLI{'display'} =~ /3/;
          }
 	 elsif ($RES =~ /30([0-3]|7)/)
          {
-            nprint("+ $uri - Redirects ($RES) to " . $result{'location'} . " , $TESTS{$CHECKID}{message}") if $CLI{display} =~ /1/;
+            nprint("+ $uri - Redirects ($RES) to " . $result{'location'} . " , $TESTS{$CHECKID}{message}") if $CLI{'display'} =~ /1/;
          }
    
          my $m1_method= my $m1o_method= my $m1a_method= my $f2_method= my $f1_method ="content";

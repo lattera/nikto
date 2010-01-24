@@ -43,7 +43,7 @@ sub csv_open
    open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
 
    # Write header
-   print OUT "\"meta\",\"meta\",\"$NIKTO{name}\",\"v$NIKTO{version}/$NIKTO{core_version}\"\n";
+   print OUT "\"meta\",\"meta\",\"$NIKTO{'name'}\",\"v$NIKTO{'version'}/$NIKTO{'core_version'}\"\n";
    return OUT;
 }
 

@@ -124,7 +124,7 @@ sub html_change_vars
     my $protocol = "http";
     if ($mark->{ssl}) { $protocol .= "s"; }
 
-    $variables{"#TEMPL_HCTR"}               = $NIKTO{TEMPL_HCTR};
+    $variables{"#TEMPL_HCTR"}               = $NIKTO{'TEMPL_HCTR'};
     $variables{"#TEMPL_END"}                = date_disp($mark->{end_time});
     $variables{"#TEMPL_HOSTNAME"}           = simple_enc($mark->{hostname});
     $variables{"#TEMPL_HOST_HEADER"}        = $mark->{hostname};
@@ -136,7 +136,7 @@ sub html_change_vars
     $variables{"#TEMPL_ITEMS_TESTED"}       = $mark->{total_checks};
     $variables{"#TEMPL_PORT"}               = $mark->{port};
     $variables{"#TEMPL_START"}              = date_disp($mark->{start_time});
-    $variables{"#TEMPL_NIKTO_VER"}          = $NIKTO{version};
+    $variables{"#TEMPL_NIKTO_VER"}          = $NIKTO{'version'};
     $variables{"#TEMPL_BANNER"}             = simple_enc($mark->{banner});
     $variables{"#TEMPL_NIKTO_CLI"}          = $CLI{'all_options'};
     $variables{"#TEMPL_CTR"}                = $mark->{total_checks};

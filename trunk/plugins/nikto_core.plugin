@@ -143,7 +143,7 @@ sub map_codes
  my $rs=LW2::utils_randstr(8);
 
  # / for OK response
- $NIKTO{totalrequests}++;
+ $NIKTO{'totalrequests'}++;
  $request{'whisker'}->{'uri'} = "/";
  delete $request{'whisker'}->{'data'};
  $request{'whisker'}->{'method'} = GET;
@@ -153,7 +153,7 @@ sub map_codes
  dump_var("Request Hash", \%request);
  if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
  LW2::http_do_request_timeout(\%request,\%result);
- $NIKTO{totalrequests}++;
+ $NIKTO{'totalrequests'}++;
  dump_var("Result Hash", \%result);
  if (defined $result{location}) 
   { 
@@ -167,7 +167,7 @@ sub map_codes
       dump_var("Request Hash", \%request);
       if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
       LW2::http_do_request_timeout(\%request,\%result);
-      $NIKTO{totalrequests}++;
+      $NIKTO{'totalrequests'}++;
       dump_var("Result Hash", \%result);
      }
     else  # different host... ugh... guess
@@ -207,7 +207,7 @@ sub map_codes
  foreach my $file (keys %REQS)
   {
    nprint("- Testing error for file: $file\n","v");
-   $NIKTO{totalrequests}++;
+   $NIKTO{'totalrequests'}++;
    $request{'whisker'}->{'uri'}    = $file;
    $request{'whisker'}->{'method'} = GET;
    LW2::http_close(\%request);  # force-close any old connections
@@ -219,7 +219,7 @@ sub map_codes
    dump_var("Request Hash", \%request);
    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request,\%result);
-   $NIKTO{totalrequests}++;
+   $NIKTO{'totalrequests'}++;
    dump_var("Result Hash", \%result);
 
    $ext=$REQS{$file};
@@ -279,7 +279,7 @@ sub map_codes
   }
 
  # lastly, get a hash of index.php so we can cut down on some false positives...
-   $NIKTO{totalrequests}++;
+   $NIKTO{'totalrequests'}++;
    $request{'whisker'}->{'uri'}    = "/index.php?";
    $request{'whisker'}->{'method'} = GET;
    LW2::http_close(\%request);  # force-close any old connections
@@ -291,7 +291,7 @@ sub map_codes
    dump_var("Request Hash", \%request);
    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request,\%result);
-   $NIKTO{totalrequests}++;
+   $NIKTO{'totalrequests'}++;
    dump_var("Result Hash", \%result);
 
    my $content=rm_active_content($result{'whisker'}->{'data'});
@@ -374,7 +374,7 @@ sub dump_target_info
       my $sslcyphers=$result{whisker}->{ssl_cipher}      || "Unknown"; 
       my $sslissuers=$result{whisker}->{ssl_cert_issuer} || "Unknown";
       my $sslinfo=$result{whisker}->{ssl_cert_subject}   || "Unknown";
-      $sslprint="$DIV\n";
+      $sslprint="$NIKTO{'DIV'}\n";
       $sslprint.="+ SSL Info:        Ciphers: $sslcyphers\n                   Info:    $sslissuers\n                   Subject: $sslinfo";
 
      $mark->{sslcyphers}=$sslcyphers;
@@ -397,29 +397,29 @@ sub dump_target_info
    if (defined $request{'whisker'}->{'proxy_host'}) { 
    		nprint("- Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); 
    }
-   if (defined $NIKTO{hostid}) { 
-   		nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); 
+   if (defined $NIKTO{'hostid'}) { 
+   		nprint("- Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}","v"); 
    }
    if ($mark->{ssl}) { 
    		nprint($sslprint); 
    }
-   if (defined $NIKTO{anti_ids} && defined $CLI{'evasion'}) {
-      for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { 
+   if (defined $NIKTO{'anti_ids'} && defined $CLI{'evasion'}) {
+      for (my $i=1;$i<=(keys %{$NIKTO{'anti_ids'}});$i++) { 
       	if ($CLI{'evasion'} =~ /$i/) { 
-      		nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); 
+      		nprint("+ Using IDS Evasion:  $NIKTO{'anti_ids'}{$i}"); 
       		}
       	}
    }
-      if (defined $NIKTO{mutate_opts} && defined $CLI{'mutate'}) {
-      for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { 
+      if (defined $NIKTO{'mutate_opts'} && defined $CLI{'mutate'}) {
+      for (my $i=1;$i<=(keys %{$NIKTO{'mutate_opts'}});$i++) { 
       		if ($CLI{'mutate'} =~ /$i/) { 
-      			nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); 
+      			nprint("+ Using Mutation:     $NIKTO{'mutate_opts'}{$i}"); 
       		}
       	}
    }
    my $time=date_disp($mark->{start_time});
    nprint("+ Start Time:         $time");
-   nprint($DIV);
+   nprint($NIKTO{'DIV');
 
    if ($mark->{banner} ne "") { 
       nprint("+ Server: $mark->{banner}");
@@ -434,45 +434,45 @@ sub general_config
 {
  ## gotta set these first
  $|=1;
- $NIKTO{anti_ids}{1}="Random URI encoding (non-UTF8)";
- $NIKTO{anti_ids}{2}="Directory self-reference (/./)";
- $NIKTO{anti_ids}{3}="Premature URL ending";
- $NIKTO{anti_ids}{4}="Prepend long random string";
- $NIKTO{anti_ids}{5}="Fake parameter";
- $NIKTO{anti_ids}{6}="TAB as request spacer";
- $NIKTO{anti_ids}{7}="Change the case of the URL";
- $NIKTO{anti_ids}{8}="Use Windows directory separator (\\)";
+ $NIKTO{'anti_ids'}{1}="Random URI encoding (non-UTF8)";
+ $NIKTO{'anti_ids'}{2}="Directory self-reference (/./)";
+ $NIKTO{'anti_ids'}{3}="Premature URL ending";
+ $NIKTO{'anti_ids'}{4}="Prepend long random string";
+ $NIKTO{'anti_ids'}{5}="Fake parameter";
+ $NIKTO{'anti_ids'}{6}="TAB as request spacer";
+ $NIKTO{'anti_ids'}{7}="Change the case of the URL";
+ $NIKTO{'anti_ids'}{8}="Use Windows directory separator (\\)";
 
- $NIKTO{mutate_opts}{1}="Test all files with all root directories";
- $NIKTO{mutate_opts}{2}="Guess for password file names";
- $NIKTO{mutate_opts}{3}="Enumerate user names via Apache (/~user type requests)";
- $NIKTO{mutate_opts}{4}="Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type requests)";
- $NIKTO{mutate_opts}{5}="Attempt to brute force sub-domain names, assume that the host name is the parent domain";
- $NIKTO{mutate_opts}{6}="Attempt to guess directory names from the supplied dictionary file";
+ $NIKTO{'mutate_opts'}{1}="Test all files with all root directories";
+ $NIKTO{'mutate_opts'}{2}="Guess for password file names";
+ $NIKTO{'mutate_opts'}{3}="Enumerate user names via Apache (/~user type requests)";
+ $NIKTO{'mutate_opts'}{4}="Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type requests)";
+ $NIKTO{'mutate_opts'}{5}="Attempt to brute force sub-domain names, assume that the host name is the parent domain";
+ $NIKTO{'mutate_opts'}{6}="Attempt to guess directory names from the supplied dictionary file";
 
- $NIKTO{display}{1}="Show redirects";
- $NIKTO{display}{2}="Show cookies received";
- $NIKTO{display}{3}="Show all 200/OK responses";
- $NIKTO{display}{4}="Show URLs which require authentication";
- $NIKTO{display}{V}="Verbose Output";
- $NIKTO{display}{D}="Debug Output";
+ $NIKTO{'display'}{1}="Show redirects";
+ $NIKTO{'display'}{2}="Show cookies received";
+ $NIKTO{'display'}{3}="Show all 200/OK responses";
+ $NIKTO{'display'}{4}="Show URLs which require authentication";
+ $NIKTO{'display'}{V}="Verbose Output";
+ $NIKTO{'display'}{D}="Debug Output";
  
- $NIKTO{tuning}{1}="Interesting File / Seen in logs";
- $NIKTO{tuning}{2}="Misconfiguration / Default File";
- $NIKTO{tuning}{3}="Information Disclosure";
- $NIKTO{tuning}{4}="Injection (XSS/Script/HTML)";
- $NIKTO{tuning}{5}="Remote File Retrieval - Inside Web Root";
- $NIKTO{tuning}{6}="Denial of Service";
- $NIKTO{tuning}{7}="Remote File Retrieval - Server Wide";
- $NIKTO{tuning}{8}="Command Execution / Remote Shell";
- $NIKTO{tuning}{9}="SQL Injection";
- $NIKTO{tuning}{0}="File Upload";
- $NIKTO{tuning}{a}="Authentication Bypass";
- $NIKTO{tuning}{b}="Software Identification";
- $NIKTO{tuning}{c}="Remote Source Inclusion";
- $NIKTO{tuning}{x}="Reverse Tuning Options (i.e., include all except specified)";
+ $NIKTO{'tuning'}{1}="Interesting File / Seen in logs";
+ $NIKTO{'tuning'}{2}="Misconfiguration / Default File";
+ $NIKTO{'tuning'}{3}="Information Disclosure";
+ $NIKTO{'tuning'}{4}="Injection (XSS/Script/HTML)";
+ $NIKTO{'tuning'}{5}="Remote File Retrieval - Inside Web Root";
+ $NIKTO{'tuning'}{6}="Denial of Service";
+ $NIKTO{'tuning'}{7}="Remote File Retrieval - Server Wide";
+ $NIKTO{'tuning'}{8}="Command Execution / Remote Shell";
+ $NIKTO{'tuning'}{9}="SQL Injection";
+ $NIKTO{'tuning'}{0}="File Upload";
+ $NIKTO{'tuning'}{a}="Authentication Bypass";
+ $NIKTO{'tuning'}{b}="Software Identification";
+ $NIKTO{'tuning'}{c}="Remote Source Inclusion";
+ $NIKTO{'tuning'}{x}="Reverse Tuning Options (i.e., include all except specified)";
 
- $NIKTO{options_short}= "
+ $NIKTO{'options_short'}= "
        -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -dbcheck            check database and other key files for syntax errors (cannot be abbreviated)
        -evasion+           ids evasion technique
@@ -500,20 +500,20 @@ sub general_config
    + requires a value
    ";
 
- $NIKTO{options}="
+ $NIKTO{'options'}="
    Options:
        -config+            Use this config file
        -Cgidirs+           Scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -Display+           Turn on/off display outputs:\n";
-   foreach my $k (sort keys %{$NIKTO{display}}) 
-      { $NIKTO{options} .= "                               $k     $NIKTO{display}{$k}\n"; }
+   foreach my $k (sort keys %{$NIKTO{'display'}}) 
+      { $NIKTO{'options'} .= "                               $k     $NIKTO{'display'}{$k}\n"; }
 
- $NIKTO{options}.="       -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
+ $NIKTO{'options'}.="       -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
        -evasion+          IDS evasion technique:\n";
-   foreach my $k (sort keys %{$NIKTO{anti_ids}}) 
-      { $NIKTO{options} .= "                               $k     $NIKTO{anti_ids}{$k}\n"; }
+   foreach my $k (sort keys %{$NIKTO{'anti_ids'}}) 
+      { $NIKTO{'options'} .= "                               $k     $NIKTO{'anti_ids'}{$k}\n"; }
 
- $NIKTO{options}.="       -findonly          Find http(s) ports only, don't perform a full scan
+ $NIKTO{'options'}.="       -findonly          Find http(s) ports only, don't perform a full scan
        -Format+           Save file (-o) format:
                                 htm   HTML Format
                                 csv   Comma-separated-value
@@ -524,10 +524,10 @@ sub general_config
        -id+               Host authentication to use, format is userid:password
        -list-plugins      List all available plugins, perform no testing
        -mutate+           Guess additional file names:\n";
-   foreach my $k (sort keys %{$NIKTO{mutate_opts}}) 
-      { $NIKTO{options} .= "                               $k     $NIKTO{mutate_opts}{$k}\n"; }
+   foreach my $k (sort keys %{$NIKTO{'mutate_opts'}}) 
+      { $NIKTO{'options'} .= "                               $k     $NIKTO{'mutate_opts'}{$k}\n"; }
 
- $NIKTO{options}.="       -mutate-options    Provide information for mutates
+ $NIKTO{'options'}.="       -mutate-options    Provide information for mutates
        -nocache           Disables the URI cache
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
@@ -536,15 +536,15 @@ sub general_config
        -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds)\n";
 
- $NIKTO{options}.="       -root+             Prepend root value to all requests, format is /directory
+ $NIKTO{'options'}.="       -root+             Prepend root value to all requests, format is /directory
        -ssl               Force ssl mode on port
        -Single            Single request mode
        -timeout+          Timeout (default 2 seconds)
        -Tuning+           Scan tuning:\n";
-   foreach my $k (sort keys %{$NIKTO{tuning}}) 
-      { $NIKTO{options} .= "                               $k     $NIKTO{tuning}{$k}\n"; }
+   foreach my $k (sort keys %{$NIKTO{'tuning'}}) 
+      { $NIKTO{'options'} .= "                               $k     $NIKTO{'tuning'}{$k}\n"; }
 
- $NIKTO{options}.="       -useproxy          Use the proxy defined in config.txt
+ $NIKTO{'options'}.="       -useproxy          Use the proxy defined in config.txt
        -update            Update databases and plugins from cirt.net (cannot be abbreviated)
        -Version           Print plugin and database versions
        -vhost+            Virtual host (for Host header)
@@ -552,7 +552,7 @@ sub general_config
    ";
 
  ### CLI STUFF
- $CLI{'pause'}=$CLI{'html'}=$OUTPUT{'verbose'}=$CLI{'skiplookup'}=$NIKTO{totalrequests}=$OUTPUT{debug}=0;
+ $CLI{'pause'}=$CLI{'html'}=$OUTPUT{'verbose'}=$CLI{'skiplookup'}=$NIKTO{'totalrequests'}=$OUTPUT{debug}=0;
  $CLI{'all_options'}=join(" ",@ARGV);
  
  # preprocess CLI options which cannot be abbreviated
@@ -660,9 +660,9 @@ sub general_config
     $CLI{'plugins'}="ALL";
  }
 
- $NIKTO{timeout}=$CLI{'timeout'} || 10;
+ $NIKTO{'timeout'}=$CLI{'timeout'} || 10;
 
- $NIKTO{useragent}="Mozilla/4.75 ($NIKTO{name}/$NIKTO{version})";
+ $NIKTO{'useragent'}="Mozilla/4.75 ($NIKTO{'name'}/$NIKTO{'version'})";
  
  # SSL Test
  if (!LW2::ssl_is_available()) { nprint("- ***** SSL support not available (see docs for SSL install instructions) *****"); }
@@ -682,11 +682,11 @@ sub general_config
  my @F=<FI>;
  close(FI);
  my @VERS=grep(/^#VERSION/,@F);
- $NIKTO{core_version}=$VERS[0];
- $NIKTO{core_version}=~s/\#VERSION,//;
- chomp($NIKTO{core_version});
- $NIKTO{TMPL_HCTR}=0;
- $NIKTO{TMPL_SUMMARY}=0;
+ $NIKTO{'core_version'}=$VERS[0];
+ $NIKTO{'core_version'}=~s/\#VERSION,//;
+ chomp($NIKTO{'core_version'});
+ $NIKTO{'TMPL_HCTR'}=0;
+ $NIKTO{'TMPL_SUMMARY'}=0;
 
  return;
 }
@@ -1401,7 +1401,7 @@ sub check_updates
  my (%REMOTE, %LOCAL, @DBTOGET) = ();
  my ($pluginmsg, $remotemsg) = "";
  my $code_updates=0;
- my $serverdir="/nikto/UPDATES/$NIKTO{version}";
+ my $serverdir="/nikto/UPDATES/$NIKTO{'version'}";
  
  my $server="www.cirt.net";
  $request{'whisker'}->{'version'}="1.1";
@@ -1479,9 +1479,9 @@ sub check_updates
  {
   if ($remotefile eq "nikto") # main program version
    { 
-    if ($REMOTE{$remotefile} > $NIKTO{version}) 
+    if ($REMOTE{$remotefile} > $NIKTO{'version'}) 
      { 
-      nprint "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{version}\n";
+      nprint "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
       nprint "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n"; 
       if ($remotemsg ne "") {  nprint "+ $server message: $remotemsg\n"; }
       exit; 
@@ -1581,7 +1581,7 @@ sub do_auth
          LW2::http_fixup_request(\%request);
          if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
          LW2::http_do_request_timeout(\%request,\%result); # test auth
-	     $NIKTO{totalrequests}++;
+	     $NIKTO{'totalrequests'}++;
          dump_var("Auth Request",\%request);
          dump_var("Auth Response",\%result);
          if ($result{'www-authenticate'} =~ /^ntlm/i)
@@ -1591,7 +1591,7 @@ sub do_auth
             if ($#ntlm_x == 1)
             {
                LW2::http_do_request_timeout(\%request,\%result);
-	       $NIKTO{totalrequests}++;
+	       $NIKTO{'totalrequests'}++;
             }
          }
          if ($result{'www-authenticate'} eq "" &&
@@ -1605,7 +1605,7 @@ sub do_auth
             }
             # Finally repeat the check
             LW2::http_do_request_timeout(\%request,\%result); # test auth
-	    $NIKTO{totalrequests}++;
+	    $NIKTO{'totalrequests'}++;
             # and leave
             last;
          }
@@ -1732,7 +1732,7 @@ sub proxy_check
   
   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
   LW2::http_do_request_timeout(\%request,\%result);
-  $NIKTO{totalrequests}++;
+  $NIKTO{'totalrequests'}++;
   dump_var("Request Hash", \%request);
   dump_var("Result Hash", \%result);
 
@@ -1757,7 +1757,7 @@ sub proxy_check
    if ($result{'proxy-authenticate'} !~ /Basic/i)
     {
      my @x=split(/ /,$result{'proxy-authenticate'});
-     nprint("+ Proxy server uses '$x[0]' rather than 'Basic' authentication. $NIKTO{name} $NIKTO{version} can't do that.");
+     nprint("+ Proxy server uses '$x[0]' rather than 'Basic' authentication. $NIKTO{'name'} $NIKTO{'version'} can't do that.");
      exit;
     }
    
@@ -1767,7 +1767,7 @@ sub proxy_check
    LW2::http_fixup_request(\%request);
    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request,\%result);
-   $NIKTO{totalrequests}++;
+   $NIKTO{'totalrequests'}++;
    dump_var("Request Hash", \%request);
    dump_var("Result Hash", \%result);
    if ($result{'proxy-authenticate'} ne "") 
@@ -1880,7 +1880,7 @@ sub fetch
  else
  {
     LW2::http_do_request_timeout(\%request,\%result);
-    $NIKTO{totalrequests}++;
+    $NIKTO{'totalrequests'}++;
     unless (defined $CLI{'nocache'})
     {
        $CACHE{$request{whisker}->{uri}}{method}=$request{whisker}->{method};
@@ -1921,12 +1921,12 @@ sub setup_hash
    LW2::http_init_request($reqhash);
    $reqhash->{whisker}->{ssl_save_info}=1;
    $reqhash->{whisker}->{lowercase_incoming_headers}=1;
-   $reqhash->{whisker}->{timeout}=$NIKTO{timeout};
+   $reqhash->{whisker}->{timeout}=$NIKTO{'timeout'};
    if (defined $CLI{'evasion'})
    {
       $reqhash->{whisker}->{encode_anti_ids}=$CLI{'evasion'};
    }
-   $reqhash->{'User-Agent'}=$NIKTO{useragent};
+   $reqhash->{'User-Agent'}=$NIKTO{'useragent'};
    $reqhash->{whisker}->{retry}=0;
    $reqhash->{whisker}->{host} = $mark->{hostname} || $mark->{ip};
 
@@ -1994,7 +1994,7 @@ sub nfetch
    else
    {
       LW2::http_do_request_timeout(\%request,\%result);
-      $NIKTO{totalrequests}++;
+      $NIKTO{'totalrequests'}++;
       unless (defined $CLI{'nocache'})
       {
          $CACHE{$uri}{method}=$result{whisker}->{method};
@@ -2142,10 +2142,12 @@ sub version
 {
    my @NIKTOFILES=dirlist($NIKTOCONFIG{PLUGINDIR},"(^nikto|^db_)");
 
-   nprint "$DIV\n$NIKTO{name} Versions\n$DIV\n";
+   nprint "$NIKTO{'DIV'}\n";
+   nprint "$NIKTO{'name'} Versions\n";
+   nprint "$NIKTO{'DIV'}\n";
    nprint "File                               Version      Last Mod\n";
    nprint "-----------------------------      --------     ----------\n";
-   nprint "Nikto main                         $NIKTO{version}\n";
+   nprint "Nikto main                         $NIKTO{'version'}\n";
    nprint "LibWhisker                         $LW2::VERSION\n";
 
    foreach my $FILE (sort @NIKTOFILES)
@@ -2163,7 +2165,7 @@ sub version
       my $ws2=(13-length($VERS[0]));
       nprint "$FILE". " " x $ws1  . "$VERS[0]". " " x $ws2. "$modification[4]\n";
    }
-   nprint "$DIV\n";
+   nprint "$NIKTO{'DIV'}\n";
 
    exit;
 }
@@ -2294,8 +2296,8 @@ return;
 #######################################################################
 sub usage
 {
-   if ($_[0] eq 2) { nprint($NIKTO{options}); }
-   else { nprint($NIKTO{options_short}); }
+   if ($_[0] eq 2) { nprint($NIKTO{'options'}); }
+   else { nprint($NIKTO{'options_short'}); }
    exit;
 }
 #######################################################################
