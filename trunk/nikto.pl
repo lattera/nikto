@@ -11,7 +11,7 @@ Getopt::Long::Configure('no_ignore_case');
 #   $Id$                             #   
 # --------------------------------------------------------------------------- #
 ###############################################################################
-#  Copyright (C) 2004-2008 CIRT, Inc.
+#  Copyright (C) 2004-2010 CIRT, Inc.
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -42,7 +42,7 @@ Getopt::Long::Configure('no_ignore_case');
 # global var/definitions
 use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT/;
 use vars qw/%NIKTO %REALMS %NIKTOCONFIG %request %result %COUNTERS/;
-use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @BUILDITEMS $http_eol/;
+use vars qw/%db_extensions %FoF %UPDATES $DIV @DBFILE @BUILDITEMS/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE/;
 
 # setup
@@ -51,7 +51,6 @@ $DIV               = "-" x 75;
 $NIKTO{version}    = "2.1.1";
 $NIKTO{name}       = "Nikto";
 $NIKTO{configfile} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
-$http_eol          = "\r\n";
 
 # read the --config option
 {
@@ -102,8 +101,8 @@ nprint("- $NIKTO{name} v$NIKTO{version}");
 LW2::http_init_request(\%request);
 $request{'whisker'}->{'ssl_save_info'}              = 1;
 $request{'whisker'}->{'lowercase_incoming_headers'} = 1;
-$request{'whisker'}->{'timeout'}                    = $CLI{timeout} || 10;
-if (defined $CLI{evasion}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{evasion}; }
+$request{'whisker'}->{'timeout'}                    = $CLI{'timeout'} || 10;
+if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'}; }
 $request{'User-Agent'} = $NIKTO{useragent};
 $request{'whisker'}->{'retry'} = 0;
 proxy_setup();
@@ -111,7 +110,7 @@ proxy_setup();
 nprint($DIV);
 
 # No targets - quit while we're ahead
-if ($CLI{host} eq "") 
+if ($CLI{'host'} eq "") 
 { 
    nprint("+ ERROR: No host specified");
    usage(); 
@@ -121,7 +120,7 @@ $COUNTERS{hosts_total}=$COUNTERS{hosts_complete}=0;
 load_plugins();
 
 # Parse the supplied list of targets
-my @MARKS=set_targets($CLI{host}, $CLI{ports}, $CLI{ssl}, $CLI{root});
+my @MARKS=set_targets($CLI{'host'}, $CLI{'ports'}, $CLI{'ssl'}, $CLI{'root'});
 # Now check each target is real and remove duplicates/fill in extra information
 foreach my $mark (@MARKS)
 {
@@ -138,7 +137,7 @@ foreach my $mark (@MARKS)
 
    # Check that the port is open
    my $open=port_check($mark->{hostname}, $mark->{ip}, $mark->{port});
-   if (defined $CLI{vhost}) { $mark->{vhost} = $CLI{vhost} };
+   if (defined $CLI{'vhost'}) { $mark->{vhost} = $CLI{'vhost'} };
    if ($open == 0) {
       $mark->{test} = 0;
       next;
@@ -147,7 +146,7 @@ foreach my $mark (@MARKS)
 }
 
 # Open reporting
-report_head($CLI{format}, $CLI{file});
+report_head($CLI{'format'}, $CLI{'file'});
 
 # Now we've done the precursor, do the scan
 foreach my $mark (@MARKS) {
@@ -156,10 +155,10 @@ foreach my $mark (@MARKS) {
    $mark->{start_time} = time();
    # These should just be passed in the hash - but it's a lot of work to move to a local $request
    $request{whisker}->{host} = $mark->{hostname} || $mark->{ip};
-   if (defined $CLI{vhost})
+   if (defined $CLI{'vhost'})
    {
-      $request{Host} = $CLI{vhost};
-      $mark->{vhost} = $CLI{vhost};
+      $request{Host} = $CLI{'vhost'};
+      $mark->{vhost} = $CLI{'vhost'};
    }
    $request{'whisker'}->{'port'}    = $mark->{port};
    $request{'whisker'}->{'ssl'}     = $mark->{ssl};
@@ -181,7 +180,7 @@ foreach my $mark (@MARKS) {
       exit(1);
    };
    
-   if ($CLI{findonly})
+   if ($CLI{'findonly'})
    {
       my $protocol="http";
       if ($mark->{ssl}) { $protocol .= "s"; }
@@ -196,7 +195,7 @@ foreach my $mark (@MARKS) {
       dump_target_info($mark);
       report_host_start($mark);
       set_scan_items($mark);
-      unless (defined $CLI{nofof}) { map_codes() };
+      unless (defined $CLI{'nofof'}) { map_codes() };
       run_plugins($mark);
    }
    $mark->{end_time} = time();

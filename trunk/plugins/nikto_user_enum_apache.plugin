@@ -49,7 +49,7 @@ sub nikto_user_enum_apache
    my @cgiwraps, @cfgcgi=split(/ /, $VARIABLES{"\@CGIDIRS"});
    
    # Set the URL according to the mutate version
-   my @mutates=split(//,$CLI{mutate});
+   my @mutates=split(//,$CLI{'mutate'});
    foreach my $option (@mutates)
    {
       if ($option eq "3")

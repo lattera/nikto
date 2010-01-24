@@ -132,7 +132,7 @@ sub nikto_headers
    $request{'whisker'}{'version'}  = "1.0";
    delete $request{'whisker'}{'Host'};
    delete $request{'Host'};
-   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request, \%result);
    $NIKTO{totalrequests}++;
 
@@ -154,7 +154,7 @@ sub nikto_headers
    $request{'whisker'}->{'uri'}    = ".";
    $request{'whisker'}->{'method'} = "GET";
    $request{'whisker'}{'version'}  = "1.0";
-   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request, \%result);
    $NIKTO{totalrequests}++;
 

@@ -42,20 +42,20 @@ sub nikto_cgi
    my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));
    my ($res, $possiblecgidir, $found) ="";
 
-   if (defined $CLI{forcecgi} && $CLI{forcecgi} eq "all")                       # all possible CGI dirs to be "true" 
+   if (defined $CLI{'forcecgi'} && $CLI{'forcecgi'} eq "all")                       # all possible CGI dirs to be "true" 
    { 
       nprint("Using all known CGI directories\n","d");
       $VARIABLES{"\@CGIDIRS"} = join(" ",@CFGCGI); 
    }
-   elsif (defined $CLI{forcecgi} && $CLI{forcecgi} eq "none")                   # scan no CGI directories
+   elsif (defined $CLI{'forcecgi'} && $CLI{'forcecgi'} eq "none")                   # scan no CGI directories
    {
       nprint("Using no CGI directories\n","d");
       $VARIABLES{"\@CGIDIRS"} = ""; 
    }   
-   elsif (defined $CLI{forcecgi} && $CLI{forcecgi} =~ /[a-zA-Z0-9]/)            # scan a specific directory 
+   elsif (defined $CLI{'forcecgi'} && $CLI{'forcecgi'} =~ /[a-zA-Z0-9]/)            # scan a specific directory 
    {
-      nprint("Using CGI dir '$CLI{forcecgi}'\n","d");
-      $VARIABLES{"\@CGIDIRS"} = $CLI{forcecgi}; 
+      nprint("Using CGI dir \'$CLI{'forcecgi'}\'\n","d");
+      $VARIABLES{"\@CGIDIRS"} = $CLI{'forcecgi'}; 
    }
    else                                               # or normal testing of each dir 
    {
@@ -84,7 +84,7 @@ sub nikto_cgi
       {
          $VARIABLES{"\@CGIDIRS"} = join(" ",@POSSIBLECGI);
       }
-   } # end !$CLI{forcecgi}
+   } # end !$CLI{'forcecgi'}
 
    nprint("- Checking for CGI in: $VARIABLES{\"\@CGIDIRS\"}","v");
 }

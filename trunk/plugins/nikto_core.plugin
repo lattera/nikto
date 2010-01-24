@@ -99,7 +99,7 @@ sub nprint
    if ($line =~ /^+ ERROR\:/) { print STDERR "$line\n"; return; }
    
    # don't print to STDOUT if output file is "-"
-   if ($CLI{file} eq "-") { return; }
+   if ($CLI{'file'} eq "-") { return; }
 
    # print to scan details to standard output if the users wants another format and is saving results to a file
    $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
@@ -115,11 +115,11 @@ sub nprint
 sub get_ext
 {
  my $uri=$_[0] || return;
- if ($uri =~ /\/$/)        { return "DIRECTORY"; }
+ if ($uri =~ /\/$/) { return "DIRECTORY"; }
  $uri =~ s/^.*\///;
  $uri =~ s/(\?|\&|\%).*$//;
- if ($uri =~ /^\.[^.%]/)   { return "DOTFILE"; }
- if ($uri !~ /\./)      { return "NONE"; }
+ if ($uri =~ /^\.[^.%]/) { return "DOTFILE"; }
+ if ($uri !~ /\./) { return "NONE"; }
  $uri =~ s/\".*$//;
  $uri =~ s/^.*\.//;
  return $uri;
@@ -147,12 +147,11 @@ sub map_codes
  $request{'whisker'}->{'uri'} = "/";
  delete $request{'whisker'}->{'data'};
  $request{'whisker'}->{'method'} = GET;
- $request{'whisker'}->{'http_eol'}=$http_eol;
 
  delete $request{'whisker'}->{'Content-Length'};
  LW2::http_close(\%request);  # force-close any old connections
  dump_var("Request Hash", \%request);
- if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+ if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
  LW2::http_do_request_timeout(\%request,\%result);
  $NIKTO{totalrequests}++;
  dump_var("Result Hash", \%result);
@@ -163,11 +162,10 @@ sub map_codes
      {
       $request{'whisker'}->{'uri'} = $result{location};
       $request{'whisker'}->{'uri'} =~ s/^http(s)?\:\/\/$request{'whisker'}{'host'}//i;
-      $request{'whisker'}->{'http_eol'}=$http_eol;
       LW2::http_close(\%request);  # force-close any old connections
       LW2::http_fixup_request(\%request);
       dump_var("Request Hash", \%request);
-      if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+      if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
       LW2::http_do_request_timeout(\%request,\%result);
       $NIKTO{totalrequests}++;
       dump_var("Result Hash", \%result);
@@ -212,7 +210,6 @@ sub map_codes
    $NIKTO{totalrequests}++;
    $request{'whisker'}->{'uri'}    = $file;
    $request{'whisker'}->{'method'} = GET;
-   $request{'whisker'}->{'http_eol'}=$http_eol;
    LW2::http_close(\%request);  # force-close any old connections
    delete $request{'whisker'}->{'data'};
    delete $request{'Content-Encoding'};
@@ -220,24 +217,21 @@ sub map_codes
    LW2::http_fixup_request(\%request);
 
    dump_var("Request Hash", \%request);
-   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request,\%result);
    $NIKTO{totalrequests}++;
    dump_var("Result Hash", \%result);
 
    $ext=$REQS{$file};
    $FoF{$ext}{response} = $result{'whisker'}->{'code'};
-   if (defined $result{location}) 
+
+   # handle .com to .org redirs or whatnot
+   if (defined $result{location})
      { 
-   $FoF{$ext}{location} = $result{location};
-   $file=char_escape($file);
-   $FoF{$ext}{location} =~ s/$file//;
-#  if ($ext eq "php")
-#   {
-#nprint "$ext $FoF{$ext}\n";
-#nprint "loc is:$FoF{$ext}{location}\n";  exit; 
-#}
-     } # handle .com to .org redirs or whatnot
+   	$FoF{$ext}{location} = $result{location};
+   	$file=char_escape($file);
+   	$FoF{$ext}{location} =~ s/$file//;
+     }
 
    # if it is not specific type, figure out Content or HASH method...
    if    ($FoF{$ext}{response} eq 404) { $FoF{$ext}{mode} = "STD";    next; }
@@ -288,7 +282,6 @@ sub map_codes
    $NIKTO{totalrequests}++;
    $request{'whisker'}->{'uri'}    = "/index.php?";
    $request{'whisker'}->{'method'} = GET;
-   $request{'whisker'}->{'http_eol'}=$http_eol;
    LW2::http_close(\%request);  # force-close any old connections
    delete $request{'whisker'}->{'data'};
    delete $request{'Content-Encoding'};
@@ -296,7 +289,7 @@ sub map_codes
    LW2::http_fixup_request(\%request);
 
    dump_var("Request Hash", \%request);
-   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request,\%result);
    $NIKTO{totalrequests}++;
    dump_var("Result Hash", \%result);
@@ -398,8 +391,8 @@ sub dump_target_info
 
    nprint("+ Target Hostname:    $mark->{hostname}"); 
    nprint("+ Target Port:        $mark->{port}");
-   if ((defined $CLI{vhost}) && ($CLI{vhost} ne $mark->{hostname})) { 
-   		nprint("+ Virtual Host:   $CLI{vhost}"); 
+   if ((defined $CLI{'vhost'}) && ($CLI{'vhost'} ne $mark->{hostname})) { 
+   		nprint("+ Virtual Host:   $CLI{'vhost'}"); 
    }
    if (defined $request{'whisker'}->{'proxy_host'}) { 
    		nprint("- Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); 
@@ -410,16 +403,16 @@ sub dump_target_info
    if ($mark->{ssl}) { 
    		nprint($sslprint); 
    }
-   if (defined $NIKTO{anti_ids} && defined $CLI{evasion}) {
+   if (defined $NIKTO{anti_ids} && defined $CLI{'evasion'}) {
       for (my $i=1;$i<=(keys %{$NIKTO{anti_ids}});$i++) { 
-      	if ($CLI{evasion} =~ /$i/) { 
+      	if ($CLI{'evasion'} =~ /$i/) { 
       		nprint("+ Using IDS Evasion:  $NIKTO{anti_ids}{$i}"); 
       		}
       	}
    }
-      if (defined $NIKTO{mutate_opts} && defined $CLI{mutate}) {
+      if (defined $NIKTO{mutate_opts} && defined $CLI{'mutate'}) {
       for (my $i=1;$i<=(keys %{$NIKTO{mutate_opts}});$i++) { 
-      		if ($CLI{mutate} =~ /$i/) { 
+      		if ($CLI{'mutate'} =~ /$i/) { 
       			nprint("+ Using Mutation:     $NIKTO{mutate_opts}{$i}"); 
       		}
       	}
@@ -559,116 +552,115 @@ sub general_config
    ";
 
  ### CLI STUFF
- $CLI{pause}=$CLI{html}=$OUTPUT{verbose}=$CLI{skiplookup}=$NIKTO{totalrequests}=$OUTPUT{debug}=0;
- $CLI{all_options}=join(" ",@ARGV);
+ $CLI{'pause'}=$CLI{'html'}=$OUTPUT{'verbose'}=$CLI{'skiplookup'}=$NIKTO{totalrequests}=$OUTPUT{debug}=0;
+ $CLI{'all_options'}=join(" ",@ARGV);
  
  # preprocess CLI options which cannot be abbreviated
  for (my $i=0;$i<=$#ARGV;$i++)
   {
    if    ($ARGV[$i] eq '-dbcheck')  { dbcheck(); }   
    elsif ($ARGV[$i] eq '-update')   { check_updates(); }
-   elsif ($ARGV[$i] eq '-verbose')  { print STDERR "-verbose is deprecated, please  use '-D V' instead (verbose enabled)\n"; $OUTPUT{verbose}=1; $ARGV[$i]=""; }
-   elsif ($ARGV[$i] eq '-debug')    { print STDERR "-debug is deprecated, please  use '-D D' instead (debug enabled)\n";     $OUTPUT{debug}=1;   $ARGV[$i]=""; }
   }
 
  GetOptions
  (
-           "nolookup"                => \$CLI{skiplookup},
-           "config=s"                => \$CLI{config},
-           "Cgidirs=s"               => \$CLI{forcecgi},
-           "mutate=s"                => \$CLI{mutate},
+           "nolookup"                => \$CLI{'skiplookup'},
+           "config=s"                => \$CLI{'config'},
+           "Cgidirs=s"               => \$CLI{'forcecgi'},
+           "mutate=s"                => \$CLI{'mutate'},
            "mutate-options=s"        => \$CLI{'mutate-options'},
-           "id=s"                    => \$CLI{hostauth},
-           "evasion=s"               => \$CLI{evasion},
-           "port=s"                  => \$CLI{ports},
-           "findonly"                => \$CLI{findonly},
-           "root=s"                  => \$CLI{root},
-           "timeout=s"               => \$CLI{timeout},
-           "Pause=s"                 => \$CLI{pause},
-           "ssl"                     => \$CLI{ssl},
-           "nocache"                 => \$CLI{nocache},
-           "nossl"                   => \$CLI{nossl},
-           "no404"                   => \$CLI{nofof},
-           "useproxy"                => \$CLI{useproxy},
-           "Help"                    => \$CLI{help},
-           "vhost=s"                 => \$CLI{vhost},
-           "host=s"                  => \$CLI{host},
-           "output=s"                => \$CLI{file},
-           "Format=s"                => \$CLI{format},
-           "Display=s"               => \$CLI{display},
-           "Single"                  => \$CLI{Single},
-           "Tuning=s"                => \$CLI{tuning},
-           "Version"                 => \$CLI{version},
-           "Plugins=s"               => \$CLI{plugins},
+           "id=s"                    => \$CLI{'hostauth'},
+           "evasion=s"               => \$CLI{'evasion'},
+           "port=s"                  => \$CLI{'ports'},
+           "findonly"                => \$CLI{'findonly'},
+           "root=s"                  => \$CLI{'root'},
+           "timeout=s"               => \$CLI{'timeout'},
+           "Pause=s"                 => \$CLI{'pause'},
+           "ssl"                     => \$CLI{'ssl'},
+           "nocache"                 => \$CLI{'nocache'},
+           "nossl"                   => \$CLI{'nossl'},
+           "no404"                   => \$CLI{'nofof'},
+           "useproxy"                => \$CLI{'useproxy'},
+           "Help"                    => \$CLI{'help'},
+           "vhost=s"                 => \$CLI{'vhost'},
+           "host=s"                  => \$CLI{'host'},
+           "output=s"                => \$CLI{'file'},
+           "Format=s"                => \$CLI{'format'},
+           "Display=s"               => \$CLI{'display'},
+           "Single"                  => \$CLI{'Single'},
+           "Tuning=s"                => \$CLI{'tuning'},
+           "Version"                 => \$CLI{'version'},
+           "Plugins=s"               => \$CLI{'plugins'},
            "list-plugins"            => \$CLI{'list-plugins'},
  ) or usage(0);
 
- if    ($CLI{help})         { usage(2);  }
- elsif ($CLI{version})      { version(); }
- elsif ($CLI{Single})       { single();  }
+ if    ($CLI{'help'})         { usage(2);  }
+ elsif ($CLI{'version'})      { version(); }
+ elsif ($CLI{'Single'})       { single();  }
  elsif ($CLI{'list-plugins'}) { list_plugins(); }
  
  # output file
- if (!defined $CLI{format}) {
+ if (!defined $CLI{'format'}) {
     # Check what output has
-    $CLI{format} = "none";
-    if (defined $CLI{file}) {
-       $CLI{format} = lc($CLI{file});
-       $CLI{format} =~ s/(^.*\.)([^.]*$)/$2/g;
+    $CLI{'format'} = "none";
+    if (defined $CLI{'file'}) {
+       $CLI{'format'} = lc($CLI{'file'});
+       $CLI{'format'} =~ s/(^.*\.)([^.]*$)/$2/g;
     }
  }
 
- if    ($CLI{format} =~ /te?xt/i) { $CLI{format}="txt"; }
- elsif ($CLI{format} =~ /html?/i) { $CLI{format}="htm"; }
- elsif ($CLI{format} =~ /csv/i)   { $CLI{format}="csv"; }
- elsif ($CLI{format} =~ /xml/i)   { $CLI{format}="xml"; }
+ if    ($CLI{'format'} =~ /te?xt/i) { $CLI{'format'}="txt"; }
+ elsif ($CLI{'format'} =~ /html?/i) { $CLI{'format'}="htm"; }
+ elsif ($CLI{'format'} =~ /csv/i)   { $CLI{'format'}="csv"; }
+ elsif ($CLI{'format'} =~ /xml/i)   { $CLI{'format'}="xml"; }
+ elsif ($CLI{'format'} eq 'none')   { } 
  else                             { nprint("+ ERROR: Invalid output format"); exit; }
 
- if (($CLI{file} ne "") && ($CLI{format} eq "")) { nprint("+ERROR: Output file specified without a format"); exit; }
+ if (($CLI{'file'} ne "") && ($CLI{'format'} eq "")) { nprint("+ERROR: Output file specified without a format"); exit; }
  
  # verify readable dtd 
- if ($CLI{format} eq 'xml' && !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
+ if ($CLI{'format'} eq 'xml' && !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
 
  # screen output
- if (defined $CLI{display})
+ if (defined $CLI{'display'})
  {
-    if ($CLI{display} =~ /d/i)  { $OUTPUT{debug}=1; }
-    if ($CLI{display} =~ /v/i)  { $OUTPUT{verbose}=1; }
+    if ($CLI{'display'} =~ /d/i)  { $OUTPUT{debug}=1; }
+    if ($CLI{'display'} =~ /v/i)  { $OUTPUT{verbose}=1; }
  }
  
  # port(s)
- if (defined $CLI{ports})
+ if (defined $CLI{'ports'})
  {
-    $CLI{ports}=~s/^\s+//;
-    $CLI{ports}=~s/\s+$//;
-    if ($CLI{ports} =~ /[^0-9\-\, ]/) { nprint("+ ERROR: Invalid port option '$CLI{ports}'"); exit; }
+    $CLI{'ports'}=~s/^\s+//;
+    $CLI{'ports'}=~s/\s+$//;
+    if ($CLI{'ports'} =~ /[^0-9\-\, ]/) { nprint("+ ERROR: Invalid port option '$CLI{'ports'}'"); exit; }
  }
 
  # Fixup
- if (defined $CLI{root})
+ if (defined $CLI{'root'})
  {
-    $CLI{root} =~ s/\/$//;
-    if (($CLI{root} !~ /^\//) && ($CLI{root} ne "")) { $CLI{root} = "/$CLI{root}"; }
+    $CLI{'root'} =~ s/\/$//;
+    if (($CLI{'root'} !~ /^\//) && ($CLI{'root'} ne "")) { $CLI{'root'} = "/$CLI{'root'}"; }
  }
 
- if (defined $CLI{hostauth})
+ if (defined $CLI{'hostauth'})
  {
-  my @x=split(/:/,$CLI{hostauth});
+  my @x=split(/:/,$CLI{'hostauth'});
   if (($#x > 2) || ($x[0] eq ""))
-   { nprint("+ ERROR: '$CLI{hostauth}' (-i option) syntax is 'user:password' or 'user:password:domain' for host authentication."); exit;  }
+   { nprint("+ ERROR: \'$CLI{'hostauth'}\' (-i option) syntax is 'user:password' or 'user:password:domain' for host authentication."); exit;  }
  } 
 
- if (defined $CLI{evasion})
+ if (defined $CLI{'evasion'})
  {
-    $CLI{evasion}=~s/[^0-9]//g;
+    $CLI{'evasion'}=~s/[^0-9]//g;
  }
 
- if (!defined $CLI{plugins})
+ if (!defined $CLI{'plugins'})
  {
-    $CLI{plugins}="ALL";
+    $CLI{'plugins'}="ALL";
  }
 
- $NIKTO{timeout}=$CLI{timeout} || 10;
+ $NIKTO{timeout}=$CLI{'timeout'} || 10;
 
  $NIKTO{useragent}="Mozilla/4.75 ($NIKTO{name}/$NIKTO{version})";
  
@@ -677,10 +669,10 @@ sub general_config
  
  # Notices
  my $notice="";
- if (defined $CLI{root}) 
-   { $notice .= "Prepending '$CLI{root}' to requests"; }
- if ($CLI{pause} > 0) 
-   { $notice .= ", Pausing $CLI{pause} seconds per request"; }
+ if (defined $CLI{'root'}) 
+   { $notice .= "Prepending \'$CLI{'root'}\' to requests"; }
+ if ($CLI{'pause'} > 0) 
+   { $notice .= ", Pausing $CLI{'pause'} seconds per request"; }
  $notice =~ s/^, //; 
  if ($notice ne '')
    { nprint("-***** $notice *****"); }
@@ -707,7 +699,7 @@ sub resolve
    # ident is name, lookup IP
    if ($ident =~ /[^0-9\.]/)   # not an IP, assume name
    {
-      if ($CLI{skiplookup})
+      if ($CLI{'skiplookup'})
       {
          nprint("+ ERROR: -skiplookup set, but given name\n");
          exit;
@@ -744,7 +736,7 @@ sub resolve
       }
 
       $ip=$ident;
-      if (!$CLI{skiplookup}) 
+      if (!$CLI{'skiplookup'}) 
       {
          use IO::Socket;
          my $temp_ip=inet_aton($ip);
@@ -1030,9 +1022,9 @@ sub load_databases
                 $db_realms_ctr++;
               }
             # Cheat and add CLI directly to REALMS
-            if (defined $CLI{hostauth})
+            if (defined $CLI{'hostauth'})
             {
-             my @x=split(/:/,$CLI{hostauth});
+             my @x=split(/:/,$CLI{'hostauth'});
 
              $REALMS{$db_realms_ctr}{tid} = "700500";
              $REALMS{$db_realms_ctr}{realm} = (defined $x[2])?$x[2]:'@ANY';
@@ -1165,8 +1157,8 @@ sub port_check
    $m->{ssl}=0;
 
    my @checktypes=('HTTP', 'HTTPS');
-   if ($CLI{ssl}) { shift(@checktypes); }
-   if ($CLI{nossl}) { pop(@checktypes); }
+   if ($CLI{'ssl'}) { shift(@checktypes); }
+   if ($CLI{'nossl'}) { pop(@checktypes); }
 
    foreach my $method (split(/ /,$NIKTOCONFIG{CHECKMETHODS}))
    {
@@ -1207,10 +1199,10 @@ sub load_plugins
    
    # Check if running plugins is NONE - if so, don't bother initalising
    # plugins
-   if ($CLI{plugins} eq "NONE") {
+   if ($CLI{'plugins'} eq "NONE") {
       return;
    }
-   my @torun=split(/,/,$CLI{plugins});
+   my @torun=split(/,/,$CLI{'plugins'});
 
    foreach my $plugin (@pluginlist) {
       my $plugin_name = $plugin;
@@ -1419,9 +1411,9 @@ sub check_updates
  $request{'whisker'}->{'host'}=$server;
  
  for (my $i=0;$i<=$#ARGV;$i++) 
- { if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { $CLI{useproxy}=1; last; } }
+ { if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { $CLI{'useproxy'}=1; last; } }
  
- if (($NIKTOCONFIG{PROXYHOST} ne "") && ($CLI{useproxy}))
+ if (($NIKTOCONFIG{PROXYHOST} ne "") && ($CLI{'useproxy'}))
   {
    $request{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
    $request{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
@@ -1586,9 +1578,8 @@ sub do_auth
          LW2::auth_set($authtype,\%request,$REALMS{$REALM}{id},$REALMS{$REALM}{pw});
          # Path to fix short reads
          $request{'whisker'}->{allow_short_reads}=1;
-         $request{'whisker'}->{'http_eol'}=$http_eol;
          LW2::http_fixup_request(\%request);
-         if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+         if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
          LW2::http_do_request_timeout(\%request,\%result); # test auth
 	     $NIKTO{totalrequests}++;
          dump_var("Auth Request",\%request);
@@ -1717,7 +1708,7 @@ return $input;
 ###############################################################################
 sub proxy_setup
 {
-   if (!$CLI{useproxy}) { return; }
+   if (!$CLI{'useproxy'}) { return; }
 
    # HTTP proxy
    $request{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
@@ -1730,7 +1721,7 @@ sub proxy_check
 {
   my ($mark) = @_;
   
- if (defined $request{'whisker'}->{'proxy_host'} && $CLI{useproxy})  # proxy is set up
+ if (defined $request{'whisker'}->{'proxy_host'} && $CLI{'useproxy'})  # proxy is set up
  {
   LW2::http_close(\%request);  # force-close any old connections
   setup_hash(\%request, $mark);
@@ -1739,7 +1730,7 @@ sub proxy_check
  
   LW2::http_fixup_request(\%request);
   
-  if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+  if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
   LW2::http_do_request_timeout(\%request,\%result);
   $NIKTO{totalrequests}++;
   dump_var("Request Hash", \%request);
@@ -1773,9 +1764,8 @@ sub proxy_check
    # test it...
    LW2::http_close(\%request);  # force-close any old connections
    LW2::auth_set("proxy-basic",\%request,$NIKTOCONFIG{PROXYUSER},$NIKTOCONFIG{PROXYPASS});   # set auth
-   $request{'whisker'}->{'http_eol'}=$http_eol;
    LW2::http_fixup_request(\%request);
-   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    LW2::http_do_request_timeout(\%request,\%result);
    $NIKTO{totalrequests}++;
    dump_var("Request Hash", \%request);
@@ -1848,12 +1838,12 @@ sub content_present
 #######################################################################
 sub fetch
 {
- if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+ if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
  LW2::http_close(\%request);  # force-close any old connections
  $request{'whisker'}->{'uri'} = $_[0];
- if (defined $CLI{root})
+ if (defined $CLI{'root'})
  {
-    $request{'whisker'}->{'uri'}    = $CLI{root} . $_[0];   # prepend -root option value
+    $request{'whisker'}->{'uri'}    = $CLI{'root'} . $_[0];   # prepend -root option value
  }
  $request{'whisker'}->{'method'} = $_[1];
  delete $request{'whisker'}->{'data'};
@@ -1879,7 +1869,7 @@ sub fetch
  } 
  unless ($_[4]) { LW2::http_fixup_request(\%request); }
  # Cache
- if (defined($CACHE{$request{whisker}->{uri}}) && !defined($CLI{nocache}) &&
+ if (defined($CACHE{$request{whisker}->{uri}}) && !defined($CLI{'nocache'}) &&
      ($CACHE{$request{whisker}->{uri}}{method} eq $request{whisker}->{method}))
  {
     # Get from cache
@@ -1891,7 +1881,7 @@ sub fetch
  {
     LW2::http_do_request_timeout(\%request,\%result);
     $NIKTO{totalrequests}++;
-    unless (defined $CLI{nocache})
+    unless (defined $CLI{'nocache'})
     {
        $CACHE{$request{whisker}->{uri}}{method}=$request{whisker}->{method};
        $CACHE{$request{whisker}->{uri}}{res}=$result{whisker}->{code};
@@ -1904,7 +1894,7 @@ sub fetch
     }
  }
  
- if (defined $CLI{display} && ($CLI{display} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
+ if (defined $CLI{'display'} && ($CLI{'display'} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
   { 
    foreach my $c (@{$result{'whisker'}->{'cookies'}}) 
     { 
@@ -1932,9 +1922,9 @@ sub setup_hash
    $reqhash->{whisker}->{ssl_save_info}=1;
    $reqhash->{whisker}->{lowercase_incoming_headers}=1;
    $reqhash->{whisker}->{timeout}=$NIKTO{timeout};
-   if (defined $CLI{evasion})
+   if (defined $CLI{'evasion'})
    {
-      $reqhash->{whisker}->{encode_anti_ids}=$CLI{evasion};
+      $reqhash->{whisker}->{encode_anti_ids}=$CLI{'evasion'};
    }
    $reqhash->{'User-Agent'}=$NIKTO{useragent};
    $reqhash->{whisker}->{retry}=0;
@@ -1946,10 +1936,9 @@ sub setup_hash
    }
    $reqhash->{whisker}->{port} = $mark->{port};
    $reqhash->{whisker}->{ssl} = $mark->{ssl};
-   $request{'whisker'}->{'http_eol'} =$http_eol;
    
    # Proxy stuff
-   if (defined $NIKTOCONFIG{PROXYHOST} && defined $CLI{useproxy})
+   if (defined $NIKTOCONFIG{PROXYHOST} && defined $CLI{'useproxy'})
    {
       $reqhash->{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
       $reqhash->{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
@@ -1963,17 +1952,16 @@ sub setup_hash
 sub nfetch
 {
    my ($mark, $uri, $method, $data, $headers, $noclean) = @_;
-   if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+   if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
    my %request, %result;
    setup_hash(\%request, $mark);
  
    $request{whisker}->{uri} = $uri;
-   if (defined $CLI{root})
+   if (defined $CLI{'root'})
    {
-      $request{whisker}->{uri} = $CLI{root} . $uri; # prepend -root option value
+      $request{whisker}->{uri} = $CLI{'root'} . $uri; # prepend -root option value
    }
    $request{whisker}->{method} = $method;
-   $request{whisker}->{http_eol}=$http_eol;
    my $header_hash=$headers;
 
    if (defined $data)
@@ -1995,7 +1983,7 @@ sub nfetch
    unless ($noclean) { LW2::http_fixup_request(\%request); }
 
    # Cache
-   if (defined $CACHE{$uri} && !defined $CLI{nocache} &&
+   if (defined $CACHE{$uri} && !defined $CLI{'nocache'} &&
        $CACHE{$uri}{method} eq $method && $CACHE{$uri}{mark} eq $mark)
    {
       # Get from cache
@@ -2007,7 +1995,7 @@ sub nfetch
    {
       LW2::http_do_request_timeout(\%request,\%result);
       $NIKTO{totalrequests}++;
-      unless (defined $CLI{nocache})
+      unless (defined $CLI{'nocache'})
       {
          $CACHE{$uri}{method}=$result{whisker}->{method};
          $CACHE{$uri}{res}=$result{whisker}->{code};
@@ -2021,7 +2009,7 @@ sub nfetch
       }
    }
  
-   if (defined $CLI{display} && ($CLI{display} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
+   if (defined $CLI{'display'} && ($CLI{'display'} =~ /2/) && (defined($result{'whisker'}->{'cookies'})))
    { 
       foreach my $c (@{$result{'whisker'}->{'cookies'}}) 
       { 
@@ -2071,11 +2059,11 @@ sub set_scan_items
    my $add=1;
 
    # check tuning options
-   if ((defined $CLI{tuning}) && (defined $item[2]))
+   if ((defined $CLI{'tuning'}) && (defined $item[2]))
    {
       # Work out the required tuning from the CLI string
       my $exclude=0;
-      foreach my $tune (split(//,$CLI{tuning}))
+      foreach my $tune (split(//,$CLI{'tuning'}))
       {
          if ($tune eq "x")
          {
@@ -2122,7 +2110,7 @@ sub set_scan_items
   }
 
 nprint("- $mark->{total_checks} server checks loaded","v");
-if ($mark->{total_checks} eq 0 && !defined $CLI{tuning}) { nprint("+ Unable to load valid checks!"); exit; }
+if ($mark->{total_checks} eq 0 && !defined $CLI{'tuning'}) { nprint("+ Unable to load valid checks!"); exit; }
 return;
 }
 #######################################################################
@@ -2240,7 +2228,7 @@ sub send_updates
  
  for (my $i=0;$i<=$#ARGV;$i++) { 
  	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { 
- 		$CLI{useproxy}=1; 
+ 		$CLI{'useproxy'}=1; 
  		last; 
  	} 
  }
@@ -2248,7 +2236,7 @@ sub send_updates
  my  $ip=gethostbyname($server);
  if ($ip ne "") { $request{'whisker'}->{'host'}= inet_ntoa($ip); }
  else { $request{'whisker'}->{'host'}=$server; }
- if (($NIKTOCONFIG{PROXYHOST} ne "") && ($CLI{useproxy}))
+ if (($NIKTOCONFIG{PROXYHOST} ne "") && ($CLI{'useproxy'}))
 
   {
    $request{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
