@@ -1048,8 +1048,7 @@ sub dbcheck
  if ($prefix eq ""  )  { nprint "\n-->\tNikto Databases\n"; }
  if ($prefix eq "u"  ) { nprint "\n-->\tUser Databases\n"; }
 
- for my $file (@dbs) 
-  { 
+ for my $file (@dbs) { 
    my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
    if (!-r $filename) { next; }
    open(IN,"<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
@@ -1114,69 +1113,44 @@ sub dbcheck
          }
         nprint "\t$ctr entries\n";
      }
-   elsif ($file eq 'db_embedded') 
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-	   if ((count_fields($line, 1) ne 4) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
+   elsif ($file eq 'db_headers') { 
+      my $ctr=0; 
+      foreach $line (<IN>) { 
+         if ((count_fields($line) ne 0) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; } 
+         $ctr++; 
+      } 
+      nprint "\t$ctr entries\n"; 
+   } 
+   elsif ($file eq 'db_multiple_index') { 
+      my $ctr=0; 
+      foreach $line (<IN>) { 
+         if ((count_fields($line) ne 0) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; } 
+         $ctr++; 
+      } 
+      nprint "\t$ctr entries\n"; 
+   } 
+   else {
+      # It's a file of standard DB type, we can do this intelligently
+      my @headers;
+      my $ctr = 0, $fields = 0;
+      foreach $line (<IN>) {
+         # first, grab the headers
+         if ($fields == 0) {
+            $line =~ s/\#.*//;
+            next if ($line eq "");
+            @headers = parse_csv($line);
+            $fields = $#headers;
+            next;
          }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_favicon') 
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-	   if ((count_fields($line, 1) ne 2) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
+    #     nprint("Fields: $fields " . count_fields($line, 1)); 
+         if ((count_fields($line, 1) != $fields - 1) &&
+             (count_fields($line) ne '')) {
+            print STDERR "\t+ ERROR: Invalid syntax: $line";
          }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_headers')
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-           if ((count_fields($line) ne 0) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
-         }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_httpoptions')
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-           if ((count_fields($line, 1) ne 3) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
-         }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_multiple_index')
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-           if ((count_fields($line) ne 0) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
-         }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_server_msgs')
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-           if ((count_fields($line, 1) ne 2) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
-         }
-        nprint "\t$ctr entries\n";
-     }
-   elsif ($file eq 'db_subdomains')
-     {
-       my $ctr=0;
-       foreach $line (<IN>) {
-           if ((count_fields($line, 1) ne 1) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
-           $ctr++;
-         }
-        nprint "\t$ctr entries\n";
-     }
+         $ctr++;
+      }
+      nprint "\t$ctr entries\n";
+   }
 
    close(IN);  
   }
