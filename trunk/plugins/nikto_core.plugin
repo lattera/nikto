@@ -1043,9 +1043,8 @@ sub load_databases
 ###############################################################################
 sub dbcheck
 {
- my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
+ my @dbs=qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
  my $prefix = $_[0];
-
  if ($prefix eq ""  )  { nprint "\n-->\tNikto Databases\n"; }
  if ($prefix eq "u"  ) { nprint "\n-->\tUser Databases\n"; }
 
@@ -1054,31 +1053,26 @@ sub dbcheck
    my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
    if (!-r $filename) { next; }
    open(IN,"<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
-   
    nprint "Syntax Check: $filename\n";
    
    if ($file eq 'db_outdated') 
      {
-       foreach $line (<IN>)
-         {
+       foreach $line (<IN>) {
            $line =~ s/^\s+//;
            if ($line =~ /^\#/) { next; }
            chomp($line);
            if ($line eq "") { next; }
            my @L=parse_csv($line);
-           if ($line !~ /^\".*\"\,\".*\"\,\".*\"$/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            if ($#L ne 3) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            $ENTRIES{"$L[0]"}++;
          }
-
           foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
           nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
    elsif ($file eq 'db_tests') 
      {
        my %ENTRIES;
-       foreach my $line (<IN>)
-         {
+       foreach my $line (<IN>) {
            if ($line !~ /^\"/)  { next; }
            my @L=parse_csv($line);
            if ($L[4] !~ /(GET|POST|TRACE|TRACK|OPTIONS|SEARCH|INDEX)/i) { print STDERR "\t+ ERROR: Possibly invalid method: $L[4] on ($line)\n"; }
@@ -1087,16 +1081,15 @@ sub dbcheck
            if ($line !~ /^(\".*\",){11}\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            if (($L[3] =~ /^\@CG/) && ($L[3] !~ /^\@CGIDIRS/)) { print STDERR "\t+ ERROR: Possible \@CGIDIRS misspelling: $line"; }
            $ENTRIES{"$L[3],$L[4],$L[5],$L[6],$L[7],$L[8],$L[9],$L[11],$L[12]"}++;
+	   if ((count_fields($line, 1) ne 12) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
          }
-
        foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
        nprint "\t" . keys(%ENTRIES) . " entries\n";
      }
    elsif ($file eq 'db_variables') 
      {
        my $ctr=0;
-       foreach $line (<IN>)
-         {
+       foreach $line (<IN>) {
            if ($line !~ /^\@/)  { next; }
            if ($line !~ /^\@.+\=.+$/i ) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
            $ctr++;
@@ -1106,12 +1099,8 @@ sub dbcheck
    elsif ($file eq 'db_realms') 
      {
        my $ctr=0;
-       foreach $line (<IN>)
-         {
-           if ($line !~ /^\"/)  { next; }
-           chomp($line);
-           my @L=parse_csv($line);
-           if ($#L ne 4) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
+       foreach $line (<IN>) {
+	   if ((count_fields($line, 1) ne 4) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
            $ctr++;
          }
         nprint "\t$ctr entries\n";
@@ -1119,9 +1108,71 @@ sub dbcheck
    elsif ($file eq 'db_404_strings') 
      {
        my $ctr=0;
-       foreach $line (<IN>)
-         {
+       foreach $line (<IN>) {
            # not really any syntax to check
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_embedded') 
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+	   if ((count_fields($line, 1) ne 4) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_favicon') 
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+	   if ((count_fields($line, 1) ne 2) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_headers')
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+           if ((count_fields($line) ne 0) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_httpoptions')
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+           if ((count_fields($line, 1) ne 3) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_multiple_index')
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+           if ((count_fields($line) ne 0) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_server_msgs')
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+           if ((count_fields($line, 1) ne 2) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
+           $ctr++;
+         }
+        nprint "\t$ctr entries\n";
+     }
+   elsif ($file eq 'db_subdomains')
+     {
+       my $ctr=0;
+       foreach $line (<IN>) {
+           if ((count_fields($line, 1) ne 1) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line"; }
            $ctr++;
          }
         nprint "\t$ctr entries\n";
@@ -1134,6 +1185,19 @@ sub dbcheck
 
  nprint "\n";
  exit;
+}
+###############################################################################
+sub count_fields
+{
+ my $line =$_[0] || return;
+ my $checkid=$_[1] || 0;
+ if ($line !~ /^\"/) { return; }
+ chomp($line);
+ $line =~ s/\s+$//;
+ if ($line eq '') { return; }
+ my @L=parse_csv($line);
+ if ($checkid && ($L[0] ne 'nikto_id') && (($L[0] =~ /[^0-9]/) || ($L[0] eq ''))) { return -1; }
+ return $#L;
 }
 ###############################################################################
 sub get_banner
