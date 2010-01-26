@@ -419,7 +419,7 @@ sub dump_target_info
    }
    my $time=date_disp($mark->{start_time});
    nprint("+ Start Time:         $time");
-   nprint($NIKTO{'DIV');
+   nprint($NIKTO{'DIV'});
 
    if ($mark->{banner} ne "") { 
       nprint("+ Server: $mark->{banner}");
