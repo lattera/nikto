@@ -23,7 +23,7 @@
 # NOTES:
 # versions are loaded from the "db_server_msgs" file, which should be in the
 # plugins directory this plugin checks the server version to see if there are
-# any version specific items in the4 db_server_msgs this differs from
+# any version specific items in the db_server_msgs this differs from
 # nikto_outdated because that is ONLY checking to see if it is an old version,
 # whereas this checks to see if the versions match
 ###############################################################################
@@ -51,7 +51,7 @@ sub nikto_msgs
    {
       if ($mark->{banner} =~ /($item->{server})\b/i)
       {
-         add_vulnerability($mark,"$1 - $item->{message}",$item->{nikto_id},0);
+         add_vulnerability($mark, "$1 - $item->{message}", $item->{nikto_id}, $item->{osvdb});
       }
 
    }

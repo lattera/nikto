@@ -1,4 +1,5 @@
 2010-01-20 Nikto 2.1.1
+	- Ticket  95: Added support for OSVDB, now the fun bit of filling it in
         - Ticket 111: Basic syntax checks for all databases
         - Ticket 109: Added an extra optional <ssl /> element to xml output to contain the SSL date. Need to do similar for html, txt and csv
 	- Ticket 106: Shorts authentication being successful if an error is returned
