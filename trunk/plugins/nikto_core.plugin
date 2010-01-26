@@ -1142,7 +1142,6 @@ sub dbcheck
             $fields = $#headers;
             next;
          }
-    #     nprint("Fields: $fields " . count_fields($line, 1)); 
          if ((count_fields($line, 1) != $fields - 1) &&
              (count_fields($line) ne '')) {
             print STDERR "\t+ ERROR: Invalid syntax: $line";
