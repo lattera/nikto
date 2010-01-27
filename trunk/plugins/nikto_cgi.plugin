@@ -40,7 +40,7 @@ sub nikto_cgi
    my ($gotvalid,$gotinvalid)=0;
    my @POSSIBLECGI=();
    my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));
-   my ($res, $possiblecgidir, $found) ="";
+   my ($res, $content, $possiblecgidir, $found) ="";
 
    if (defined $CLI{'forcecgi'} && $CLI{'forcecgi'} eq "all")                       # all possible CGI dirs to be "true" 
    { 
@@ -61,7 +61,7 @@ sub nikto_cgi
    {
       foreach $possiblecgidir (@CFGCGI)
       {
-         ($res, $CONTENT)=nfetch($mark,$possiblecgidir,"GET");
+         ($res, $content)=nfetch($mark,$possiblecgidir,"GET");
          nprint("Checked for CGI dir\t$possiblecgidir\tgot:$res","d");
          if (content_present($res) eq TRUE)
          {

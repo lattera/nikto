@@ -49,7 +49,7 @@ sub nikto_headers
    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
    {
       (my $res, $content) = nfetch($mark,$f, "GET", "", \%headers);
-      if (defined $headers{x-powered-by}) { $xpb{ $headers{x-powered-by} } = 1; }
+      if (defined $headers{'x-powered-by'}) { $xpb{ $headers{'x-powered-by'} } = 1; }
    }
 
    foreach my $x (sort keys %xpb)
@@ -71,7 +71,7 @@ sub nikto_headers
       (my $res, $content) = nfetch($mark, $f , "GET", "", \%transheaders);
       if ($res eq "200")
       {
-         $transheaders{Translate}="f";
+         $transheaders{'Translate'}="f";
          ($res, $content) = nfetch($mark,$f . "\\", "GET", "", \%transheaders);
          if ($res eq "200")
          {
@@ -86,9 +86,9 @@ sub nikto_headers
 
    #######################################################################
    # Servlet-Engine info
-   if (defined $headers{servlet-engine})
+   if (defined $headers{'servlet-engine'})
    {
-      my $x = $headers{servlet-engine};
+      my $x = $headers{'servlet-engine'};
       $x = ~s/\(.*$//;
       $x =~ s/\s+//g;
       push(@BUILDITEMS, $x);
@@ -214,9 +214,9 @@ sub nikto_headers
    }
    
    # Now we have a header, let's check ETag for inode
-   if (defined $headers{etag})
+   if (defined $headers{'etag'})
    {
-      my $etag=$headers{etag};
+      my $etag=$headers{'etag'};
       $etag =~ s/"//g;
       my @fields = split("-",$etag);
       my $message = "ETag header found on server";

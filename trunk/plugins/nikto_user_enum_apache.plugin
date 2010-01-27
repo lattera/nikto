@@ -122,7 +122,7 @@ sub nikto_user_enum_apache_brute
    while (length($text) <= 5)
    {
       if (($ctr % 500) eq 0) { nprint("- User enumeration guess $ctr ($text)", "v"); }
-      (my $result, $content) = nfetch($mark, $url . $text, "HEAD");
+      ($result, $content) = nfetch($mark, $url . $text, "HEAD");
       my $user = nikto_user_enum_apache_check($result, $text);
       if (defined $user)
       {
@@ -163,7 +163,7 @@ sub nikto_user_enum_apache_dictionary
       s/^~//;
       if ($_ eq "" ) { next };
       if (($ctr % 500) == 0) { nprint("- User enumeration guess $ctr ($_)", "v"); }
-      (my $result, $content) = nfetch($mark, $url . $_, "HEAD");
+      ($result, $content) = nfetch($mark, $url . $_, "HEAD");
       my $user = nikto_user_enum_apache_check($result, $_);
       if ($user)
       {

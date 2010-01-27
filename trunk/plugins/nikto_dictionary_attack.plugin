@@ -66,7 +66,7 @@ sub nikto_dictionary_attack
       next if ($_ eq "" );
       my $dir=$_;
       if (($ctr % 100) == 0) { nprint("- Directory enumeration guess $ctr ($dir): /$dir/", "v"); }
-      (my $result, $content) = nfetch($mark,"/$dir/", "HEAD");
+      my ($result, $content) = nfetch($mark,"/$dir/", "HEAD");
       foreach my $found (split(/ /, $VARIABLES{"\@HTTPFOUND"}))
       {
          if ($result eq $found)
