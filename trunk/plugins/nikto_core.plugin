@@ -442,6 +442,8 @@ sub general_config
  $NIKTO{'anti_ids'}{6}="TAB as request spacer";
  $NIKTO{'anti_ids'}{7}="Change the case of the URL";
  $NIKTO{'anti_ids'}{8}="Use Windows directory separator (\\)";
+ $NIKTO{'anti_ids'}{A}="Use a carriage return (0x0d) as a request spacer";
+ $NIKTO{'anti_ids'}{B}="Use binary value 0x0b as a request spacer";
 
  $NIKTO{'mutate_opts'}{1}="Test all files with all root directories";
  $NIKTO{'mutate_opts'}{2}="Guess for password file names";
@@ -1079,6 +1081,7 @@ sub dbcheck
            if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            if ($line !~ /^(\".*\",){11}\".*\"/) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
            if (($L[3] =~ /^\@CG/) && ($L[3] !~ /^\@CGIDIRS/)) { print STDERR "\t+ ERROR: Possible \@CGIDIRS misspelling: $line"; }
+	   if ($L[1] =~ /[^0-9]/) { print STDERR "\t+ ERROR: Invalid OSVDB ID: $line"; }
            $ENTRIES{"$L[3],$L[4],$L[5],$L[6],$L[7],$L[8],$L[9],$L[11],$L[12]"}++;
 	   if ((count_fields($line, 1) ne 12) && (count_fields($line) ne '')) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
          }
