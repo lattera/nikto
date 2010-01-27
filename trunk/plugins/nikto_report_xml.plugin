@@ -93,25 +93,14 @@ sub xml_item
 ###############################################################################
 sub xml_open_templates
 {
-    my @ts        = dirlist($NIKTOCONFIG{TEMPLATEDIR});
-    my $have_cirt = 0;
-    foreach my $t (@ts)
+    foreach my $t (dirlist($NIKTOCONFIG{TEMPLATEDIR}, "xml.*"))
     {
         open(T, "<$NIKTOCONFIG{TEMPLATEDIR}/$t");
         my @TEMPLATE = <T>;
         close(T);
         my $T = join("", @TEMPLATE);
         $t =~ s/\..*$//;
-
-        # :-)
-        if ($T =~ /\s?20[0-9]{2}\s?CIRT, Inc/i) { $have_cirt = 1; }
-
         $TEMPLATES{$t} = $T;
-    }
-
-    if (!$have_cirt)
-    {
-        print "\nIt looks like you may have removed the Nikto copyright from the reports. Please remember that this program is copyrighted, takes a lot of work to maintain, and is completely free for non-commercial use.\n\nIf this message has been a mistake, please notify sullo\@cirt.net.\n\n";
     }
 
     return;
@@ -164,67 +153,45 @@ sub xml_change_vars
     }
 
     # Scanner Messages Handling
+
     if ($template =~ /\#TEMPL_SMMSG/)
     {
-        my $template_orig  = $template;
-        my $template_final = "";
-
-        if ($item->{uri} ne '') { next; }
+    	if ($item->{uri} ne '') { return $template; }
         my $OSVDB = $item->{osvdb};
         if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
-        $OSVDB_LINK = "http://osvdb.org/$OSVDB";
+        my $OSVDB_LINK = "http://osvdb.org/$OSVDB";
         $template =~ s/\#TEMPL_SMMSG/$item->{message}/;
         $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
         $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
         $template =~ s/\#ID/$item->{nikto_id}/;
-        $template_final .= $template;
-        $template = $template_orig;
-        $template = "$template_final\n";
     }
 
     # Positives Handling
     if ($template =~ /\#TEMPL_MSG/)
     {
-        my $template_orig  = $template;
-        my $template_final = "";
         if ($item->{uri} eq '') { next; }
-        foreach my $uri (split(' ',$item->{uri}))
-        {
-           $item->{uri}                     = simple_enc($item->{uri});
-           $variables{"#TEMPL_URI"}         = $uri;
-           $variables{"#TEMPL_MSG"}         = $item->{message};
-           $variables{"#TEMPL_HTTP_METHOD"} = $item->{method};
+        $variables{"#TEMPL_URI"}         = simple_enc($item->{uri});
+        $variables{"#TEMPL_MSG"}         = $item->{message};
+        $variables{"#TEMPL_HTTP_METHOD"} = $item->{method};
   
-           $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$mark->{port}$variables{\"#TEMPL_URI\"}";
-           $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
-           if ($mark->{hostname} ne "")
-           {
-               $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$mark->{port}$variables{\"#TEMPL_URI\"}";
-           }
+        $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$mark->{port}$variables{\"#TEMPL_URI\"}";
+        $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
+        if ($mark->{hostname} ne "")
+        {
+          $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$mark->{port}$variables{\"#TEMPL_URI\"}";
+        }
  
-           $OSVDB      = "";
-           $OSVDB_LINK = "";
-           foreach my $o (split(/ /, $item->{osvdb}))
-           {
-               if ($o eq "")
-               {
-                   $o = "0";
-               }
+        my $OSVDB = $item->{osvdb};
+        if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
+        my $OSVDB_LINK = "http://osvdb.org/$OSVDB";
 
-               $OSVDB      .= "$o";
-               $OSVDB_LINK .= "http://osvdb.org/$o";
-           }
+        $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
+        $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
+        $template =~ s/\#ID/$item->{nikto_id}/;
 
-           $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
-           $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
-           $template =~ s/\#ID/$item->{nikto_id}/;
-
-           foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
-           $template_final .= $template;
-           $template = $template_orig;
-       }
-       $template = "$template_final\n";
+        foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
     }
+
     return $template;
 }
 ###############################################################################
