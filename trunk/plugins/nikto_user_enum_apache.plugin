@@ -46,8 +46,9 @@ sub nikto_user_enum_apache
 {
    my ($mark) = @_;
    my $url;
-   my @cgiwraps, @cfgcgi=split(/ /, $VARIABLES{"\@CGIDIRS"});
-   
+   my @cgiwraps;
+   my @cfgcgi=split(/ /, $VARIABLES{"\@CGIDIRS"});
+
    # Set the URL according to the mutate version
    my @mutates=split(//,$CLI{'mutate'});
    foreach my $option (@mutates)
@@ -59,11 +60,11 @@ sub nikto_user_enum_apache
          if (defined $CLI{'mutate-options'})
          {
             # We have options - assume it is a dictionary attack
-            nikto_user_enum_apache_dictionary($url);
+            nikto_user_enum_apache_dictionary($url, $mark);
          }
          else
          {
-            nikto_user_enum_apache_brute($url);
+            nikto_user_enum_apache_brute($url, $mark);
          }
       }
       if ($option eq "4")
@@ -87,11 +88,11 @@ sub nikto_user_enum_apache
             if (defined $CLI{'mutate-options'})
             {
                # We have options - assume it is a dictionary attack
-               nikto_user_enum_apache_dictionary($url);
+               nikto_user_enum_apache_dictionary($url, $mark);
             }
             else
             {
-               nikto_user_enum_apache_brute($url);
+               nikto_user_enum_apache_brute($url, $mark);
             }
          }
       }
@@ -112,6 +113,8 @@ sub nikto_user_enum_apache_brute
    # combinations of usernames, but hey, then it wouldn't
    # be 'brute force' would it? (jfs)
 
+   my $url=shift;
+   my ($mark)=@_;
    my $text = "a";
    my $ctr  = 0;
    my $message="Valid users found via Apache enumeration: ";
@@ -120,7 +123,7 @@ sub nikto_user_enum_apache_brute
    while (length($text) <= 5)
    {
       if (($ctr % 500) eq 0) { nprint("- User enumeration guess $ctr ($text)", "v"); }
-      (my $result, $content) = nfetch($mark,"/~" . $text, "HEAD");
+      (my $result, $content) = nfetch($mark, $url . $text, "HEAD");
       my $user = nikto_user_enum_apache_check($result, $text);
       if (defined $user)
       {
@@ -131,7 +134,7 @@ sub nikto_user_enum_apache_brute
    }
    if ($found)
    {
-      add_vulnerability($mark, $message . join(' ',@foundusers), 999997, "637", "HEAD", "/");
+      add_vulnerability($mark, $message . join(', ',@foundusers), 999997, "637", "HEAD", "/");
    }
    
 }
@@ -139,6 +142,8 @@ sub nikto_user_enum_apache_brute
 sub nikto_user_enum_apache_dictionary
 {
    my $filename=$CLI{'mutate-options'};
+   my $url=shift;
+   my ($mark)=@_;
    my $message="Valid users found via Apache enumeration: ";
    my @foundusers=();
    my $result, $content;
@@ -159,7 +164,7 @@ sub nikto_user_enum_apache_dictionary
       s/^~//;
       if ($_ eq "" ) { next };
       if (($ctr % 500) == 0) { nprint("- User enumeration guess $ctr ($_)", "v"); }
-      (my $result, $content) = nfetch($mark,"/~" . $_, "HEAD");
+      (my $result, $content) = nfetch($mark, $url . $_, "HEAD");
       my $user = nikto_user_enum_apache_check($result, $_);
       if ($user)
       {
@@ -170,7 +175,7 @@ sub nikto_user_enum_apache_dictionary
    close(IN);
    if (scalar(@foundusers))
    {
-      add_vulnerability($mark, $message . join(' ',@foundusers), 999997, "637", "HEAD", "/");
+      add_vulnerability($mark, $message . join(', ',@foundusers), 999997, "637", "HEAD", "/");
    }
 }
 
