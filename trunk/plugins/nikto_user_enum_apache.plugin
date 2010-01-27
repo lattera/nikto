@@ -77,7 +77,6 @@ sub nikto_user_enum_apache
             if ($content =~ /check your URL/i)
             {
                push(@cgiwraps, "$curl");
-               $valid++;
             }
          }
          
@@ -118,7 +117,7 @@ sub nikto_user_enum_apache_brute
    my $text = "a";
    my $ctr  = 0;
    my $message="Valid users found via Apache enumeration: ";
-   my $result, $content;
+   my ($result, $content);
    my @foundusers=();
    while (length($text) <= 5)
    {
@@ -132,7 +131,7 @@ sub nikto_user_enum_apache_brute
       $text++;
       $ctr++;
    }
-   if ($found)
+   if (scalar(@foundusers))
    {
       add_vulnerability($mark, $message . join(', ',@foundusers), 999997, "637", "HEAD", "/");
    }
@@ -146,7 +145,7 @@ sub nikto_user_enum_apache_dictionary
    my ($mark)=@_;
    my $message="Valid users found via Apache enumeration: ";
    my @foundusers=();
-   my $result, $content;
+   my ($result, $content);
    my $ctr=0;
    
    nprint("- Enumerating Apache users (using dictionary $filename).", "v");
