@@ -24,7 +24,7 @@ sub nikto_dictionary_attack_init
 {
    my $id =
    {
-      name         => "subdomain",
+      name         => "dictionary",
       full_name    => "Dictionary attack",
       author       => "Deity",
       description  => "Attempts to dictionary attack commonly known directories/files",
