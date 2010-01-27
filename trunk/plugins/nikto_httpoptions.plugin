@@ -44,7 +44,8 @@ sub nikto_httpoptions
    (my $res, $content) = nfetch($mark,"*", "OPTIONS", "", \%headers);
    my $aoptions = "$headers{allow}, ";
    my $poptions = "$headers{public}, ";
-   my ($allow_methods, $public_methods, $txt);
+   my ($allow_methods, $public_methods);
+   my $txt = "";
    my $dbarray;
 
    $dbarray=init_db("db_httpoptions");

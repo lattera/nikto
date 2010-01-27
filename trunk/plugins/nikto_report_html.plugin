@@ -195,6 +195,4 @@ sub simple_enc
     return $var;
 }
 
-sub nikto_reports { }    # so core doesn't freak
-
 1;

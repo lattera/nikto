@@ -96,10 +96,10 @@ sub nprint
       return;
    } 
    # print errors to STDERR
-   if ($line =~ /^+ ERROR\:/) { print STDERR "$line\n"; return; }
+   if ($line =~ /^\+ ERROR\:/) { print STDERR "$line\n"; return; }
    
    # don't print to STDOUT if output file is "-"
-   if ($CLI{'file'} eq "-") { return; }
+   if ((defined $CLI{file}) && ($CLI{'file'} eq "-")) { return; }
 
    # print to scan details to standard output if the users wants another format and is saving results to a file
    $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
@@ -618,7 +618,7 @@ sub general_config
  elsif ($CLI{'format'} eq 'none')   { } 
  else                             { nprint("+ ERROR: Invalid output format"); exit; }
 
- if (($CLI{'file'} ne "") && ($CLI{'format'} eq "")) { nprint("+ERROR: Output file specified without a format"); exit; }
+ if ((defined $CLI{'file'}) && ($CLI{'format'} eq "")) { nprint("+ERROR: Output file specified without a format"); exit; }
  
  # verify readable dtd 
  if ($CLI{'format'} eq 'xml' && !-r $NIKTOCONFIG{NIKTODTD})   { nprint("+ ERROR: reading DTD"); exit; } 
@@ -767,7 +767,7 @@ sub set_targets
    my ($hostlist, $portlist, $ssl, $root)=@_;
    my $host_ctr=1;
    my @hosts=split(/,/,$hostlist);
-   my @ports=split(/,/,$portlist);
+   my @ports=split(/,/,$portlist) if defined $portlist;
    my @checkhosts;
    my @results;
    my @marks;
@@ -779,7 +779,7 @@ sub set_targets
    {
       if ($port =~ /-/)
       {
-         my $start, $end;
+         my ($start, $end);
          my @temp=split(/-/,$port);
          $start=$temp[0];
          $end=$temp[1];
@@ -1189,7 +1189,7 @@ sub get_banner
 sub port_check
 {
    my ($hostname, $ip, $port) = @_;
-   my %m, %headers;
+   my (%m, %headers);
 
    $m->{hostname}=$hostname;
    $m->{ip}=$ip;
@@ -1270,7 +1270,7 @@ sub load_plugins
             foreach my $torun_plugin (@torun) {
                if ($torun_plugin eq "ALL" ||
                    $pluginhash->{name} eq $torun_plugin) {
-                  $pluginhash->{run}=true;
+                  $pluginhash->{run}="true";
                }
             }
                
@@ -1993,7 +1993,7 @@ sub nfetch
 {
    my ($mark, $uri, $method, $data, $headers, $noclean) = @_;
    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-   my %request, %result;
+   my (%request, %result);
    setup_hash(\%request, $mark);
  
    $request{whisker}->{uri} = $uri;
