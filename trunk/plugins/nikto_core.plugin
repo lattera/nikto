@@ -2251,11 +2251,11 @@ sub send_updates
  else
   {
    $answer=read_data("\n
-   ***** Portions of the server's ident string ($updated_version)
-   are not in the Nikto database or is newer than the known string.
-   Would you like to submit this information (*no server specific data*)
-   to CIRT.net for a Nikto update (or you may email to sullo\@cirt.net)
-   (y/n)? ","");
+   *********************************************************************
+   Portions of the server's ident string ($updated_version) are not in
+   the Nikto database or is newer than the known string. Would you like
+   to submit this information (*no server specific data*) to CIRT.net
+   for a Nikto update (or you may email to sullo\@cirt.net) (y/n)? ","");
   }
 
  if ($answer !~ /y/i) { return; }
@@ -2324,11 +2324,11 @@ sub send_updates
 
  if ($CONTENT !~ /SUCCESS/) 
   { 
-   print STDERR "+ ERROR: ($RES, $CONTENT): Unable to send updated version string(s) to CIRT.net\n"; 
+   print STDERR "+ ERROR: ($RES, $CONTENT): Unable to send update info to CIRT.net\n"; 
   }
  else
   {
-   nprint "- Sent updated version string(s) to CIRT.net\n"; 
+   nprint "- Sent updated info to CIRT.net -- Thank you!\n"; 
   }
 
 return;
