@@ -20,8 +20,7 @@
 # PURPOSE:
 # Nikto core functionality
 ###############################################################################
-sub change_variables
-{
+sub change_variables {
    # $line is the unfiltered variable
    my $line=$_[0];
    my @subtests; # @subtests is the returned array of expanded variables
@@ -32,19 +31,14 @@ sub change_variables
    $line =~ s/\@HOSTNAME/$shname/g;
    $line =~ s/JUNK\(([0-9]+)\)/LW2::utils_randstr($1)/e;
 
-   if ($line !~ "\@")
-   {
+   if ($line !~ "\@") {
       push(@subtests, $line);
    }
-   else
-   {
-      foreach my $varname (keys %VARIABLES)
-      {
-         if ($line =~ "$varname")
-         {
+   else {
+      foreach my $varname (keys %VARIABLES) {
+         if ($line =~ "$varname") {
             # We've found the variable; now to expand it!
-            foreach my $value (split(/ /, $VARIABLES{$varname}))
-            {
+            foreach my $value (split(/ /, $VARIABLES{$varname})) {
                $cooked = $line;
                $cooked =~ s/$varname/$value/g;
                push(@subtests, change_variables($cooked));
@@ -57,25 +51,36 @@ sub change_variables
 }
 
 ###############################################################################
-sub is_404
-{
- my ($uri, $content, $rescode) = @_;
- $ext=get_ext($uri);
+sub is_404 {
+   my ($uri, $content, $rescode) = @_;
+   $ext=get_ext($uri);
+   my $pagenf=0;
 
- if   (($FoF{$ext}{mode} eq "STD") && (($rescode eq 401) || ($rescode eq 403) || ($rescode eq 404) || ($rescode eq 410))) { return 1; }
- elsif ($FoF{$ext}{mode} eq "STD")  { return 0; }
- elsif ($FoF{$ext}{mode} eq "REDIR") 
-  { 
-   if ($result{location} eq $FoF{$ext}{location}) { return 1; }
-  }
- elsif (($FoF{$ext}{type} eq "CONTENT")  && ($content =~ /$FoF{$ext}{match}/i))    { return 1; } 
- elsif (($FoF{$ext}{type} eq "BLANK") && ($content eq ""))                         { return 1; } 
- elsif ($FoF{$ext}{type} eq "HASH")
-   {
-     my $content=rm_active_content($content, $uri);
-     if (LW2::md4($content) eq $FoF{$ext}{match}) { return 1; } 
+   if (($FoF{$ext}{mode} eq "STD") &&
+       ($rescode =~ /4[0-9][0-9]/)) {
+      $pagenf=1;
    }
-return 0;
+   elsif ($FoF{$ext}{mode} eq "REDIR") { 
+      if ($result{location} eq $FoF{$ext}{location}) {
+         $pagenf=1;
+      }
+   }
+   elsif (($FoF{$ext}{type} eq "CONTENT") &&
+          ($content =~ /$FoF{$ext}{match}/i)) {
+      $pagenf=1;
+   } 
+   elsif (($FoF{$ext}{type} eq "BLANK") &&
+          ($content eq "")) {
+      $pagenf=1;
+   } 
+   elsif ($FoF{$ext}{type} eq "HASH") {
+      my $content=rm_active_content($content, $uri);
+      if (LW2::md4($content) eq $FoF{$ext}{match}) {
+         $pagenf=1;
+      } 
+   }
+
+   return $pagenf;
 }
 ###############################################################################
 sub nprint
