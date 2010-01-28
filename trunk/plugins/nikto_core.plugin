@@ -2178,8 +2178,7 @@ sub parse_csv
    return @new;
 }
 #######################################################################
-sub version
-{
+sub version {
    my @NIKTOFILES=dirlist($NIKTOCONFIG{PLUGINDIR},"(^nikto|^db_)");
 
    nprint "$NIKTO{'DIV'}\n";
@@ -2190,8 +2189,7 @@ sub version
    nprint "Nikto main                         $NIKTO{'version'}\n";
    nprint "LibWhisker                         $LW2::VERSION\n";
 
-   foreach my $FILE (sort @NIKTOFILES)
-   {
+   foreach my $FILE (sort @NIKTOFILES) {
       open(FI,"<$NIKTOCONFIG{PLUGINDIR}/$FILE") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$FILE': $!\n";;;
       my @F=<FI>;
       close(FI);
@@ -2334,44 +2332,41 @@ sub send_updates
 return;
 }
 #######################################################################
-sub usage
-{
-   if ($_[0] eq 2) { nprint($NIKTO{'options'}); }
-   else { nprint($NIKTO{'options_short'}); }
+sub usage {
+   if ($_[0] eq 2) {
+      nprint($NIKTO{'options'});
+   }
+   else {
+      nprint($NIKTO{'options_short'});
+   }
    exit;
 }
 #######################################################################
-sub init_db
-{
+sub init_db {
    my $dbname=$_[0];
    my $filename="$NIKTOCONFIG{PLUGINDIR}/" . $dbname;
    my (@dbarray, @headers);
    my $hashref = {};
 
    # Check that the database exists
-   unless (open(IN, "<$filename"))
-   {
+   unless (open(IN, "<$filename")) {
       nprint("+ ERROR: Unable to open database file $dbname: $!.");
       return $dbarray;
    }
 
    # Now read the header values
-   while (<IN>)
-   {
+   while (<IN>) {
       chomp;
       s/\#.*$//;
       if ($_ eq "" ) { next };
-      unless (@headers)
-      {
+      unless (@headers) {
          @headers=parse_csv($_); 
       }
-      else
-      {
+      else {
          # contents; so split them up and apply to hash
          my @contents=parse_csv($_);
          my $hashref={};
-         for (my $i=0; $i<=$#contents; $i++)
-         {
+         for (my $i=0; $i<=$#contents; $i++) {
             $hashref->{$headers[$i]} = $contents[$i];
          }
          push(@dbarray, $hashref);
@@ -2380,23 +2375,20 @@ sub init_db
    return \@dbarray;
 }
 #######################################################################
-sub add_vulnerability
-{
+sub add_vulnerability {
    my ($mark, $message, $nikto_id, $osvdb, $method, $uri) = @_;
    $uri="/" unless (defined $uri);
    $method="GET" unless (defined $method);
    $osvdb="0" unless (defined $osvdb);
 
    my $result="";
-   if (defined $_[7])
-   {
+   if (defined $_[7]) {
       $result=$_[7]->{whisker}->{data};
    }
    my $outmessage=$message;
    my $resulthash={};
 
-   unless ($osvdb eq "")
-   {
+   unless ($osvdb eq "0") {
       $outmessage ="OSVDB-$osvdb: $message";
    }
    nprint("+ $outmessage"); 
