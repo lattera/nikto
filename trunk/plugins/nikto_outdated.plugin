@@ -119,19 +119,21 @@ sub nikto_outdated
 sub vereval
 {
     # split both by last char of @_[0], as it is the name to version separator
-    my $sepr = substr($_[2], (length($sepr) - 1), 1);
+    my $sepr = substr($_[2], (length($_[2]) - 1), 1);
     nprint("nikto_outdated.plugin: verstring: $_[2], sepr:$sepr", "d");
 
-    $CURRENT = lc($_[0]);
-    $RUNNING = lc($_[1]);
+    my $CURRENT = lc($_[0]);
+    my $RUNNING = lc($_[1]);
+    my $CURRENT_ORIG = $CURRENT;
+    my $RUNNING_ORIG = $RUNNING;
     my $mark=$_[3];
 
     nprint("nikto_outdated.plugin: \$CURRENT:$CURRENT:\$RUNNING:$RUNNING:", "d");
 
     my @T = split(/$sepr/, $CURRENT);
-    my $CURRENT = $T[$#T];    # should be version...
+    $CURRENT = $T[$#T];    # should be version...
     @T = split(/$sepr/, $RUNNING);
-    my $RUNNING = $T[$#T];    # should be version...
+    $RUNNING = $T[$#T];    # should be version...
 
     # convert alphas to numerics so we can do a real comparison
     $CURRENT =~ s/([^0-9\.]){1}/"." . ord($1) . "."/eg;
@@ -145,7 +147,7 @@ sub vereval
 
     nprint("nikto_outdated.plugin: \$CURRENT:$CURRENT:\$RUNNING:$RUNNING\: (after numberifcation)", "d");
 
-    if (($CUR_ORIG !~ /[a-zA-Z]/) && ($RUN_ORIG !~ /[a-zA-Z]/))
+    if (($CURRENT_ORIG !~ /[a-z]/) && ($RUNNING_ORIG !~ /[a-z]/))
     {
         @CUR = split(/\./, $CURRENT);
         @RUN = split(/\./, $RUNNING);
