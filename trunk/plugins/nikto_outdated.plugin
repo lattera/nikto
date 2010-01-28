@@ -160,7 +160,7 @@ sub vereval
     # Check to see whether the arrays both have the same length
     if (scalar(@RUN) != scalar(@CUR))
     {
-       add_vulnerability($mark, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING while the database has: $CURRENT. This may cause false positives.",699999,0,"HEAD");
+       add_vulnerability($mark, "Number of sections in the version string differ from those in the database, the server reports: $RUNNING_ORIG while the database has: $CURRENT. This may cause false positives.",699999,0,"HEAD");
     }
 
     # start with 0... eval each in turn...
