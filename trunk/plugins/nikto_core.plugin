@@ -1200,6 +1200,12 @@ sub port_check
    my ($hostname, $ip, $port) = @_;
    my (%m, %headers);
 
+   # Check SKIPPORTS
+   if ($NIKTOCONFIG{'SKIPPORTS'} =~ /\b$port\b/) {
+   	nprint("+ ERROR: SKIPPORTS (nikto.conf) contains $port -- not checking");
+	return 0;
+	}
+
    $m->{hostname}=$hostname;
    $m->{ip}=$ip;
    $m->{port}=$port;

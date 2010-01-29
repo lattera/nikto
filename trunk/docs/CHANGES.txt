@@ -1,21 +1,23 @@
 2010-01-20 Nikto 2.1.1
-	- Moved User-Agent string to nikto.conf
-	- Added dynamic variables to User-Agent (Testid, Evasion methods)
-	- Reporting: simplify xml/html code, fix a bug when a space is in the uri, and load ony needed templates
-	- Enable 2 new LW evasion tacticts (carriage return or binary value as request spacer)
-	- Ticket  95: Added support for OSVDB, now the fun bit of filling it in
+	- Ticket 117: Fixed SKIPPORTS
+	- Ticket 116: Moved User-Agent string to nikto.conf
+	- Ticket 116: Added dynamic variables to User-Agent (Testid, Evasion methods)
+	- Ticket 95: Added support for OSVDB, now the fun bit of filling it in
         - Ticket 111: Basic syntax checks for all databases
         - Ticket 109: Added an extra optional <ssl /> element to xml output to contain the SSL date. Need to do similar for html, txt and csv
 	- Ticket 106: Shorts authentication being successful if an error is returned
 	- Ticket 107: Support for short reads in LW2.5
         - Ticket 98: If -Format is missed guess the format based on file extension in -output. Default is none if -output is omitted.
-	- Added support to select plugins via -Plugins and -list-plugins option to list current plugins
-	- Major bug fix for proxy usage
 	- Ticket 96: Multiple index file enhancements for groups and better unique file identification
 	- Ticket 103: <description> content in xml report is now wrapped in CDATA 
 	- Ticket 110: Mutate now respects db variables
 	- Ticket 97: Fix for response caching
 	- Ticket 99: Spelling disagreements between Brits and Americans
+	- Removed NMAP and NMAPOPTS from nikto.conf as it is no longer used/supported
+	- Reporting: simplify xml/html code, fix a bug when a space is in the uri, and load ony needed templates
+	- Enable 2 new LW evasion tacticts (carriage return or binary value as request spacer)
+	- Added support to select plugins via -Plugins and -list-plugins option to list current plugins
+	- Major bug fix for proxy usage
 	- Don't report p3p header as unusual
 	- Various changes to aid future binary db usage for mutates
 	- Various changes to aid future multi-threading
