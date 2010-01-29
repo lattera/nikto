@@ -50,7 +50,7 @@ sub nikto_dictionary_attack
    }
 
    # Record the host for future use
-   my $host=$mark->{hostname};
+   my $host=$mark->{'hostname'};
 
    nprint("- Guessing directories/files (using dictionary $dictfile).", "v");
    unless (open(IN, "<$dictfile"))

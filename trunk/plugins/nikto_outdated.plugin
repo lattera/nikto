@@ -43,36 +43,36 @@ sub nikto_outdated
 
     # populate @BUILDITEMS with appropriate values
     # if Apache, split on space...
-    if ($mark->{banner} =~ /apache/i)
+    if ($mark->{'banner'} =~ /apache/i)
     {
-        push(@BUILDITEMS, (split(/ /, $mark->{banner})));
-    } elsif ($mark->{banner} =~ /weblogic/i)    # strip all the date info...
+        push(@BUILDITEMS, (split(/ /, $mark->{'banner'})));
+    } elsif ($mark->{'banner'} =~ /weblogic/i)    # strip all the date info...
     {
-        my @T = split(/ /, $mark->{banner});
+        my @T = split(/ /, $mark->{'banner'});
         push(@BUILDITEMS, "$T[0]\/$T[1]");
-    } elsif ($mark->{banner} =~ /sitescope/i)    # strip all the date info...
+    } elsif ($mark->{'banner'} =~ /sitescope/i)    # strip all the date info...
     {
-        my @T = split(/ /, $mark->{banner});
+        my @T = split(/ /, $mark->{'banner'});
         push(@BUILDITEMS, "$T[0]");
     } else
     {
-        if ($mark->{banner} !~ /\s/)             # has no spaces
+        if ($mark->{'banner'} !~ /\s/)             # has no spaces
         {
-            $MATCHSTRING = $mark->{banner};
-        } elsif ($mark->{banner} =~ /\//)        # has spaces and / sepr
+            $MATCHSTRING = $mark->{'banner'};
+        } elsif ($mark->{'banner'} =~ /\//)        # has spaces and / sepr
         {
-            $MATCHSTRING = $mark->{banner};
+            $MATCHSTRING = $mark->{'banner'};
             $MATCHSTRING =~ s/\s+//g;
         } else                                                                            # must create  sepr
         {
             # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)
-            my $sepr = $mark->{banner};
+            my $sepr = $mark->{'banner'};
             $sepr =~ s/[a-zA-Z0-9\.\(\)]//gi;
             $sepr = substr($sepr, (length($sepr) - 1), 1);
 
             # $sepr=~ s/\s+/ /g;
             # break up ID string on $sepr
-            my @T = split(/$sepr/, $mark->{banner});
+            my @T = split(/$sepr/, $mark->{'banner'});
 
             # assume last is version...
             for ($i = 0 ; $i < $#T ; $i++) { $MATCHSTRING .= "$T[$i] "; }
@@ -107,7 +107,7 @@ sub nikto_outdated
                     $msg =~ s/\@RUNNING_VER/$BI/g;
                     $msg =~ s/\@CURRENT_VER/$v/g;
                     chomp($msg);
-                    add_vulnerability($mark,$msg, $OVERS{$V}{tid},0,"HEAD");
+                    add_vulnerability($mark,$msg, $OVERS{$V}{'tid'},0,"HEAD");
                 }
             }
         }

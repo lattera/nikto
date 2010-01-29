@@ -43,7 +43,7 @@ sub nikto_subdomain
    my $dbarray = init_db("db_subdomains");
 
    # Record the host for future use
-   my $host=$mark->{hostname};
+   my $host=$mark->{'hostname'};
 
    # Check whether the host is an IP address
    if ($host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/)
@@ -67,18 +67,18 @@ sub nikto_subdomain
    {
       # Use fetch to minimize extra code
       # First we need to mangle the host.
-      my $newhost=$item->{subdomain} . "." . $host;
-      $request{whisker}{host} = $newhost;
+      my $newhost=$item->{'subdomain'} . "." . $host;
+      $request{'whisker'}{'host'} = $newhost;
       my ($result, $content) = fetch("/", "HEAD", "", "subdomain");
 
-      if ($result{whisker}{error} eq "")
+      if ($result{'whisker'}{'error'} eq "")
       {
-         add_vulnerability($mark,"Subdomain $item->{subdomain} found", $item->{nikto_id}, 0);
+         add_vulnerability($mark,"Subdomain $item->{'subdomain'} found", $item->{'nikto_id'}, 0);
       } # End if
 
    } # End foreach
    # Reset $request - we need to localise $request!
-   $request{whisker}{host}=$host; 
+   $request{'whisker'}{'host'}=$host; 
    if (!$nocache_enabled) { undef $CLI{'nocache'}; }
 } # End sub
 

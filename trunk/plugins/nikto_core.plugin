@@ -26,8 +26,8 @@ sub change_variables {
    my @subtests; # @subtests is the returned array of expanded variables
    my $cooked;
 
-   my $shname=$mark->{hostname} || $mark->{ip};
-   $line =~ s/\@IP/$mark->{ip}/g;
+   my $shname=$mark->{'hostname'} || $mark->{'ip'};
+   $line =~ s/\@IP/$mark->{'ip'}/g;
    $line =~ s/\@HOSTNAME/$shname/g;
    $line =~ s/JUNK\(([0-9]+)\)/LW2::utils_randstr($1)/e;
 
@@ -56,26 +56,26 @@ sub is_404 {
    $ext=get_ext($uri);
    my $pagenf=0;
 
-   if (($FoF{$ext}{mode} eq "STD") &&
+   if (($FoF{$ext}{'mode'} eq "STD") &&
        ($rescode =~ /4[0-9][0-9]/)) {
       $pagenf=1;
    }
-   elsif ($FoF{$ext}{mode} eq "REDIR") { 
-      if ($result{location} eq $FoF{$ext}{location}) {
+   elsif ($FoF{$ext}{'mode'} eq "REDIR") { 
+      if ($result{'location'} eq $FoF{$ext}{'location'}) {
          $pagenf=1;
       }
    }
-   elsif (($FoF{$ext}{type} eq "CONTENT") &&
-          ($content =~ /$FoF{$ext}{match}/i)) {
+   elsif (($FoF{$ext}{'type'} eq "CONTENT") &&
+          ($content =~ /$FoF{$ext}{'match'}/i)) {
       $pagenf=1;
    } 
-   elsif (($FoF{$ext}{type} eq "BLANK") &&
+   elsif (($FoF{$ext}{'type'} eq "BLANK") &&
           ($content eq "")) {
       $pagenf=1;
    } 
-   elsif ($FoF{$ext}{type} eq "HASH") {
+   elsif ($FoF{$ext}{'type'} eq "HASH") {
       my $content=rm_active_content($content, $uri);
-      if (LW2::md4($content) eq $FoF{$ext}{match}) {
+      if (LW2::md4($content) eq $FoF{$ext}{'match'}) {
          $pagenf=1;
       } 
    }
@@ -90,11 +90,11 @@ sub nprint
    # don't print debug & verbose to output file...
    if (defined $_[1])
    {
-      if ($_[1] eq "d" && $OUTPUT{debug})
+      if ($_[1] eq "d" && $OUTPUT{'debug'})
       { 
          print "D:" . localtime() . " $line\n";
       }
-      if ($_[1] eq "v" && $OUTPUT{verbose})
+      if ($_[1] eq "v" && $OUTPUT{'verbose'})
       { 
          print "V:" . localtime() . " $line\n";
       }
@@ -104,7 +104,7 @@ sub nprint
    if ($line =~ /^\+ ERROR\:/) { print STDERR "$line\n"; return; }
    
    # don't print to STDOUT if output file is "-"
-   if ((defined $CLI{file}) && ($CLI{'file'} eq "-")) { return; }
+   if ((defined $CLI{'file'}) && ($CLI{'file'} eq "-")) { return; }
 
    # print to scan details to standard output if the users wants another format and is saving results to a file
    $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
@@ -160,12 +160,12 @@ sub map_codes
  LW2::http_do_request_timeout(\%request,\%result);
  $NIKTO{'totalrequests'}++;
  dump_var("Result Hash", \%result);
- if (defined $result{location}) 
+ if (defined $result{'location'}) 
   { 
-   nprint("- Root page / redirects to: $result{location}");
-    if ($result{location} =~ /^$request{'whisker'}{'host'}/i) # same host
+   nprint("- Root page / redirects to: $result{'location'}");
+    if ($result{'location'} =~ /^$request{'whisker'}{'host'}/i) # same host
      {
-      $request{'whisker'}->{'uri'} = $result{location};
+      $request{'whisker'}->{'uri'} = $result{'location'};
       $request{'whisker'}->{'uri'} =~ s/^http(s)?\:\/\/$request{'whisker'}{'host'}//i;
       LW2::http_close(\%request);  # force-close any old connections
       LW2::http_fixup_request(\%request);
@@ -177,25 +177,25 @@ sub map_codes
      }
     else  # different host... ugh... guess
      {
-      $FoF{okay}{response}=200;
-      $FoF{okay}{type}="STD";
+      $FoF{'okay'}{'response'}=200;
+      $FoF{'okay'}{'type'}="STD";
      }
   }
  else
   {
-   $FoF{okay}{response}=$result{'whisker'}->{'code'};
+   $FoF{'okay'}{'response'}=$result{'whisker'}->{'code'};
    my $content=rm_active_content($result{'whisker'}->{'data'});
-   $FoF{okay}{type}="HASH";
-   $FoF{okay}{match}=LW2::md4($content);
+   $FoF{'okay'}{'type'}="HASH";
+   $FoF{'okay'}{'match'}=LW2::md4($content);
   }
 
  # these are some used in mutate that may not be in the db_tests
- $db_extensions{bak}=1;
- $db_extensions{data}=1;
- $db_extensions{dbc}=1;
- $db_extensions{dbf}=1;
- $db_extensions{lst}=1;
- $db_extensions{htx}=1;
+ $db_extensions{'bak'}=1;
+ $db_extensions{'data'}=1;
+ $db_extensions{'dbc'}=1;
+ $db_extensions{'dbf'}=1;
+ $db_extensions{'lst'}=1;
+ $db_extensions{'htx'}=1;
 
  foreach my $ext (keys %db_extensions) 
    {
@@ -228,28 +228,28 @@ sub map_codes
    dump_var("Result Hash", \%result);
 
    $ext=$REQS{$file};
-   $FoF{$ext}{response} = $result{'whisker'}->{'code'};
+   $FoF{$ext}{'response'} = $result{'whisker'}->{'code'};
 
    # handle .com to .org redirs or whatnot
-   if (defined $result{location})
+   if (defined $result{'location'})
      { 
-   	$FoF{$ext}{location} = $result{location};
+   	$FoF{$ext}{'location'} = $result{'location'};
    	$file=char_escape($file);
-   	$FoF{$ext}{location} =~ s/$file//;
+   	$FoF{$ext}{'location'} =~ s/$file//;
      }
 
    # if it is not specific type, figure out Content or HASH method...
-   if    ($FoF{$ext}{response} eq 404) { $FoF{$ext}{mode} = "STD";    next; }
-   elsif ($FoF{$ext}{response} eq 200) { $FoF{$ext}{mode} = "OK";     }
-   elsif ($FoF{$ext}{response} eq 410) { $FoF{$ext}{mode} = "STD";    next; }
-   elsif ($FoF{$ext}{response} eq 401) { $FoF{$ext}{mode} = "STD";    next; }
-   elsif ($FoF{$ext}{response} eq 403) { $FoF{$ext}{mode} = "STD";    next; }
-   elsif ($FoF{$ext}{response} eq 300) { $FoF{$ext}{mode} = "REDIR";  next; }
-   elsif ($FoF{$ext}{response} eq 301) { $FoF{$ext}{mode} = "REDIR";  next; }
-   elsif ($FoF{$ext}{response} eq 302) { $FoF{$ext}{mode} = "REDIR";  next; }
-   elsif ($FoF{$ext}{response} eq 303) { $FoF{$ext}{mode} = "REDIR";  next; }
-   elsif ($FoF{$ext}{response} eq 307) { $FoF{$ext}{mode} = "REDIR";  next; }
-   else  { $FoF{$ext}{mode} = "OTHER";  }
+   if    ($FoF{$ext}{'response'} eq 404) { $FoF{$ext}{'mode'} = "STD";    next; }
+   elsif ($FoF{$ext}{'response'} eq 200) { $FoF{$ext}{'mode'} = "OK";     }
+   elsif ($FoF{$ext}{'response'} eq 410) { $FoF{$ext}{'mode'} = "STD";    next; }
+   elsif ($FoF{$ext}{'response'} eq 401) { $FoF{$ext}{'mode'} = "STD";    next; }
+   elsif ($FoF{$ext}{'response'} eq 403) { $FoF{$ext}{'mode'} = "STD";    next; }
+   elsif ($FoF{$ext}{'response'} eq 300) { $FoF{$ext}{'mode'} = "REDIR";  next; }
+   elsif ($FoF{$ext}{'response'} eq 301) { $FoF{$ext}{'mode'} = "REDIR";  next; }
+   elsif ($FoF{$ext}{'response'} eq 302) { $FoF{$ext}{'mode'} = "REDIR";  next; }
+   elsif ($FoF{$ext}{'response'} eq 303) { $FoF{$ext}{'mode'} = "REDIR";  next; }
+   elsif ($FoF{$ext}{'response'} eq 307) { $FoF{$ext}{'mode'} = "REDIR";  next; }
+   else  { $FoF{$ext}{'mode'} = "OTHER";  }
 
    # if we've got an OK/OTHER response, look at content first
    my $done=0;
@@ -259,8 +259,8 @@ sub map_codes
         nprint ("- Testing error string: $ERRSTRINGS{$string}","d");
         if ($result{'whisker'}->{'data'} =~ /$ERRSTRINGS{$string}/i)
         {
-          $FoF{$ext}{type}="CONTENT";
-          $FoF{$ext}{match}=$ERRSTRINGS{$string};
+          $FoF{$ext}{'type'}="CONTENT";
+          $FoF{$ext}{'match'}=$ERRSTRINGS{$string};
           $done=1;
           last;
          }
@@ -270,15 +270,15 @@ sub map_codes
      {
       if (length($result{'whisker'}->{'data'}) eq 0) # blank content
        {
-        $FoF{$ext}{type}="BLANK";
-        $FoF{$ext}{match}="";
+        $FoF{$ext}{'type'}="BLANK";
+        $FoF{$ext}{'match'}="";
         $done=1;
        }
       if (!$done)  # md4!
       { 
        my $content=rm_active_content($result{'whisker'}->{'data'});
-       $FoF{$ext}{match}=LW2::md4($content);
-       $FoF{$ext}{type}="HASH";
+       $FoF{$ext}{'match'}=LW2::md4($content);
+       $FoF{$ext}{'type'}="HASH";
       }
      }
   }
@@ -300,10 +300,10 @@ sub map_codes
    dump_var("Result Hash", \%result);
 
    my $content=rm_active_content($result{'whisker'}->{'data'});
-   $FoF{"index.php"}{match}=LW2::md4($content);
-   $FoF{"index.php"}{type}="HASH";
+   $FoF{"index.php"}{'match'}=LW2::md4($content);
+   $FoF{"index.php"}{'type'}="HASH";
 
- # foreach $ext (keys %FoF)   { nprint "$ext: mode $FoF{$ext}{mode}, response $FoF{$ext}{response}, type $FoF{$ext}{type}\n"; }
+ # foreach $ext (keys %FoF)   { nprint "$ext: mode $FoF{$ext}{'mode'}, response $FoF{$ext}{'response'}, type $FoF{$ext}{'type'}\n"; }
 return;
 }
 ###############################################################################

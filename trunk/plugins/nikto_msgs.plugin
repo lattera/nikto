@@ -49,15 +49,15 @@ sub nikto_msgs
 
    foreach my $item (@$dbarray)
    {
-      if ($mark->{banner} =~ /($item->{server})\b/i)
+      if ($mark->{'banner'} =~ /($item->{'server'})\b/i)
       {
-         add_vulnerability($mark, "$1 - $item->{message}", $item->{nikto_id}, $item->{osvdb});
+         add_vulnerability($mark, "$1 - $item->{'message'}", $item->{'nikto_id'}, $item->{'osvdb'});
       }
 
    }
    # Special stuff to pull information from results 
    # McAfee ePO 
-   if ($mark->{banner} =~ /(Agent-ListenServer-HttpSvr\/1\.0)\b/i) 
+   if ($mark->{'banner'} =~ /(Agent-ListenServer-HttpSvr\/1\.0)\b/i) 
    { 
       my ($RES, $CONTENT) = nfetch($mark, "/", "GET", "", "", "", "msgs: Agent-ListenServer-HttpSvr"); 
       next unless ($RES == 200); 
@@ -69,7 +69,7 @@ sub nikto_msgs
       add_vulnerability($mark,"Web server is a McAfee ePO agent, showing the hostname is $name and the ePO server is $eposerver.",80100,0);      
    } 
    # HP WBEM 
-   if ($mark->{banner} =~ /(CompaqHTTPServer)/i) 
+   if ($mark->{'banner'} =~ /(CompaqHTTPServer)/i) 
    { 
       my ($RES, $CONTENT) = nfetch($mark, "/cpqlogin.htm", "GET", "", "", "", "msgs: CompaqHTTPServer"); 
       next unless ($RES == 200); 

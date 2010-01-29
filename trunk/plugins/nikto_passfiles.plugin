@@ -59,19 +59,19 @@ sub nikto_passfiles
             # dir/file
             $mctr++;
             $m_test++;
-            $TESTS{$m_test}{uri}         = LW2::uri_normalize("$dir$f");
-            $TESTS{$m_test}{message}     = "URL created via password mutate option.";
-            $TESTS{$m_test}{match_1}     = 200;
-            $TESTS{$m_test}{match_1_and} = "";
-            $TESTS{$m_test}{match_1_or}  = "";
-            $TESTS{$m_test}{fail_1}      = "";
-            $TESTS{$m_test}{fail_2}      = "";
-            $TESTS{$m_test}{method}      = "GET";
-            $TESTS{$m_test}{data}        = "";
-            $TESTS{$m_test}{headers}     = "";
-            $TESTS{$m_test}{category}    = 1;
-            $TESTS{$m_test}{osvdb}       = 3092;
-            $TESTS{$m_test}{server}      = "generic";
+            $TESTS{$m_test}{'uri'}         = LW2::uri_normalize("$dir$f");
+            $TESTS{$m_test}{'message'}     = "URL created via password mutate option.";
+            $TESTS{$m_test}{'match_1'}     = 200;
+            $TESTS{$m_test}{'match_1_and'} = "";
+            $TESTS{$m_test}{'match_1_or'}  = "";
+            $TESTS{$m_test}{'fail_1'}      = "";
+            $TESTS{$m_test}{'fail_2'}      = "";
+            $TESTS{$m_test}{'method'}      = "GET";
+            $TESTS{$m_test}{'data'}        = "";
+            $TESTS{$m_test}{'headers'}     = "";
+            $TESTS{$m_test}{'category'}    = 1;
+            $TESTS{$m_test}{'osvdb'}       = 3092;
+            $TESTS{$m_test}{'server'}      = "generic";
 
             foreach $ext (@EXTS)
             {
@@ -79,19 +79,19 @@ sub nikto_passfiles
                 # dir/file.ext
                 $mctr++;
                 $m_test++;
-                $TESTS{$m_test}{uri}         = LW2::uri_normalize("$dir$f.$ext");
-                $TESTS{$m_test}{message}     = "URL created via password mutate option.";
-                $TESTS{$m_test}{match_1}     = 200;
-                $TESTS{$m_test}{match_1_and} = "";
-                $TESTS{$m_test}{match_1_or}  = "";
-                $TESTS{$m_test}{fail_1}      = "";
-                $TESTS{$m_test}{fail_2}      = "";
-                $TESTS{$m_test}{method}      = "GET";
-                $TESTS{$m_test}{data}        = "";
-                $TESTS{$m_test}{headers}     = "";
-                $TESTS{$m_test}{category}    = 1;
-                $TESTS{$m_test}{osvdb}       = 3092;
-                $TESTS{$m_test}{server}      = "generic";
+                $TESTS{$m_test}{'uri'}         = LW2::uri_normalize("$dir$f.$ext");
+                $TESTS{$m_test}{'message'}     = "URL created via password mutate option.";
+                $TESTS{$m_test}{'match_1'}     = 200;
+                $TESTS{$m_test}{'match_1_and'} = "";
+                $TESTS{$m_test}{'match_1_or'}  = "";
+                $TESTS{$m_test}{'fail_1'}      = "";
+                $TESTS{$m_test}{'fail_2'}      = "";
+                $TESTS{$m_test}{'method'}      = "GET";
+		$TESTS{$m_test}{'data'}        = "";
+                $TESTS{$m_test}{'headers'}     = "";
+                $TESTS{$m_test}{'category'}    = 1;
+                $TESTS{$m_test}{'osvdb'}       = 3092;
+                $TESTS{$m_test}{'server'}      = "generic";
 
                 foreach my $cgi (@CGIDIRS)
                 {
@@ -99,36 +99,36 @@ sub nikto_passfiles
                     # dir/file.ext
                     $mctr++;
                     $m_test++;
-                    $TESTS{$m_test}{uri}         = LW2::uri_normalize("$cgi$dir$f.$ext");
-                    $TESTS{$m_test}{message}     = "URL created via password mutate option.";
-                    $TESTS{$m_test}{match_1}     = 200;
-                    $TESTS{$m_test}{match_1_and} = "";
-                    $TESTS{$m_test}{match_1_or}  = "";
-                    $TESTS{$m_test}{fail_1}      = "";
-                    $TESTS{$m_test}{fail_2}      = "";
-                    $TESTS{$m_test}{method}      = "GET";
-                    $TESTS{$m_test}{data}        = "";
-                    $TESTS{$m_test}{headers}     = "";
-                    $TESTS{$m_test}{category}    = 1;
-                    $TESTS{$m_test}{osvdb}       = 3092;
-                    $TESTS{$m_test}{server}      = "generic";
+                    $TESTS{$m_test}{'uri'}         = LW2::uri_normalize("$cgi$dir$f.$ext");
+                    $TESTS{$m_test}{'message'}     = "URL created via password mutate option.";
+                    $TESTS{$m_test}{'match_1'}     = 200;
+                    $TESTS{$m_test}{'match_1_and'} = "";
+                    $TESTS{$m_test}{'match_1_or'}  = "";
+                    $TESTS{$m_test}{'fail_1'}      = "";
+                    $TESTS{$m_test}{'fail_2'}      = "";
+                    $TESTS{$m_test}{'method'}      = "GET";
+                    $TESTS{$m_test}{'data'}        = "";
+                    $TESTS{$m_test}{'headers'}     = "";
+                    $TESTS{$m_test}{'category'}    = 1;
+                    $TESTS{$m_test}{'osvdb'}       = 3092;
+                    $TESTS{$m_test}{'server'}      = "generic";
 
                     # dir/file
                     $mctr++;
                     $m_test++;
-                    $TESTS{$m_test}{uri}         = LW2::uri_normalize("$cgi$dir$f");
-                    $TESTS{$m_test}{message}     = "URL created via password mutate option.";
-                    $TESTS{$m_test}{match_1}     = 200;
-                    $TESTS{$m_test}{match_1_and} = "";
-                    $TESTS{$m_test}{match_1_or}  = "";
-                    $TESTS{$m_test}{fail_1}      = "";
-                    $TESTS{$m_test}{fail_2}      = "";
-                    $TESTS{$m_test}{method}      = "GET";
-                    $TESTS{$m_test}{data}        = "";
-                    $TESTS{$m_test}{headers}     = "";
-                    $TESTS{$m_test}{category}    = 1;
-                    $TESTS{$m_test}{osvdb}       = 3092;
-                    $TESTS{$m_test}{server}      = "generic";
+                    $TESTS{$m_test}{'uri'}         = LW2::uri_normalize("$cgi$dir$f");
+                    $TESTS{$m_test}{'message'}     = "URL created via password mutate option.";
+                    $TESTS{$m_test}{'match_1'}     = 200;
+                    $TESTS{$m_test}{'match_1_and'} = "";
+                    $TESTS{$m_test}{'match_1_or'}  = "";
+                    $TESTS{$m_test}{'fail_1'}      = "";
+                    $TESTS{$m_test}{'fail_2'}      = "";
+                    $TESTS{$m_test}{'method'}      = "GET";
+                    $TESTS{$m_test}{'data'}        = "";
+                    $TESTS{$m_test}{'headers'}     = "";
+                    $TESTS{$m_test}{'category'}    = 1;
+                    $TESTS{$m_test}{'osvdb'}       = 3092;
+                    $TESTS{$m_test}{'server'}      = "generic";
                 }
             }
         }

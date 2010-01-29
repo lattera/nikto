@@ -119,7 +119,7 @@ sub nikto_headers
    $NIKTO{'totalrequests'}++;
    if (   ($result{'content-location'} ne "")
       && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
-      && ($result{'content-location'} !~ /$mark->{ip}/))
+      && ($result{'content-location'} !~ /$mark->{'ip'}/))
    {
       add_vulnerability($mark,"IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".", 999989, 630);
    }
@@ -138,7 +138,7 @@ sub nikto_headers
 
    if (($result{'location'} ne "")
       && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
-      && ($result{'location'} !~ /$mark->{ip}/))
+      && ($result{'location'} !~ /$mark->{'ip'}/))
    {
       add_vulnerability($mark,"IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",999988,630,"GET","/images");
    }
@@ -188,7 +188,7 @@ sub nikto_headers
       my $reportnum = 999100;
       foreach my $st_header (@$dbarray)
       {
-         if ($header eq $st_header->{header})
+         if ($header eq $st_header->{'header'})
          {
             $found=1;
          }

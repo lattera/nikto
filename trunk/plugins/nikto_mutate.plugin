@@ -45,11 +45,11 @@ sub nikto_mutate
     foreach my $checkid (keys %TESTS) {
 	# split out vars. this would normally get done JIT for running the test,
 	# but here we need to split on the varnames for proper mutating (still expanded later)
-        if ($TESTS{$checkid}{uri} =~ /\@/) {
+        if ($TESTS{$checkid}{'uri'} =~ /\@/) {
       		foreach my $varname (keys %VARIABLES) {
-         		if ($TESTS{$checkid}{uri} =~ "$varname") {
+         		if ($TESTS{$checkid}{'uri'} =~ "$varname") {
 				$DIRS{$varname} = "";
-				my $f=$TESTS{$checkid}{uri};
+				my $f=$TESTS{$checkid}{'uri'};
 				$f =~ s/$varname//g;
 				$FS{$f}="" unless $f eq "";
 				last;
@@ -58,8 +58,8 @@ sub nikto_mutate
 		}
 	else {
 
-        	my $dir  = LW2::uri_get_dir($TESTS{$checkid}{uri});
-        	my $file = $TESTS{$checkid}{uri};
+        	my $dir  = LW2::uri_get_dir($TESTS{$checkid}{'uri'});
+        	my $file = $TESTS{$checkid}{'uri'};
         	if ($dir ne "") {
                		$DIRS{$dir} = "";
                	 	$dir =~ s/([^a-zA-Z0-9])/\\$1/g;
@@ -86,26 +86,26 @@ sub nikto_mutate
             # skip self referencing stuff
             if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
 
-            $mark->{total_checks}++;
+            $mark->{'total_checks'}++;
             $m_test++;
             $new_tests++;
 	    # This is a little non-standard but much faster than mod on every test
-            if ($OUTPUT{verbose} && (($new_tests % 100000) eq 0))
+            if ($OUTPUT{'verbose'} && (($new_tests % 100000) eq 0))
 		{ nprint("-Added test ($new_tests of many):$root$file:", "d"); }
 
-            $TESTS{$m_test}{uri}         = "$root$file";
-            $TESTS{$m_test}{message}     = "URL created via mutate option.";
-            $TESTS{$m_test}{match_1}     = 200;
-            $TESTS{$m_test}{match_1_and} = "";
-            $TESTS{$m_test}{match_1_or}  = "";
-            $TESTS{$m_test}{fail_1}      = "";
-            $TESTS{$m_test}{fail_2}      = "";
-            $TESTS{$m_test}{method}      = "GET";
-            $TESTS{$m_test}{data}        = "";
-            $TESTS{$m_test}{headers}     = "";
-            $TESTS{$m_test}{category}    = 1;
-            $TESTS{$m_test}{osvdb}       = 3092;
-            $TESTS{$m_test}{server}      = "generic";
+            $TESTS{$m_test}{'uri'}         = "$root$file";
+            $TESTS{$m_test}{'message'}     = "URL created via mutate option.";
+            $TESTS{$m_test}{'match_1'}     = 200;
+            $TESTS{$m_test}{'match_1_and'} = "";
+            $TESTS{$m_test}{'match_1_or'}  = "";
+            $TESTS{$m_test}{'fail_1'}      = "";
+            $TESTS{$m_test}{'fail_2'}      = "";
+            $TESTS{$m_test}{'method'}      = "GET";
+            $TESTS{$m_test}{'data'}        = "";
+            $TESTS{$m_test}{'headers'}     = "";
+            $TESTS{$m_test}{'category'}    = 1;
+            $TESTS{$m_test}{'osvdb'}       = 3092;
+            $TESTS{$m_test}{'server'}      = "generic";
         }
     }
 

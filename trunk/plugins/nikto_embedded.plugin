@@ -49,23 +49,23 @@ sub nikto_embedded
 
    foreach my $item (@$dbarray)
    {
-      (my $res, $content) = nfetch($mark, $item->{uri}, "GET", "", "", "", "embedded detection");
+      (my $res, $content) = nfetch($mark, $item->{'uri'}, "GET", "", "", "", "embedded detection");
       if ($res eq "200")
       {
          my @lines=split(/\n/,$content);
          foreach my $line (@lines)
          {
             # Check for the matches and pull out information
-            if ($line =~ $item->{match})
+            if ($line =~ $item->{'match'})
             {
                # Now pull out the make
                my $model=$line; 
-               $model =~ s/$item->{match}/$item->{model}/ee;
+               $model =~ s/$item->{'match'}/$item->{'model'}/ee;
                $model =~ s/\+/ /g;
                
                if ($model ne "")
                {
-                  add_vulnerability($mark, "$item->{message} $model",$item->{nikto_id}, 0, "GET", $item->{uri});
+                  add_vulnerability($mark, "$item->{'message'} $model",$item->{'nikto_id'}, 0, "GET", $item->{'uri'});
                }
             }
          }

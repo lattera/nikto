@@ -72,7 +72,7 @@ sub single
     }
 
     # get request->whisker hash answers
-    foreach my $key (sort keys %{ $request{whisker} })
+    foreach my $key (sort keys %{ $request{'whisker'} })
     {
 
         # already asked these
@@ -187,7 +187,7 @@ sub single
         print "\t$item: $result{'whisker'}->{$item}\n";
     }
 
-    if ($VARS{html})
+    if ($VARS{'html'})
     {
         print "-" x $width, "  Response Content\n";
         print "$result{'whisker'}->{'data'}\n";

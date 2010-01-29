@@ -42,8 +42,8 @@ sub nikto_httpoptions
    my %headers;
    # test for both OPTIONS / and OPTIONS * as they may give different results
    (my $res, $content) = nfetch($mark, "*", "OPTIONS", "", \%headers, "", "httpoptions: OPTIONS *");
-   my $aoptions = "$headers{allow}, ";
-   my $poptions = "$headers{public}, ";
+   my $aoptions = "$headers{'allow'}, ";
+   my $poptions = "$headers{'public'}, ";
    my ($allow_methods, $public_methods);
    my $txt = "";
    my $dbarray;
@@ -51,8 +51,8 @@ sub nikto_httpoptions
    $dbarray=init_db("db_httpoptions");
 
    ($res, $content) = nfetch($mark, "/", "OPTIONS", "", \%headers, "", "httpoptions: OPTIONS /");
-   $aoptions .= $headers{allow};
-   $poptions .= $headers{public};
+   $aoptions .= $headers{'allow'};
+   $poptions .= $headers{'public'};
 
    foreach my $o (split(/,[ ]?/, $aoptions)) { $allow_methods .= ", $o" unless ($allow_methods =~ /\b$o\b/ || $o eq ''); }
    $allow_methods =~ s/^[ ]?, //;
@@ -60,7 +60,7 @@ sub nikto_httpoptions
    $public_methods =~ s/^[ ]?, //;
 
    # proxy can impose it's methods... should actually check this not just warn
-   if ($CLI{useproxy} ne "") { $txt = "(May be proxy's methods, not server's)"; }
+   if ($CLI{'useproxy'} ne "") { $txt = "(May be proxy's methods, not server's)"; }
 
    if ($allow_methods ne "")
    {
@@ -108,7 +108,7 @@ sub nikto_httpoptions
       # Check for all flavours of HTTP
       foreach my $version (split(/ /,"1.0 1.1"))
       {
-         $request{whisker}{version} = $version; 
+         $request{'whisker'}{'version'} = $version; 
          ($res, $content) = nfetch($mark, "/", $method, "", \%headers, "", "httpoptions: $method");
          if ($res == 200)
          {
@@ -138,11 +138,11 @@ sub eval_methods
    # Now search database for the method.
    foreach my $item (@$dbarray)
    {
-      if ($item->{method} eq $method)
+      if ($item->{'method'} eq $method)
       {
-         $message = $item->{message};
+         $message = $item->{'message'};
          $message =~ s/\@TYPE\@/$type/;
-         add_vulnerability($mark,"$message",$item->{nikto_id},$item->{osvdb});
+         add_vulnerability($mark,"$message",$item->{'nikto_id'},$item->{'osvdb'});
       }
    }
 }

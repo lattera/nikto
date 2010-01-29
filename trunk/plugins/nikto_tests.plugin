@@ -44,29 +44,29 @@ sub nikto_tests
    { 
       if ($CHECKID >= 500000) { next; } # skip TESTS added manually during run (for reports)
       # replace variables in the uri
-      my @urilist=change_variables($TESTS{$CHECKID}{uri});
+      my @urilist=change_variables($TESTS{$CHECKID}{'uri'});
 
       # Now repeat for each uri
       foreach my $uri (@urilist)
       {
-         (my $RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data}, $CHECKID);
-         nprint("- $RES for $TESTS{$CHECKID}{method}:\t$request{whisker}{uri}","v");
+         (my $RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{'method'},$TESTS{$CHECKID}{'data'}, $CHECKID);
+         nprint("- $RES for $TESTS{$CHECKID}{'method'}:\t$request{'whisker'}{'uri'}","v");
          # Check for errors to reduce false positives 
-         if (defined $result{whisker}->{error}) 
+         if (defined $result{'whisker'}->{'error'}) 
          { 
             # An error occured, show in verbose mode and skip 
             # Try it again before we report it fully
             sleep(1);
-            ($RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data}, $CHECKID);
-            nprint("- $RES for $TESTS{$CHECKID}{method}:\t$request{whisker}{uri}","v");
+            ($RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{'method'},$TESTS{$CHECKID}{'data'}, $CHECKID);
+            nprint("- $RES for $TESTS{$CHECKID}{'method'}:\t$request{'whisker'}{'uri'}","v");
             
-            if (defined $result{whisker}->{error}) 
+            if (defined $result{'whisker'}->{'error'}) 
             {
-               nprint("+ ERROR: $uri returned an error: $result{whisker}{error}\n"); 
+               nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n"); 
                next; 
             }
          }
-         $NIKTO{'resp_counts'}{$RES}{total}++;
+         $NIKTO{'resp_counts'}{$RES}{'total'}++;
    
          # do auth/redir first, independent of test pass/fail
          if ($RES eq 401)
@@ -81,52 +81,52 @@ sub nikto_tests
          }
          elsif ($RES eq 200)
          {
-            nprint("+ $uri - 200/OK Response could be $TESTS{$CHECKID}{message}") if $CLI{'display'} =~ /3/;
+            nprint("+ $uri - 200/OK Response could be $TESTS{$CHECKID}{'message'}") if $CLI{'display'} =~ /3/;
          }
 	 elsif ($RES =~ /30([0-3]|7)/)
          {
-            nprint("+ $uri - Redirects ($RES) to " . $result{'location'} . " , $TESTS{$CHECKID}{message}") if $CLI{'display'} =~ /1/;
+            nprint("+ $uri - Redirects ($RES) to " . $result{'location'} . " , $TESTS{$CHECKID}{'message'}") if $CLI{'display'} =~ /1/;
          }
    
          my $m1_method= my $m1o_method= my $m1a_method= my $f2_method= my $f1_method ="content";
          my $positive=0;
    
          # how to check each conditional
-         if ($TESTS{$CHECKID}{match_1} =~ /^[0-9]{3}$/)     { $m1_method="code";  }
-         if ($TESTS{$CHECKID}{match_1_or} =~ /^[0-9]{3}$/)  { $m1o_method="code"; }
-         if ($TESTS{$CHECKID}{match_1_and} =~ /^[0-9]{3}$/) { $m1a_method="code"; }
-         if ($TESTS{$CHECKID}{fail_1} =~ /^[0-9]{3}$/)      { $f1_method="code";  }
-         if ($TESTS{$CHECKID}{fail_2} =~ /^[0-9]{3}$/)      { $f2_method="code";  }
+         if ($TESTS{$CHECKID}{'match_1'} =~ /^[0-9]{3}$/)     { $m1_method="code";  }
+         if ($TESTS{$CHECKID}{'match_1_or'} =~ /^[0-9]{3}$/)  { $m1o_method="code"; }
+         if ($TESTS{$CHECKID}{'match_1_and'} =~ /^[0-9]{3}$/) { $m1a_method="code"; }
+         if ($TESTS{$CHECKID}{'fail_1'} =~ /^[0-9]{3}$/)      { $f1_method="code";  }
+         if ($TESTS{$CHECKID}{'fail_2'} =~ /^[0-9]{3}$/)      { $f2_method="code";  }
    
          # basic match for positive result
          if ($m1_method eq "content")
          { 
-            if ($CONTENT =~ /$TESTS{$CHECKID}{match_1}/) 
+            if ($CONTENT =~ /$TESTS{$CHECKID}{'match_1'}/) 
             { 
                $positive=1; 
             } 
          }
          else                         
          { 
-            if (($RES eq $TESTS{$CHECKID}{match_1}) || ($RES eq $FoF{okay}{response})) 
+            if (($RES eq $TESTS{$CHECKID}{'match_1'}) || ($RES eq $FoF{'okay'}{'response'})) 
             { 
                $positive=1; 
             } 
          }
    
          # no match, check optional match
-         if ((!$positive) && ($TESTS{$CHECKID}{match_1_or} ne ""))
+         if ((!$positive) && ($TESTS{$CHECKID}{'match_1_or'} ne ""))
          {
             if ($m1o_method eq "content")
             {
-               if ($CONTENT =~ /$TESTS{$CHECKID}{match_1_or}/)
+               if ($CONTENT =~ /$TESTS{$CHECKID}{'match_1_or'}/)
                { 
                   $positive=1; 
                } 
             }
             else
             {
-               if (($RES eq $TESTS{$CHECKID}{match_1_or}) || ($RES eq $FoF{okay}{response}))
+               if (($RES eq $TESTS{$CHECKID}{'match_1_or'}) || ($RES eq $FoF{'okay'}{'response'}))
                {
                   $positive=1;
                }
@@ -136,37 +136,37 @@ sub nikto_tests
          # matched on something, check fails/ands
          if ($positive)
          { 
-            if ($TESTS{$CHECKID}{fail_1} ne "")
+            if ($TESTS{$CHECKID}{'fail_1'} ne "")
             {
-               if ($f1_method eq "content") { if ($CONTENT =~ /$TESTS{$CHECKID}{fail_1}/) { next; } }
-               else { if ($RES eq $TESTS{$CHECKID}{fail_1}) { next; } }
+               if ($f1_method eq "content") { if ($CONTENT =~ /$TESTS{$CHECKID}{'fail_1'}/) { next; } }
+               else { if ($RES eq $TESTS{$CHECKID}{'fail_1'}) { next; } }
             }
-            if ($TESTS{$CHECKID}{fail_2} ne "")
+            if ($TESTS{$CHECKID}{'fail_2'} ne "")
             {
-               if ($f2_method eq "content") { if ($CONTENT =~ /$TESTS{$CHECKID}{fail_2}/) { next; } }
-               else { if ($RES eq $TESTS{$CHECKID}{fail_2}) { next; } }
+               if ($f2_method eq "content") { if ($CONTENT =~ /$TESTS{$CHECKID}{'fail_2'}/) { next; } }
+               else { if ($RES eq $TESTS{$CHECKID}{'fail_2'}) { next; } }
             }
-            if ($TESTS{$CHECKID}{match_1_and} ne "")
+            if ($TESTS{$CHECKID}{'match_1_and'} ne "")
             {
-               if ($m1a_method eq "content") { if ($CONTENT !~ /$TESTS{$CHECKID}{match_1_and}/) { next; } }
-               else { if ($RES ne $TESTS{$CHECKID}{match_1_and}) { next; } }
+               if ($m1a_method eq "content") { if ($CONTENT !~ /$TESTS{$CHECKID}{'match_1_and'}/) { next; } }
+               else { if ($RES ne $TESTS{$CHECKID}{'match_1_and'}) { next; } }
             }
    
             # if it's an index.php, check for normal /index.php to see if it's a FP
             if ($uri =~ /^\/index.php\?/)
             {
                my $CONTENT=rm_active_content($CONTENT, $uri);
-               if (LW2::md4($CONTENT) eq $FoF{'index.php'}{match}) { next; } 
+               if (LW2::md4($CONTENT) eq $FoF{'index.php'}{'match'}) { next; } 
             }
    
             # lastly check for a false positive based on file extension or type
             if (($m1_method eq "code") || ($m1o_method eq "code"))
             {
-               if (is_404($request{whisker}{uri},$CONTENT,$RES)) { next; }
+               if (is_404($request{'whisker'}{'uri'},$CONTENT,$RES)) { next; }
             }
    
-            $TESTS{$CHECKID}{osvdb} =~ s/\s+/ OSVDB\-/g;
-            add_vulnerability($mark,"$request{whisker}{uri}: $TESTS{$CHECKID}{message}",$CHECKID,$TESTS{$CHECKID}{osvdb},$TESTS{$CHECKID}{method},$uri);
+            $TESTS{$CHECKID}{'osvdb'} =~ s/\s+/ OSVDB\-/g;
+            add_vulnerability($mark,"$request{'whisker'}{'uri'}: $TESTS{$CHECKID}{'message'}",$CHECKID,$TESTS{$CHECKID}{'osvdb'},$TESTS{$CHECKID}{'method'},$uri);
          }
       }
    } # end check loop
