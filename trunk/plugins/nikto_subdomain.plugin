@@ -69,7 +69,7 @@ sub nikto_subdomain
       # First we need to mangle the host.
       my $newhost=$item->{subdomain} . "." . $host;
       $request{whisker}{host} = $newhost;
-      my ($result, $content) = fetch("/", "HEAD");
+      my ($result, $content) = fetch("/", "HEAD", "", "subdomain");
 
       if ($result{whisker}{error} eq "")
       {

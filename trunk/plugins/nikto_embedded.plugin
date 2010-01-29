@@ -32,7 +32,7 @@ sub nikto_embedded_init
    my $id =
    {
       name         => "embedded",
-      full_name    => "Embedded Destection",
+      full_name    => "Embedded Detection",
       author       => "Deity",
       description  => "Checks to see whether the host is an embedded server.",
       scan_method  => \&nikto_embedded,
@@ -49,7 +49,7 @@ sub nikto_embedded
 
    foreach my $item (@$dbarray)
    {
-      (my $res, $content) = nfetch($mark,$item->{uri},"GET");
+      (my $res, $content) = nfetch($mark, $item->{uri}, "GET", "", "", "", "embedded detection");
       if ($res eq "200")
       {
          my @lines=split(/\n/,$content);

@@ -48,7 +48,7 @@ sub nikto_headers
    my %xpb;
    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
    {
-      (my $res, $content) = nfetch($mark,$f, "GET", "", \%headers);
+      (my $res, $content) = nfetch($mark, $f, "GET", "", \%headers, "", "headers: powered-by");
       if (defined $headers{'x-powered-by'}) { $xpb{ $headers{'x-powered-by'} } = 1; }
    }
 
@@ -68,11 +68,11 @@ sub nikto_headers
    my %transheaders;
    foreach my $f (qw/\/index.asp \/junk999.asp \/index.aspx \/junk988.aspx \/login.asp \/login.aspx/ )
    {
-      (my $res, $content) = nfetch($mark, $f , "GET", "", \%transheaders);
+      (my $res, $content) = nfetch($mark, $f , "GET", "", \%transheaders, "", "headers: Translate-f #1");
       if ($res eq "200")
       {
          $transheaders{'Translate'}="f";
-         ($res, $content) = nfetch($mark,$f . "\\", "GET", "", \%transheaders);
+         ($res, $content) = nfetch($mark, $f . "\\", "GET", "", \%transheaders, "", "headers: Translate-f #2");
          if ($res eq "200")
          {
             if ($content =~ /<asp:/ || $content =~ /<\/asp:/)
@@ -167,7 +167,7 @@ sub nikto_headers
    # All other interesting headers
    
    # First let's hit something we know should return something
-   my ($res, $content)=nfetch($mark,"/","GET","",\%headers);
+   my ($res, $content)=nfetch($mark, "/", "GET" ,"" ,\%headers, "", "headers: base");
 
    foreach my $header (@interesting_headers)
    {
@@ -209,7 +209,7 @@ sub nikto_headers
    # Try to grab a standard file
    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
    {
-      (my $res, $content) = nfetch($mark,$f, "GET","", \%headers);
+      (my $res, $content) = nfetch($mark, $f, "GET", "", \%headers, "", "headers: etag");
       last if (defined $headers{'etag'});
    }
    

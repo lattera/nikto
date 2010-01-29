@@ -49,7 +49,7 @@ sub nikto_tests
       # Now repeat for each uri
       foreach my $uri (@urilist)
       {
-         (my $RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data});
+         (my $RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data}, $CHECKID);
          nprint("- $RES for $TESTS{$CHECKID}{method}:\t$request{whisker}{uri}","v");
          # Check for errors to reduce false positives 
          if (defined $result{whisker}->{error}) 
@@ -57,7 +57,7 @@ sub nikto_tests
             # An error occured, show in verbose mode and skip 
             # Try it again before we report it fully
             sleep(1);
-            ($RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data});
+            ($RES, $CONTENT) = fetch($uri,$TESTS{$CHECKID}{method},$TESTS{$CHECKID}{data}, $CHECKID);
             nprint("- $RES for $TESTS{$CHECKID}{method}:\t$request{whisker}{uri}","v");
             
             if (defined $result{whisker}->{error}) 

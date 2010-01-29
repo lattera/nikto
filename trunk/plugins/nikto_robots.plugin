@@ -38,7 +38,7 @@ sub nikto_robots_init
 sub nikto_robots
 {
    my ($mark) = @_;
-   (my $RES, $CONTENT) = nfetch($mark,"/robots.txt", "GET");
+   (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", "", "", "robots");
 
    if (($RES eq 200) || ($RES eq $FoF{okay}{response}))    # got one!
    {

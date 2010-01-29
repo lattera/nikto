@@ -1,4 +1,6 @@
 2010-01-20 Nikto 2.1.1
+	- Moved User-Agent string to nikto.conf
+	- Added dynamic variables to User-Agent (Testid, Evasion methods)
 	- Reporting: simplify xml/html code, fix a bug when a space is in the uri, and load ony needed templates
 	- Enable 2 new LW evasion tacticts (carriage return or binary value as request spacer)
 	- Ticket  95: Added support for OSVDB, now the fun bit of filling it in
