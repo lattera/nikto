@@ -36,7 +36,7 @@ sub change_variables {
    }
    else {
       foreach my $varname (keys %VARIABLES) {
-         if ($line =~ "$varname") {
+         if ($line =~ /$varname/) {
             # We've found the variable; now to expand it!
             foreach my $value (split(/ /, $VARIABLES{$varname})) {
                $cooked = $line;
@@ -674,6 +674,11 @@ sub general_config
  $NIKTO{'useragent'} =~ s/\@VERSION/$NIKTO{'version'}/g;
  my $ev = $CLI{'evasion'} || "None";
  $NIKTO{'useragent'} =~ s/\@EVASIONS/$ev/g;
+
+ # RFI URL -- push it to VARIABLES
+ if ($NIKTOCONFIG{'RFIURL'} ne '') {
+	$VARIABLES{'@RFIURL'} = $NIKTOCONFIG{'RFIURL'};
+	}
  
  # SSL Test
  if (!LW2::ssl_is_available()) { nprint("- ***** SSL support not available (see docs for SSL install instructions) *****"); }
@@ -2142,6 +2147,11 @@ sub set_scan_items
    }
     # Skip list
     foreach my $id (@SKIPLIST) { if ($id eq $item[0]) { $add=0; } }
+
+    # RFI URL Defined?
+    if (($item[2] =~ /c/) && ($VARIABLES{'@RFIURL'} eq '')) {
+	$add=0;
+	}
 
     if ($add)
     {
