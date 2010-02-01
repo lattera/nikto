@@ -14,6 +14,7 @@
 	- Ticket 97: Fix for response caching
 	- Ticket 99: Spelling disagreements between Brits and Americans
 	- Added @RFIURL to nikto.conf for a remote file include location, and supporting code.
+	- Added ~2300 RFI tests from the combined RSnake/OSVDB list
 	- Removed NMAP and NMAPOPTS from nikto.conf as it is no longer used/supported
 	- Reporting: simplify xml/html code, fix a bug when a space is in the uri, and load ony needed templates
 	- Enable 2 new LW evasion tacticts (carriage return or binary value as request spacer)
