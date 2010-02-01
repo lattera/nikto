@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY description SYSTEM "sections/description.xml">
 <!ENTITY options SYSTEM "sections/options.xml">
 ]>
-
 <book>
-<title>Nikto v2.1.1 - The Manual</title>
+  <title>Nikto v2.1.1 - The Manual</title>
 
-<chapter id="introduction">
-   <title>Introduction</title>
+  <chapter id="introduction">
+    <title>Introduction</title>
 
-   <section>
+    <section>
       <title>Overview</title>
 
       <para>Nikto is a web server assessment tool. It is designed to find
       various default and insecure files, configurations and programs on any
       type of web server.</para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Description</title>
 
       &description;
@@ -26,11 +26,11 @@
       <para>The name "Nikto" is taken from the movie "The Day the Earth Stood
       Still", and of course subsequent abuse by Bruce Campbell in "Army of
       Darkness". More information on the pop-culture popularity of Nikto can
-      be found at
-      <ulink url="http://www.blather.net/blather/2005/10/klaatu_barada_nikto_the_day_th.html">http://www.blather.net/blather/2005/10/klaatu_barada_nikto_the_day_th.html</ulink></para>
-   </section>
+      be found at <ulink
+      url="http://www.blather.net/blather/2005/10/klaatu_barada_nikto_the_day_th.html">http://www.blather.net/blather/2005/10/klaatu_barada_nikto_the_day_th.html</ulink></para>
+    </section>
 
-   <section>
+    <section>
       <title>Advanced Error Detection Logic</title>
 
       <para>Most web security tools, (including Nikto 1.32 and below), rely
@@ -67,9 +67,9 @@
       match that hash value against future .txt tests. The latter is by far
       the slowest type of match, but in many cases will provide valid results
       for a particular file type.</para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>History</title>
 
       <para>The Nikto 1.00 Beta was released on December 27, 2001, (followed
@@ -81,29 +81,31 @@
       <para>In 2008, due to other commitments, Sullo, the original author
       couldn't continue to support Nikto and the code was released under the
       GPL and passed to the community for support.</para>
-   </section>
-</chapter>
+    </section>
+  </chapter>
 
-<chapter id="installation">
-   <title>Installation</title>
+  <chapter id="installation">
+    <title>Installation</title>
 
-   <section>
+    <section>
       <title>Requirements</title>
 
       <para>Any system which supports a basic PERL installation should allow
       Nikto to run. It has been extensively tested on:</para>
 
       <itemizedlist>
-         <listitem>
-            <para>Windows (using ActiveState Perl)</para>
-         </listitem>
-         <listitem>
-            <para>Mac OSX</para>
-         </listitem>
-         <listitem>
-            <para>Various Linux and Unix installations (including RedHat,
-            Solaris, Debian, Knoppix, etc.)</para>
-         </listitem>
+        <listitem>
+          <para>Windows (using ActiveState Perl)</para>
+        </listitem>
+
+        <listitem>
+          <para>Mac OSX</para>
+        </listitem>
+
+        <listitem>
+          <para>Various Linux and Unix installations (including RedHat,
+          Solaris, Debian, Knoppix, etc.)</para>
+        </listitem>
       </itemizedlist>
 
       <para>The only required PERL module that does not come standard is
@@ -117,36 +119,30 @@
       for SSL is dependent on the installation package, but is rumored to
       exist for ActiveState's Perl.</para>
 
-      <para>The nmap scanner can also be used, if desired. In some cases using
-      nmap will slow down Nikto execution, as it must call an external
-      program. For scanning many ports across one or more servers, using nmap
-      will be faster than using Nikto's internal PERL scanning.</para>
-
       <itemizedlist>
-         <listitem>
-            <para>PERL: <ulink
-            url="http://www.cpan.org/">http://www.cpan.org/</ulink></para>
-         </listitem>
-         <listitem>
-            <para>LibWhisker: <ulink
-            url="http://www.wiretrip.net/">http://www.wiretrip.net/</ulink></para>
-         </listitem>
-         <listitem>
-            <para>ActiveState Perl: <ulink
-            url="http://www.activestate.com/">http://www.activestate.com/</ulink></para>
-         </listitem>
-         <listitem>
-            <para>OpenSSL: <ulink
-            url="http://www.openssl.org/">http://www.openssl.org/</ulink></para>
-         </listitem>
-         <listitem>
-            <para>nmap: <ulink
-            url="http://www.insecure.org/">http://insecure.org/</ulink></para>
-         </listitem>
-      </itemizedlist>
-   </section>
+        <listitem>
+          <para>PERL: <ulink
+          url="http://www.cpan.org/">http://www.cpan.org/</ulink></para>
+        </listitem>
 
-   <section>
+        <listitem>
+          <para>LibWhisker: <ulink
+          url="http://www.wiretrip.net/">http://www.wiretrip.net/</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>ActiveState Perl: <ulink
+          url="http://www.activestate.com/">http://www.activestate.com/</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>OpenSSL: <ulink
+          url="http://www.openssl.org/">http://www.openssl.org/</ulink></para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
       <title>Install</title>
 
       <para>These instructions do not include information on installing PERL,
@@ -162,13 +158,13 @@
       <para>Assuming a standard OS/PERL installation, Nikto should now be
       usable. See Chapter 4 (Options) or Chapter 8 (Troubleshooting) for
       further configuration information.</para>
-   </section>
-</chapter>
+    </section>
+  </chapter>
 
-<chapter id="usage">
-<title>Usage</title>
+  <chapter id="usage">
+    <title>Usage</title>
 
-   <section>
+    <section>
       <title>Basic Testing</title>
 
       <para>The most basic Nikto scan requires simply a host to target, since
@@ -196,25 +192,24 @@
       <screen>perl nikto.pl -h 192.168.0.1 -p 443 -ssl</screen>
 
       <note>
-      <para><parameter>-mutate</parameter> 1 increases the number of tests so
-      that all filenames are tested against all databases inc 
-      <filename>db_tests</filename>. This will produce over 2,000,000 extra
-      tests, which will use up a massive amount of resource.</para>
+        <para><parameter>-mutate</parameter> 1 increases the number of tests
+        so that all filenames are tested against all databases inc
+        <filename>db_tests</filename>. This will produce over 2,000,000 extra
+        tests, which will use up a massive amount of resource.</para>
       </note>
 
       <para>More complex tests can be performed using the
       <parameter>-mutate</parameter> parameter, as detailed later. This can
       produce extra tests, some of which may be provided with extra parameters
-      through the <parameter>-mutate-options</parameter> parameter. For example,
-      using <parameter>-mutate</parameter> 3, with or without a file attempts
-      to brute force usernames if the web server allows
+      through the <parameter>-mutate-options</parameter> parameter. For
+      example, using <parameter>-mutate</parameter> 3, with or without a file
+      attempts to brute force usernames if the web server allows
       ~<replaceable>user</replaceable> URIs:</para>
- 
-      <screen>perl nikto.pl -h 192.168.0.1 -mutate 3 -mutate-options user-list.txt</screen>
-   
-   </section>
 
-   <section>
+      <screen>perl nikto.pl -h 192.168.0.1 -mutate 3 -mutate-options user-list.txt</screen>
+    </section>
+
+    <section>
       <title>Multiple Port Testing</title>
 
       <para>Nikto can scan multiple ports in the same scanning session. To
@@ -224,9 +219,9 @@
       on ports 80, 88 and 443.</para>
 
       <screen>perl nikto.pl -h 192.168.0.1 -p 80,88,443</screen>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Multiple Host Testing</title>
 
       <para>Nikto support scanning multiple hosts in the same session via a
@@ -239,17 +234,18 @@
       <para>This is an example of a valid hosts file:</para>
 
       <example>
-      <title>Valid Hosts File</title>
-      <programlisting>192.168.0.1:80
+        <title>Valid Hosts File</title>
+
+        <programlisting>192.168.0.1:80
 http://192.168.0.1:8080/
 192.168.0.3</programlisting>
       </example>
 
       <note>
-         <para>For win32 users: due to peculiaries in the way that cmd.exe
-         works with pipes, the above example may not work for you. In this case
-         a temporary file will have to be used to store the output from
-         nmap</para>
+        <para>For win32 users: due to peculiaries in the way that cmd.exe
+        works with pipes, the above example may not work for you. In this case
+        a temporary file will have to be used to store the output from
+        nmap</para>
       </note>
 
       <para>A host file may also be an nmap output in "greppable" format (i.e.
@@ -259,22 +255,22 @@ http://192.168.0.1:8080/
       the filename. For example:</para>
 
       <screen>nmap -p80 192.168.0.0/24 -oG - | nikto.pl -h -</screen>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Using a Proxy</title>
 
       <para>If the machine running Nikto only has access to the target host
       (or update server) via an HTTP proxy, the test can still be performed.
-      Set the <varname>PROXY*</varname> variables (as described in section
-      4), then execute Nikto with the -u (-useproxy) command. All connections
-      will be relayed through the HTTP proxy specified in the configuration
+      Set the <varname>PROXY*</varname> variables (as described in section 4),
+      then execute Nikto with the -u (-useproxy) command. All connections will
+      be relayed through the HTTP proxy specified in the configuration
       file.</para>
 
       <screen>perl nikto.pl -h 192.168.0.1 -p 80 -u</screen>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Updating</title>
 
       <para>Nikto can be automatically updated, assuming you have Internet
@@ -283,7 +279,7 @@ http://192.168.0.1:8080/
       command.</para>
 
       <note>
-         <para>The -update option cannot be abbreviated.</para>
+        <para>The -update option cannot be abbreviated.</para>
       </note>
 
       <screen>perl nikto.pl -update</screen>
@@ -299,9 +295,9 @@ http://192.168.0.1:8080/
 
       <para>Updates may also be manually downloaded from <ulink
       url="http://www.cirt.net/">http://www.cirt.net/</ulink></para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Integration with Nessus</title>
 
       <para>Nessus (<ulink
@@ -309,19 +305,20 @@ http://192.168.0.1:8080/
       be configured to automatically launch Nikto when it finds a web server.
       Ensure Nikto works properly, then place the directory containing
       nikto.pl in root's PATH environment variable. When nessusd starts, it
-      should see the nikto.pl program and enable usage through the
-      GUI.</para>
-   </section>
-</chapter>
+      should see the nikto.pl program and enable usage through the GUI.</para>
+    </section>
+  </chapter>
 
-<chapter id="options">
-   <title>Command Line Options</title>
-   <section>
+  <chapter id="options">
+    <title>Command Line Options</title>
+
+    <section>
       <title>All Options</title>
-      &options;
-   </section>
 
-   <section>
+      &options;
+    </section>
+
+    <section>
       <title>Mutation Techniques</title>
 
       <para>A mutation will cause Nikto to combine tests or attempt to guess
@@ -330,49 +327,53 @@ http://192.168.0.1:8080/
       type, multiple may be combined.</para>
 
       <orderedlist>
-         <listitem>
-            <para>Test all files with all root directories. This takes each test
-            and splits it into a list of files and directories. A scan list is
-            then created by combining each file with each directory.</para>
-         </listitem>
-         <listitem>
-            <para>Guess for password file names. Takes a list of common password
-            file names (such as "passwd", "pass", "password") and file
-            extensions ("txt", "pwd", "bak", etc.) and builds a list of files
-            to check for.</para>
-         </listitem>
-         <listitem>
-            <para>Enumerate user names via Apache (/~user type requests).
-            Exploit a misconfiguration with Apache UserDir setups which allows
-            valid user names to be discovered. This will attempt to brute-force
-            guess user names. A file of known users can also be supplied by
-            supplying the file name in the
-            <parameter>-mutate-options</parameter> parameter.</para>
-         </listitem>
-         <listitem>
-            <para>Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user
-            type requests). Exploit a flaw in cgiwrap which allows valid user
-            names to be discovered. This will attempt to brute-force guess user
-            names. A file of known users can also be supplied by supplying the
-            file name in the <parameter>-mutate-options</parameter>
-            parameter.</para>
-         </listitem>
-         <listitem>
-            <para>Attempt to brute force sub-domain names. This will
-            attempt to brute force know domain names, it will assume the given
-            host (without a www) is the parent domain.</para>
-         </listitem>
-         <listitem>
-            <para>Attempt to brute directory names. This is the only mutate
-            option that requires a file to be passed in the
-            <parameter>-mutate-options</parameter> parameter. It will use the
-            given file to attempt to guess directory names. Lists of common
-            directories may be found in the OWASP DirBuster project.</para>  
-         </listitem>
-      </orderedlist>
-   </section>
+        <listitem>
+          <para>Test all files with all root directories. This takes each test
+          and splits it into a list of files and directories. A scan list is
+          then created by combining each file with each directory.</para>
+        </listitem>
 
-   <section>
+        <listitem>
+          <para>Guess for password file names. Takes a list of common password
+          file names (such as "passwd", "pass", "password") and file
+          extensions ("txt", "pwd", "bak", etc.) and builds a list of files to
+          check for.</para>
+        </listitem>
+
+        <listitem>
+          <para>Enumerate user names via Apache (/~user type requests).
+          Exploit a misconfiguration with Apache UserDir setups which allows
+          valid user names to be discovered. This will attempt to brute-force
+          guess user names. A file of known users can also be supplied by
+          supplying the file name in the
+          <parameter>-mutate-options</parameter> parameter.</para>
+        </listitem>
+
+        <listitem>
+          <para>Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type
+          requests). Exploit a flaw in cgiwrap which allows valid user names
+          to be discovered. This will attempt to brute-force guess user names.
+          A file of known users can also be supplied by supplying the file
+          name in the <parameter>-mutate-options</parameter> parameter.</para>
+        </listitem>
+
+        <listitem>
+          <para>Attempt to brute force sub-domain names. This will attempt to
+          brute force know domain names, it will assume the given host
+          (without a www) is the parent domain.</para>
+        </listitem>
+
+        <listitem>
+          <para>Attempt to brute directory names. This is the only mutate
+          option that requires a file to be passed in the
+          <parameter>-mutate-options</parameter> parameter. It will use the
+          given file to attempt to guess directory names. Lists of common
+          directories may be found in the OWASP DirBuster project.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section>
       <title>Display</title>
 
       <para>By default only some basic information about the target and
@@ -380,35 +381,40 @@ http://192.168.0.1:8080/
       parameter can produce more information for debugging issues.</para>
 
       <itemizedlist>
-         <listitem>
-            <para>1 - Show redirects. This will display all requests which
-            elicit a "redirect" response from the server.</para>
-         </listitem>
-         <listitem>
-            <para>2 - Show cookies received. This will display all cookies that
-            were sent by the remote host.</para>
-         </listitem>
-         <listitem>
-            <para>3 - Show all 200/OK responses. This will show all responses
-            which elicit an "okay" (200) response from the server. This could be
-            useful for debugging.</para>
-         </listitem>
-         <listitem>
-            <para>4 - Show URLs which require authentication. This will show all
-            responses which elicit an "authorization required" header.</para>
-         </listitem>
-         <listitem>
-            <para>D - Debug Output. Show debug output, which shows the verbose
-            output and extra information such as variable content.</para>
-         </listitem>
-         <listitem>
-            <para>V - Verbose Output. Show verbose output, which typically shows
-            where Nikto is during program execution.</para>
-         </listitem>
-      </itemizedlist>
-   </section>
+        <listitem>
+          <para>1 - Show redirects. This will display all requests which
+          elicit a "redirect" response from the server.</para>
+        </listitem>
 
-   <section>
+        <listitem>
+          <para>2 - Show cookies received. This will display all cookies that
+          were sent by the remote host.</para>
+        </listitem>
+
+        <listitem>
+          <para>3 - Show all 200/OK responses. This will show all responses
+          which elicit an "okay" (200) response from the server. This could be
+          useful for debugging.</para>
+        </listitem>
+
+        <listitem>
+          <para>4 - Show URLs which require authentication. This will show all
+          responses which elicit an "authorization required" header.</para>
+        </listitem>
+
+        <listitem>
+          <para>D - Debug Output. Show debug output, which shows the verbose
+          output and extra information such as variable content.</para>
+        </listitem>
+
+        <listitem>
+          <para>V - Verbose Output. Show verbose output, which typically shows
+          where Nikto is during program execution.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
       <title>Scan Tuning</title>
 
       <para>Scan tuning can be used to decrease the number of tests performed
@@ -434,78 +440,91 @@ http://192.168.0.1:8080/
       <screen>perl nikto.pl -h 192.168.0.1 -T 58xb</screen>
 
       <para>The valid tuning options are:</para>
-      
-      <itemizedlist>
-         <listitem>
-            <para>0 - File Upload. Exploits which allow a file to be
-            uploaded to the target server.</para>
-         </listitem>
-         <listitem>
-            <para>1 - Interesting File / Seen in logs. An unknown but suspicious
-            file or attack that has been seen in web server logs (note: if you
-            have information regarding any of these attacks, please contact
-            CIRT, Inc.).</para>
-         </listitem>
-         <listitem>
-            <para>2 - Misconfiguration / Default File. Default files or files
-            which have been misconfigured in some manner. This could be
-            documentation, or a resource which should be password
-            protected.</para>
-         </listitem>
-         <listitem>
-            <para>3 - Information Disclosure. A resource which reveals
-            information about the target. This could be a file system path or
-            account name.</para>
-         </listitem>
-         <listitem>
-            <para>4 - Injection (XSS/Script/HTML). Any manner of injection,
-            including cross site scripting (XSS) or content (HTML). This does
-            not include command injection.</para>
-         </listitem>
-         <listitem>
-            <para>5 - Remote File Retrieval - Inside Web Root. Resource allows
-            remote users to retrieve unauthorized files from within the web
-            server's root directory.</para>
-         </listitem>
-         <listitem>
-            <para>6 - Denial of Service. Resource allows a denial of service
-            against the target application, web server or host (note: no
-            intentional DoS attacks are attempted).</para>
-         </listitem>
-         <listitem>
-            <para>7 - Remote File Retrieval - Server Wide. Resource allows
-            remote users to retrieve unauthorized files from anywhere on the
-            target.</para>
-         </listitem>
-         <listitem>
-            <para>8 - Command Execution / Remote Shell. Resource allows the user
-            to execute a system command or spawn a remote shell.</para>
-         </listitem>
-         <listitem>
-            <para>9 - SQL Injection. Any type of attack which allows SQL to be
-            executed against a database.</para>
-         </listitem>
-         <listitem>
-            <para>a - Authentication Bypass. Allows client to access a
-            resource it should not be allowed to access.</para>
-         </listitem>
-         <listitem>
-            <para>b - Software Identification. Installed software or program
-            could be positively identified.</para>
-         </listitem>
-         <listitem>
-            <para>c - Remote source inclusion. Software allows remote inclusion
-            of source code.</para>
-         </listitem>
-         <listitem>
-            <para>x - Reverse Tuning Options. Perform exclusion of the specified
-            tuning type instead of inclusion of the specified tuning
-            type.</para>
-         </listitem>
-      </itemizedlist>
-   </section>
 
-   <section>
+      <itemizedlist>
+        <listitem>
+          <para>0 - File Upload. Exploits which allow a file to be uploaded to
+          the target server.</para>
+        </listitem>
+
+        <listitem>
+          <para>1 - Interesting File / Seen in logs. An unknown but suspicious
+          file or attack that has been seen in web server logs (note: if you
+          have information regarding any of these attacks, please contact
+          CIRT, Inc.).</para>
+        </listitem>
+
+        <listitem>
+          <para>2 - Misconfiguration / Default File. Default files or files
+          which have been misconfigured in some manner. This could be
+          documentation, or a resource which should be password
+          protected.</para>
+        </listitem>
+
+        <listitem>
+          <para>3 - Information Disclosure. A resource which reveals
+          information about the target. This could be a file system path or
+          account name.</para>
+        </listitem>
+
+        <listitem>
+          <para>4 - Injection (XSS/Script/HTML). Any manner of injection,
+          including cross site scripting (XSS) or content (HTML). This does
+          not include command injection.</para>
+        </listitem>
+
+        <listitem>
+          <para>5 - Remote File Retrieval - Inside Web Root. Resource allows
+          remote users to retrieve unauthorized files from within the web
+          server's root directory.</para>
+        </listitem>
+
+        <listitem>
+          <para>6 - Denial of Service. Resource allows a denial of service
+          against the target application, web server or host (note: no
+          intentional DoS attacks are attempted).</para>
+        </listitem>
+
+        <listitem>
+          <para>7 - Remote File Retrieval - Server Wide. Resource allows
+          remote users to retrieve unauthorized files from anywhere on the
+          target.</para>
+        </listitem>
+
+        <listitem>
+          <para>8 - Command Execution / Remote Shell. Resource allows the user
+          to execute a system command or spawn a remote shell.</para>
+        </listitem>
+
+        <listitem>
+          <para>9 - SQL Injection. Any type of attack which allows SQL to be
+          executed against a database.</para>
+        </listitem>
+
+        <listitem>
+          <para>a - Authentication Bypass. Allows client to access a resource
+          it should not be allowed to access.</para>
+        </listitem>
+
+        <listitem>
+          <para>b - Software Identification. Installed software or program
+          could be positively identified.</para>
+        </listitem>
+
+        <listitem>
+          <para>c - Remote source inclusion. Software allows remote inclusion
+          of source code.</para>
+        </listitem>
+
+        <listitem>
+          <para>x - Reverse Tuning Options. Perform exclusion of the specified
+          tuning type instead of inclusion of the specified tuning
+          type.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
       <title>Single Request Mode</title>
 
       <para>Single request mode is designed to preform a solitary request
@@ -522,8 +541,8 @@ http://192.168.0.1:8080/
       very user-friendly. Here is an example Nikto run with the
       <parameter>-Single</parameter> option.</para>
 
-<screen>
-<![CDATA[
+      <screen>
+
 [dave@yggdrasil nikto-2.03]$ ./nikto.pl -Single
 --------------------------------------------  Nikto 2.1.1
 --------------------------------------------  Single Request Mode
@@ -606,295 +625,357 @@ http://192.168.0.1:8080/
         uri: /test.html
         version: 1.1
 --------------------------------------------  Response Content
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
-<title>404 Not Found</title>
-</head><body>
-<h1>Not Found</h1>
-<p>The requested URL /test.html was not found on this server.</p>
-<hr>
-<address>Apache/2 Server at localhost Port 80</address>
-</body></html>
-]]>
+&lt;!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN"&gt;
+&lt;html&gt;&lt;head&gt;
+&lt;title&gt;404 Not Found&lt;/title&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Not Found&lt;/h1&gt;
+&lt;p&gt;The requested URL /test.html was not found on this server.&lt;/p&gt;
+&lt;hr&gt;
+&lt;address&gt;Apache/2 Server at localhost Port 80&lt;/address&gt;
+&lt;/body&gt;&lt;/html&gt;
+
 </screen>
+    </section>
+  </chapter>
 
-   </section>
-</chapter>
+  <chapter id="configuration">
+    <title>Configuration Files</title>
 
-<chapter id="configuration">
-   <title>Configuration Files</title>
-
-   <section>
+    <section>
       <title>Location</title>
+
       <para>Nikto, like any non-trivial program needs to know a few things
       about how to work with the current environment. For most situations the
       default configuration file will work. Sometimes, tuning may be required,
       or some things may need to be changes.</para>
 
       <para>Nikto will look for a configuration file in three places and if it
-      finds one, will apply it in the strict order, listed below. A later found
-      configuration file will overwrite any variables set in an earlier
+      finds one, will apply it in the strict order, listed below. A later
+      found configuration file will overwrite any variables set in an earlier
       configuration file. The locations are:</para>
 
       <orderedlist>
-         <listitem>
-            <para>/etc/nikto.conf (this may be altered depending on
-            platform)</para>
-         </listitem>
-         <listitem>
-            <para>$HOME/nikto.conf</para>
-         </listitem>
-         <listitem>
-            <para>nikto.conf</para>
-         </listitem>
-      </orderedlist>
-   </section>
+        <listitem>
+          <para>/etc/nikto.conf (this may be altered depending on
+          platform)</para>
+        </listitem>
 
-   <section>
+        <listitem>
+          <para>$HOME/nikto.conf</para>
+        </listitem>
+
+        <listitem>
+          <para>nikto.conf</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section>
       <title>Format</title>
+
       <para>The configuration files are formated like a standard Unix
       configuration file: blank lines are ignored, any line starting with a #
       is ignored, variables are set with VariableName=Value line.</para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Variables</title>
+
       <para>The following variables may be set within the configuration
       file:</para>
 
       <variablelist>
-         <varlistentry>
-            <term><varname>CLIOPTS</varname></term>
-            <listitem>
-               <para>Default options that should always be passed to the
-               command line. For example:</para>
-               <screen>CLIOPTS=-output results.txt -Format text</screen>
+        <varlistentry>
+          <term><varname>CLIOPTS</varname></term>
 
-               <para>Default Setting</para>
-               <screen>CLIOPTS=</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>NIKTODTD</varname></term>
-            <listitem>
-               <para>Path to the location of the DTD used for XML output. If the
-               path is not absolute then it will be relative to the directory
-               where Nikto is executed.</para>
+          <listitem>
+            <para>Default options that should always be passed to the command
+            line. For example:</para>
 
-               <para>Default Setting</para>
-               <screen>NIKTODTD=docs/nikto.dtd</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>NMAP</varname></term>
-            <term><varname>NMAPOPTS</varname></term>
-            <listitem>
-               <para><emphasis>Deprecated</emphasis></para>
-               <para>Location of nmap and the default nmap options. Nikto used
-               to use nmap to aid in checking for valid HTTP ports on any
-               targets. From Nikto 2.10, nmap is no longer used from within
-               Nikto and this variable will do nothing. This variable may be
-               removed in a later version.</para>
+            <screen>CLIOPTS=-output results.txt -Format text</screen>
 
-               <para>Default Setting</para>
-               <screen>NMAP=/usr/local/bin/nmap
-NMPOPTS=-P0</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>SKIPPORTS</varname></term>
-            <listitem>
-               <para><emphasis>Deprecated</emphasis></para>
-               <para>This configuration item originally defined ports that
-               would never be scanned by Nikto. This is currently unused and
-               deprecated.</para>
+            <para>Default Setting</para>
 
-               <para>Default Setting</para>
-               <screen>SKIPPORTS=21 111</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>SKIPIDS</varname></term>
-            <listitem>
-               <note><para>Note, this filter only applies to tests in the
-               <filename>db_tests</filename> database</para></note>
+            <screen>CLIOPTS=</screen>
+          </listitem>
+        </varlistentry>
 
-               <para>Contains a space separated list of Test IDs (tids) that
-               Nikto will not run on the system, for example:</para>
+        <varlistentry>
+          <term><varname>NIKTODTD</varname></term>
 
-               <screen>SKIPIDS=000045 000345</screen>
+          <listitem>
+            <para>Path to the location of the DTD used for XML output. If the
+            path is not absolute then it will be relative to the directory
+            where Nikto is executed.</para>
 
-               <para>Default Setting</para>
-               <screen>SKIPIDS=</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>DEFAULTHTTPVER</varname></term>
-            <listitem>
-               <para>Defines the default version of HTTP that Nikto will use,
-               unless superceded by a specific test. Usually keeping this to
-               the default will suffice, though some web servers may only work
-               with later versions of the HTTP protocol.</para>
-               <para>Default Setting</para>
-               <screen>DEFAULTHTTPVER=1.0</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>UPDATES</varname></term>
-            <listitem>
-               <para>If the outdated Nikto plugin sees a web server it doesn't
-               know of, or a version that is later than that defined in
-               <filename>db_outdated</filename>, then it will send this
-               information back to cirt.net for inclusion in future versions of
-               Nikto. Server specific information (e.g. IP addresses or
-               hostnames) are not sent.</para>
+            <para>Default Setting</para>
 
-               <para>This item can be set to one of the below values:</para>
-               <blockquote>
-               <variablelist>
-                  <varlistentry>
-                     <term><varname>UPDATES=yes</varname></term>
-                     <listitem>
-                        <para>Display each submission and ask for permission
-                        before it is sent</para>
-                     </listitem>
-                  </varlistentry>
-                  <varlistentry>
-                     <term><varname>UPDATES=no</varname></term>
-                     <listitem>
-                        <para>Do not send any data back to cirt.net</para>
-                     </listitem>
-                  </varlistentry>
-                  <varlistentry>
-                     <term><varname>UPDATES=auto</varname></term>
-                     <listitem>
-                        <para>Send data back to cirt.net with no
-                        prompting</para>
-                     </listitem>
-                  </varlistentry>
-               </variablelist>
-               </blockquote>
-               <para>Default Setting</para>
-               <screen>UPDATES=yes</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>MAX_WARN</varname></term>
-            <listitem>
-               <para><emphasis>Unused</emphasis></para>
-               <para>Produces a warning of a number of MOVED responses are
-               retrieved. This is currently unused.</para>
+            <screen>NIKTODTD=docs/nikto.dtd</screen>
+          </listitem>
+        </varlistentry>
 
-               <para>Default Setting</para>
-               <screen>MAX_WARN=20</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>PROMPTS</varname></term>
-            <listitem>
-               <para><emphasis>Deprecated</emphasis></para>
-               <para>Disables Nikto prompts if set to "no". This is currently
-               unused and has been deprecated by the UPDATES item.</para>
+        <varlistentry>
+          <term><varname>RFIURL</varname></term>
 
-               <para>Default Setting</para>
-               <screen>PROMPTS=</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>CIRT</varname></term>
-            <listitem>
-               <para>The IP address that Nikto will use to update the databases
-               and plugins, or will send version information back to (as
-               described in the <varname>UPDATES</varname> item).</para>
+          <listitem>
+            <para>Full URL to an file for remote file inclusion. This file
+            should contain a call to phpinfo(), as Nikto will look for the
+            output of that command to determine that the RFI succeeded. You
+            may use the default cirt.net file, but please keep in mind there
+            must be connectivity from the target server to cirt.net, it's
+            subject to cirt.net's availability, and successful requests will
+            be logged (by Apache). We recommend you use your own. </para>
 
-               <para>Default Setting</para>
-               <screen>CIRT=209.172.49.178</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>PROXYHOST</varname></term>
-            <term><varname>PROXYPORT</varname></term>
-            <term><varname>PROXYUSER</varname></term>
-            <term><varname>PROXYPASS</varname></term>
-            <listitem>
-               <para>Address, port and username password of a proxy to relay all
-               requests through. Note, to use a proxy, you must set the
-               configuration items in the configuration file and supply the
-               <parameter>-useproxy</parameter> switch to the command
-               line.</para>
+            <para>Default Setting</para>
 
-               <para>Default Setting</para>
-               <screen>PROXYHOST=
+            <screen>RFIURL=http://cirt.net/rfiinc.txt?</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>SKIPPORTS</varname></term>
+
+          <listitem>
+            <para>This configuration item defines ports that would never be
+            scanned by Nikto. </para>
+
+            <para>Default Setting</para>
+
+            <screen>SKIPPORTS=21 111</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>SKIPIDS</varname></term>
+
+          <listitem>
+            <note>
+              <para>Note, this filter only applies to tests in the
+              <filename>db_tests</filename> database</para>
+            </note>
+
+            <para>Contains a space separated list of Test IDs (tids) that
+            Nikto will not run on the system, for example:</para>
+
+            <screen>SKIPIDS=000045 000345</screen>
+
+            <para>Default Setting</para>
+
+            <screen>SKIPIDS=</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>DEFAULTHTTPVER</varname></term>
+
+          <listitem>
+            <para>Defines the default version of HTTP that Nikto will use,
+            unless superceded by a specific test. Usually keeping this to the
+            default will suffice, though some web servers may only work with
+            later versions of the HTTP protocol.</para>
+
+            <para>Default Setting</para>
+
+            <screen>DEFAULTHTTPVER=1.0</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>UPDATES</varname></term>
+
+          <listitem>
+            <para>If the outdated Nikto plugin sees a web server it doesn't
+            know of, or a version that is later than that defined in
+            <filename>db_outdated</filename>, then it will send this
+            information back to cirt.net for inclusion in future versions of
+            Nikto. Server specific information (e.g. IP addresses or
+            hostnames) are not sent.</para>
+
+            <para>This item can be set to one of the below values:</para>
+
+            <blockquote>
+              <variablelist>
+                <varlistentry>
+                  <term><varname>UPDATES=yes</varname></term>
+
+                  <listitem>
+                    <para>Display each submission and ask for permission
+                    before it is sent</para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term><varname>UPDATES=no</varname></term>
+
+                  <listitem>
+                    <para>Do not send any data back to cirt.net</para>
+                  </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                  <term><varname>UPDATES=auto</varname></term>
+
+                  <listitem>
+                    <para>Send data back to cirt.net with no prompting</para>
+                  </listitem>
+                </varlistentry>
+              </variablelist>
+            </blockquote>
+
+            <para>Default Setting</para>
+
+            <screen>UPDATES=yes</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>MAX_WARN</varname></term>
+
+          <listitem>
+            <para><emphasis>Unused</emphasis></para>
+
+            <para>Produces a warning of a number of MOVED responses are
+            retrieved. This is currently unused.</para>
+
+            <para>Default Setting</para>
+
+            <screen>MAX_WARN=20</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>PROMPTS</varname></term>
+
+          <listitem>
+            <para><emphasis>Deprecated</emphasis></para>
+
+            <para>Disables Nikto prompts if set to "no". This is currently
+            unused and has been deprecated by the UPDATES item.</para>
+
+            <para>Default Setting</para>
+
+            <screen>PROMPTS=</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>CIRT</varname></term>
+
+          <listitem>
+            <para>The IP address that Nikto will use to update the databases
+            and plugins, or will send version information back to (as
+            described in the <varname>UPDATES</varname> item).</para>
+
+            <para>Default Setting</para>
+
+            <screen>CIRT=209.172.49.178</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>PROXYHOST</varname></term>
+
+          <term><varname>PROXYPORT</varname></term>
+
+          <term><varname>PROXYUSER</varname></term>
+
+          <term><varname>PROXYPASS</varname></term>
+
+          <listitem>
+            <para>Address, port and username password of a proxy to relay all
+            requests through. Note, to use a proxy, you must set the
+            configuration items in the configuration file and supply the
+            <parameter>-useproxy</parameter> switch to the command
+            line.</para>
+
+            <para>Default Setting</para>
+
+            <screen>PROXYHOST=
 PROXYPORT=
 PROXYUSER=
 PROXYPASS=</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>STATIC-COOKIE</varname></term>
-            <listitem>
-               <para>Adds the supplied cookie to all requests made via Nikto,
-               this is generally useful is an authentication cookie is required
-               for a website. For example:</para>
-               <screen>STATIC-COOKIE=userid=0</screen>
+          </listitem>
+        </varlistentry>
 
-               <para>Default Setting</para>
-               <screen>STATIC-COOKIE=</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>CHECKMETHODS</varname></term>
-            <listitem>
-               <para>Nikto will attempt to identify targets as webservers by
-               sending a request to fetch the / URI via certain HTTP methods.
-               Some web servers do not implement all HTTP methods and may cause
-               Nikto to fail to identify the web server correctly if it doesn't
-               support the method being used.</para>
+        <varlistentry>
+          <term><varname>STATIC-COOKIE</varname></term>
 
-               <para>If this setting is missing from the configuration file,
-               then Nikto will default back to the Nikto 2.02 default of
-               HEAD.</para>
+          <listitem>
+            <para>Adds the supplied cookie to all requests made via Nikto,
+            this is generally useful is an authentication cookie is required
+            for a website. For example:</para>
 
-               <para>Default Setting</para>
-               <screen>CHECKMETHODS=HEAD GET</screen>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term><varname>EXECDIR</varname></term>
-            <term><varname>PLUGINDIR</varname></term>
-            <term><varname>TEMPLATEDIR</varname></term>
-            <term><varname>DOCDIR</varname></term>
-            <listitem>
-               <para>Defines where to find the location of Nikto, its plugins,
-               XML/HTML templates and documents. This should only normally be
-               changed if repackaging Nikto to work with different file system
-               standards. Nikto will use the EXECDIR item to guess the other
-               directories.</para>
+            <screen>STATIC-COOKIE=userid=0</screen>
 
-               <para>Default Setting</para>
-               <screen>EXECDIR=.
+            <para>Default Setting</para>
+
+            <screen>STATIC-COOKIE=</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>CHECKMETHODS</varname></term>
+
+          <listitem>
+            <para>Nikto will attempt to identify targets as webservers by
+            sending a request to fetch the / URI via certain HTTP methods.
+            Some web servers do not implement all HTTP methods and may cause
+            Nikto to fail to identify the web server correctly if it doesn't
+            support the method being used.</para>
+
+            <para>If this setting is missing from the configuration file, then
+            Nikto will default back to the Nikto 2.02 default of HEAD.</para>
+
+            <para>Default Setting</para>
+
+            <screen>CHECKMETHODS=HEAD GET</screen>
+          </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term><varname>EXECDIR</varname></term>
+
+          <term><varname>PLUGINDIR</varname></term>
+
+          <term><varname>TEMPLATEDIR</varname></term>
+
+          <term><varname>DOCDIR</varname></term>
+
+          <listitem>
+            <para>Defines where to find the location of Nikto, its plugins,
+            XML/HTML templates and documents. This should only normally be
+            changed if repackaging Nikto to work with different file system
+            standards. Nikto will use the EXECDIR item to guess the other
+            directories.</para>
+
+            <para>Default Setting</para>
+
+            <screen>EXECDIR=.
 PLUGINDIR=EXECDIR/plugins
 TEMPLATEDIR=EXECDIR/templates
 DOCDIR=EXECDIR/docs</screen>
-            </listitem>
-         </varlistentry>
+          </listitem>
+        </varlistentry>
       </variablelist>
-   </section>
-</chapter>           
+    </section>
+  </chapter>
 
-<chapter id="reports">
-   <title>Output and Reports</title>
+  <chapter id="reports">
+    <title>Output and Reports</title>
 
-   <section>
+    <section>
       <title>Export Formats</title>
 
       <para>Nikto saved output comes in four flavours: text, CSV, XML or HTML.
       When using <parameter>-output</parameter>, an output format may be
       specified with <parameter>-Format</parameter>. Text format is assumed if
-      nothing is specified with <parameter>-Format</parameter>. The DTD for the
-      Nikto XML format can be found in the 'docs' directory (nikto.dtd).</para>
-   </section> 
-   <section>
+      nothing is specified with <parameter>-Format</parameter>. The DTD for
+      the Nikto XML format can be found in the 'docs' directory
+      (nikto.dtd).</para>
+    </section>
+
+    <section>
       <title>HTML and XML Customisation</title>
 
       <para>HTML reports are generated from template files located in the
@@ -906,9 +987,8 @@ DOCDIR=EXECDIR/docs</screen>
       also appears at the beginning of the report. The
       <filename>htm_host_head</filename> appears once for every host, and the
       <filename>htm_host_item.tmpl</filename> and
-      <filename>htm_host_im.tmpl</filename> appear once for each item
-      found on a host and each "informational message" per host
-      (respectively).</para>
+      <filename>htm_host_im.tmpl</filename> appear once for each item found on
+      a host and each "informational message" per host (respectively).</para>
 
       <para>All valid variables are used in these templates. Future versions
       of this documentation will include a list of variables and their
@@ -918,13 +998,13 @@ DOCDIR=EXECDIR/docs</screen>
       <filename>htm_end.tmpl</filename> without placing them in another of the
       templates. It is a violation of the Nikto licence to remove these
       notices.</para>
-   </section>
-</chapter>
+    </section>
+  </chapter>
 
-<chapter id="expanding">
-   <title>Test and Code Writing</title>
+  <chapter id="expanding">
+    <title>Test and Code Writing</title>
 
-   <section>
+    <section>
       <title>Scan Database Field Values</title>
 
       <para>Though some checks can be found in other plugins, the
@@ -932,71 +1012,96 @@ DOCDIR=EXECDIR/docs</screen>
       information. Here is a description of the field values:</para>
 
       <table>
-      <title>Scan Database Fields</title>
-      <tgroup cols="2">
-      <tbody>
-         <row>
-            <entry>Test ID</entry>
-            <entry>Nikto test ID</entry>
-         </row>
-         <row>
-            <entry>OSVDB-ID</entry>
-            <entry>Corresponding vulnerability entry number for
-            osvdb.org</entry>
-         </row>
-         <row>
-            <entry>Server Type</entry>
-            <entry>Generic server matching type</entry>
-         </row>
-         <row>
-            <entry>URI</entry>
-            <entry>URI to retrieve</entry>
-         </row>
-         <row>
-            <entry>HTTP Method</entry>
-            <entry>HTTP method to use for URI</entry>
-         </row>
-         <row>
-            <entry>Match 1</entry>
-            <entry>String or code to match for successful test</entry>
-         </row>
-         <row>
-            <entry>Match 1 (Or)</entry>
-            <entry>String or code to alternatively match for successful
-            test</entry>
-         </row>
-         <row>
-            <entry>Match1 (And)</entry>
-            <entry>String or code to also match for successful
-            test</entry>
-         </row>
-         <row>
-            <entry>Fail 1</entry>
-            <entry>String or code to match for test failure</entry>
-         </row>
-         <row>
-            <entry>Fail 2</entry>
-            <entry>String or code to match for test failure
-            (alternative)</entry>
-         </row>
-         <row>
-            <entry>Summary</entry>
-            <entry>Summary message to report for successful test</entry>
-         </row>
-         <row>
-            <entry>HTTP Data</entry>
-            <entry>HTTP data to be sent during POST tests</entry>
-         </row>
-         <row>
-            <entry>Headers</entry>
-            <entry>Additional headers to send during test</entry>
-         </row>
-      </tbody>
-      </tgroup>
-      </table>
-   </section>
+        <title>Scan Database Fields</title>
 
-   <section>
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry>Test ID</entry>
+
+              <entry>Nikto test ID</entry>
+            </row>
+
+            <row>
+              <entry>OSVDB-ID</entry>
+
+              <entry>Corresponding vulnerability entry number for
+              osvdb.org</entry>
+            </row>
+
+            <row>
+              <entry>Server Type</entry>
+
+              <entry>Generic server matching type</entry>
+            </row>
+
+            <row>
+              <entry>URI</entry>
+
+              <entry>URI to retrieve</entry>
+            </row>
+
+            <row>
+              <entry>HTTP Method</entry>
+
+              <entry>HTTP method to use for URI</entry>
+            </row>
+
+            <row>
+              <entry>Match 1</entry>
+
+              <entry>String or code to match for successful test</entry>
+            </row>
+
+            <row>
+              <entry>Match 1 (Or)</entry>
+
+              <entry>String or code to alternatively match for successful
+              test</entry>
+            </row>
+
+            <row>
+              <entry>Match1 (And)</entry>
+
+              <entry>String or code to also match for successful test</entry>
+            </row>
+
+            <row>
+              <entry>Fail 1</entry>
+
+              <entry>String or code to match for test failure</entry>
+            </row>
+
+            <row>
+              <entry>Fail 2</entry>
+
+              <entry>String or code to match for test failure
+              (alternative)</entry>
+            </row>
+
+            <row>
+              <entry>Summary</entry>
+
+              <entry>Summary message to report for successful test</entry>
+            </row>
+
+            <row>
+              <entry>HTTP Data</entry>
+
+              <entry>HTTP data to be sent during POST tests</entry>
+            </row>
+
+            <row>
+              <entry>Headers</entry>
+
+              <entry>Additional headers to send during test</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+
+    <section>
       <title>User-Defined Tests</title>
 
       <para>Users can create their own, private tests for any of the
@@ -1005,9 +1110,9 @@ DOCDIR=EXECDIR/docs</screen>
       "u", the data will be loaded along with the built-in checks.</para>
 
       <para>For example, create the file
-      <filename>plugins/udb_tests</filename> and it will be loaded at the
-      same time <filename>plugins/db_tests</filename> is loaded. These files
-      will also be checked for syntax when <parameter>-dbcheck</parameter> is
+      <filename>plugins/udb_tests</filename> and it will be loaded at the same
+      time <filename>plugins/db_tests</filename> is loaded. These files will
+      also be checked for syntax when <parameter>-dbcheck</parameter> is
       used.</para>
 
       <para>For tests which require a "private" OSVDB ID, use the OSVDB ID 0
@@ -1023,9 +1128,9 @@ DOCDIR=EXECDIR/docs</screen>
 
       <para>Please help Nikto's continued success by sending test updates to
       <email>sullo@cirt.net</email>.</para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Scan Database Syntax</title>
 
       <para>The scan database is a CSV delimited file which contains most of
@@ -1038,59 +1143,67 @@ DOCDIR=EXECDIR/docs</screen>
       <para>Here is an example test:</para>
 
       <screen>"120","3092","2","/manual/","GET","200","","","","","Web server manual","",""</screen>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Plugins</title>
 
-      <para>To allow a bit more flexibility, Nikto allows plugins so that there
-      is easy expansion of existing capabilities and some future 
+      <para>To allow a bit more flexibility, Nikto allows plugins so that
+      there is easy expansion of existing capabilities and some future
       proofing.</para>
 
       <para>Plugins are run in four different phases, these are:</para>
-      <blockquote>
-      <variablelist>
-         <varlistentry>
-            <term>Initialisation (mandatory)</term>
-            <listitem>
-               <para>Plugin initialisation is performed before targets are 
-               assigned. During this phase, the plugin should tell Nikto
-               about its existence and capabilities. It may optionally
-               set up any later required variables.</para>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term>Reconnaisance (optional)</term>
-            <listitem>
-               <para>During the reconnaisance phase, the plugin should look
-               for interesting information that may be of use during the scan
-               phase. It may report vulnerablities, though this is
-               discouraged.</para>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term>Scan (optional)</term>
-            <listitem>
-               <para>The scan phase should perform the meat of the plugin - this
-               is where it should look at the web server and return any 
-               potential vulnerabilities.</para>
-            </listitem>
-         </varlistentry>
-         <varlistentry>
-            <term>Reporting (optional)</term>
-            <listitem>
-               <para>The reporting phase is used to export any found
-               vulnerabilities into a format that they can be used later, for
-               example written as a file report, or imported into a database.
-               No testing of the web server, or reporting of new vulnerbilies
-               should be performed in this phase.</para>
 
-               <para>This phase is slightly more complex than the others and may
-               be called at several points during Nikto's execution, as detailed
-               later</para>
+      <blockquote>
+        <variablelist>
+          <varlistentry>
+            <term>Initialisation (mandatory)</term>
+
+            <listitem>
+              <para>Plugin initialisation is performed before targets are
+              assigned. During this phase, the plugin should tell Nikto about
+              its existence and capabilities. It may optionally set up any
+              later required variables.</para>
             </listitem>
-         </varlistentry>
-      </variablelist>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Reconnaisance (optional)</term>
+
+            <listitem>
+              <para>During the reconnaisance phase, the plugin should look for
+              interesting information that may be of use during the scan
+              phase. It may report vulnerablities, though this is
+              discouraged.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Scan (optional)</term>
+
+            <listitem>
+              <para>The scan phase should perform the meat of the plugin -
+              this is where it should look at the web server and return any
+              potential vulnerabilities.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Reporting (optional)</term>
+
+            <listitem>
+              <para>The reporting phase is used to export any found
+              vulnerabilities into a format that they can be used later, for
+              example written as a file report, or imported into a database.
+              No testing of the web server, or reporting of new vulnerbilies
+              should be performed in this phase.</para>
+
+              <para>This phase is slightly more complex than the others and
+              may be called at several points during Nikto's execution, as
+              detailed later</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
       </blockquote>
 
       <para>Plugins are written in standard perl in the current context. They
@@ -1106,890 +1219,1070 @@ DOCDIR=EXECDIR/docs</screen>
       order.</para>
 
       <section>
-         <title>Initialisation Phase</title>
+        <title>Initialisation Phase</title>
 
-         <para>As described above, all plugins must be able to execute in the
-         initialisation phase or they will be ignored.</para>
+        <para>As described above, all plugins must be able to execute in the
+        initialisation phase or they will be ignored.</para>
 
-         <para>A perl sub must exist called
-         <function><replaceable>filename</replaceable>_init</function>. The
-         sub is passed no parameters and should return a hash reference to a
-         hash that should contain the following entries:</para>
+        <para>A perl sub must exist called
+        <function><replaceable>filename</replaceable>_init</function>. The sub
+        is passed no parameters and should return a hash reference to a hash
+        that should contain the following entries:</para>
 
-         <variablelist>
-            <varlistentry>
-               <term><structfield>name</structfield> (mandatory)</term>
-               <listitem>
-                  <para>The short name of the plugin. This is used to identify
-                  the plugin during verbose logging and will, in future
-                  versions, be used to select plugin execution. The name
-                  should be one word and, ideally, lower case.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>full_name</structfield> (mandatory)</term>
-               <listitem>
-                  <para>The full name of the plugin. This is used to identify
-                  the plugin during verbose logging and may be used in
-                  reporting modules to identify tests run against the web
-                  server.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>author</structfield> (mandatory)</term>
-               <listitem>
-                  <para>The name or handle of the author of the plugin. This
-                  may be used during reporting to identify ownerships of
-                  copyright of tests run against the web server.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>description</structfield> (mandatory)</term>
-               <listitem>
-               <para>A short sentence to describe the purpose of the plugin.
-               This may be used during reporting, or by a front end to describe
-               the purpose of the plugin.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>copyright</structfield> (mandatory)</term>
-               <listitem>
-                  <para>The copyright string (or lack of it) of the plugin. This
-                  may be used during reporting to ensure that appropriate
-                  copyright is assigned to reports.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>recon_method</structfield> (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function used during the
-                  reconnaisance phase of the plugin's execution. If this is left
-                  undefined then the plugin will not execute during the
-                  reconnaisance phase.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>recon_cond</structfield> (optional)</term>
-               <listitem>
-                  <para>This is an expression to be evaluated before the plugin
-                  is executed; if true, the plugins is executed, if false, the
-                  plugin is skipped. This can be used to minimise plugin
-                  execution.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>recon_weight</structfield> (optional)</term>
-               <listitem>
-                  <para>This is the weight used to schedule the running of the
-                  plugin during the reconnaisance phase. If this is left
-                  undefined it will default to 50.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>scan_method</structfield> (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function used during the
-                  scan phase of the plugin's execution. If this is left
-                  undefined then the plugin will not execute during the
-                  scan phase.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>scan_cond</structfield> (optional)</term>
-               <listitem>
-                  <para>This is an expression to be evaluated before the plugin
-                  is executed; if true, the plugins is executed, if false, the
-                  plugin is skipped. This can be used to minimise plugin
-                  execution.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>scan_weight</structfield> (optional)</term>
-               <listitem>
-                  <para>This is the weight used to schedule the running of the
-                  plugin during the scan phase. If this is left undefined it
-                  will default to 50.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_head</structfield> (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function executed
-                  before any testing commences. If this is left undefined then
-                  the plugin will not be called to produce a report
-                  header.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_host_start</structfield>
-               (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function executed before
-                  the reconnaisance phase of each host. If this is left
-                  undefined then the plugin will not be called to produce a host
-                  header.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_host_end</structfield>
-               (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function executed after
-                  the scan phase of each host. If this is left undefined then
-                  the plugin will not be called to produce a host footer.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_item</structfield> (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function executed after
-                  each found vulnerability. If this is left undefined then
-                  the plugin will not be called to produce an item
-                  record.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_close</structfield> (optional)</term>
-               <listitem>
-                  <para>This should be a reference to a function executed after
-                  testing of all hosts has been finished. If this is left
-                  undefined then the plugin will not be called to close the
-                  report.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_format</structfield> (optional)</term>
-               <listitem>
-                  <para>This should describe the file format that the plugin
-                  handles. This is internally matched with the contents of the
-                  <parameter>-output</parameter> switch to reduce excessive
-                  calls to plugins.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><structfield>report_weight</structfield> (optional)</term>
-               <listitem>
-                  <para>This is the weight used to schedule the running of the
-                  plugin during the reporting phase. If this is left undefined
-                  it will default to 50.</para>
-               </listitem>
-            </varlistentry>
-         </variablelist>
+        <variablelist>
+          <varlistentry>
+            <term><structfield>name</structfield> (mandatory)</term>
 
-         <example>
-         <title>Example initialisation function</title>
-         <programlisting> <![CDATA[sub nikto_dictionary_attack_init
+            <listitem>
+              <para>The short name of the plugin. This is used to identify the
+              plugin during verbose logging and will, in future versions, be
+              used to select plugin execution. The name should be one word
+              and, ideally, lower case.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>full_name</structfield> (mandatory)</term>
+
+            <listitem>
+              <para>The full name of the plugin. This is used to identify the
+              plugin during verbose logging and may be used in reporting
+              modules to identify tests run against the web server.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>author</structfield> (mandatory)</term>
+
+            <listitem>
+              <para>The name or handle of the author of the plugin. This may
+              be used during reporting to identify ownerships of copyright of
+              tests run against the web server.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>description</structfield> (mandatory)</term>
+
+            <listitem>
+              <para>A short sentence to describe the purpose of the plugin.
+              This may be used during reporting, or by a front end to describe
+              the purpose of the plugin.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>copyright</structfield> (mandatory)</term>
+
+            <listitem>
+              <para>The copyright string (or lack of it) of the plugin. This
+              may be used during reporting to ensure that appropriate
+              copyright is assigned to reports.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>recon_method</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function used during the
+              reconnaisance phase of the plugin's execution. If this is left
+              undefined then the plugin will not execute during the
+              reconnaisance phase.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>recon_cond</structfield> (optional)</term>
+
+            <listitem>
+              <para>This is an expression to be evaluated before the plugin is
+              executed; if true, the plugins is executed, if false, the plugin
+              is skipped. This can be used to minimise plugin
+              execution.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>recon_weight</structfield> (optional)</term>
+
+            <listitem>
+              <para>This is the weight used to schedule the running of the
+              plugin during the reconnaisance phase. If this is left undefined
+              it will default to 50.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>scan_method</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function used during the
+              scan phase of the plugin's execution. If this is left undefined
+              then the plugin will not execute during the scan phase.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>scan_cond</structfield> (optional)</term>
+
+            <listitem>
+              <para>This is an expression to be evaluated before the plugin is
+              executed; if true, the plugins is executed, if false, the plugin
+              is skipped. This can be used to minimise plugin
+              execution.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>scan_weight</structfield> (optional)</term>
+
+            <listitem>
+              <para>This is the weight used to schedule the running of the
+              plugin during the scan phase. If this is left undefined it will
+              default to 50.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_head</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function executed before
+              any testing commences. If this is left undefined then the plugin
+              will not be called to produce a report header.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_host_start</structfield>
+            (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function executed before
+              the reconnaisance phase of each host. If this is left undefined
+              then the plugin will not be called to produce a host
+              header.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_host_end</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function executed after
+              the scan phase of each host. If this is left undefined then the
+              plugin will not be called to produce a host footer.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_item</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function executed after
+              each found vulnerability. If this is left undefined then the
+              plugin will not be called to produce an item record.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_close</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should be a reference to a function executed after
+              testing of all hosts has been finished. If this is left
+              undefined then the plugin will not be called to close the
+              report.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_format</structfield> (optional)</term>
+
+            <listitem>
+              <para>This should describe the file format that the plugin
+              handles. This is internally matched with the contents of the
+              <parameter>-output</parameter> switch to reduce excessive calls
+              to plugins.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><structfield>report_weight</structfield> (optional)</term>
+
+            <listitem>
+              <para>This is the weight used to schedule the running of the
+              plugin during the reporting phase. If this is left undefined it
+              will default to 50.</para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+
+        <example>
+          <title>Example initialisation function</title>
+
+          <programlisting> sub nikto_dictionary_attack_init
 {
    my $id =
    {
-      name         => "dictionary",
-      full_name    => "Dictionary attack",
-      author       => "Deity",
-      description  => "Attempts to dictionary attack commonly known directories/files",
-      recon_method => \&nikto_dictionary_attack,
-      recon_cond   => '$CLI{mutate} =~ /6/',
-      recon_weight => 20,
-      copyright    => "2009 CIRT Inc"
+      name         =&gt; "dictionary",
+      full_name    =&gt; "Dictionary attack",
+      author       =&gt; "Deity",
+      description  =&gt; "Attempts to dictionary attack commonly known directories/files",
+      recon_method =&gt; \&amp;nikto_dictionary_attack,
+      recon_cond   =&gt; '$CLI{mutate} =~ /6/',
+      recon_weight =&gt; 20,
+      copyright    =&gt; "2009 CIRT Inc"
    };
 
    return $id;
-} ]]> </programlisting>
-         </example>
+}  </programlisting>
+        </example>
       </section>
 
       <section>
-         <title>Reconnaisance Phase</title>
+        <title>Reconnaisance Phase</title>
 
-         <para>The reconnaisance phase is executed for each target at the start
-         of each scan.</para>
+        <para>The reconnaisance phase is executed for each target at the start
+        of each scan.</para>
 
-         <para>Each reconnaisance method such expect to take a
-         <varname>mark</varname> hash ref. It should return nothing.</para>
+        <para>Each reconnaisance method such expect to take a
+        <varname>mark</varname> hash ref. It should return nothing.</para>
 
-         <funcsynopsis>
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>void
+            <function><replaceable>recon_method</replaceable></function></funcdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>The reconnaisance phase is intended to be used to pull
+        information about the web server for later use by the plugin, or by
+        other plugins. Reporting vulnerabilities in this phase is
+        discouraged.</para>
+
+        <para>Example uses of the reconnaisance phase are to spider a site,
+        check for known applications etc.</para>
+      </section>
+
+      <section>
+        <title>Scan Phase</title>
+
+        <para>The scan phase is the meat of the plugin's life, this is run,
+        for each target, immediately after the reconnaisance phase.</para>
+
+        <para>Each scan should check for vulnerabilities it knows about and
+        report on them as it finds one.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>void
+            <function><replaceable>scan_method</replaceable></function></funcdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+      </section>
+
+      <section>
+        <title>Reporting Phase</title>
+
+        <para>This is potentially the most convoluted phase as it has several
+        hooks that may be used for each section in the scan's lifetime.</para>
+
+        <para>The hooks are:</para>
+
+        <section>
+          <title>Report Head</title>
+
+          <para>This hook is called immediately after target acquisition and
+          before the reconnaisance phase. It is designed to allow the
+          reporting plugin to open the report and ensure that any headers are
+          appropiately written.</para>
+
+          <funcsynopsis>
             <funcprototype>
-               <funcdef>void <function><replaceable>recon_method</replaceable></function></funcdef>
-               <paramdef>hashref <parameter>mark</parameter></paramdef>
+              <funcdef>handle
+              <function><replaceable>report_head</replaceable></function></funcdef>
+
+              <paramdef>string <parameter>filename</parameter></paramdef>
             </funcprototype>
-         </funcsynopsis>
+          </funcsynopsis>
 
-         <para>The reconnaisance phase is intended to be used to pull
-         information about the web server for later use by the plugin, or by
-         other plugins. Reporting vulnerabilities in this phase is
-         discouraged.</para>
+          <para>The <parameter>filename</parameter> parameter is a bit of a
+          misnomer; it will be a copy of the string passed to the
+          <parameter>-output</parameter> switch and may indicate, for example,
+          a database name.</para>
 
-         <para>Example uses of the reconnaisance phase are to spider a site,
-         check for known applications etc.</para>
-      </section>
+          <para>The <parameter>handle</parameter> is a handle that will be
+          passed to other reporting functions for this plugin so should be
+          internally consistent.</para>
+        </section>
 
-      <section>
-         <title>Scan Phase</title>
+        <section>
+          <title>Report Host Start</title>
 
-         <para>The scan phase is the meat of the plugin's life, this is run,
-         for each target, immediately after the reconnaisance phase.</para>
+          <para>This hook is called immediately before the reconnaisance phase
+          for each target. It is designed to allow the reporting plugin to
+          write any host specfic information.</para>
 
-         <para>Each scan should check for vulnerabilities it knows about and
-         report on them as it finds one.</para>
-
-         <funcsynopsis>
+          <funcsynopsis>
             <funcprototype>
-               <funcdef>void <function><replaceable>scan_method</replaceable></function></funcdef>
-               <paramdef>hashref <parameter>mark</parameter></paramdef>
+              <funcdef>void
+              <function><replaceable>report_host_start</replaceable></function></funcdef>
+
+              <paramdef>handle <parameter>rhandle</parameter></paramdef>
+
+              <paramdef>hashref <parameter>mark</parameter></paramdef>
             </funcprototype>
-         </funcsynopsis>
+          </funcsynopsis>
+
+          <para>The <parameter>rhandle</parameter> parameter is the output of
+          the plugin's Report Head function.</para>
+
+          <para>The <parameter>mark</parameter> parameter is a hashref for the
+          target information (described below).</para>
+        </section>
+
+        <section>
+          <title>Report Host End</title>
+
+          <para>This hook is called immediately after the scan phase for each
+          target. It is designed to allow the reporting plugin to close any
+          host specfic information.</para>
+
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef>void
+              <function><replaceable>report_host_end</replaceable></function></funcdef>
+
+              <paramdef>handle <parameter>rhandle</parameter></paramdef>
+
+              <paramdef>hashref <parameter>mark</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+
+          <para>The <parameter>rhandle</parameter> parameter is the output of
+          the plugin's Report Head function.</para>
+
+          <para>The <parameter>mark</parameter> parameter is a hashref for the
+          target information (described below).</para>
+        </section>
+
+        <section>
+          <title>Report Item</title>
+
+          <para>This hook is called once for each vulnerability found on the
+          target This should report details about the vulnerability.</para>
+
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef>void
+              <function><replaceable>report_item</replaceable></function></funcdef>
+
+              <paramdef>handle <parameter>rhandle</parameter></paramdef>
+
+              <paramdef>hashref <parameter>mark</parameter></paramdef>
+
+              <paramdef>hashref <parameter>vulnerbility</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+
+          <para>The <parameter>rhandle</parameter> parameter is the output of
+          the plugin's Report Head function.</para>
+
+          <para>The <parameter>mark</parameter> parameter is a hashref for the
+          target information (described below).</para>
+
+          <para>The <parameter>vulnerability</parameter> parameter is a
+          hashref for the vulnerability information (described below).</para>
+        </section>
+
+        <section>
+          <title>Report Close</title>
+
+          <para>This hook is called immediately after all targets have been
+          scanned. It is designed to allow the reporting plugin to elegantly
+          close the report.</para>
+
+          <funcsynopsis>
+            <funcprototype>
+              <funcdef>void
+              <function><replaceable>report_close</replaceable></function></funcdef>
+
+              <paramdef>handle <parameter>rhandle</parameter></paramdef>
+            </funcprototype>
+          </funcsynopsis>
+
+          <para>The <parameter>rhandle</parameter> parameter is the output of
+          the plugin's Report Head function.</para>
+        </section>
       </section>
 
       <section>
-         <title>Reporting Phase</title>
+        <title>Data Structures</title>
 
-         <para>This is potentially the most convoluted phase as it has several
-         hooks that may be used for each section in the scan's lifetime.</para>
+        <para>The below data structures are used to communicate between the
+        various plugin methods. Unless otherwise mentioned, they are all
+        standard perl hash references with the detailed members.</para>
 
-         <para>The hooks are:</para>
+        <section>
+          <title><structname>Mark</structname></title>
 
-         <section>
-            <title>Report Head</title>
+          <para>The mark hash contains all information about a target. It
+          contains the below members. It should be read-only.</para>
 
-            <para>This hook is called immediately after target acquisition and
-            before the reconnaisance phase. It is designed to allow the
-            reporting plugin to open the report and ensure that any headers
-            are appropiately written.</para>
-
-            <funcsynopsis>
-               <funcprototype>
-                  <funcdef>handle <function><replaceable>report_head</replaceable></function></funcdef>
-                  <paramdef>string <parameter>filename</parameter></paramdef>
-               </funcprototype>
-            </funcsynopsis>
-
-            <para>The <parameter>filename</parameter> parameter is a bit of a
-            misnomer; it will be a copy of the string passed to the
-            <parameter>-output</parameter> switch and may indicate, for
-            example, a database name.</para>
-
-            <para>The <parameter>handle</parameter> is a handle that will be
-            passed to other reporting functions for this plugin so should be
-            internally consistent.</para>
-         </section>
-
-         <section>
-            <title>Report Host Start</title>
-            <para>This hook is called immediately before the reconnaisance
-            phase for each target. It is designed to allow the reporting plugin
-            to write any host specfic information.</para>
-
-            <funcsynopsis>
-               <funcprototype>
-                  <funcdef>void <function><replaceable>report_host_start</replaceable></function></funcdef>
-                  <paramdef>handle <parameter>rhandle</parameter></paramdef>
-                  <paramdef>hashref <parameter>mark</parameter></paramdef>
-               </funcprototype>
-            </funcsynopsis>
-
-            <para>The <parameter>rhandle</parameter> parameter is the output
-            of the plugin's Report Head function.</para>
-
-            <para>The <parameter>mark</parameter> parameter is a hashref for the
-            target information (described below).</para>
-         </section>
-
-         <section>
-            <title>Report Host End</title>
-            <para>This hook is called immediately after the scan phase for
-            each target. It is designed to allow the reporting plugin to close
-            any host specfic information.</para>
-
-            <funcsynopsis>
-               <funcprototype>
-                  <funcdef>void <function><replaceable>report_host_end</replaceable></function></funcdef>
-                  <paramdef>handle <parameter>rhandle</parameter></paramdef>
-                  <paramdef>hashref <parameter>mark</parameter></paramdef>
-               </funcprototype>
-            </funcsynopsis>
-
-            <para>The <parameter>rhandle</parameter> parameter is the output
-            of the plugin's Report Head function.</para>
-
-            <para>The <parameter>mark</parameter> parameter is a hashref for the
-            target information (described below).</para>
-         </section>
-
-         <section>
-            <title>Report Item</title>
-            <para>This hook is called once for each vulnerability found on the
-            target This should report details about the vulnerability.</para>
-
-            <funcsynopsis>
-               <funcprototype>
-                  <funcdef>void <function><replaceable>report_item</replaceable></function></funcdef>
-                  <paramdef>handle <parameter>rhandle</parameter></paramdef>
-                  <paramdef>hashref <parameter>mark</parameter></paramdef>
-                  <paramdef>hashref <parameter>vulnerbility</parameter></paramdef>
-               </funcprototype>
-            </funcsynopsis>
-
-            <para>The <parameter>rhandle</parameter> parameter is the output of
-            the plugin's Report Head function.</para>
-
-            <para>The <parameter>mark</parameter> parameter is a hashref for
-            the target information (described below).</para>
-
-            <para>The <parameter>vulnerability</parameter> parameter is a
-            hashref for the vulnerability information (described below).</para>
-         </section>
-
-         <section>
-            <title>Report Close</title>
-            <para>This hook is called immediately after all targets have been
-            scanned. It is designed to allow the reporting plugin to elegantly
-            close the report.</para>
-
-            <funcsynopsis>
-               <funcprototype>
-                  <funcdef>void <function><replaceable>report_close</replaceable></function></funcdef>
-                  <paramdef>handle <parameter>rhandle</parameter></paramdef>
-               </funcprototype>
-            </funcsynopsis>
-
-            <para>The <parameter>rhandle</parameter> parameter is the output of
-            the plugin's Report Head function.</para>
-         </section>
-      </section>
-
-      <section>
-         <title>Data Structures</title>
-         <para>The below data structures are used to communicate between the
-         various plugin methods. Unless otherwise mentioned, they are all
-         standard perl hash references with the detailed members.</para>
-
-         <section>
-            <title><structname>Mark</structname></title>
-            <para>The mark hash contains all information about a target. It
-            contains the below members. It should be read-only.</para>
-
-            <blockquote>
+          <blockquote>
             <table>
-               <title>Members of the <structname>Mark</structname>
-               structure</title>
-               <tgroup cols="2">
-               <tbody>
-               <row>
-                  <entry><structfield>ident</structfield></entry>
-                  <entry>
-                     Host identifier, usually equivalent to what was
-                     passed on the command line.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>hostname</structfield></entry>
-                  <entry>
-                     Host name of the target.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>ip</structfield></entry>
-                  <entry>
-                     IP address of the target.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>port</structfield></entry>
-                  <entry>
-                     TCP port of the target.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>display_name</structfield></entry>
-                  <entry>
-                     Either the hostname, or the IP address of the
-                     target, dependant on whether a hostname has been
-                     discovered.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>ssl</structfield></entry>
-                  <entry>
-                     Flag to indicate whether the target runs over SSL.
-                     If it is set to 0, then the plugin should not use SSL. Any
-                     other value indicates SSL should be used.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>vhost</structfield></entry>
-                  <entry>
-                     Virtual hostname to use for the target.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>root</structfield></entry>
-                  <entry>
-                     Root URI to use for the target.
-                  </entry>
-               </row>
-               <row>
-                  <entry><structfield>banner</structfield></entry>
-                  <entry>
-                     Banner of the target's web server.
-                  </entry>
-               </row>
-               </tbody>
-               </tgroup>
+              <title>Members of the <structname>Mark</structname>
+              structure</title>
+
+              <tgroup cols="2">
+                <tbody>
+                  <row>
+                    <entry><structfield>ident</structfield></entry>
+
+                    <entry>Host identifier, usually equivalent to what was
+                    passed on the command line.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>hostname</structfield></entry>
+
+                    <entry>Host name of the target.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>ip</structfield></entry>
+
+                    <entry>IP address of the target.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>port</structfield></entry>
+
+                    <entry>TCP port of the target.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>display_name</structfield></entry>
+
+                    <entry>Either the hostname, or the IP address of the
+                    target, dependant on whether a hostname has been
+                    discovered.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>ssl</structfield></entry>
+
+                    <entry>Flag to indicate whether the target runs over SSL.
+                    If it is set to 0, then the plugin should not use SSL. Any
+                    other value indicates SSL should be used.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>vhost</structfield></entry>
+
+                    <entry>Virtual hostname to use for the target.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>root</structfield></entry>
+
+                    <entry>Root URI to use for the target.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>banner</structfield></entry>
+
+                    <entry>Banner of the target's web server.</entry>
+                  </row>
+                </tbody>
+              </tgroup>
             </table>
-            </blockquote>
-         </section>
+          </blockquote>
+        </section>
 
-         <section>
-            <title>Vulnerability</title>
-            <para>The vulnerability hash contains all information about a
-            vulnerability. It contains the below members. It should be
-            read-only and should only be written using the
-            <function>add_vulnerability</function> method.</para>
+        <section>
+          <title>Vulnerability</title>
 
-            <blockquote>
+          <para>The vulnerability hash contains all information about a
+          vulnerability. It contains the below members. It should be read-only
+          and should only be written using the
+          <function>add_vulnerability</function> method.</para>
+
+          <blockquote>
             <table>
-               <title>Members of the <structname>Vulnerability</structname>
-               structure</title>
-               <tgroup cols="2">
-               <tbody>
-               <row>
-                  <entry>mark</entry>
-                  <entry>Hash ref to a mark data structure.</entry>
-               </row>
-               <row>
-                  <entry>message</entry>
-                  <entry>Message for the vulnerability.</entry>
-               </row>
-               <row>
-                  <entry>nikto_id</entry>
-                  <entry>Test ID (tid) of the vulnerability, this should be
-                  a unique number which'll identify the vulnerability.</entry>
-               </row>
-               <row>
-                  <entry>osvdb</entry>
-                  <entry>OSVDB reference to the vulnerability in the Open
-                  Source Vulnerability Database. This may be 0 if an OSVDB
-                  reference is not relevant or doesn't exist.</entry>
-               </row>
-               <row>
-                  <entry>method</entry>
-                  <entry>HTTP method used to find the vulnerability.</entry>
-               </row>
-               <row>
-                  <entry>uri</entry>
-                  <entry>URI for the result.</entry>
-               </row>
-               <row>
-                  <entry>result</entry>
-                  <entry>Any HTTP data, excluding headers.</entry>
-               </row>
-               </tbody>
-               </tgroup>
+              <title>Members of the <structname>Vulnerability</structname>
+              structure</title>
+
+              <tgroup cols="2">
+                <tbody>
+                  <row>
+                    <entry>mark</entry>
+
+                    <entry>Hash ref to a mark data structure.</entry>
+                  </row>
+
+                  <row>
+                    <entry>message</entry>
+
+                    <entry>Message for the vulnerability.</entry>
+                  </row>
+
+                  <row>
+                    <entry>nikto_id</entry>
+
+                    <entry>Test ID (tid) of the vulnerability, this should be
+                    a unique number which'll identify the
+                    vulnerability.</entry>
+                  </row>
+
+                  <row>
+                    <entry>osvdb</entry>
+
+                    <entry>OSVDB reference to the vulnerability in the Open
+                    Source Vulnerability Database. This may be 0 if an OSVDB
+                    reference is not relevant or doesn't exist.</entry>
+                  </row>
+
+                  <row>
+                    <entry>method</entry>
+
+                    <entry>HTTP method used to find the vulnerability.</entry>
+                  </row>
+
+                  <row>
+                    <entry>uri</entry>
+
+                    <entry>URI for the result.</entry>
+                  </row>
+
+                  <row>
+                    <entry>result</entry>
+
+                    <entry>Any HTTP data, excluding headers.</entry>
+                  </row>
+                </tbody>
+              </tgroup>
             </table>
-            </blockquote>
-         </section>
+          </blockquote>
+        </section>
       </section>
 
       <section>
-         <title>Standard Methods</title>
-         <para>Several standard methods are defined in
-         <filename>nikto_core.plugin</filename> that can be used for all
-         plugins. It is strongly advised that these should be used where 
-         possible instead of writing new methods.</para>
+        <title>Standard Methods</title>
 
-         <para>For some methods, such as <function>add_vulnerability</function>
-         which write to global variables, these <emphasis>must</emphasis> be
-         the only interface to those global variables.</para> 
+        <para>Several standard methods are defined in
+        <filename>nikto_core.plugin</filename> that can be used for all
+        plugins. It is strongly advised that these should be used where
+        possible instead of writing new methods.</para>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>array <function>change_variables</function></funcdef>
-               <paramdef>string <parameter>line</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Expands any variables in the line parameter. The expansions are
-         variables defined in the global array <varname>@VARIABLES</varname>,
-         which may be read from <filename>db_variables</filename>, or added by
-         reconnaisance plugin methods.</para>
+        <para>For some methods, such as <function>add_vulnerability</function>
+        which write to global variables, these <emphasis>must</emphasis> be
+        the only interface to those global variables.</para>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>int <function>is_404</function></funcdef>
-               <paramdef>string <parameter>uri</parameter></paramdef>
-               <paramdef>string <parameter>content</parameter></paramdef>
-               <paramdef>string <parameter>HTTPcode</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Makes a guess whether the result is a real web page or an error
-         page. As several web servers are badly configured and don't return
-         HTTP 404 codes when a page isn't found, Nikto attempts to look for
-         common error pages. Returns 1 if the page looks like an error.</para>
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>array <function>change_variables</function></funcdef>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string <function>get_ext</function></funcdef>
-               <paramdef>string <parameter>uri</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Attempts to work out the extension of the uri. Will return the
-         extension or the special cases: DIRECTORY, DOTFILE, NONE.</para>
+            <paramdef>string <parameter>line</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string <function>date_disp</function></funcdef>
-               <paramdef>void</paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Returns the current time in a human readable format
-         (YYYY-mm-dd hh:mm:ss)</para>
+        <para>Expands any variables in the line parameter. The expansions are
+        variables defined in the global array <varname>@VARIABLES</varname>,
+        which may be read from <filename>db_variables</filename>, or added by
+        reconnaisance plugin methods.</para>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string <function>rm_active</function></funcdef>
-               <paramdef>string <parameter>content</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Attempts to remove active content (e.g. dates, adverts etc.)
-         from a page. Returns a filtered version of the content.</para>
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>int <function>is_404</function></funcdef>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string <function>get_banner</function></funcdef>
-               <paramdef>hashref <parameter>mark</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Pulls the web servers banner. This is automatically performed
-         for all targets before a mark is passed to the plugin.</para>
+            <paramdef>string <parameter>uri</parameter></paramdef>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>boolean <function>content_present</function></funcdef>
-               <paramdef>string <parameter>HTTPcode</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Checks the HTTPresponse against known "found" responses. TRUE
-         indicates that the request was probably successful.</para>
+            <paramdef>string <parameter>content</parameter></paramdef>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string HTTPCode, string content <function>fetch</function></funcdef>
-               <paramdef>string <parameter>uri</parameter></paramdef>
-               <paramdef>string <parameter>method</parameter></paramdef>
-               <paramdef>string <parameter>content</parameter></paramdef>
-               <paramdef>hashref <parameter>headers</parameter></paramdef>
-               <paramdef>boolean <parameter>noclean</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para><emphasis>Deprecated</emphasis></para>
-         <para>Performs a simple HTTP request to URI using the HTTP method,
-         <parameter>method</parameter>. <parameter>content</parameter> supplies
-         any data to pass in the HTTP body. <parameter>headers</parameter>
-         allows any custom headers to be placed in the request.
-         <parameter>noclean</parameter> is a flag specifying that the request
-         shouldn't be cleaned up before being sent (e.g. if the Host: header
-         is blank).</para>
+            <paramdef>string <parameter>HTTPcode</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string HTTPCode, string content <function>nfetch</function></funcdef>
-               <paramdef>string <parameter>uri</parameter></paramdef>
-               <paramdef>string <parameter>method</parameter></paramdef>
-               <paramdef>string <parameter>content</parameter></paramdef>
-               <paramdef>hashref <parameter>headers</parameter></paramdef>
-               <paramdef>boolean <parameter>noclean</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>An updated version of fetch that uses a local, rather than a
-         global request/result structure. This should be used in preference to
-         fetch.</para>
+        <para>Makes a guess whether the result is a real web page or an error
+        page. As several web servers are badly configured and don't return
+        HTTP 404 codes when a page isn't found, Nikto attempts to look for
+        common error pages. Returns 1 if the page looks like an error.</para>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>hashref <function>setup_hash</function></funcdef>
-               <paramdef>hashref <parameter>requesthash</parameter></paramdef>
-               <paramdef>hashref <parameter>mark</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Sets up up a libwhisker hash with the normal Nikto variables.
-         This should be used if any custom calls to libwhisker are used.</para>
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string <function>get_ext</function></funcdef>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>string <function>char_escape</function></funcdef>
-               <paramdef>string <parameter>line</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Escapes any characters within line.</para>
+            <paramdef>string <parameter>uri</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>array <function>parse_csv</function></funcdef>
-               <paramdef>string <parameter>text</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Breaks a line of CSV text into an array of items.</para>
+        <para>Attempts to work out the extension of the uri. Will return the
+        extension or the special cases: DIRECTORY, DOTFILE, NONE.</para>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>arrayref <function>init_db</function></funcdef>
-               <paramdef>string <parameter>dbname</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Initialises a database that is in <varname>PLUGINDIR</varname>
-         and returns an arrayref. The arrayref is to an array of hashrefs, each
-         hash member is configured by the first line in the database file, for
-         example:</para>
- 
-         <screen>"nikto_id","md5hash","description"</screen>
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string <function>date_disp</function></funcdef>
 
-         <para>This will result in an array of hashrefs with parameters:</para>
-<screen>array[0]->{nikto_id}
-array[0]->{md5hash}
-array[0]->{description}</screen>
+            <paramdef>void</paramdef>
+          </funcprototype>
+        </funcsynopsis>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>void <function>add_vulnerability</function></funcdef>
-               <paramdef>hashref <parameter>mark</parameter></paramdef>
-               <paramdef>string <parameter>message</parameter></paramdef>
-               <paramdef>string <parameter>nikto_id</parameter></paramdef>
-               <paramdef>string <parameter>osvdb</parameter></paramdef>
-               <paramdef>string <parameter>method</parameter></paramdef>
-               <paramdef>string <parameter>uri</parameter></paramdef>
-               <paramdef>string <parameter>data</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Adds a vulnerability for the mark, displays it to standard out
-         and sends it to any reporting plugins.</para>
+        <para>Returns the current time in a human readable format (YYYY-mm-dd
+        hh:mm:ss)</para>
 
-         <funcsynopsis>
-            <funcprototype>
-               <funcdef>void <function>nprint</function></funcdef>
-               <paramdef>string <parameter>message</parameter></paramdef>
-               <paramdef>string <parameter>display</parameter></paramdef>
-            </funcprototype>
-         </funcsynopsis>
-         <para>Prints <parameter>message</parameter> to standard out.
-         <parameter>Display</parameter> specifies a filter for the message,
-         currently this can be "v" for verbose and "d" for debug
-         output.</para>
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string <function>rm_active</function></funcdef>
+
+            <paramdef>string <parameter>content</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Attempts to remove active content (e.g. dates, adverts etc.)
+        from a page. Returns a filtered version of the content.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string <function>get_banner</function></funcdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Pulls the web servers banner. This is automatically performed
+        for all targets before a mark is passed to the plugin.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>boolean <function>content_present</function></funcdef>
+
+            <paramdef>string <parameter>HTTPcode</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Checks the HTTPresponse against known "found" responses. TRUE
+        indicates that the request was probably successful.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string HTTPCode, string content
+            <function>fetch</function></funcdef>
+
+            <paramdef>string <parameter>uri</parameter></paramdef>
+
+            <paramdef>string <parameter>method</parameter></paramdef>
+
+            <paramdef>string <parameter>content</parameter></paramdef>
+
+            <paramdef>hashref <parameter>headers</parameter></paramdef>
+
+            <paramdef>boolean <parameter>noclean</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para><emphasis>Deprecated</emphasis></para>
+
+        <para>Performs a simple HTTP request to URI using the HTTP method,
+        <parameter>method</parameter>. <parameter>content</parameter> supplies
+        any data to pass in the HTTP body. <parameter>headers</parameter>
+        allows any custom headers to be placed in the request.
+        <parameter>noclean</parameter> is a flag specifying that the request
+        shouldn't be cleaned up before being sent (e.g. if the Host: header is
+        blank).</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string HTTPCode, string content
+            <function>nfetch</function></funcdef>
+
+            <paramdef>string <parameter>uri</parameter></paramdef>
+
+            <paramdef>string <parameter>method</parameter></paramdef>
+
+            <paramdef>string <parameter>content</parameter></paramdef>
+
+            <paramdef>hashref <parameter>headers</parameter></paramdef>
+
+            <paramdef>boolean <parameter>noclean</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>An updated version of fetch that uses a local, rather than a
+        global request/result structure. This should be used in preference to
+        fetch.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>hashref <function>setup_hash</function></funcdef>
+
+            <paramdef>hashref <parameter>requesthash</parameter></paramdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Sets up up a libwhisker hash with the normal Nikto variables.
+        This should be used if any custom calls to libwhisker are used.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>string <function>char_escape</function></funcdef>
+
+            <paramdef>string <parameter>line</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Escapes any characters within line.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>array <function>parse_csv</function></funcdef>
+
+            <paramdef>string <parameter>text</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Breaks a line of CSV text into an array of items.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>arrayref <function>init_db</function></funcdef>
+
+            <paramdef>string <parameter>dbname</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Initialises a database that is in <varname>PLUGINDIR</varname>
+        and returns an arrayref. The arrayref is to an array of hashrefs, each
+        hash member is configured by the first line in the database file, for
+        example:</para>
+
+        <screen>"nikto_id","md5hash","description"</screen>
+
+        <para>This will result in an array of hashrefs with parameters:</para>
+
+        <screen>array[0]-&gt;{nikto_id}
+array[0]-&gt;{md5hash}
+array[0]-&gt;{description}</screen>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>void <function>add_vulnerability</function></funcdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+
+            <paramdef>string <parameter>message</parameter></paramdef>
+
+            <paramdef>string <parameter>nikto_id</parameter></paramdef>
+
+            <paramdef>string <parameter>osvdb</parameter></paramdef>
+
+            <paramdef>string <parameter>method</parameter></paramdef>
+
+            <paramdef>string <parameter>uri</parameter></paramdef>
+
+            <paramdef>string <parameter>data</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Adds a vulnerability for the mark, displays it to standard out
+        and sends it to any reporting plugins.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>void <function>nprint</function></funcdef>
+
+            <paramdef>string <parameter>message</parameter></paramdef>
+
+            <paramdef>string <parameter>display</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Prints <parameter>message</parameter> to standard out.
+        <parameter>Display</parameter> specifies a filter for the message,
+        currently this can be "v" for verbose and "d" for debug output.</para>
       </section>
 
       <section>
-         <title>Global Variables</title>
+        <title>Global Variables</title>
 
-         <para>The following global variables exist within Nikto, most of
-         them are defined for internal use and their use by plugins is not
-         advised. Several have been deprecated, these should not be used by
-         plugins.</para>
+        <para>The following global variables exist within Nikto, most of them
+        are defined for internal use and their use by plugins is not advised.
+        Several have been deprecated, these should not be used by
+        plugins.</para>
 
-         <variablelist>
-            <varlistentry>
-               <term><varname>%TEMPLATES</varname> (read/write)</term>
-               <listitem>
-                  <para>Hash to store the HTML and XML report templates.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%ERRSTRINGS</varname> (read)</term>
-               <listitem>
-                  <para>Hash to contain all the entries in db_404 - a list of
-                  strings that may indicate a 404.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%CLI</varname> (read)</term>
-               <listitem>
-                  <para>Hash of passed CLI parameters</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%VARIABLES</varname> (read) (write)</term>
-               <listitem>
-                  <para>Hash of contents of the entries in db_variables. Plugins
-                  should only write to this hash in the reconnaisance
-                  phase.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%TESTS</varname> (read) (write)</term>
-               <listitem>
-                  <para>Hash of the db_tests database. This is only intended
-                  to be used by the tests plugin, though it could be used by a
-                  reconnaisance plugin to add tests on the fly.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>$CONTENT</varname> (read) (write)
-               (deprecated)</term>
-               <listitem>
-                  <para>Global variable to store data from a fetch or nfetch. A
-                  local variable should be used instead</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%NIKTO</varname> (read)</term>
-               <listitem>
-                  <para>Hash which contains internal Nikto data, such as help
-                  for the command line parameters.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%REALMS</varname> (read)</term>
-               <listitem>
-                  <para>Hash of data from db_realms.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%NIKTOCONFIG</varname> (read)</term>
-               <listitem>
-                  <para>Hash containing the data read from the configuration
-                  files.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%request</varname> (read) (write)
-               (deprecated)</term>
-               <term><varname>%result</varname> (read) (write)
-               (deprecated)</term>
-               <listitem>
-                  <para>Global libwhisker hash. This should not be used; nfetch
-                  or a local hash should be used.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%COUNTERS</varname> (read) (write)</term>
-               <listitem>
-                  <para>Hash containing various global counters (e.g. number of
-                  requests)</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%db_extensions</varname> (read)
-               (deprecated)</term>
-               <listitem>
-                  <para>Hash containing a list of common extensions</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%FoF</varname> (read) (write)</term>
-               <listitem>
-                  <para>Hash containing data for each extension and what the
-                  server produces if a request for a non-existent file is
-                  requested.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%UPDATES</varname> (read) (write)</term>
-               <listitem>
-                  <para>Hash containing any updates that need to be sent back
-                  to cirt.net</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>$DIV</varname> (read)</term>
-               <listitem>
-                  <para>Divider mark for the items sent to standard out.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>@DBFILE</varname> (read)</term>
-               <listitem>
-                  <para>Placeholder used to hold the contents of
-                  <filename>db_tests</filename>.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>@BUILDITEMS</varname> (read) (write)
-               (deprecated)</term>
-               <listitem>
-                  <para>Array to hold information for tests to act on later.
-                  Use should be avoided, a local variable should be used
-                  instead.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>$PROXYCHECKED</varname> (read)</term>
-               <listitem>
-                  <para>Flag to see whether connection through the proxy has
-                  been checked.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>$http_eol</varname> (read) (deprecated)</term>
-               <listitem>
-                  <para>Contains the http end of line pattern.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>@RESULTS</varname> (read)</term>
-               <listitem>
-                  <para>Array of reported vulnerabilities, should only be
-                  written to through
-                  <function>add_vulnerability.</function></para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>@PLUGINS</varname> (read)</term>
-               <listitem>
-                  <para>Array of hashrefs for each plugin. Used internally to
-                  run plugins.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>@MARKS</varname> (read)</term>
-               <listitem>
-                  <para>Array of marks to indicate each target.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>@REPORTS</varname> (read)</term>
-               <listitem>
-                  <para>Ordered array that reporting plugins should be run in.
-                  Used for efficency on calling reporting plugins.</para>
-               </listitem>
-            </varlistentry>
-            <varlistentry>
-               <term><varname>%CACHE</varname> (read) (write)</term>
-               <listitem>
-                  <para>Containing the URI cache, should only be read/written
-                  through <function>nfetch</function>. Members:</para>
-                  <blockquote>
-                  <table>
+        <variablelist>
+          <varlistentry>
+            <term><varname>%TEMPLATES</varname> (read/write)</term>
+
+            <listitem>
+              <para>Hash to store the HTML and XML report templates.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%ERRSTRINGS</varname> (read)</term>
+
+            <listitem>
+              <para>Hash to contain all the entries in db_404 - a list of
+              strings that may indicate a 404.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%CLI</varname> (read)</term>
+
+            <listitem>
+              <para>Hash of passed CLI parameters</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%VARIABLES</varname> (read) (write)</term>
+
+            <listitem>
+              <para>Hash of contents of the entries in db_variables. Plugins
+              should only write to this hash in the reconnaisance
+              phase.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%TESTS</varname> (read) (write)</term>
+
+            <listitem>
+              <para>Hash of the db_tests database. This is only intended to be
+              used by the tests plugin, though it could be used by a
+              reconnaisance plugin to add tests on the fly.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>$CONTENT</varname> (read) (write)
+            (deprecated)</term>
+
+            <listitem>
+              <para>Global variable to store data from a fetch or nfetch. A
+              local variable should be used instead</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%NIKTO</varname> (read)</term>
+
+            <listitem>
+              <para>Hash which contains internal Nikto data, such as help for
+              the command line parameters.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%REALMS</varname> (read)</term>
+
+            <listitem>
+              <para>Hash of data from db_realms.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%NIKTOCONFIG</varname> (read)</term>
+
+            <listitem>
+              <para>Hash containing the data read from the configuration
+              files.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%request</varname> (read) (write)
+            (deprecated)</term>
+
+            <term><varname>%result</varname> (read) (write)
+            (deprecated)</term>
+
+            <listitem>
+              <para>Global libwhisker hash. This should not be used; nfetch or
+              a local hash should be used.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%COUNTERS</varname> (read) (write)</term>
+
+            <listitem>
+              <para>Hash containing various global counters (e.g. number of
+              requests)</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%db_extensions</varname> (read) (deprecated)</term>
+
+            <listitem>
+              <para>Hash containing a list of common extensions</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%FoF</varname> (read) (write)</term>
+
+            <listitem>
+              <para>Hash containing data for each extension and what the
+              server produces if a request for a non-existent file is
+              requested.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%UPDATES</varname> (read) (write)</term>
+
+            <listitem>
+              <para>Hash containing any updates that need to be sent back to
+              cirt.net</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>$DIV</varname> (read)</term>
+
+            <listitem>
+              <para>Divider mark for the items sent to standard out.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>@DBFILE</varname> (read)</term>
+
+            <listitem>
+              <para>Placeholder used to hold the contents of
+              <filename>db_tests</filename>.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>@BUILDITEMS</varname> (read) (write)
+            (deprecated)</term>
+
+            <listitem>
+              <para>Array to hold information for tests to act on later. Use
+              should be avoided, a local variable should be used
+              instead.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>$PROXYCHECKED</varname> (read) (deprecated)</term>
+
+            <listitem>
+              <para>Flag to see whether connection through the proxy has been
+              checked.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>$http_eol</varname> (read) (deprecated)</term>
+
+            <listitem>
+              <para>Contains the http end of line pattern.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>@RESULTS</varname> (read)</term>
+
+            <listitem>
+              <para>Array of reported vulnerabilities, should only be written
+              to through <function>add_vulnerability.</function></para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>@PLUGINS</varname> (read)</term>
+
+            <listitem>
+              <para>Array of hashrefs for each plugin. Used internally to run
+              plugins.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>@MARKS</varname> (read)</term>
+
+            <listitem>
+              <para>Array of marks to indicate each target.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>@REPORTS</varname> (read)</term>
+
+            <listitem>
+              <para>Ordered array that reporting plugins should be run in.
+              Used for efficency on calling reporting plugins.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term><varname>%CACHE</varname> (read) (write)</term>
+
+            <listitem>
+              <para>Containing the URI cache, should only be read/written
+              through <function>nfetch</function>. Members:</para>
+
+              <blockquote>
+                <table>
                   <title>Members of the <structname>cache</structname>
                   structure</title>
-                  <tgroup cols="2">
-                  <tbody>
-                     <row>
-                        <entry><structfield>{uri}</structfield></entry>
-                        <entry>URI for the cache</entry>
-                     </row>
-                     <row>
-                        <entry><structfield>{uri}{method}</structfield></entry>
-                        <entry>HTTP method used</entry>
-                     </row>
-                     <row>
-                        <entry><structfield>{uri}{res}</structfield></entry>
-                        <entry>HTTP result for URI</entry>
-                     </row>
-                     <row>
-                        <entry><structfield>{uri}{content}</structfield></entry>
-                        <entry>data for URI</entry>
-                     </row>
-                     <row>
-                        <entry><structfield>{uri}{mark}</structfield></entry>
-                        <entry>mark hashref for URI</entry>
-                     </row>
-                  </tbody>
-                  </tgroup>
-               </table> 
-               </blockquote>
-            </listitem>
-            </varlistentry>
-         </variablelist>
-      </section>
-   </section>
 
-   <section>
+                  <tgroup cols="2">
+                    <tbody>
+                      <row>
+                        <entry><structfield>{uri}</structfield></entry>
+
+                        <entry>URI for the cache</entry>
+                      </row>
+
+                      <row>
+                        <entry><structfield>{uri}{method}</structfield></entry>
+
+                        <entry>HTTP method used</entry>
+                      </row>
+
+                      <row>
+                        <entry><structfield>{uri}{res}</structfield></entry>
+
+                        <entry>HTTP result for URI</entry>
+                      </row>
+
+                      <row>
+                        <entry><structfield>{uri}{content}</structfield></entry>
+
+                        <entry>data for URI</entry>
+                      </row>
+
+                      <row>
+                        <entry><structfield>{uri}{mark}</structfield></entry>
+
+                        <entry>mark hashref for URI</entry>
+                      </row>
+                    </tbody>
+                  </tgroup>
+                </table>
+              </blockquote>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+      </section>
+    </section>
+
+    <section>
       <title>Test Identifiers</title>
 
       <para>Each test, whether it comes from one of the databases or in code,
@@ -1997,48 +2290,62 @@ array[0]->{description}</screen>
       as follows:</para>
 
       <blockquote>
-      <table>
-      <title>TID Scheme</title>
-      <tgroup cols="2">
-      <tbody>
-         <row>
-            <entry>000000</entry>
-            <entry>db_tests</entry>
-         </row>
-         <row>
-            <entry>400000</entry>
-            <entry>user defined tests (<filename>udb*</filename>
-            files)</entry>
-         </row>
-         <row>
-            <entry>500000</entry>
-            <entry>db_favicon</entry>
-         </row>
-         <row>
-            <entry>600000</entry>
-            <entry>db_outdated</entry>
-         </row>
-         <row>
-            <entry>700000</entry>
-            <entry>db_realms</entry>
-         </row>
-         <row>
-            <entry>800000</entry>
-            <entry>db_server_msgs</entry>
-         </row>
-         <row>
-            <entry>900000</entry>
-            <entry>tests defined in code</entry>
-         </row>
-      </tbody>
-      </tgroup>
-      </table>
+        <table>
+          <title>TID Scheme</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>000000</entry>
+
+                <entry>db_tests</entry>
+              </row>
+
+              <row>
+                <entry>400000</entry>
+
+                <entry>user defined tests (<filename>udb*</filename>
+                files)</entry>
+              </row>
+
+              <row>
+                <entry>500000</entry>
+
+                <entry>db_favicon</entry>
+              </row>
+
+              <row>
+                <entry>600000</entry>
+
+                <entry>db_outdated</entry>
+              </row>
+
+              <row>
+                <entry>700000</entry>
+
+                <entry>db_realms</entry>
+              </row>
+
+              <row>
+                <entry>800000</entry>
+
+                <entry>db_server_msgs</entry>
+              </row>
+
+              <row>
+                <entry>900000</entry>
+
+                <entry>tests defined in code</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
       </blockquote>
 
       <para>As much data as possible in the <varname>%TESTS</varname> hash
       should be populated for each new test that is defined in code (plugins).
-      These fields include URI for the test, message to print on success,
-      HTTP method and OSVDB ID. Without a 'message' value in
+      These fields include URI for the test, message to print on success, HTTP
+      method and OSVDB ID. Without a 'message' value in
       <varname>%TESTS</varname> output will not be saved in HTML or XML
       reports. Not all tests are expected to have a uri, method or OSVDB ID.
       Here is an example of setting those fields:</para>
@@ -2047,9 +2354,9 @@ array[0]->{description}</screen>
 $TESTS{999999}{message}="Enumeration of users is possible by requesting ~username";
 $TESTS{999999}{method}="GET";
 $TESTS{999999}{osvdb}=637;</screen>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Code Copyrights</title>
 
       <para>Any new or updated code, tests or information sent to the author
@@ -2057,62 +2364,65 @@ $TESTS{999999}{osvdb}=637;</screen>
       or information to the author you relinquish all claims of copyright on
       the material, and agree that this code can be claimed under the same
       copyright as Nikto.</para>
-   </section>
-</chapter>
+    </section>
+  </chapter>
 
-<chapter id="troubleshooting">
-   <title>Troubleshooting</title>
-   <section>
+  <chapter id="troubleshooting">
+    <title>Troubleshooting</title>
+
+    <section>
       <title>SOCKS Proxies</title>
 
       <para>Nikto does not currently support SOCKS proxies.</para>
-   </section>
-   <section>
+    </section>
+
+    <section>
       <title>Debugging</title>
-      
+
       <para>The major route to debugging Nikto requests is to use the
-      <parameter>-Display</parameter> with v (verbose) or d (debug). This
-      will output a vast amount of extra information to the screen, so
-      it is advised to redirect output to a file when using them.</para>
-   </section>
-</chapter>
+      <parameter>-Display</parameter> with v (verbose) or d (debug). This will
+      output a vast amount of extra information to the screen, so it is
+      advised to redirect output to a file when using them.</para>
+    </section>
+  </chapter>
 
-<chapter id="licences">
-   <title>Licences</title>
+  <chapter id="licences">
+    <title>Licences</title>
 
-   <section>
+    <section>
       <title>Nikto</title>
 
       <para>Nikto is licensed under the GNU General Public License (GPL), and
       copyrighted by CIRT, Inc.</para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>LibWhisker</title>
 
       <para>LibWhisker is licensed under the GNU General Public License (GPL),
       and copyrighted by Rain Forrest Puppy.</para>
-   </section>
+    </section>
 
-   <section>
+    <section>
       <title>Tests</title>
 
       <para>The web tests are licensed for use with Nikto only, and may not be
       reused without written consent from CIRT, Inc.</para>
-   </section>
-</chapter>
+    </section>
+  </chapter>
 
-<chapter id="credits">
-   <title>Credits</title>
-   <section>
+  <chapter id="credits">
+    <title>Credits</title>
+
+    <section>
       <title>Nikto</title>
 
       <para>Nikto was originally written and maintained by Sullo, CIRT, Inc.
-      It is currently maintained by David Lodge. LibWhisker was written
-      by Rain Forrest Puppy</para>
-   </section>
+      It is currently maintained by David Lodge. LibWhisker was written by
+      Rain Forrest Puppy</para>
+    </section>
 
-   <section>
+    <section>
       <title>Thanks</title>
 
       <para>Many people have provided feedback, fixes, and suggestions. This
@@ -2120,70 +2430,86 @@ $TESTS{999999}{osvdb}=637;</screen>
       are listed. In no particular order:</para>
 
       <itemizedlist>
-         <listitem>
-            <para>Nikto 2 Testing: Paul Woroshow, Mark G. Spencer, Michel
-            Arboi, Jericho, rfp</para>
-         </listitem>
-         <listitem>
-            <para>Jericho (attrition.org/OSVDB/OSF).
-            Support/ideas/tests/corrections/spam and help matching OSVDB IDs
-            to tests.</para>
-         </listitem>
-         <listitem>
-            <para>rfp (wiretrip.net). LibWhisker and continuing
-            support.</para>
-         </listitem>
-         <listitem>
-            <para>Erik Cabetas for many updates and fixes.</para>
-         </listitem>
-         <listitem>
+        <listitem>
+          <para>Nikto 2 Testing: Paul Woroshow, Mark G. Spencer, Michel Arboi,
+          Jericho, rfp</para>
+        </listitem>
+
+        <listitem>
+          <para>Jericho (attrition.org/OSVDB/OSF).
+          Support/ideas/tests/corrections/spam and help matching OSVDB IDs to
+          tests.</para>
+        </listitem>
+
+        <listitem>
+          <para>rfp (wiretrip.net). LibWhisker and continuing support.</para>
+        </listitem>
+
+        <listitem>
+          <para>Erik Cabetas for many updates and fixes.</para>
+        </listitem>
+
+        <listitem>
           <para>Jake Kouns (OSVDB/OSF).</para>
-         </listitem>
-         <listitem>
-            <para>Jabra (spl0it.org) for XML DTD, XML templates and supporting
-            code.</para>
-         </listitem>
-         <listitem>
-            <para>Stephen Valdez. Extensive testing. We all miss you.</para>
-         </listitem>
-         <listitem>
-            <para>S Saady. Extensive testing.</para>
-         </listitem>
-         <listitem>
-            <para>Zeno (cgisecurity.com). Nikto mirroring.</para>
-         </listitem>
-         <listitem>
-            <para>P Eronen (nixu.com). Provided many code fixes.</para>
-         </listitem>
-         <listitem>
-            <para>M Arboi. Great support by writing the code to make Nikto
-            work within Nessus, as well as bug reports.</para>
-         </listitem>
-         <listitem>
-            <para>T Seyrat. Maintains Nikto for the Debian releases.</para>
-         </listitem>
-         <listitem>
-            <para>J DePriest. Ideas/fixes.</para>
-         </listitem>
-         <listitem>
-            <para>P Woroshow. Ideas/fixes.</para>
-         </listitem>
-         <listitem>
-            <para>fr0stman. Tests.</para>
-         </listitem>
-         <listitem>
-            <para>H Heimann. Tests.</para>
-         </listitem>
-         <listitem>
-            <para>Xiola (xiola.net). Web design and more.</para>
-         </listitem>
-         <listitem>
-            <para>Ryan Dewhurst. Domain guessing code.</para>
-         </listitem>
+        </listitem>
+
+        <listitem>
+          <para>Jabra (spl0it.org) for XML DTD, XML templates and supporting
+          code.</para>
+        </listitem>
+
+        <listitem>
+          <para>Stephen Valdez. Extensive testing. We all miss you.</para>
+        </listitem>
+
+        <listitem>
+          <para>S Saady. Extensive testing.</para>
+        </listitem>
+
+        <listitem>
+          <para>Zeno (cgisecurity.com). Nikto mirroring.</para>
+        </listitem>
+
+        <listitem>
+          <para>P Eronen (nixu.com). Provided many code fixes.</para>
+        </listitem>
+
+        <listitem>
+          <para>M Arboi. Great support by writing the code to make Nikto work
+          within Nessus, as well as bug reports.</para>
+        </listitem>
+
+        <listitem>
+          <para>T Seyrat. Maintains Nikto for the Debian releases.</para>
+        </listitem>
+
+        <listitem>
+          <para>J DePriest. Ideas/fixes.</para>
+        </listitem>
+
+        <listitem>
+          <para>P Woroshow. Ideas/fixes.</para>
+        </listitem>
+
+        <listitem>
+          <para>fr0stman. Tests.</para>
+        </listitem>
+
+        <listitem>
+          <para>H Heimann. Tests.</para>
+        </listitem>
+
+        <listitem>
+          <para>Xiola (xiola.net). Web design and more.</para>
+        </listitem>
+
+        <listitem>
+          <para>Ryan Dewhurst. Domain guessing code.</para>
+        </listitem>
       </itemizedlist>
 
-      <para>This document is &copy; 2009 CIRT, Inc. and may not be reused without
+      <para>This document is © 2009 CIRT, Inc. and may not be reused without
       permission.</para>
-   </section>
-</chapter>
+    </section>
+  </chapter>
 </book>
