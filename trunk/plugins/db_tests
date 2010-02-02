@@ -6171,3 +6171,5 @@
 "006178","5292","c","/ytb/cuenta/cuerpo.php?base_archivo=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "006179","5292","c","/zipndownload.php?PP_PATH=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "006180","5292","c","/zoomstats/libs/dbmax/mysql.php?GLOBALS['lib']['db']['path']=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
+"006181","0","3","/wp-content/plugins/akismet/readme.txt","GET","Tested up to","","","","","The WordPress Akismet plugin 'Tested up to' version usually matches the WordPress version","",""
+"006182","0","3","/wp-content/plugins/hello.php","GET","Call to undefined function add_action() in ","","","","","The WordPress hello.php plugin reveals a file system path","",""
