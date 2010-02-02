@@ -1,0 +1,198 @@
+#VERSION,2.02
+# $Id: nikto_user_enum_apache.plugin 300 2010-02-01 21:02:40Z sullo $
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+# PURPOSE:
+# Enumeration of users and directories in system (as Apache's ~username)
+###############################################################################
+# NOTES:
+# This plugin tries to enumerate all the users and directories
+# in the system (of course the bruteforce attack is limited to a given range).
+# In some Apache/UNIX systems this might give out many local users
+# (which could later on be used for a ssh brute-force attack).
+# This plugin was originally written by Javier Fernandez-Sanguino Pe–a
+###############################################################################
+sub nikto_user_enum_apache_init
+{
+   my $id =
+   {
+      name         => "user_enum_apache",
+      full_name    => "Apache User Enumeration",
+      author       => "Javier Fernandez-Sanguinoi Pena",
+      description  => "Attempts to enumerate usernames by guessing usernames.",
+      scan_method  => \&nikto_user_enum_apache,
+      scan_cond    => '$CLI{mutate} =~ /3/ || $CLI{mutate} =~ /4/',
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
+
+sub nikto_user_enum_apache
+{
+   my ($mark) = @_;
+   my $url;
+   my @cgiwraps;
+   my @cfgcgi=split(/ /, $VARIABLES{"\@CGIDIRS"});
+
+   # Set the URL according to the mutate version
+   my @mutates=split(//,$CLI{'mutate'});
+   foreach my $option (@mutates)
+   {
+      if ($option eq "3")
+      {
+         $url="/~";
+         # First check whether we use a dictionary attack of brute force it
+         if (defined $CLI{'mutate-options'})
+         {
+            # We have options - assume it is a dictionary attack
+            nikto_user_enum_apache_dictionary($url, $mark);
+         }
+         else
+         {
+            nikto_user_enum_apache_brute($url, $mark);
+         }
+      }
+      if ($option eq "4")
+      {
+         # Check for existence of cgiwrap
+         foreach my $cgidir (@CFGCGI)
+         {
+            my $curl = "$cgidir" . "cgiwrap";
+            (my $result, $content) = nfetch($mark, $curl, "GET", "", "", "", "user_enum_apache: cgiwrap");
+            if ($content =~ /check your URL/i)
+            {
+               push(@cgiwraps, "$curl");
+            }
+         }
+         
+         foreach my $cgiwrap (@cgiwraps)
+         {
+            $url="$cgiwrap/~";
+            # First check whether we use a dictionary attack of brute force it
+            if (defined $CLI{'mutate-options'})
+            {
+               # We have options - assume it is a dictionary attack
+               nikto_user_enum_apache_dictionary($url, $mark);
+            }
+            else
+            {
+               nikto_user_enum_apache_brute($url, $mark);
+            }
+         }
+      }
+   }
+}
+
+sub nikto_user_enum_apache_brute
+{
+   nprint("- Enumerating Apache users (1 to 5 characters).", "v");
+
+   # Note1: This script only generates names with letters A-Z (no numbers)
+   #
+   # Note2: this script will generate SUM(26^n)(n=$min to $max)
+   # it's probably faster to write this to a file than to generate it
+   # on the fly BTW.
+   #
+   # Of course, it could be optimized to skip some "strange"
+   # combinations of usernames, but hey, then it wouldn't
+   # be 'brute force' would it? (jfs)
+
+   my $url=shift;
+   my ($mark)=@_;
+   my $text = "a";
+   my $ctr  = 0;
+   my $message="Valid users found via Apache enumeration: ";
+   my ($result, $content);
+   my @foundusers=();
+   while (length($text) <= 5)
+   {
+      if (($ctr % 500) eq 0) { nprint("- User enumeration guess $ctr ($text)", "v"); }
+      ($result, $content) = nfetch($mark, $url . $text, "HEAD", "", "", "", "user_enum_apache: enumeration");
+      my $user = nikto_user_enum_apache_check($result, $text);
+      if (defined $user)
+      {
+         push(@foundusers,$user);
+      }
+      $text++;
+      $ctr++;
+   }
+   if (scalar(@foundusers))
+   {
+      add_vulnerability($mark, $message . join(', ',@foundusers), 999997, "637", "HEAD", "/");
+   }
+   
+}
+
+sub nikto_user_enum_apache_dictionary
+{
+   my $filename=$CLI{'mutate-options'};
+   my $url=shift;
+   my ($mark)=@_;
+   my $message="Valid users found via Apache enumeration: ";
+   my @foundusers=();
+   my ($result, $content);
+   my $ctr=0;
+   
+   nprint("- Enumerating Apache users (using dictionary $filename).", "v");
+   unless (open(IN, "<$filename"))
+   {
+      nprint("+ ERROR: Unable to open dictionary file $filename: $!.");
+   }
+
+   # Now attempt on each entry
+   while (<IN>)
+   {
+      chomp;
+      s/\#.*$//;
+      # remove preceding ~ just in case
+      s/^~//;
+      if ($_ eq "" ) { next };
+      if (($ctr % 500) == 0) { nprint("- User enumeration guess $ctr ($_)", "v"); }
+      ($result, $content) = nfetch($mark, $url . $_, "HEAD", "", "", "", "user_enum_apache: dictionary");
+      my $user = nikto_user_enum_apache_check($result, $_);
+      if ($user)
+      {
+         push(@foundusers,$user);
+      }
+      $ctr++;
+   }
+   close(IN);
+   if (scalar(@foundusers))
+   {
+      add_vulnerability($mark, $message . join(', ',@foundusers), 999997, "637", "HEAD", "/");
+   }
+}
+
+sub nikto_user_enum_apache_check
+{
+   (my $code, $user) = @_;
+   my $result="";
+   
+   foreach my $found (split(/ /, $VARIABLES{"\@HTTPFOUND"}))
+   {
+      if ($code eq $found)
+      {
+         $result=$user;
+         last;
+      }
+   }
+   
+   return $result;
+}     
+
+1;

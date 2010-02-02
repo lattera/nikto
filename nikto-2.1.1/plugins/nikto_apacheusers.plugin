@@ -1,0 +1,55 @@
+#VERSION,2.03
+# $Id: nikto_apacheusers.plugin 300 2010-02-01 21:02:40Z sullo $
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+# PURPOSE:
+# Apache user enumeration
+###############################################################################
+sub nikto_apacheusers_init
+{
+   my $id =
+   {
+      name         => "apacheusers",
+      full_name    => "Apache Users",
+      author       => "Sullo",
+      description  => "Checks whether we can enumerate usernames directly from the web server",
+      scan_method  => \&nikto_apacheusers,
+      copyright    => "2008 CIRT Inc."
+   };
+   return $id;
+}
+
+sub nikto_apacheusers
+{
+   my ($mark) = @_;
+   (my $RES, $CONTENT) = nfetch($mark, "/~root", "GET", "", "", "", "apacheusers: known user");
+
+   $CONTENT = char_escape($CONTENT);
+   if ($CONTENT =~ /forbidden/i)    # good on "root"
+   {
+      (my $RES, $CONTENT) = nfetch($mark, "/~" . LW2::utils_randstr(8), "GET", "", "", "", "apacheusers: invalid user");
+
+      $CONTENT = char_escape($CONTENT);
+      if ($CONTENT !~ /forbidden/i)    # Good, it gave an error instead of forbidden
+      {
+         add_vulnerability($mark, "Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).", 999999, 637, "GET", "/~root");
+      }
+   }
+}
+
+1;
