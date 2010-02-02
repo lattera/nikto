@@ -527,7 +527,7 @@ http://192.168.0.1:8080/
     <section>
       <title>Single Request Mode</title>
 
-      <para>Single request mode is designed to preform a solitary request
+      <para>Single request mode is designed to perform a solitary request
       against the target. This is useful to confirm a test result using the
       same resources Nikto used during a scan. The single option allows manual
       setting of most variables used by Nikto and LibWhisker, and upon
@@ -848,10 +848,8 @@ http://192.168.0.1:8080/
           <term><varname>PROMPTS</varname></term>
 
           <listitem>
-            <para><emphasis>Deprecated</emphasis></para>
-
             <para>Disables Nikto prompts if set to "no". This is currently
-            unused and has been deprecated by the UPDATES item.</para>
+            only used to prompt for proxy authentication and sending updates.</para>
 
             <para>Default Setting</para>
 

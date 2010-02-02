@@ -55,6 +55,8 @@ reference number to specify the type, multiple may be used:</para>
         <para>6 - TAB as request spacer</para>
         <para>7 - Change the case of the URL</para>
         <para>8 - Use Windows directory separator (\)</para>
+        <para>A - Use a carriage return (0x0d) as a request spacer</para>
+        <para>B - Use binary value 0x0b as a request spacer</para>
       </listitem>
     </varlistentry>
     <varlistentry>
