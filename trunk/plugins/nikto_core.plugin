@@ -2245,9 +2245,11 @@ sub send_updates
  my ($updated_version, $answer, $RES);
  foreach my $ver (keys %UPDATES) 
   { 
-   if ($ver !~ /[0-9]/)   { next; }        # no version info...useless
-   if ($ver eq "Win32") { next; }          # also no use
-   if ($ver eq "Linux-Mandrake") { next; } # just... usually garbage
+   # ignore useless ones...
+   if ($ver !~ /[0-9]/)   { next; }
+   elsif ($ver eq "Win32") { next; }
+   elsif ($ver eq "(Win32)") { next; }
+   elsif ($ver eq "Linux-Mandrake") { next; }
    $have_updates=1; 
    $updated_version .= "$ver ";
   }
