@@ -679,9 +679,14 @@ sub general_config
  if ($NIKTOCONFIG{'RFIURL'} ne '') {
 	$VARIABLES{'@RFIURL'} = $NIKTOCONFIG{'RFIURL'};
 	}
+ else {
+	nprint("- ***** RFIURL is not defined in nikto.conf, which means no RFI tests will run *****"); 
+	}
  
  # SSL Test
- if (!LW2::ssl_is_available()) { nprint("- ***** SSL support not available (see docs for SSL install instructions) *****"); }
+ if (!LW2::ssl_is_available()) { 
+	nprint("- ***** SSL support not available (see docs for SSL install instructions) *****"); 
+	}
  
  # Notices
  my $notice="";
@@ -715,11 +720,10 @@ sub resolve
    # ident is name, lookup IP
    if ($ident =~ /[^0-9\.]/)   # not an IP, assume name
    {
-      if ($CLI{'skiplookup'})
-      {
-         nprint("+ ERROR: -skiplookup set, but given name\n");
-         exit;
-      }
+      if ($CLI{'skiplookup'}) {
+	print("+ ERROR: -skiplookup set, but given name\n");
+	exit;
+      	}
       $ip=gethostbyname($ident);
       if (($ip eq "") && ($request{'whisker'}->{'proxy_host'} ne ""))    # can't resolve name to IP, but using proxy
       {
@@ -752,19 +756,17 @@ sub resolve
       }
 
       $ip=$ident;
-      if (!$CLI{'skiplookup'}) 
-      {
-         use IO::Socket;
-         my $temp_ip=inet_aton($ip);
-         $name=gethostbyaddr($temp_ip,AF_INET); 
-         # check reverse dns to avoid an inet_aton error
-         my $rdnsip=gethostbyname($name);
-         if ($rdnsip ne "")
-         {
-            $rdnsip=inet_ntoa($rdnsip);
-            if ($ip ne $rdnsip) { $name=$ip; }  # Reverse DNS does not match
-         }
-         else { $name = $ip; }  # Reverse DNS does not exist
+      if (!$CLI{'skiplookup'}) {
+	use IO::Socket;
+	my $temp_ip=inet_aton($ip);
+	$name=gethostbyaddr($temp_ip,AF_INET); 
+	# check reverse dns to avoid an inet_aton error
+	my $rdnsip=gethostbyname($name);
+	if ($rdnsip ne "") {
+        	$rdnsip=inet_ntoa($rdnsip);
+        	if ($ip ne $rdnsip) { $name=$ip; }  # Reverse DNS does not match
+         	}
+        else { $name = $ip; }  # Reverse DNS does not exist
       }
       if ($name eq "") { $name=$ip; }
    }

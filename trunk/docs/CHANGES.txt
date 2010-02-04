@@ -1,5 +1,6 @@
 2010-02-04
 	- Match plugin names case-insensitive
+	- Warn if RFIURL is undefined
 2010-01-20 Nikto 2.1.1
 	- Ticket 117: Fixed SKIPPORTS
 	- Ticket 116: Moved User-Agent string to nikto.conf
