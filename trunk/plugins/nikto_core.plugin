@@ -1289,7 +1289,7 @@ sub load_plugins
             # Perl doesn't allow us to use "in", pity
             foreach my $torun_plugin (@torun) {
                if ($torun_plugin eq "ALL" ||
-                   $pluginhash->{name} eq $torun_plugin) {
+                   $pluginhash->{name} =~ /$torun_plugin/i) {
                   $pluginhash->{run}="true";
                }
             }
