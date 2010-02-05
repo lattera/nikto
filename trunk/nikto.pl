@@ -277,7 +277,7 @@ sub setup_dirs
       }
       else
       {
-         print STDERR "Could not work out the nikto EXECDIR, try setting it in niktorc";
+         print STDERR "Could not work out the nikto EXECDIR, try setting it in nikto.conf";
          exit;
       }
    }
