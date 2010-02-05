@@ -387,26 +387,28 @@ sub dump_target_info
      $mark->{sslinfo}=$sslinfo;
    }
 
-   if ($mark->{ip} =~ /[a-z]/i) { 
-   		nprint("+ Target IP:       (proxied)"); 
-   }
-   else { 
-   		nprint("+ Target IP:          $mark->{ip}"); 
-   }
+   if ($OUTPUT{scrub} != 1) {
+      if ($mark->{ip} =~ /[a-z]/i) { 
+         nprint("+ Target IP:       (proxied)"); 
+      }
+      else { 
+         nprint("+ Target IP:          $mark->{ip}"); 
+      }
 
-   nprint("+ Target Hostname:    $mark->{hostname}"); 
-   nprint("+ Target Port:        $mark->{port}");
-   if ((defined $CLI{'vhost'}) && ($CLI{'vhost'} ne $mark->{hostname})) { 
-   		nprint("+ Virtual Host:   $CLI{'vhost'}"); 
-   }
-   if (defined $request{'whisker'}->{'proxy_host'}) { 
-   		nprint("- Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); 
-   }
-   if (defined $NIKTO{'hostid'}) { 
-   		nprint("- Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}","v"); 
-   }
-   if ($mark->{ssl}) { 
-   		nprint($sslprint); 
+      nprint("+ Target Hostname:    $mark->{hostname}"); 
+      nprint("+ Target Port:        $mark->{port}");
+      if ((defined $CLI{'vhost'}) && ($CLI{'vhost'} ne $mark->{hostname})) { 
+         nprint("+ Virtual Host:   $CLI{'vhost'}"); 
+      }
+      if (defined $request{'whisker'}->{'proxy_host'}) { 
+         nprint("- Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); 
+      }
+      if (defined $NIKTO{'hostid'}) { 
+         nprint("- Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}","v"); 
+      }
+      if ($mark->{ssl}) { 
+         nprint($sslprint); 
+      }
    }
    if (defined $NIKTO{'anti_ids'} && defined $CLI{'evasion'}) {
       for (my $i=1;$i<=(keys %{$NIKTO{'anti_ids'}});$i++) { 
@@ -559,7 +561,7 @@ sub general_config
    ";
 
  ### CLI STUFF
- $CLI{'pause'}=$CLI{'html'}=$OUTPUT{'verbose'}=$CLI{'skiplookup'}=$NIKTO{'totalrequests'}=$OUTPUT{debug}=0;
+ $CLI{'pause'}=$CLI{'html'}=$OUTPUT{'verbose'}=$CLI{'skiplookup'}=$NIKTO{'totalrequests'}=$OUTPUT{debug}=$OUTPUT{scrub}=0;
  $CLI{'all_options'}=join(" ",@ARGV);
  
  # preprocess CLI options which cannot be abbreviated
@@ -633,6 +635,7 @@ sub general_config
  {
     if ($CLI{'display'} =~ /d/i)  { $OUTPUT{debug}=1; }
     if ($CLI{'display'} =~ /v/i)  { $OUTPUT{verbose}=1; }
+    if ($CLI{'display'} =~ /s/i)  { $OUTPUT{scrub}=1; }
  }
  
  # port(s)
@@ -878,7 +881,9 @@ sub set_targets
             my $markhash={};
             $markhash->{ident} = $defhost;
             $markhash->{port} = $port;
-            nprint("- Target:$markhash->{ident} port:$markhash->{port}","v");
+            unless ($OUTPUT{scrub} == 1) {
+               nprint("- Target:$markhash->{ident} port:$markhash->{port}","v");
+            }
             push(@marks,$markhash);
          }
       }
@@ -892,7 +897,9 @@ sub set_targets
          $markhash->{ident} = $defhost;
          $markhash->{port} = $defport;
          
-         nprint("- Target:$markhash->{ident} port:$markhash->{port}","v");
+         unless ($OUTPUT{scrub} == 1) {
+            nprint("- Target:$markhash->{ident} port:$markhash->{port}","v");
+         }
          push(@marks,$markhash);
       }
    }
@@ -1227,7 +1234,9 @@ sub port_check
       $request{'whisker'}->{'method'}=$method;
       foreach my $checkssl (@checktypes)
       {
-         nprint("- Checking for $checkssl on port $ip:$port, using $method","v");
+         if ($OUTPUT{scrub} != 1) {
+            nprint("- Checking for $checkssl on port $ip:$port, using $method","v");
+         }
          $m->{ssl}=($checkssl eq "HTTP")?0:1;
          proxy_check($m);
          my ($res, $content)=nfetch($m, "/", $method, "", \%headers, "", "Port Check");
@@ -1241,7 +1250,9 @@ sub port_check
                dump_var("Result Hash", \%result);
                next;
             }
-            nprint("- $checkssl Server found: $ip:$port \t$headers{server}","d");
+            if ($OUTPUT{scrub} != 1) {
+               nprint("- $checkssl Server found: $ip:$port \t$headers{server}","d");
+            }
             return $m->{ssl}+1;
          }
       }
@@ -1872,6 +1883,10 @@ sub dump_var
    my %hash_in = %{$_[1]};
    my $display = LW2::dump('', \%hash_in);
    $display =~ s/^\$/'$msg'/;
+   if ($OUTPUT{scrub}) {
+      $display =~ s/\s'port' => .*\n//g;
+      $display =~ s/\s'host' => .*\n//ig;
+   }
    nprint($display,"d");
    return;
 }
