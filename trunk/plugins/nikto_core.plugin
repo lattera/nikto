@@ -1269,6 +1269,7 @@ sub port_check
 sub load_plugins
 {
    my @pluginlist=dirlist("$NIKTOCONFIG{PLUGINDIR}",'\.plugin$');
+   my @all_names;
    
    # Check if running plugins is NONE - if so, don't bother initalising
    # plugins
@@ -1306,12 +1307,17 @@ sub load_plugins
                   $pluginhash->{run}="true";
                }
             }
+            push(@all_names, $pluginhash->{name});
                
             push(@PLUGINS, $pluginhash);
             nprint("- Loaded \"$pluginhash->{full_name}\" plugin.","v");
          }
       }
    }
+ 
+   # populate plugin macros
+   $NIKTOCONFIG{'@@NONE'} = "";
+   $NIKTOCONFIG{'@@ALL'}  = join(',',@all_names);
 }
 
 ###############################################################################
@@ -2463,12 +2469,64 @@ sub list_plugins {
 
    foreach my $plugin (@PLUGINS) {
       nprint("Plugin $plugin->{'name'}");
+      push(@all_names,$plugin->{'name'});
       nprint(" $plugin->{'full_name'} - $plugin->{'description'}");
       nprint(" Written by $plugin->{'author'}, Copyright (C) $plugin->{'copyright'}");
       nprint("\n");
    }
 
+   # Plugin macros
+   nprint("Defined plugin macros:");
+
+   foreach my $macro (keys %NIKTOCONFIG) {
+      if ($macro =~ /^@@/) {
+         nprint(" $macro = \"" . $NIKTOCONFIG{$macro} . "\"");
+         if ($NIKTOCONFIG{$macro} =~ /@@/) {
+            nprint("  (expanded) = \"" . join(',',expand_pluginlist($NIKTOCONFIG{$macro})) . "\"");
+         }
+      }
+   }
+
    exit(0);
+}
+
+sub expand_pluginlist
+{
+   my ($pluginlist) = @_;
+   my @raw=split(/,/,$pluginlist);
+   my @cooked;
+
+   # For laziness make ourselves a list of macros first
+   my @macros;
+   foreach my $config (keys %NIKTOCONFIG) {
+      if ($config =~ /^@@/) {
+         push(@macros, $config);
+      }
+   }
+
+   # Now loop through each member of the list and expand it
+   foreach my $entry (@raw) {
+      my $result=$entry;
+      # Is it a macro
+      if ($entry =~ /^[-]?@@/) {
+         foreach my $macro (@macros)
+         {
+            if ($entry =~ /[-]?$macro/) {
+                # It's a macro, so replace the contents with the macro
+                $result = $NIKTOCONFIG{$macro};
+                # stop an infinite loop
+                last;
+            }
+         }
+         if ($result eq $entry) {
+            # macro not found or is itself - ignore
+            $result = "";
+         }
+      }
+      push(@cooked, $result);
+   }
+   
+   return @cooked;
 }
 #######################################################################
 sub nikto_core { return; } # trap for this plugin being called to run. lame.
