@@ -249,6 +249,8 @@ sub load_config
 
    # Check for necessary config items
    check_config_defined("CHECKMETHODS", "HEAD");
+   check_config_defined('@@MUTATE', 'dictionary;mutate;passfiles;subdomain;user_enum_apache');
+   check_config_defined('@@DEFAULT', '@@ALL,-@@MUTATE');
 
    return "";
 }

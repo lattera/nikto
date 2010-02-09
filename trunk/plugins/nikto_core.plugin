@@ -655,7 +655,7 @@ sub general_config
 
  if (!defined $CLI{'plugins'})
  {
-    $CLI{'plugins'}="ALL";
+    $CLI{'plugins'}='@@DEFAULT';
  }
 
  $NIKTO{'timeout'}=$CLI{'timeout'} || 10;
@@ -1253,13 +1253,15 @@ sub load_plugins
 {
    my @pluginlist=dirlist("$NIKTOCONFIG{PLUGINDIR}",'\.plugin$');
    my @all_names;
-   
+      
+   # populate plugin macros
+   $NIKTOCONFIG{'@@NONE'} = "";
+
    # Check if running plugins is NONE - if so, don't bother initalising
    # plugins
-   if ($CLI{'plugins'} eq "NONE") {
+   if ($CLI{'plugins'} eq '@@NONE') {
       return;
    }
-   my @torun=split(/,/,$CLI{'plugins'});
 
    foreach my $plugin (@pluginlist) {
       my $plugin_name = $plugin;
@@ -1282,14 +1284,6 @@ sub load_plugins
             $pluginhash->{recon_weight}=50 unless (defined $pluginhash->{recon_weight});
             $pluginhash->{scan_weight}=50 unless (defined $pluginhash->{scan_weight});
             $pluginhash->{report_weight}=50 unless (defined $pluginhash->{report_weight});
-            # Check that the plugin is to be run
-            # Perl doesn't allow us to use "in", pity
-            foreach my $torun_plugin (@torun) {
-               if ($torun_plugin eq "ALL" ||
-                   $pluginhash->{name} =~ /$torun_plugin/i) {
-                  $pluginhash->{run}="true";
-               }
-            }
             push(@all_names, $pluginhash->{name});
                
             push(@PLUGINS, $pluginhash);
@@ -1297,12 +1291,50 @@ sub load_plugins
          }
       }
    }
- 
-   # populate plugin macros
-   $NIKTOCONFIG{'@@NONE'} = "";
-   $NIKTOCONFIG{'@@ALL'}  = join(',',@all_names);
+   $NIKTOCONFIG{'@@ALL'} = join(';',@all_names);
+   my @torun=split(/;/,expand_pluginlist($CLI{'plugins'},0));
+   
+   # Second pass to ensure that @@ALL is configured
+   foreach my $plugin (@PLUGINS) {
+      # Check that the plugin is to be run
+      # Perl doesn't allow us to use "in", pity
+      foreach my $torun_plugin (@torun) {
+         # split up into parameters
+         my $name = my $suffix = $torun_plugin;
+         if ($torun_plugin =~ /\(/) {
+            $name =~ s/(.*)(\(.*\))/$1/;
+            $suffix =~ s/(.*)(\(.*\))/$2/;
+         } else {
+            $name = $torun_plugin;
+            $suffix = "";
+         }
+         if ($plugin->{'name'} =~ /$name/i) {
+            $plugin->{'run'}=1;
+            # Create parameters
+            if ($suffix ne "")
+            {
+               my $parameters = {};
+               $suffix =~ s/(\()(.*[^\)])(\)?)/$2/;
+               foreach my $parameter (split(/,/, $suffix)) {
+                  if ($parameter !~ /:/) {
+                     $parameters->{$parameter} = 1;
+                  } else {
+                     my $key = my $value = $parameter;
+                     $key =~ s/:.*//;
+                     $value =~ s/.*://;
+                     $parameters->{$key} = $value;
+                  }
+               }
+               $plugin->{'parameters'} = $parameters;
+            }
+         }
+      }
+   } 
 }
 
+###############################################################################
+# this is ugly, and potentially dangerous if untrusted plugins are present
+###############################################################################
 ###############################################################################
 # this is ugly, and potentially dangerous if untrusted plugins are present
 ###############################################################################
@@ -1326,8 +1358,22 @@ sub run_plugins
             }
             if ($run)
             {   
+               my $oldverbose=$OUTPUT{'verbose'};
+               my $olddebug=$OUTPUT{'debug'};
                nprint("- Running recon for \"$plugin->{full_name}\" plugin","v");
-               &{$plugin->{recon_method}}($mark);
+               if (defined $plugin->{'parameters'}->{'verbose'} &&
+                   $plugin->{'parameters'}->{'verbose'} == 1)
+               {
+                  $OUTPUT{'verbose'}=1;
+               }
+               if (defined $plugin->{'parameters'}->{'debug'} && 
+                   $plugin->{'parameters'}->{'debug'} == 1)
+               {
+                  $OUTPUT{'debug'}=1;
+               }
+               &{$plugin->{'recon_method'}}($mark,$plugin->{'parameters'});
+               $OUTPUT{'verbose'}=$oldverbose;
+               $OUTPUT{'debug'}=$olddebug;
             }
          }
       }
@@ -1350,8 +1396,22 @@ sub run_plugins
             }
             if ($run)
             {   
+               my $oldverbose=$OUTPUT{'verbose'};
+               my $olddebug=$OUTPUT{'debug'};
                nprint("- Running scan for \"$plugin->{full_name}\" plugin","v");
-               &{$plugin->{scan_method}}($mark);
+               if (defined $plugin->{'parameters'}->{'verbose'} &&
+                   $plugin->{'parameters'}->{'verbose'} == 1)
+               {
+                  $OUTPUT{'verbose'}=1;
+               }
+               if (defined $plugin->{'parameters'}->{'debug'} && 
+                   $plugin->{'parameters'}->{'debug'} == 1)
+               {
+                  $OUTPUT{'debug'}=1;
+               }
+               &{$plugin->{scan_method}}($mark,$plugin->{'parameters'});
+               $OUTPUT{'verbose'}=$oldverbose;
+               $OUTPUT{'debug'}=$olddebug;
             }
          }
       }
@@ -2465,7 +2525,7 @@ sub list_plugins {
       if ($macro =~ /^@@/) {
          nprint(" $macro = \"" . $NIKTOCONFIG{$macro} . "\"");
          if ($NIKTOCONFIG{$macro} =~ /@@/) {
-            nprint("  (expanded) = \"" . join(',',expand_pluginlist($NIKTOCONFIG{$macro})) . "\"");
+            nprint("  (expanded) = \"" . expand_pluginlist($NIKTOCONFIG{$macro}, 0) . "\"");
          }
       }
    }
@@ -2473,13 +2533,19 @@ sub list_plugins {
    exit(0);
 }
 
+# This is overly complicated and jumps a lot between scalars and arrays. The REs are
+# probably dodgy, but it works! W00!
 sub expand_pluginlist
 {
-   my ($pluginlist) = @_;
-   my @raw=split(/,/,$pluginlist);
+   my ($pluginlist, $parent) = @_;
+   my @raw=split(/;/,$pluginlist);
    my @cooked;
-
-   # For laziness make ourselves a list of macros first
+   
+   # Stop excessive recursion
+   if ($parent > 100)
+   {
+      return "";
+   }
    my @macros;
    foreach my $config (keys %NIKTOCONFIG) {
       if ($config =~ /^@@/) {
@@ -2488,28 +2554,85 @@ sub expand_pluginlist
    }
 
    # Now loop through each member of the list and expand it
+   my $count=0;
    foreach my $entry (@raw) {
-      my $result=$entry;
+      $count++;
+      if ($count > 100) {
+         # we've gone recursive: blank and exit
+         $result="";
+      }
+      my $result=$entry;;
       # Is it a macro
-      if ($entry =~ /^[-]?@@/) {
+      if ($result =~ /^-?@@/) {
+         my $original = $result;
+         
+         # break up into components
+         $prefix = ($result =~ /^-/)?"-":"";
+         $name = $suffix = $result;
+         $name =~ s/(^-?)(@@[[:alpha:]]+)(\(?.*\)?$)/$2/;
+         $suffix =~ s/(.*)(\(.*\))/$2/;
+         if ($suffix eq $result) {
+            $suffix="";
+         }
          foreach my $macro (@macros)
          {
-            if ($entry =~ /[-]?$macro/) {
+            if ($result =~ /-?$macro/) {
                 # It's a macro, so replace the contents with the macro
-                $result = $NIKTOCONFIG{$macro};
+                # Add prefix and suffix to each member of the macro
+                my @temp;
+                foreach my $child (split(/;/, $NIKTOCONFIG{$macro})) {
+                   push(@temp, "$prefix$child$suffix");
+                }
+                $result = join(';', @temp);
                 # stop an infinite loop
                 last;
             }
          }
-         if ($result eq $entry) {
+         if ($result =~ /^-?@@/ && $result eq $original) {
             # macro not found or is itself - ignore
             $result = "";
          }
       }
+      # Now it's been expanded - we need to recursively analyse it
+      if ($result =~ /^-?@@/ ) {
+         $result=expand_pluginlist($result, $parent+1);
+      }
+  
       push(@cooked, $result);
    }
    
-   return @cooked;
+   # Join, to resplit
+   my $temp=join(';', @cooked);
+   my @newraw=split(/;/, $temp);
+   @cooked=@newraw;
+   
+   # Now deal with - if we're the first instance of the function
+   if ($parent == 0) {
+      my @newcooked;
+      foreach my $plugin (@cooked)
+      {
+         if ($plugin =~ /^-/) {
+            my $name = $plugin;
+            $name =~ s/(^-)(.+)(\(?.*\)?$)/$2/;
+            # Remove $name from newcooked if it exists
+            my @toasted;
+            foreach my $newplugin (@newcooked) {
+               my $tname = $newplugin;
+               if ($tname ne $name)
+               {
+                  push(@toasted, $tname);
+               }
+            }
+            # Newcooked, should now be @toasted
+            @newcooked=@toasted;
+         } else {
+            push(@newcooked, $plugin);
+         }
+      }
+      @cooked=@newcooked;
+   }      
+   
+   return join(';',@cooked);
 }
 #######################################################################
 sub nikto_core { return; } # trap for this plugin being called to run. lame.

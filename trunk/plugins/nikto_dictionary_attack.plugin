@@ -29,7 +29,6 @@ sub nikto_dictionary_attack_init
       author       => "Deity",
       description  => "Attempts to dictionary attack commonly known directories/files",
       recon_method => \&nikto_dictionary_attack,
-      recon_cond   => '$CLI{mutate} =~ /6/',
       recon_weight => 20,
       copyright    => "2009 CIRT Inc"
    };
@@ -39,8 +38,18 @@ sub nikto_dictionary_attack_init
 
 sub nikto_dictionary_attack
 {
-   my ($mark) = @_;
-   my $dictfile=$CLI{'mutate-options'};
+   my ($mark, $parameters) = @_;
+   
+   my $dictfile="";
+   if (defined $parameters &&
+       defined $parameters->{'dictionary'}) {
+      $dictfile = $parameters->{'dictionary'};
+   } elsif (defined($CLI{'mutate-options'})) {
+      $dictfile=$CLI{'mutate-options'};
+   } else {
+      nprint("- No dictionary file given in plugin options, skipping check");
+      return;
+   }
    my $ctr=0;
    
    if (!defined $dictfile)
