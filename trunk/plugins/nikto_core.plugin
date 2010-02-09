@@ -54,34 +54,35 @@ sub change_variables {
 sub is_404 {
    my ($uri, $content, $rescode) = @_;
    $ext=get_ext($uri);
-   my $pagenf=0;
 
-   if (($FoF{$ext}{'mode'} eq "STD") &&
-       ($rescode =~ /4[0-9][0-9]/)) {
-      $pagenf=1;
-   }
+   if (($FoF{$ext}{'mode'} eq "STD") && ($rescode =~ /4[0-9][0-9]/)) {
+   	 return 1;
+   	}
    elsif ($FoF{$ext}{'mode'} eq "REDIR") { 
-      if ($result{'location'} eq $FoF{$ext}{'location'}) {
-         $pagenf=1;
-      }
-   }
-   elsif (($FoF{$ext}{'type'} eq "CONTENT") &&
-          ($content =~ /$FoF{$ext}{'match'}/i)) {
-      $pagenf=1;
-   } 
-   elsif (($FoF{$ext}{'type'} eq "BLANK") &&
-          ($content eq "")) {
-      $pagenf=1;
-   } 
+   	if ($result{'location'} eq $FoF{$ext}{'location'}) {
+        	 return 1;
+      		}
+   	}
+   elsif (($FoF{$ext}{'type'} eq "BLANK") && ($content eq "")) {
+   	return 1;
+   	} 
    elsif ($FoF{$ext}{'type'} eq "HASH") {
-      my $content=rm_active_content($content, $uri);
-      if (LW2::md4($content) eq $FoF{$ext}{'match'}) {
-         $pagenf=1;
-      } 
-   }
+      	my $content=rm_active_content($content, $uri);
+      	if (LW2::md4($content) eq $FoF{$ext}{'match'}) {
+         	return 1;
+      		} 
+	}
+   else {
+   	foreach my $string (keys %ERRSTRINGS) {
+   		if ($content =~ /$string/i) {
+			print "TEMP DEBUG: 404 based on content match ($string -> $uri)\n";
+   			return 1;
+   			} 
+   		}
+	}
 
-   return $pagenf;
-}
+   return 0;
+   }
 ###############################################################################
 sub nprint
 {
@@ -252,35 +253,16 @@ sub map_codes
    else  { $FoF{$ext}{'mode'} = "OTHER";  }
 
    # if we've got an OK/OTHER response, look at content first
-   my $done=0;
-   
-   foreach my $string (keys %ERRSTRINGS)
-       {
-        nprint ("- Testing error string: $ERRSTRINGS{$string}","d");
-        if ($result{'whisker'}->{'data'} =~ /$ERRSTRINGS{$string}/i)
-        {
-          $FoF{$ext}{'type'}="CONTENT";
-          $FoF{$ext}{'match'}=$ERRSTRINGS{$string};
-          $done=1;
-          last;
-         }
-       }
-
-   if (!$done) # we have to get desperate...
-     {
-      if (length($result{'whisker'}->{'data'}) eq 0) # blank content
-       {
-        $FoF{$ext}{'type'}="BLANK";
+   # blank content, or hash...
+   if (length($result{'whisker'}->{'data'}) eq 0) {
+   	$FoF{$ext}{'type'}="BLANK";
         $FoF{$ext}{'match'}="";
-        $done=1;
-       }
-      if (!$done)  # md4!
-      { 
+        }
+   else {
        my $content=rm_active_content($result{'whisker'}->{'data'});
        $FoF{$ext}{'match'}=LW2::md4($content);
        $FoF{$ext}{'type'}="HASH";
-      }
-     }
+       }
   }
 
  # lastly, get a hash of index.php so we can cut down on some false positives...
@@ -311,6 +293,12 @@ sub rm_active_content
 {
  # Try to remove active content which could mess up the file's signature
  my $cont=$_[0];
+ my $file=$_[1];
+
+ # filename
+ if ($file ne '') { 
+	$cont =~ s/$file//g;
+	}
  
  # Dates
  $cont =~ s/([0-9]{4}|[0-9]{1,2})(\-|\.|\/)[0-9]{1,2}(\-|\.|\/)([0-9]{4}|[0-9]{1,2})//g;
@@ -963,10 +951,9 @@ sub load_databases
  my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
  my $prefix = $_[0];
 
- unless (defined $prefix)
- {
-    $prefix="";
- }
+ unless (defined $prefix) {
+    	$prefix="";
+ 	}
 
  # verify required files
  for my $file (@dbs) 
@@ -1011,14 +998,10 @@ sub load_databases
             }
 
        # db_404_strings
-       elsif ($file eq 'db_404_strings')
-          {
-            my $db_404_ctr=keys %ERRSTRINGS;
-            foreach my $l (@file) 
-              { 
-                $ERRSTRINGS{$db_404_ctr} = $l;
-                $db_404_ctr++;
-              }
+       elsif ($file eq 'db_404_strings') {
+       		foreach my $l (@file) { 
+                	$ERRSTRINGS{$l}=1;
+              		}
            }
    
        # db_outdated
@@ -1204,7 +1187,7 @@ sub get_banner
    my ($mark) = @_;
    my %headers;
    
-   (my $res, $content) = nfetch($mark, "/", "GET", "", \%headers, "", "Get Banner");
+   (my $res, $CONTENT) = nfetch($mark, "/", "GET", "", \%headers, "", "Get Banner");
 
    return $headers{server};
 }

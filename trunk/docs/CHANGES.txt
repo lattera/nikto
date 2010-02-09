@@ -1,3 +1,7 @@
+2010-02-08
+	- Add filename support to rm_active_content 
+	- Ticket 122: Use db_404_strings as a higher priority
+	- Ticket 122: Cleanup db_404_strings to prevent over-matching
 2010-02-05
 	- Added basic support for -D s (scrub, removes some information from the log)
 2010-02-04

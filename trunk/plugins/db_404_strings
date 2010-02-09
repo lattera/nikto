@@ -10,10 +10,8 @@
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
 #######################################################################
 # Notes:
-# Strings to be used for 404 content match, if HTTP code is not 404, one per line
-# Many of these were borrowed from the Nessus Project's no_404.nasl, many thanks.
+# Strings to be used for 404 content match
 #######################################################################
-404
 Access Failed
 an error
 Bad Request
@@ -26,22 +24,18 @@ Error processing SSI file
 ExtendNet DX Configuration
 FireWall-1 message
 forcelogon.htm
-HP Web JetAdmin
 IMail Server Web Messaging
 Management Console	
 name=qt id="search" size=40 value=" "
 No web site is configured at this address
 not found
 parameter is incorrect                                   # IIS 5.0 500 error
-Page Not Found
-PHP Fatal error:  Unable to open
 Please identify yourself:
 Reload acp_userinfo database
 RSA SecurID User Name Request
 The userid or password that was specified is not valid.  # Tivoli server administrator   
 TYPE=password	                                         # As in "<input type=password>"
-Unable to complete your request due to added security features
+Unable to complete your request
 unable to open
 Web access denied
-Webmin server
 Hack Attempts
