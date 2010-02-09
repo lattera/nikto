@@ -2544,6 +2544,7 @@ sub expand_pluginlist
    # Stop excessive recursion
    if ($parent > 100)
    {
+      nprint("ERROR: Recursion found whilst expanding macros");
       return "";
    }
    my @macros;
@@ -2559,6 +2560,7 @@ sub expand_pluginlist
       $count++;
       if ($count > 100) {
          # we've gone recursive: blank and exit
+         nprint("ERROR: Recursion found whilst expanding macros");
          $result="";
       }
       my $result=$entry;;

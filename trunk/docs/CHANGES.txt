@@ -1,3 +1,5 @@
+2010-02-09
+	- Updated -Plugins support
 2010-02-08
 	- Add filename support to rm_active_content 
 	- Ticket 122: Use db_404_strings as a higher priority
