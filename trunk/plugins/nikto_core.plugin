@@ -957,7 +957,7 @@ sub parse_hostfile
 ###############################################################################
 sub load_databases
 {
- my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
+ my @dbs=qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
  my $prefix = $_[0];
 
  unless (defined $prefix) {
@@ -1010,6 +1010,16 @@ sub load_databases
        elsif ($file eq 'db_404_strings') {
        		foreach my $l (@file) { 
                 	$ERRSTRINGS{$l}=1;
+              		}
+           }
+
+       # db_content_search
+       elsif ($file eq 'db_content_search') {
+       		foreach my $l (@file) { 
+                	my @T=parse_csv($l);
+                	$CONTENTSEARCH{$T[0]}{'osvdb'}=$T[1];
+                	$CONTENTSEARCH{$T[0]}{'string'}=$T[2];
+                	$CONTENTSEARCH{$T[0]}{'message'}=$T[3];
               		}
            }
    
@@ -1176,6 +1186,23 @@ sub dbcheck
 
  nprint "\n";
  exit;
+}
+###############################################################################
+sub content_search
+{
+ my $body=shift;
+ my $file=shift;
+ my $method=shift || "GET";
+ my ($mark) = @_;
+
+ foreach my $testid (keys %CONTENTSEARCH) {
+	if ($body =~ /$CONTENTSEARCH{$testid}{string}/i) {
+		my $outmessage = "$file: $CONTENTSEARCH{$testid}{'message'}";
+		add_vulnerability($mark, $outmessage, $CONTENTSEARCH{$testid}{testid}, $CONTENTSEARCH{$testid}{osvdb}, $method, $file);
+		}
+	}
+
+ return;
 }
 ###############################################################################
 sub count_fields
@@ -2048,6 +2075,10 @@ sub fetch
        delete $request{$key};
     }
  }
+
+ # content search
+ content_search($result{whisker}->{data}, $request{whisker}->{uri}, $request{whisker}->{method});
+
  $request{'User-Agent'}=$temp_ua; # reset UA
  return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
 }
@@ -2169,6 +2200,9 @@ sub nfetch
          }
       }
    }
+
+   # content search
+   content_search($result{whisker}->{data}, $request{whisker}->{uri}, $request{whisker}->{method}, $mark);
 
    return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'}, $result{'whisker'}->{'error'};
 }
