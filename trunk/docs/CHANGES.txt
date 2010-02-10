@@ -1,3 +1,5 @@
+2010-02-10
+	- Updated -check_updates to use nfetch instead of fetch
 2010-02-09
 	- Updated -Plugins support
 2010-02-08

@@ -1551,135 +1551,127 @@ sub report_close
 ###############################################################################
 sub check_updates
 {
- LW2::http_init_request(\%request);
- my (%REMOTE, %LOCAL, @DBTOGET) = ();
- my ($pluginmsg, $remotemsg) = "";
- my $code_updates=0;
- my $serverdir="/nikto/UPDATES/$NIKTO{'version'}";
+   LW2::http_init_request(\%request);
+   my (%REMOTE, %LOCAL, @DBTOGET) = ();
+   my ($pluginmsg, $remotemsg) = "";
+   my $code_updates=0;
+   my $serverdir="/nikto/UPDATES/$NIKTO{'version'}";
  
- my $server="www.cirt.net";
- $request{'whisker'}->{'version'}="1.1";
- $request{'whisker'}->{'port'}=80;
- $request{'whisker'}->{'anti_ids'}="";
- $request{'User-Agent'}="Nikto Update Agent";
- $request{'whisker'}->{'host'}=$server;
- 
- for (my $i=0;$i<=$#ARGV;$i++) 
- { if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { $CLI{'useproxy'}=1; last; } }
- 
- if (($NIKTOCONFIG{PROXYHOST} ne "") && ($CLI{'useproxy'}))
-  {
-   $request{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
-   $request{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
-  }
+   # set up our mark
+   my %mark = (
+      'ident' => 'www.cirt.net',
+      'ssl' => 0,
+      'port' => 80
+   );
+   ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('www.cirt.net');
 
- # retrieve versions file
- LW2::http_close(\%request);  # force-close any old connections
- LW2::http_fixup_request(\%request);
- (my $RES, $CONTENT) = fetch("$serverdir/versions.txt","GET");
- if ($RES eq 407) # requires Auth
-  {
-   if ($NIKTOCONFIG{PROXYUSER} eq "")  
+   for (my $i=0;$i<=$#ARGV;$i++) {
+      if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
+         $CLI{'useproxy'}=1; last;
+      }
+   }
+ 
+   # retrieve versions file
+   (my $RES, $CONTENT) = nfetch(\%mark,"$serverdir/versions.txt","GET");
+   if ($RES eq 407) {
+      if ($NIKTOCONFIG{PROXYUSER} eq "")  
       {
-      $NIKTOCONFIG{PROXYUSER}=read_data("Proxy ID: ","");
-      $NIKTOCONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
-     }
-   LW2::auth_set("proxy-basic",\%request,$NIKTOCONFIG{PROXYUSER},$NIKTOCONFIG{PROXYPASS});
+         $NIKTOCONFIG{PROXYUSER}=read_data("Proxy ID: ","");
+         $NIKTOCONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
+      }
 
-   # and try again
-   LW2::http_close(\%request);  # force-close any old connections
-   LW2::http_fixup_request(\%request);
-   ($RES, $CONTENT) = fetch("$serverdir/versions.txt","GET");
-  }
+      # and try again
+      ($RES, $CONTENT) = nfetch(\%mark,"$serverdir/versions.txt","GET");
+   }
 
- if ($RES eq "") # lookup failure?
-  {
-      LW2::http_close(\%request);  # force-close any old connections
-   $request{'whisker'}->{'host'}=$NIKTOCONFIG{CIRT};
-   $request{'Host'}="www.cirt.net";
-   LW2::http_fixup_request(\%request);
-   ($RES, $CONTENT) = fetch("$serverdir/versions.txt","GET");
-  }
-
- if ($RES ne 200) 
-  { print STDERR "+ ERROR ($RES): Unable to get $request{'whisker'}->{'host'}$serverdir/versions.txt\n"; 
-    exit; }
-
- # make hash
- for (split(/\n/,$CONTENT))
- { 
-  my @l=parse_csv($_);
-  if ($_ =~ /^msg/) { $remotemsg="$l[1]"; next; }
-  $REMOTE{$l[0]}=$l[1]; 
- }
+   if ($RES eq "") {
+      ($RES, $CONTENT) = nfetch(\%mark,"$serverdir/versions.txt","GET");
+   }
  
- # get local versions of plugins/dbs
- my @NIKTOFILES=dirlist($NIKTOCONFIG{PLUGINDIR},"");
+   if ($RES ne 200) {
+      print STDERR "+ ERROR ($RES): Unable to get $request{'whisker'}->{'host'}$serverdir/versions.txt\n"; 
+      exit;
+   }
 
- foreach my $file (@NIKTOFILES)
- {
-  my $v="";
-  open(LOCAL,"<$NIKTOCONFIG{PLUGINDIR}/$file") || print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$file' for read: $@\n";
-  my @l=<LOCAL>;
-  close(LOCAL);
+   # make hash
+   for (split(/\n/,$CONTENT)) { 
+      my @l=parse_csv($_);
+      if ($_ =~ /^msg/) {
+         $remotemsg="$l[1]";
+         next;
+      }
+      $REMOTE{$l[0]}=$l[1]; 
+   }
+ 
+   # get local versions of plugins/dbs
+   my @NIKTOFILES=dirlist($NIKTOCONFIG{PLUGINDIR},"");
+
+   foreach my $file (@NIKTOFILES) {
+      my $v="";
+      open(LOCAL,"<$NIKTOCONFIG{PLUGINDIR}/$file") ||
+         print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$file' for read: $@\n";
+      my @l=<LOCAL>;
+      close(LOCAL);
   
-  my @VERS=grep(/^#VERSION/,@l);
-  chomp($VERS[0]);
-  $LOCAL{$file}=(parse_csv($VERS[0]))[1];
- }
-
- # check main nikto versions
- foreach my $remotefile (keys %REMOTE)
- {
-  if ($remotefile eq "nikto") # main program version
-   { 
-    if ($REMOTE{$remotefile} > $NIKTO{'version'}) 
-     { 
-      nprint "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
-      nprint "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n"; 
-      if ($remotemsg ne "") {  nprint "+ $server message: $remotemsg\n"; }
-      exit; 
-     }
-    next;
+      my @VERS=grep(/^#VERSION/,@l);
+      chomp($VERS[0]);
+      $LOCAL{$file}=(parse_csv($VERS[0]))[1];
    }
 
-  if (($LOCAL{$remotefile} eq "") || ($REMOTE{$remotefile} > $LOCAL{$remotefile}))
-   { 
-    push(@DBTOGET,$remotefile); 
-    if ($remotefile !~ /^db_/) { $code_updates=1; }
+   # check main nikto versions
+   foreach my $remotefile (keys %REMOTE) {
+      if ($remotefile eq "nikto") {
+         if ($REMOTE{$remotefile} > $NIKTO{'version'}) { 
+            nprint "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
+            nprint "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n"; 
+            if ($remotemsg ne "") {
+               nprint "+ $server message: $remotemsg\n";
+            }
+            exit; 
+         }
+         next;
+      }
+
+      if (($LOCAL{$remotefile} eq "") ||
+          ($REMOTE{$remotefile} > $LOCAL{$remotefile})) { 
+         push(@DBTOGET,$remotefile); 
+         if ($remotefile !~ /^db_/) { $code_updates=1; }
+      } elsif ($REMOTE{$remotefile} < $LOCAL{$remotefile}) {
+         print STDERR "+ ERROR: Local '$remotefile' (ver $LOCAL{$remotefile}) is NEWER than remote (ver $REMOTE{$remotefile}).\n";
+      } 
    }
-  elsif ($REMOTE{$remotefile} < $LOCAL{$remotefile})  # local is newer (!)
-   { print STDERR "+ ERROR: Local '$remotefile' (ver $LOCAL{$remotefile}) is NEWER than remote (ver $REMOTE{$remotefile}).\n";  } 
- }
 
- # replace local files if updated
- foreach my $toget (@DBTOGET)
- {
-  nprint "+ Retrieving '$toget'\n";
-  (my $RES, $CONTENT) = fetch("$serverdir/$toget","GET");
-  if ($RES ne 200) { print STDERR "+ ERROR: Unable to get $server$serverdir/$toget\n"; exit; }
-  if ($CONTENT ne "") {
-   open(OUT,">$NIKTOCONFIG{PLUGINDIR}/$toget") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$toget' for write: $@\n";
-   print OUT $CONTENT;
-   close(OUT); 
-  }
- }
+   # replace local files if updated
+   foreach my $toget (@DBTOGET) {
+      nprint "+ Retrieving '$toget'\n";
+      (my $RES, $CONTENT) = nfetch(\%mark,"$serverdir/$toget","GET");
+      if ($RES ne 200) {
+         print STDERR "+ ERROR: Unable to get $server$serverdir/$toget\n";
+         exit;
+      }
+      if ($CONTENT ne "") {
+         open(OUT,">$NIKTOCONFIG{PLUGINDIR}/$toget")
+            || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$toget' for write: $@\n";
+         print OUT $CONTENT;
+         close(OUT); 
+      }
+   }
 
-# CHANGES file
-if ($code_updates)
- {
-  nprint "+ Retrieving 'CHANGES.txt'\n";
-  (my $RES, $CONTENT) = fetch("$serverdir/CHANGES.txt","GET");
-  if (($CONTENT ne "") && ($RES eq 200)) {
-   open(OUT,">$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt' for write: $@\n";
-   print OUT $CONTENT;
-   close(OUT); 
-  }
- }
+   # CHANGES file
+   if ($code_updates) {
+      nprint "+ Retrieving 'CHANGES.txt'\n";
+      (my $RES, $CONTENT) = nfetch(\%mark,"$serverdir/CHANGES.txt","GET");
+      if (($CONTENT ne "") && ($RES eq 200)) {
+         open(OUT,">$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt") ||
+            die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt' for write: $@\n";
+         print OUT $CONTENT;
+         close(OUT); 
+      }
+   }
 
-if ($#DBTOGET < 0 )   { nprint "+ No updates required.\n"; }
-if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
-exit;
+   if ($#DBTOGET < 0 )   { nprint "+ No updates required.\n"; }
+   if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
+   exit;
 }
 ###############################################################################
 # do_auth
