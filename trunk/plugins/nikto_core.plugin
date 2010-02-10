@@ -680,7 +680,7 @@ sub general_config
  $NIKTO{'useragent'} =~ s/\@EVASIONS/$ev/g;
 
  # RFI URL -- push it to VARIABLES
- if ($NIKTOCONFIG{'RFIURL'} ne '') {
+ if (defined $NIKTOCONFIG{'RFIURL'}) {
 	$VARIABLES{'@RFIURL'} = $NIKTOCONFIG{'RFIURL'};
 	}
  else {
@@ -2335,130 +2335,96 @@ sub version {
    exit;
 }
 #######################################################################
-sub send_updates
-{
- if ($NIKTOCONFIG{UPDATES} !~ /yes|auto/i) { return; }
+sub send_updates {
+   return if ($NIKTOCONFIG{UPDATES} !~ /yes|auto/i);
  
- my $have_updates=0;
- my ($updated_version, $answer, $RES);
- foreach my $ver (keys %UPDATES) 
-  { 
-   # ignore useless ones...
-   if ($ver !~ /[0-9]/)   { next; }
-   elsif ($ver eq "Win32") { next; }
-   elsif ($ver eq "(Win32)") { next; }
-   elsif ($ver eq "Linux-Mandrake") { next; }
-   $have_updates=1; 
-   $updated_version .= "$ver ";
-  }
+   my $have_updates=0;
+   my ($updated_version, $answer, $RES);
+   foreach my $ver (keys %UPDATES) { 
+      # ignore useless ones...
+      if ($ver !~ /[0-9]/)   { next; }
+      elsif ($ver eq "Win32") { next; }
+      elsif ($ver eq "(Win32)") { next; }
+      elsif ($ver eq "Linux-Mandrake") { next; }
+      $have_updates=1; 
+      $updated_version .= "$ver ";
+   }
   
- if ((!$have_updates) || ($updated_version eq "")) { return; }
+   if ((!$have_updates) || ($updated_version eq "")) { return; }
  
- # make sure the db_outdatedb isn't *too* old
- open(OD,"<$NIKTOCONFIG{PLUGINDIR}/db_outdated") || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/db_outdated': $!\n";;
- @F=<OD>;
- close(OD);
+   # make sure the db_outdatedb isn't *too* old
+   open(OD,"<$NIKTOCONFIG{PLUGINDIR}/db_outdated") ||
+      die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/db_outdated': $!\n";;
+   @F=<OD>;
+   close(OD);
  
- my @LASTUPDATED=grep(/^\# \$Id: db_outdated/, @F);
- $LASTUPDATED[0] =~ /([0-9]{4}\-[0-9]{2})/;
- $lm = $1;
- $lm =~ s/\-//g;
+   my @LASTUPDATED=grep(/^\# \$Id: db_outdated/, @F);
+   $LASTUPDATED[0] =~ /([0-9]{4}\-[0-9]{2})/;
+   $lm = $1;
+   $lm =~ s/\-//g;
  
- my @NOW=localtime(time);
- $NOW[5]+=1900;
- $NOW[4]++;
- if ($NOW[4] < 10) { $NOW[4]="0$NOW[4]"; }
- my $now="$NOW[5]$NOW[4]";
- if (($now - $lm) > 120) { return; }  # DB is 4 months old... ignore the updates!
+   my @NOW=localtime(time);
+   $NOW[5]+=1900;
+   $NOW[4]++;
+   if ($NOW[4] < 10) { $NOW[4]="0$NOW[4]"; }
+   my $now="$NOW[5]$NOW[4]";
+   if (($now - $lm) > 120) { return; }  # DB is 4 months old... ignore the updates!
  
- $updated_version =~ s/\s+$//; 
- $updated_version =~ s/^\s+//; 
+   $updated_version =~ s/\s+$//; 
+   $updated_version =~ s/^\s+//; 
  
- if ($NIKTOCONFIG{UPDATES} eq "auto") { $answer = "y"; }
- else
-  {
-   $answer=read_data("\n
-   *********************************************************************
-   Portions of the server's ident string ($updated_version) are not in
-   the Nikto database or is newer than the known string. Would you like
-   to submit this information (*no server specific data*) to CIRT.net
-   for a Nikto update (or you may email to sullo\@cirt.net) (y/n)? ","");
-  }
+   if ($NIKTOCONFIG{UPDATES} eq "auto") {
+      $answer = "y";
+   } else {
+      $answer=read_data("\n
+      *********************************************************************
+      Portions of the server's ident string ($updated_version) are not in
+      the Nikto database or is newer than the known string. Would you like
+      to submit this information (*no server specific data*) to CIRT.net
+      for a Nikto update (or you may email to sullo\@cirt.net) (y/n)? ","");
+   }
 
- if ($answer !~ /y/i) { return; }
+   if ($answer !~ /y/i) { return; }
  
- LW2::http_init_request(\%request);
- my $server="www.cirt.net";
- $request{'whisker'}->{'version'}="1.1";
- $request{'whisker'}->{'port'}=80;
- $request{'whisker'}->{'anti_ids'}="";
- $request{'User-Agent'}="Nikto Update Agent";
- $request{'Host'}=$server;
+   # set up our mark
+   my %mark = (
+      'ident' => 'www.cirt.net',
+      'ssl' => 0,
+      'port' => 80
+   );
+   ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('www.cirt.net');
+
  
- for (my $i=0;$i<=$#ARGV;$i++) { 
- 	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { 
- 		$CLI{'useproxy'}=1; 
- 		last; 
- 	} 
- }
+   for (my $i=0;$i<=$#ARGV;$i++) { 
+      if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { 
+         $CLI{'useproxy'}=1; 
+         last; 
+      } 
+   }
  
- my  $ip=gethostbyname($server);
- if ($ip ne "") { $request{'whisker'}->{'host'}= inet_ntoa($ip); }
- else { $request{'whisker'}->{'host'}=$server; }
- if (($NIKTOCONFIG{PROXYHOST} ne "") && ($CLI{'useproxy'}))
+   ($RES, $CONTENT) = nfetch(\%mark,"/cgi-bin/versions?DATA=$updated_version","GET");
 
-  {
-   $request{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
-   $request{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
-  }
+   if ($RES eq 407) {
+      if ($NIKTOCONFIG{PROXYUSER} eq "") {
+         $NIKTOCONFIG{PROXYUSER}=read_data("Proxy ID: ","");
+         $NIKTOCONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
+      }
+      ($RES, $CONTENT) = nfetch(\%mark,"/cgi-bin/versions?DATA=$updated_version","GET");
+   }
 
- # send data
- LW2::http_close(\%request);  # force-close any old connections
- LW2::http_fixup_request(\%request);
- ($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
+   if ($RES eq "") {
+      LW2::http_close(\%request);  # force-close any old connections
+      $mark{'ip'}=$NIKTOCONFIG{CIRT};
+      ($RES, $CONTENT) = nfetch(\%mark,"/cgi-bin/versions?DATA=$updated_version","GET");
+   }
 
- # if res is blank... maybe only proxy to get to net?
- if (($RES eq "") && ($NIKTOCONFIG{PROXYHOST} ne ""))
-  {
-   $request{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
-   $request{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
-   ($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
-  }
+   if ($CONTENT !~ /SUCCESS/) { 
+      print STDERR "+ ERROR: ($RES, $CONTENT): Unable to send update info to CIRT.net\n"; 
+   } else {
+      nprint "- Sent updated info to CIRT.net -- Thank you!\n"; 
+   }
 
- if ($RES eq 407) # requires Auth
-  {
-   if ($NIKTOCONFIG{PROXYUSER} eq "")  
-      {
-      $NIKTOCONFIG{PROXYUSER}=read_data("Proxy ID: ","");
-      $NIKTOCONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
-     }
-   LW2::auth_set("proxy-basic",\%request,$NIKTOCONFIG{PROXYUSER},$NIKTOCONFIG{PROXYPASS});
-
-   # and try again
-   LW2::http_close(\%request);  # force-close any old connections
-   LW2::http_fixup_request(\%request);
-  ($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
-  }
-
- if ($RES eq "") # lookup failure?
-  {
-        LW2::http_close(\%request);  # force-close any old connections
-        $request{'whisker'}->{'host'}=$NIKTOCONFIG{CIRT};
-        $request{'Host'}="www.cirt.net";
-        LW2::http_fixup_request(\%request);
-   	($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
-  }
-
- if ($CONTENT !~ /SUCCESS/) 
-  { 
-   print STDERR "+ ERROR: ($RES, $CONTENT): Unable to send update info to CIRT.net\n"; 
-  }
- else
-  {
-   nprint "- Sent updated info to CIRT.net -- Thank you!\n"; 
-  }
-
-return;
+   return;
 }
 #######################################################################
 sub usage {
@@ -2655,6 +2621,8 @@ sub expand_pluginlist
                if ($tname ne $name)
                {
                   push(@toasted, $tname);
+                  # only remove the first instance
+                  last;
                }
             }
             # Newcooked, should now be @toasted
