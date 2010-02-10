@@ -6170,3 +6170,5 @@
 "006182","0","3","/wp-content/plugins/hello.php","GET","Call to undefined function add_action() in ","","","","","The WordPress hello.php plugin reveals a file system path","",""
 "006183","0","3","/readme.html","GET","Version ","","","","","This WordPress file reveals the installed version.","",""
 "006184","0","3","/wp-links-opml.php","GET","generator=\"WordPress/","","","","","This WordPress script reveals the installed version.","",""
+"006184","3093","1","/includes/db.inc","GET","200","<?php","","","","Include files (.inc) should not be served in plain text.","",""
+"006185","3093","1","/includes/sendmail.inc","GET","200","<?php","","","","Include files (.inc) should not be served in plain text.","",""
