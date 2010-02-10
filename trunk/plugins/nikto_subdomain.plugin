@@ -29,7 +29,6 @@ sub nikto_subdomain_init
       author       => "Ryan Dewhurst",
       description  => "Attempts to bruteforce commonly known sub-domains",
       scan_method  => \&nikto_subdomain,
-      scan_cond    => '$CLI{mutate} =~ /5/',
       scan_weight => 20,
       copyright    => "2009 Ryan Dewhurst"
    };
@@ -68,17 +67,15 @@ sub nikto_subdomain
       # Use fetch to minimize extra code
       # First we need to mangle the host.
       my $newhost=$item->{'subdomain'} . "." . $host;
-      $request{'whisker'}{'host'} = $newhost;
-      my ($result, $content) = fetch("/", "HEAD", "", "subdomain");
+      $mark->{'hostname'} = $newhost;
+      my ($result, $content, $error) = nfetch($mark, "/", "HEAD", "", "subdomain");
 
-      if ($result{'whisker'}{'error'} eq "")
+      if ($error eq "")
       {
          add_vulnerability($mark,"Subdomain $item->{'subdomain'} found", $item->{'nikto_id'}, 0);
       } # End if
 
    } # End foreach
-   # Reset $request - we need to localise $request!
-   $request{'whisker'}{'host'}=$host; 
    if (!$nocache_enabled) { undef $CLI{'nocache'}; }
 } # End sub
 
