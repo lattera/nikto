@@ -2026,6 +2026,15 @@ array[0]-&gt;{description}</screen>
           </varlistentry>
 
           <varlistentry>
+            <term><varname>%CONTENTSEARCH</varname> (read)</term>
+
+            <listitem>
+              <para>Hash to contain all the entries in db_content_search - a list of
+              strings and related info to alert on from any request (regardless of test result).</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
             <term><varname>%ERRSTRINGS</varname> (read)</term>
 
             <listitem>
@@ -2322,6 +2331,12 @@ array[0]-&gt;{description}</screen>
                 <entry>700000</entry>
 
                 <entry>db_realms</entry>
+              </row>
+
+              <row>
+                <entry>750000</entry>
+
+                <entry>db_content_search</entry>
               </row>
 
               <row>
