@@ -1155,7 +1155,7 @@ DOCDIR=EXECDIR/docs</screen>
       <blockquote>
         <variablelist>
           <varlistentry>
-            <term>Initialisation (mandatory)</term>
+            <term>Initialization (mandatory)</term>
 
             <listitem>
               <para>Plugin initialisation is performed before targets are
@@ -1217,7 +1217,7 @@ DOCDIR=EXECDIR/docs</screen>
       order.</para>
 
       <section>
-        <title>Initialisation Phase</title>
+        <title>Initialization Phase</title>
 
         <para>As described above, all plugins must be able to execute in the
         initialisation phase or they will be ignored.</para>
@@ -1957,7 +1957,7 @@ DOCDIR=EXECDIR/docs</screen>
           </funcprototype>
         </funcsynopsis>
 
-        <para>Initialises a database that is in <varname>PLUGINDIR</varname>
+        <para>Initializes a database that is in <varname>PLUGINDIR</varname>
         and returns an arrayref. The arrayref is to an array of hashrefs, each
         hash member is configured by the first line in the database file, for
         example:</para>
@@ -2385,7 +2385,7 @@ $TESTS{999999}{osvdb}=637;</screen>
   </chapter>
 
   <chapter id="licences">
-    <title>Licences</title>
+    <title>Licenses</title>
 
     <section>
       <title>Nikto</title>
