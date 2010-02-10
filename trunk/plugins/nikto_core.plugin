@@ -247,8 +247,7 @@ sub map_codes
    $FoF{$ext}{'response'} = $result{'whisker'}->{'code'};
 
    # handle .com to .org redirs or whatnot
-   if (defined $result{'location'})
-     { 
+   if (defined $result{'location'}) { 
    	$FoF{$ext}{'location'} = $result{'location'};
    	$file=char_escape($file);
    	$FoF{$ext}{'location'} =~ s/$file//;
@@ -256,7 +255,7 @@ sub map_codes
 
    # if it is not specific type, figure out Content or HASH method...
    if    ($FoF{$ext}{'response'} eq 404) { $FoF{$ext}{'mode'} = "STD";    next; }
-   elsif ($FoF{$ext}{'response'} eq 200) { $FoF{$ext}{'mode'} = "OK";     }
+   elsif ($FoF{$ext}{'response'} eq 200) { $FoF{$ext}{'mode'} = "OK"; }
    elsif ($FoF{$ext}{'response'} eq 410) { $FoF{$ext}{'mode'} = "STD";    next; }
    elsif ($FoF{$ext}{'response'} eq 401) { $FoF{$ext}{'mode'} = "STD";    next; }
    elsif ($FoF{$ext}{'response'} eq 403) { $FoF{$ext}{'mode'} = "STD";    next; }
