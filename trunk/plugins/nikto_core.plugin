@@ -1070,7 +1070,7 @@ sub load_databases
 ###############################################################################
 sub dbcheck
 {
- my @dbs=qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables/;
+ my @dbs=qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
  my $prefix = $_[0];
  if ($prefix eq ""  )  { nprint "\n-->\tNikto Databases\n"; }
  if ($prefix eq "u"  ) { nprint "\n-->\tUser Databases\n"; }
