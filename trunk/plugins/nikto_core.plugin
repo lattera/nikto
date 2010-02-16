@@ -2621,8 +2621,6 @@ sub expand_pluginlist
                if ($tname ne $name)
                {
                   push(@toasted, $tname);
-                  # only remove the first instance
-                  last;
                }
             }
             # Newcooked, should now be @toasted
