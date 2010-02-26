@@ -10,7 +10,20 @@
 # grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
 #######################################################################
 # Notes:
-# Tuning option (3rd field) values can be found here: http://cirt.net/nikto2-docs/options.html#id2838127
+# Tuning options (field 3):
+# 0 - File Upload
+# 1 - Interesting File / Seen in logs
+# 2 - Misconfiguration / Default File
+# 3 - Information Disclosure
+# 4 - Injection (XSS/Script/HTML)
+# 5 - Remote File Retrieval - Inside Web Root
+# 6 - Denial of Service
+# 7 - Remote File Retrieval - Server Wide
+# 8 - Command Execution / Remote Shell
+# 9 - SQL Injection
+# a - Authentication Bypass
+# b - Software Identification
+# c - Remote source inclusion
 #######################################################################
 "000001","0","b","/TiVoConnect?Command=QueryServer","GET","Calypso Server","","","","","The Tivo Calypso server is running. This page will display the version and platform it is running on. Other URLs may allow download of media.","",""
 "000002","0","b","/TiVoConnect?Command=QueryContainer&Container=/&Recurse=Yes","GET","TiVoContainer","","","","","TiVo client service is running and may allow download of mp3 or jpg files.","",""
@@ -6172,3 +6185,4 @@
 "006184","0","3","/wp-links-opml.php","GET","generator=\"WordPress/","","","","","This WordPress script reveals the installed version.","",""
 "006184","3093","1","/includes/db.inc","GET","200","<?php","","","","Include files (.inc) should not be served in plain text.","",""
 "006185","3093","1","/includes/sendmail.inc","GET","200","<?php","","","","Include files (.inc) should not be served in plain text.","",""
+"006186","","3","/wp-app.log","GET","Array","LANG","","","","Wordpress' wp-app.log may leak application/system details.","",""
