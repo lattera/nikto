@@ -37,7 +37,7 @@ sub nikto_tests_init
 
 sub nikto_tests
 {
-   my ($mark) = @_;
+   my ($mark, $parameters) = @_;
 
    # this is the actual the looped code for all the checks
    foreach my $CHECKID (sort keys %TESTS) 
@@ -171,7 +171,62 @@ sub nikto_tests
       }
    } # end check loop
    
+   # Perform mutation tests
+   if ($parameters->{'passfiles'}) {
+      passchecks($mark);
+   }
+   
    return;
 }
+
+sub passchecks {
+   my ($mark) = @_;
+   my @DIRS   = (split(/ /, $VARIABLES{"\@PASSWORDDIRS"}));
+   my @PFILES = (split(/ /, $VARIABLES{"\@PASSWORDFILES"}));
+   my @EXTS = qw(asp bak dat data dbc dbf exe htm html htx ini lst txt xml php php3 phtml);
+   
+   nprint("- Performing passfiles mutation", "v");
+
+   foreach my $dir (@DIRS)
+   {
+      foreach my $file (@PFILES)
+      {
+         next if ($file eq "");
+
+         # dir/file
+         testfile($mark, "$dir$file", "passfiles", "299998");
+
+         foreach my $ext (@EXTS) {
+            # dir/file.ext
+            testfile($mark, "$dir$file.$ext", "passfiles", "299998");
+
+            foreach my $cgi (@CGIDIRS)
+            {
+               # dir/file.ext
+               testfile($mark, "$cgi$dir$file.$ext", "passfiles", "299998");
+
+               # dir/file
+               testfile($mark, "$cgi$dir$file", "passfiles", "299998");
+            }
+         }
+      }
+   }
+}
+
+sub testfile {
+   my ($mark, $uri, $name, $tid) = @_;
+   my ($result, $contents, $error) = nfetch( $mark, "$uri", "GET",  "", "", "", "Tests: $name");
+   nprint("- $result for $uri","v");
+   if ($error) 
+   {
+      nprint("+ ERROR: $uri returned an error: $error"); 
+      return; 
+   }
+   if ($result == 200) {
+      add_vulnerability( $mark, "$uri: file found during $name mutation", "$tid", "0", "GET");
+   }
+}
+   
+   
 
 1;

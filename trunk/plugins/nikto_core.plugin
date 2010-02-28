@@ -666,10 +666,21 @@ sub general_config
     $CLI{'evasion'}=~s/[^1-8AB]//g;
  }
 
- if (!defined $CLI{'plugins'})
+ if (!defined $CLI{'plugins'} || $CLI{'plugins'} eq "")
  {
     $CLI{'plugins'}='@@DEFAULT';
  }
+ 
+   # Mapping for mutate for plugins
+   if (defined $CLI{'mutate'}) {
+      nprint("- Mutate is deprecated, use -Plugins instead");
+      if ($CLI{'mutate'} =~ /2/) {
+         $CLI{'plugins'} .= ';tests(passfiles)';
+      }
+      if ($CLI{'mutate'} =~ /6/) {
+         $CLI{'plugins'} .= ';dictionary(dict:' . $CLI{'mutate-opts'} . ')';
+      }
+   }
 
  $NIKTO{'timeout'}=$CLI{'timeout'} || 10;
 
@@ -682,7 +693,7 @@ sub general_config
  # RFI URL -- push it to VARIABLES
  if (defined $NIKTOCONFIG{'RFIURL'}) {
 	$VARIABLES{'@RFIURL'} = $NIKTOCONFIG{'RFIURL'};
-	}
+ }
  else {
 	nprint("- ***** RFIURL is not defined in nikto.conf, which means no RFI tests will run *****"); 
 	}
