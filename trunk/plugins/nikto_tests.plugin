@@ -175,6 +175,9 @@ sub nikto_tests
    if ($parameters->{'passfiles'}) {
       passchecks($mark);
    }
+   if ($parameters->{'all'}) {
+      allchecks($mark);
+   }
    
    return;
 }
@@ -213,6 +216,42 @@ sub passchecks {
    }
 }
 
+sub allchecks {
+   my ($mark) = @_;
+   
+   # Hashes to temporarily store files/dirs in
+   # We're using hashes to ensure that duplicates are removed
+   my (%FILES, %DIRS);
+
+   # build the arrays
+   nprint("- Loading root level files", "v");
+   foreach my $checkid (keys %TESTS) {
+      # Expand out vars so we get full matches
+      my @uris=change_variables($TESTS{$checkid}{'uri'});
+      
+      foreach my $uri (@uris) {
+         my $dir  = LW2::uri_get_dir($uri);
+        	my $file = $uri;
+
+        	if ($dir ne "") {
+            $DIRS{$dir} = "";
+            $dir =~ s/([^a-zA-Z0-9])/\\$1/g;
+            $file =~ s/$dir//;
+         }
+        	if (($file ne "") && ($file !~ /^\?/)) {
+            $FILES{$file} = "";
+    		}
+      }
+	}
+   
+   # Now do a check for each item - just check the return status, nothing else
+   foreach my $dir (keys %DIRS) {
+      foreach my $file (keys %FILES) {
+         testfile($mark, "$dir$file", "all checks", 299999);
+      }
+   }
+}   
+
 sub testfile {
    my ($mark, $uri, $name, $tid) = @_;
    my ($result, $contents, $error) = nfetch( $mark, "$uri", "GET",  "", "", "", "Tests: $name");
@@ -225,8 +264,6 @@ sub testfile {
    if ($result == 200) {
       add_vulnerability( $mark, "$uri: file found during $name mutation", "$tid", "0", "GET");
    }
-}
-   
-   
+}  
 
 1;

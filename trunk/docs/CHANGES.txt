@@ -1,3 +1,7 @@
+2010-03-03
+	- Mutate 1 now wrapped into nikto_tests and doesn't take up anywhere near the amount of memory!
+2010-02-28
+	- Starting to deprecate mutate by replacing with plugin options. -mutate 2 (passfiles) is now implemented within tests and uses less memory.
 2010-02-10
 	- Updated -check_updates to use nfetch instead of fetch
 2010-02-09
