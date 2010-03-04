@@ -20,40 +20,35 @@
 # PURPOSE:
 # Get a favicon.ico file & MD5 fingerprint
 ###############################################################################
-sub nikto_favicon_init
-{
-   my $id =
-   {
-      name         => "favicon",
-      full_name    => "Favicon",
-      author       => "Sullo",
-      description  => "Checks the web server's favicon against known favicons.",
-      copyright    => "2008 CIRT Inc.",
-      scan_method  => \&nikto_favicon,
-   };
-   return $id;
-}
+sub nikto_favicon_init {
+    my $id = { name        => "favicon",
+               full_name   => "Favicon",
+               author      => "Sullo",
+               description => "Checks the web server's favicon against known favicons.",
+               copyright   => "2008 CIRT Inc.",
+               scan_method => \&nikto_favicon,
+               };
+    return $id;
+    }
 
-sub nikto_favicon
-{
-   my ($mark)=@_;
-   my ($RES, $CONTENT) = nfetch($mark, "/favicon.ico", "GET", "", "", "", "favicon");
-   my $dbarray = init_db("db_favicon");
+sub nikto_favicon {
+    my ($mark) = @_;
+    my ($RES, $CONTENT) = nfetch($mark, "/favicon.ico", "GET", "", "", "", "favicon");
+    my $dbarray = init_db("db_favicon");
 
-   if ($RES eq "200" && $CONTENT ne "")
-   {
-      my $hash = LW2::md5($CONTENT);
-      $hash =~ s/^.*://;
-      nprint("Got favicon.ico hash:$hash", "d", "");
+    if ($RES eq "200" && $CONTENT ne "") {
+        my $hash = LW2::md5($CONTENT);
+        $hash =~ s/^.*://;
+        nprint("Got favicon.ico hash:$hash", "d", "");
 
-      foreach my $item (@$dbarray)
-      {
-         if ($item->{'md5hash'} eq $hash)
-         {
-            add_vulnerability($mark,"/favicon.ico file identifies this server as: $item->{'description'}", $item->{'nikto_id'}, 39272);
-         }
-      }
-   }
-}
+        foreach my $item (@$dbarray) {
+            if ($item->{'md5hash'} eq $hash) {
+                add_vulnerability($mark,
+                              "/favicon.ico file identifies this server as: $item->{'description'}",
+                              $item->{'nikto_id'}, 39272);
+                }
+            }
+        }
+    }
 
 1;

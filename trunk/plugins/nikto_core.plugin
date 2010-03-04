@@ -75,7 +75,6 @@ sub is_404 {
    else {
    	foreach my $string (keys %ERRSTRINGS) {
    		if ($content =~ /$string/i) {
-			print "TEMP DEBUG: 404 based on content match ($string -> $uri)\n";
    			return 1;
    			} 
    		}
@@ -2264,7 +2263,6 @@ sub set_scan_items
 
     if ($add)
     {
-     # This nasty set of loops allows for multiple values per line
      my $ext = get_ext($item[3]);
      $db_extensions{$ext}=1;
 
@@ -2287,6 +2285,7 @@ sub set_scan_items
    }
   }
 
+undef @DBFILE; # this memory hog is no longer needed!
 nprint("- $mark->{total_checks} server checks loaded","v");
 if ($mark->{total_checks} eq 0 && !defined $CLI{'tuning'}) { nprint("+ Unable to load valid checks!"); exit; }
 return;
