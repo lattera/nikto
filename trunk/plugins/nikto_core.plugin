@@ -377,9 +377,9 @@ sub dump_target_info
    my $sslprint="";
 
    if ($mark->{ssl}) { 
-      my $sslcyphers=$result{whisker}->{ssl_cipher}      || "Unknown"; 
-      my $sslissuers=$result{whisker}->{ssl_cert_issuer} || "Unknown";
-      my $sslinfo=$result{whisker}->{ssl_cert_subject}   || "Unknown";
+      my $sslcyphers=$result{'whisker'}->{'ssl_cipher'}      || "Unknown"; 
+      my $sslissuers=$result{'whisker'}->{'ssl_cert_issuer'} || "Unknown";
+      my $sslinfo=$result{'whisker'}->{'ssl_cert_subject'}   || "Unknown";
       $sslprint="$NIKTO{'DIV'}\n";
       $sslprint.="+ SSL Info:        Ciphers: $sslcyphers\n                   Info:    $sslissuers\n                   Subject: $sslinfo";
 
@@ -1723,7 +1723,7 @@ sub do_auth
       next unless ($realm =~ /$REALMS{$REALM}{realm}/i || $REALMS{$REALM}{realm} eq '@ANY');
       if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq ""))
       { 
-         my $uridir=$request{whisker}->{uri};
+         my $uridir=$request{'whisker'}->{'uri'};
          $uridir =~ s#/[^/]*$#/#g;
          add_vulnerability($mark,"Blank credentials found at $uridir ($request{whisker}->{uri}), $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}", $REALMS{$REALM}{tid},0,"GET",$uridir,\%result); 
       }
@@ -1754,7 +1754,7 @@ sub do_auth
              !defined $result{'whisker'}->{'error'}) {  
             unless ($REALMS{$REALM}{tid} == 700500 ||
                     $REALMS{$REALM}{checked} == 1) {
-               my $uridir=$request{whisker}->{uri};
+               my $uridir=$request{'whisker'}->{'uri'};
                $uridir =~ s#/[^/]*$#/#g;
                add_vulnerability($mark,"Default account found for '$realm' at $uridir ($request{whisker}->{uri}) (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",$REALMS{$REALM}{tid},0,"GET",$uridir,\%result);
                $REALMS{$REALM}{checked}=1;
@@ -2036,13 +2036,13 @@ sub fetch
  } 
  unless ($_[4]) { LW2::http_fixup_request(\%request); }
  # Cache
- if (defined($CACHE{$request{whisker}->{uri}}) && !defined($CLI{'nocache'}) &&
-     ($CACHE{$request{whisker}->{uri}}{method} eq $request{whisker}->{method}))
+ if (defined($CACHE{$request{'whisker'}->{'uri'}}) && !defined($CLI{'nocache'}) &&
+     ($CACHE{$request{'whisker'}->{'uri'}}{'method'} eq $request{'whisker'}->{'method'}))
  {
     # Get from cache
-    nprint("- Retrieving $request{whisker}->{uri} from cache.","v");
-    $result{whisker}->{code}=$CACHE{$request{whisker}->{uri}}{res};
-    $result{whisker}->{data}=$CACHE{$request{whisker}->{uri}}{content};
+    nprint("- Retrieving $request{'whisker'}->{'uri'} from cache.","v");
+    $result{'whisker'}->{'code'}=$CACHE{$request{'whisker'}->{'uri'}}{'res'};
+    $result{'whisker'}->{'data'}=$CACHE{$request{'whisker'}->{'uri'}}{'content'};
  }
  else
  {
@@ -2050,9 +2050,9 @@ sub fetch
     $NIKTO{'totalrequests'}++;
     unless (defined $CLI{'nocache'})
     {
-       $CACHE{$request{whisker}->{uri}}{method}=$request{whisker}->{method};
-       $CACHE{$request{whisker}->{uri}}{res}=$result{whisker}->{code};
-       $CACHE{$request{whisker}->{uri}}{content}=$result{whisker}->{data};
+       $CACHE{$request{'whisker'}->{'uri'}}{'method'}=$request{'whisker'}->{'method'};
+       $CACHE{$request{'whisker'}->{'uri'}}{'res'}=$result{'whisker'}->{'code'};
+       $CACHE{$request{'whisker'}->{'uri'}}{'content'}=$result{'whisker'}->{'data'};
     }
     if ($OUTPUT{debug})
     {
@@ -2079,7 +2079,7 @@ sub fetch
  }
 
  # content search
- content_search($result{whisker}->{data}, $request{whisker}->{uri}, $request{whisker}->{method});
+ content_search($result{'whisker'}->{'data'}, $request{'whisker'}->{'uri'}, $request{'whisker'}->{'method'});
 
  $request{'User-Agent'}=$temp_ua; # reset UA
  return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
@@ -2091,28 +2091,28 @@ sub setup_hash
 
    # Do the standard set up for the hash 
    LW2::http_init_request($reqhash);
-   $reqhash->{whisker}->{ssl_save_info}=1;
-   $reqhash->{whisker}->{lowercase_incoming_headers}=1;
-   $reqhash->{whisker}->{timeout}=$NIKTO{'timeout'};
+   $reqhash->{'whisker'}->{'ssl_save_info'}=1;
+   $reqhash->{'whisker'}->{'lowercase_incoming_headers'}=1;
+   $reqhash->{'whisker'}->{'timeout'}=$NIKTO{'timeout'};
    if (defined $CLI{'evasion'}) {
-   	$reqhash->{whisker}->{encode_anti_ids}=$CLI{'evasion'};
+   	$reqhash->{'whisker'}->{'encode_anti_ids'}=$CLI{'evasion'};
    	}
    $reqhash->{'User-Agent'}=$NIKTO{'useragent'};
    $reqhash->{'User-Agent'}=~s/\@TESTID/$testid/g;
-   $reqhash->{whisker}->{retry}=0;
-   $reqhash->{whisker}->{host}=$mark->{hostname} || $mark->{ip};
+   $reqhash->{'whisker'}->{'retry'}=0;
+   $reqhash->{'whisker'}->{'host'}=$mark->{'hostname'} || $mark->{'ip'};
 
-   if ($mark->{vhost}) {
-   	$request{Host} = $mark->{vhost};
+   if ($mark->{'vhost'}) {
+   	$request{'Host'} = $mark->{'vhost'};
    	}
-   $reqhash->{whisker}->{port} = $mark->{port};
-   $reqhash->{whisker}->{ssl} = $mark->{ssl};
+   $reqhash->{'whisker'}->{'port'} = $mark->{'port'};
+   $reqhash->{'whisker'}->{'ssl'} = $mark->{'ssl'};
    
    # Proxy stuff
    if (defined $NIKTOCONFIG{PROXYHOST} && defined $CLI{'useproxy'}) {
-   	$reqhash->{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{PROXYHOST};
-   	$reqhash->{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{PROXYPORT};
-   	LW2::auth_set("proxy-basic",$reqhash,$NIKTOCONFIG{PROXYUSER}, $NIKTOCONFIG{PROXYPASS});
+   	$reqhash->{'whisker'}->{'proxy_host'}=$NIKTOCONFIG{'PROXYHOST'};
+   	$reqhash->{'whisker'}->{'proxy_port'}=$NIKTOCONFIG{'PROXYPORT'};
+   	LW2::auth_set("proxy-basic",$reqhash,$NIKTOCONFIG{'PROXYUSER'}, $NIKTOCONFIG{'PROXYPASS'});
    	}
    
    return $reqhash;
@@ -2125,19 +2125,19 @@ sub nfetch
    my (%request, %result);
    setup_hash(\%request, $mark, $testid);
  
-   $request{whisker}->{uri} = $uri;
+   $request{'whisker'}->{'uri'} = $uri;
    if (defined $CLI{'root'})
    {
-      $request{whisker}->{uri} = $CLI{'root'} . $uri; # prepend -root option value
+      $request{'whisker'}->{'uri'} = $CLI{'root'} . $uri; # prepend -root option value
    }
-   $request{whisker}->{method} = $method;
+   $request{'whisker'}->{'method'} = $method;
    my $header_hash=$headers;
 
    if (defined $data)
    { 
       my $r=$data;
       $r =~ s/\\\"/\"/g; 
-      $request{whisker}->{data} = $r;
+      $request{'whisker'}->{'data'} = $r;
    }
   
    # check for extra HTTP headers
@@ -2157,8 +2157,8 @@ sub nfetch
    {
       # Get from cache
       nprint("- Retrieving $uri from cache.","v");
-      $result{whisker}->{code}=$CACHE{$uri}{res};
-      $result{whisker}->{data}=$CACHE{$uri}{content};
+      $result{'whisker'}->{'code'}=$CACHE{$uri}{'res'};
+      $result{'whisker'}->{'data'}=$CACHE{$uri}{'content'};
    }
    else
    {
@@ -2166,10 +2166,10 @@ sub nfetch
       $NIKTO{'totalrequests'}++;
       unless (defined $CLI{'nocache'})
       {
-         $CACHE{$uri}{method}=$result{whisker}->{method};
-         $CACHE{$uri}{res}=$result{whisker}->{code};
-         $CACHE{$uri}{content}=$result{whisker}->{data};
-         $CACHE{$uri}{mark}=$mark;
+         $CACHE{$uri}{'method'}=$result{'whisker'}->{'method'};
+         $CACHE{$uri}{'res'}=$result{'whisker'}->{'code'};
+         $CACHE{$uri}{'content'}=$result{'whisker'}->{'data'};
+         $CACHE{$uri}{'mark'}=$mark;
       }
       if ($OUTPUT{debug})
       {
@@ -2204,7 +2204,7 @@ sub nfetch
    }
 
    # content search
-   content_search($result{whisker}->{data}, $request{whisker}->{uri}, $request{whisker}->{method}, $mark);
+   content_search($result{'whisker'}->{'data'}, $request{'whisker'}->{'uri'}, $request{'whisker'}->{'method'}, $mark);
 
    return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'}, $result{'whisker'}->{'error'};
 }
@@ -2488,7 +2488,7 @@ sub add_vulnerability {
 
    my $result="";
    if (defined $_[7]) {
-      $result=$_[7]->{whisker}->{data};
+      $result=$_[7]->{'whisker'}->{'data'};
    }
    my $outmessage=$message;
    my $resulthash={};
