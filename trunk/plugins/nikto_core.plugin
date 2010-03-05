@@ -310,6 +310,7 @@ sub rm_active_content
 
  # filename
  if ($file ne '') { 
+	$file =~ s/([^a-zA-Z0-9\s])/\\$1/g;
 	$cont =~ s/$file//g;
 	}
  
@@ -326,17 +327,16 @@ sub rm_active_content
  # Advertising
  
  # URI, if provided, plus encoded versions of it
- if (defined $_[1]) 
+ # $_[1] has unescaped file name, and $file has escaped. use appropriate one!
+ if (defined $file) 
    { 
       # match pages which link to themselves w/diff args
-      my $e = $_[1];
-      $e =~ s/^\/$_[1]\??//;  
-      $e =~ s/([^a-zA-Z0-9\s])/\\$1/g; # escaping
+      my $e = $file;
+      $e =~ s/^\/$file\??//;  
       $cont =~ s/$e//gs; 
 
       # again but with the index in place
-      $e = $_[1];
-      $e =~ s/([^a-zA-Z0-9\s])/\\$1/g; # escaping
+      $e = $file;
       $cont =~ s/$e//gs; 
 
       # base 64
@@ -357,9 +357,9 @@ sub rm_active_content
       $cont =~ s/$e//gs; 
 
       # url encoding, query portion
-      if ($_[1] =~ /\?/)
+      if ($file =~ /\?/)
          {
-            $e = $_[1];
+            $e = $file;
             $e =~ s/\?(.*$)//;
             my $qs = $1;
             $qs =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
