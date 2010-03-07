@@ -20,72 +20,65 @@
 # PURPOSE:
 # Run dictionary tests
 ###############################################################################
-sub nikto_dictionary_attack_init
-{
-   my $id =
-   {
-      name         => "dictionary",
-      full_name    => "Dictionary attack",
-      author       => "Deity",
-      description  => "Attempts to dictionary attack commonly known directories/files",
-      recon_method => \&nikto_dictionary_attack,
-      recon_weight => 20,
-      copyright    => "2009 CIRT Inc"
-   };
+sub nikto_dictionary_attack_init {
+    my $id = { name         => "dictionary",
+               full_name    => "Dictionary attack",
+               author       => "Deity",
+               description  => "Attempts to dictionary attack commonly known directories/files",
+               recon_method => \&nikto_dictionary_attack,
+               recon_weight => 20,
+               copyright    => "2009 CIRT Inc"
+               };
 
-   return $id;
-}
+    return $id;
+    }
 
-sub nikto_dictionary_attack
-{
-   my ($mark, $parameters) = @_;
-   
-   my $dictfile="";
-   if (defined $parameters &&
-       defined $parameters->{'dictionary'}) {
-      $dictfile = $parameters->{'dictionary'};
-   } elsif (defined($CLI{'mutate-options'})) {
-      $dictfile=$CLI{'mutate-options'};
-   } else {
-      nprint("- No dictionary file given in plugin options, skipping check","v");
-      return;
-   }
-   my $ctr=0;
-   
-   if (!defined $dictfile)
-   {
-      nprint("- No dictionary file given in mutate-options, skipping check");
-      return;
-   }
+sub nikto_dictionary_attack {
+    my ($mark, $parameters) = @_;
 
-   # Record the host for future use
-   my $host=$mark->{'hostname'};
+    my $dictfile = "";
+    if (   defined $parameters
+        && defined $parameters->{'dictionary'}) {
+        $dictfile = $parameters->{'dictionary'};
+        }
+    elsif (defined($CLI{'mutate-options'})) {
+        $dictfile = $CLI{'mutate-options'};
+        }
+    else {
+        nprint("- No dictionary file given in plugin options, skipping check", "v");
+        return;
+        }
+    my $ctr = 0;
 
-   nprint("- Guessing directories/files (using dictionary $dictfile).", "v");
-   unless (open(IN, "<$dictfile"))
-   {
-      nprint("+ ERROR: Unable to open dictionary file $dictfile: $!.");
-   }
+    if (!defined $dictfile) {
+        nprint("- No dictionary file given in mutate-options, skipping check");
+        return;
+        }
 
-   # Now attempt on each entry
-   while (<IN>)
-   {
-      chomp;
-      s/\#.*$//;
-      next if ($_ eq "" );
-      my $dir=$_;
-      if (($ctr % 100) == 0) { nprint("- Directory enumeration guess $ctr ($dir): /$dir/", "v"); }
-      my ($result, $content) = nfetch($mark, "/$dir/", "HEAD", "", "", "", "dictionary_attack");
-      foreach my $found (split(/ /, $VARIABLES{"\@HTTPFOUND"}))
-      {
-         if ($result eq $found)
-         {
-            add_vulnerability($mark, "Found directory /$dir/", 999969, "0", "HEAD", "/$dir/");
-         }
-      }
-      $ctr++;
-   }
-   close(IN);
-} # End sub
+    # Record the host for future use
+    my $host = $mark->{'hostname'};
+
+    nprint("- Guessing directories/files (using dictionary $dictfile).", "v");
+    unless (open(IN, "<$dictfile")) {
+        nprint("+ ERROR: Unable to open dictionary file $dictfile: $!.");
+        }
+
+    # Now attempt on each entry
+    while (<IN>) {
+        chomp;
+        s/\#.*$//;
+        next if ($_ eq "");
+        my $dir = $_;
+        if (($ctr % 100) == 0) { nprint("- Directory enumeration guess $ctr ($dir): /$dir/", "v"); }
+        my ($result, $content) = nfetch($mark, "/$dir/", "HEAD", "", "", "", "dictionary_attack");
+        foreach my $found (split(/ /, $VARIABLES{"\@HTTPFOUND"})) {
+            if ($result eq $found) {
+                add_vulnerability($mark, "Found directory /$dir/", 999969, "0", "HEAD", "/$dir/");
+                }
+            }
+        $ctr++;
+        }
+    close(IN);
+    }    # End sub
 
 1;

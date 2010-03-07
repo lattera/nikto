@@ -20,69 +20,69 @@
 # PURPOSE:
 # Look for multiple unique index files
 ###############################################################################
-sub nikto_multiple_index_init
-{
-   my $id =
-   {
-      name         => "mutiple_index",
-      full_name    => "Multiple Index",
-      author       => "deity",
-      description  => "Checks for multiple index files",
-      scan_method  => \&nikto_multiple_index,
-      copyright    => "2009 CIRT Inc"
-   };
+sub nikto_multiple_index_init {
+    my $id = { name        => "mutiple_index",
+               full_name   => "Multiple Index",
+               author      => "deity",
+               description => "Checks for multiple index files",
+               scan_method => \&nikto_multiple_index,
+               copyright   => "2009 CIRT Inc"
+               };
 
-   return $id;
-}
+    return $id;
+    }
 
-sub nikto_multiple_index
-{
-   my ($mark) = @_;
-   my $dbarray = init_db("db_multiple_index");
-   my ($found, $hashes);
-   foreach my $item (@$dbarray) {
-      	# Use nfetch to minimise extra code
-      	# First we need to mangle the host.
-      	my ($res, $content) = nfetch($mark, "/$item->{'index'}", "GET", "", "", "", "multiple_index");
+sub nikto_multiple_index {
+    my ($mark) = @_;
+    my $dbarray = init_db("db_multiple_index");
+    my ($found, $hashes);
+    foreach my $item (@$dbarray) {
 
-      	if (($res == 200) || ($res == 404)) {
-       		$content=rm_active_content($result{'whisker'}->{'data'}, "/$item->{'index'}");
-       		my $hash=LW2::md4($content);
-		$found{$item->{'index'}}=$hash;
-		$hashes{$hash}++;
-      	}
+        # Use nfetch to minimise extra code
+        # First we need to mangle the host.
+        my ($res, $content) =
+          nfetch($mark, "/$item->{'index'}", "GET", "", "", "", "multiple_index");
 
-   } # End foreach
+        if (($res == 200) || ($res == 404)) {
+            $content = rm_active_content($result{'whisker'}->{'data'}, "/$item->{'index'}");
+            my $hash = LW2::md4($content);
+            $found{ $item->{'index'} } = $hash;
+            $hashes{$hash}++;
+            }
 
-   if (keys(%found) > 1)
-   {
-	# make sure we have unique pages
-	$total_unique=0;
-	foreach my $hash (keys %hashes) {
-		if ($hashes{$hash} eq 1) {
-			$total_unique++;
-		}
-	}
+        }    # End foreach
 
-	# one unique hash... bogus responses
-	if ($total_unique <= 1) { 
-		return; 
-	}
+    if (keys(%found) > 1) {
 
-	my $tempstring;
-	foreach my $f (keys %found) { $tempstring .= "$f, "; }
-	$tempstring =~ s/,$//;
+        # make sure we have unique pages
+        $total_unique = 0;
+        foreach my $hash (keys %hashes) {
+            if ($hashes{$hash} eq 1) {
+                $total_unique++;
+                }
+            }
 
-	# some unique... report slightly differently
-	if ($total_unique < keys(%found)) {
-      		add_vulnerability($mark,"Multiple index files found (note, these may not all be unique): $tempstring", 740000, 0);
-	}
+        # one unique hash... bogus responses
+        if ($total_unique <= 1) {
+            return;
+            }
 
-	# all unique... report
-	if ($total_unique eq keys(%found)) {
-      		add_vulnerability($mark,"Multiple index files found: $tempstring", 740000, 0);
-	}
-   }
-}
+        my $tempstring;
+        foreach my $f (keys %found) { $tempstring .= "$f, "; }
+        $tempstring =~ s/,$//;
+
+        # some unique... report slightly differently
+        if ($total_unique < keys(%found)) {
+            add_vulnerability($mark,
+                      "Multiple index files found (note, these may not all be unique): $tempstring",
+                      740000, 0);
+            }
+
+        # all unique... report
+        if ($total_unique eq keys(%found)) {
+            add_vulnerability($mark, "Multiple index files found: $tempstring", 740000, 0);
+            }
+        }
+    }
 
 1;

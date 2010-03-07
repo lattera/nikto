@@ -20,36 +20,41 @@
 # PURPOSE:
 # Apache user enumeration
 ###############################################################################
-sub nikto_apacheusers_init
-{
-   my $id =
-   {
-      name         => "apacheusers",
-      full_name    => "Apache Users",
-      author       => "Sullo",
-      description  => "Checks whether we can enumerate usernames directly from the web server",
-      scan_method  => \&nikto_apacheusers,
-      copyright    => "2008 CIRT Inc."
-   };
-   return $id;
-}
+sub nikto_apacheusers_init {
+    my $id = {
+            name        => "apacheusers",
+            full_name   => "Apache Users",
+            author      => "Sullo",
+            description => "Checks whether we can enumerate usernames directly from the web server",
+            scan_method => \&nikto_apacheusers,
+            copyright   => "2008 CIRT Inc."
+            };
+    return $id;
+    }
 
-sub nikto_apacheusers
-{
-   my ($mark) = @_;
-   (my $RES, $CONTENT) = nfetch($mark, "/~root", "GET", "", "", "", "apacheusers: known user");
+sub nikto_apacheusers {
+    my ($mark) = @_;
+    (my $RES, $CONTENT) = nfetch($mark, "/~root", "GET", "", "", "", "apacheusers: known user");
 
-   $CONTENT = char_escape($CONTENT);
-   if ($CONTENT =~ /forbidden/i)    # good on "root"
-   {
-      (my $RES, $CONTENT) = nfetch($mark, "/~" . LW2::utils_randstr(8), "GET", "", "", "", "apacheusers: invalid user");
+    $CONTENT = char_escape($CONTENT);
+    if ($CONTENT =~ /forbidden/i)    # good on "root"
+    {
+        (my $RES, $CONTENT) = nfetch($mark, "/~" . LW2::utils_randstr(8),
+                                     "GET", "", "", "", "apacheusers: invalid user");
 
-      $CONTENT = char_escape($CONTENT);
-      if ($CONTENT !~ /forbidden/i)    # Good, it gave an error instead of forbidden
-      {
-         add_vulnerability($mark, "Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).", 999999, 637, "GET", "/~root");
-      }
-   }
-}
+        $CONTENT = char_escape($CONTENT);
+        if ($CONTENT !~ /forbidden/i)    # Good, it gave an error instead of forbidden
+        {
+            add_vulnerability(
+                $mark,
+                "Enumeration of users is possible by requesting ~username (responds with 'Forbidden' for users, 'not found' for non-existent users).",
+                999999,
+                637,
+                "GET",
+                "/~root"
+                );
+            }
+        }
+    }
 
 1;

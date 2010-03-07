@@ -20,63 +20,59 @@
 # PURPOSE:
 # Look for subdomains
 ###############################################################################
-sub nikto_subdomain_init
-{
-   my $id =
-   {
-      name         => "subdomain",
-      full_name    => "Sub-domain forcer",
-      author       => "Ryan Dewhurst",
-      description  => "Attempts to bruteforce commonly known sub-domains",
-      scan_method  => \&nikto_subdomain,
-      scan_weight => 20,
-      copyright    => "2009 Ryan Dewhurst"
-   };
+sub nikto_subdomain_init {
+    my $id = { name        => "subdomain",
+               full_name   => "Sub-domain forcer",
+               author      => "Ryan Dewhurst",
+               description => "Attempts to bruteforce commonly known sub-domains",
+               scan_method => \&nikto_subdomain,
+               scan_weight => 20,
+               copyright   => "2009 Ryan Dewhurst"
+               };
 
-   return $id;
-}
+    return $id;
+    }
 
-sub nikto_subdomain
-{
-   my ($mark) = @_;
-   my $dbarray = init_db("db_subdomains");
+sub nikto_subdomain {
+    my ($mark) = @_;
+    my $dbarray = init_db("db_subdomains");
 
-   # Record the host for future use
-   my $host=$mark->{'hostname'};
+    # Record the host for future use
+    my $host = $mark->{'hostname'};
 
-   # Check whether the host is an IP address
-   if ($host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/)
-   {
-      # Host is an IP address, don't bother!
-      return;
-   }
+    # Check whether the host is an IP address
+    if ($host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/) {
 
-   # Check if the start of the domain is "www"
-   if ($host =~ /^www\./)
-   {
-      # Remove the www.
-      $host =~ s/^www\.//;
-   }
+        # Host is an IP address, don't bother!
+        return;
+        }
 
-   my $nocache_enabled=0;
-   if ($CLI{'nocache'}) { $nocache_enabled=1; }
-   $CLI{'nocache'}=1;
+    # Check if the start of the domain is "www"
+    if ($host =~ /^www\./) {
 
-   foreach my $item (@$dbarray)
-   {
-      # Use fetch to minimize extra code
-      # First we need to mangle the host.
-      my $newhost=$item->{'subdomain'} . "." . $host;
-      $mark->{'hostname'} = $newhost;
-      my ($result, $content, $error) = nfetch($mark, "/", "HEAD", "", "subdomain");
+        # Remove the www.
+        $host =~ s/^www\.//;
+        }
 
-      if ($error eq "")
-      {
-         add_vulnerability($mark,"Subdomain $item->{'subdomain'} found", $item->{'nikto_id'}, 0);
-      } # End if
+    my $nocache_enabled = 0;
+    if ($CLI{'nocache'}) { $nocache_enabled = 1; }
+    $CLI{'nocache'} = 1;
 
-   } # End foreach
-   if (!$nocache_enabled) { undef $CLI{'nocache'}; }
-} # End sub
+    foreach my $item (@$dbarray) {
+
+        # Use fetch to minimize extra code
+        # First we need to mangle the host.
+        my $newhost = $item->{'subdomain'} . "." . $host;
+        $mark->{'hostname'} = $newhost;
+        my ($result, $content, $error) = nfetch($mark, "/", "HEAD", "", "subdomain");
+
+        if ($error eq "") {
+            add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'},
+                              0);
+            }    # End if
+
+        }    # End foreach
+    if (!$nocache_enabled) { undef $CLI{'nocache'}; }
+    }    # End sub
 
 1;

@@ -20,30 +20,28 @@
 # PURPOSE:
 # Test Apache's expect header XSS
 ###############################################################################
-sub nikto_apache_expect_xss_init
-{
-   my $id =
-   {
-      name         => "apache_export_xss",
-      full_name    => "Apache Expect XSS",
-      author       => "Sullo",
-      description  => "Checks whether the web servers has a cross-site scripting vulnerability through the Expect: HTTP header",
-      scan_method  => \&nikto_apache_expect_xss,
-      copyright    => "2008 CIRT Inc."
-   };
-   return $id;
-}
+sub nikto_apache_expect_xss_init {
+    my $id = {
+        name      => "apache_export_xss",
+        full_name => "Apache Expect XSS",
+        author    => "Sullo",
+        description =>
+          "Checks whether the web servers has a cross-site scripting vulnerability through the Expect: HTTP header",
+        scan_method => \&nikto_apache_expect_xss,
+        copyright   => "2008 CIRT Inc."
+        };
+    return $id;
+    }
 
-sub nikto_apache_expect_xss
-{
-   my ($mark) = @_;
-   my %headers=('Expect', '<script>alert(xss)</script>');
-   (my $RES, $CONTENT) = nfetch($mark, "/", "GET", "", \%headers, "", "apache_expect_xss");
+sub nikto_apache_expect_xss {
+    my ($mark) = @_;
+    my %headers = ('Expect', '<script>alert(xss)</script>');
+    (my $RES, $CONTENT) = nfetch($mark, "/", "GET", "", \%headers, "", "apache_expect_xss");
 
-   if ($CONTENT =~ /<script>alert\(xss\)<\/script>/)
-   {
-      add_vulnerability($mark, "Apache is vulnerable to XSS via the Expect header", 999974, 27487);
-   }
-}
+    if ($CONTENT =~ /<script>alert\(xss\)<\/script>/) {
+        add_vulnerability($mark, "Apache is vulnerable to XSS via the Expect header", 999974,
+                          27487);
+        }
+    }
 
 1;

@@ -20,109 +20,98 @@
 # PURPOSE:
 # Check out the robots.txt file
 ###############################################################################
-sub nikto_robots_init
-{
-   my $id =
-   {
-      name         => "robots",
-      full_name    => "Robots",
-      author       => "Sullo",
-      description  => "Checks whether there's anything within the robots.txt file and analyses it for other paths to pass to other scripts.",
-      recon_method => \&nikto_robots,
-      recon_weight => 49,
-      copyright    => "2008 CIRT Inc."
-   };
-   return $id;
-}
+sub nikto_robots_init {
+    my $id = {
+        name      => "robots",
+        full_name => "Robots",
+        author    => "Sullo",
+        description =>
+          "Checks whether there's anything within the robots.txt file and analyses it for other paths to pass to other scripts.",
+        recon_method => \&nikto_robots,
+        recon_weight => 49,
+        copyright    => "2008 CIRT Inc."
+        };
+    return $id;
+    }
 
-sub nikto_robots
-{
-   my ($mark) = @_;
-   (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", "", "", "robots");
+sub nikto_robots {
+    my ($mark) = @_;
+    (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", "", "", "robots");
 
-   if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'}))    # got one!
-   {
-      if (is_404("robots.txt", $CONTENT, $RES)) { return; }
+    if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'}))    # got one!
+    {
+        if (is_404("robots.txt", $CONTENT, $RES)) { return; }
 
-      my ($DIRS, $RFILES) = "";
-      my $DISCTR = 0;
-      my @DOC = split(/\n/, $CONTENT);
-      foreach my $line (@DOC)
-      {
-         $line = char_escape($line);
-         if ($line =~ /allow/i)                       # hmmm...
-         {
-            chomp($line);
-            $line =~ s/\#.*$//;
-            $line =~ s/(^\s+|\s+$)//g;
-            $line =~ s/\s+/ /g;
-            $line =~ s/\\t/ /g;
-            $line =~ s/(dis)?allow(\\:)?( )?//i;
-            $line =~ s/\*//g;
-            $line =~ s/\/+/\//g;
+        my ($DIRS, $RFILES) = "";
+        my $DISCTR = 0;
+        my @DOC = split(/\n/, $CONTENT);
+        foreach my $line (@DOC) {
+            $line = char_escape($line);
+            if ($line =~ /allow/i)                              # hmmm...
+            {
+                chomp($line);
+                $line =~ s/\#.*$//;
+                $line =~ s/(^\s+|\s+$)//g;
+                $line =~ s/\s+/ /g;
+                $line =~ s/\\t/ /g;
+                $line =~ s/(dis)?allow(\\:)?( )?//i;
+                $line =~ s/\*//g;
+                $line =~ s/\/+/\//g;
 
-            if ($line eq "") { next; }
-   
-            # try to figure out file vs dir... just guess...
-            if (($line !~ /\./) && ($line !~ /\/$/)) { $line .= "/"; }
+                if ($line eq "") { next; }
 
-            $line = LW2::uri_normalize($line);
+                # try to figure out file vs dir... just guess...
+                if (($line !~ /\./) && ($line !~ /\/$/)) { $line .= "/"; }
 
-            # figure out dirs/files...
-            my $realdir  = LW2::uri_get_dir($line);
-            my $realfile = $line;
-            $realfile =~ s/^$realdir//;
+                $line = LW2::uri_normalize($line);
 
-            nprint("- robots.txt entry dir:$realdir -- file:$realfile", "d");
-            if (($realdir  ne "") && ($realdir  ne "/")) { $DIRS{$realdir}++; }
-            if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
-            $DISCTR++;
-         }    # end if $line =~ disallow
-      }    # end foreach my $line (@DOC)_
+                # figure out dirs/files...
+                my $realdir  = LW2::uri_get_dir($line);
+                my $realfile = $line;
+                $realfile =~ s/^$realdir//;
 
-      # add them  to mutate dir/file
-      my $raw;
-      foreach $raw (sort keys %DIRS)
-      {
-         $raw =~ s/\\//g;
-         if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/)
-         {
-            $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
-         }
-         if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/)
-         {
-            $VARIABLES{"\@CGIDIRS"} .= " $raw";
-         }
-         if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/)
-         {
-            $VARIABLES{"\@NUKE"} .= " $raw";
-         }
-         if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/)
-         {
-            $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
-         }
-      }
+                nprint("- robots.txt entry dir:$realdir -- file:$realfile", "d");
+                if (($realdir  ne "") && ($realdir  ne "/")) { $DIRS{$realdir}++; }
+                if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
+                $DISCTR++;
+                }    # end if $line =~ disallow
+            }    # end foreach my $line (@DOC)_
 
-      foreach $raw (sort keys %RFILES)
-      {
-         $raw =~ s/\\//g;
-         if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/)
-         {
-            $VARIABLES{"\@MUTATEFILES"} .= " $raw";
-         }
-         if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/)
-         {
-            $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
-         }
-      }
+        # add them  to mutate dir/file
+        my $raw;
+        foreach $raw (sort keys %DIRS) {
+            $raw =~ s/\\//g;
+            if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/) {
+                $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
+                }
+            if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/) {
+                $VARIABLES{"\@CGIDIRS"} .= " $raw";
+                }
+            if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/) {
+                $VARIABLES{"\@NUKE"} .= " $raw";
+                }
+            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/) {
+                $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
+                }
+            }
 
-      my $msg;
-      if ($DISCTR eq 1)   { $msg = "contains $DISCTR entry which should be manually viewed."; }
-      elsif ($DISCTR > 1) { $msg = "contains $DISCTR entries which should be manually viewed."; }
-      else                { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
+        foreach $raw (sort keys %RFILES) {
+            $raw =~ s/\\//g;
+            if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/) {
+                $VARIABLES{"\@MUTATEFILES"} .= " $raw";
+                }
+            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/) {
+                $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
+                }
+            }
 
-      add_vulnerability($mark,"robots.txt $msg", 999996, 0, "GET", "/robots.txt",\%result);
-   }
-}
+        my $msg;
+        if ($DISCTR eq 1) { $msg = "contains $DISCTR entry which should be manually viewed."; }
+        elsif ($DISCTR > 1) { $msg = "contains $DISCTR entries which should be manually viewed."; }
+        else { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
+
+        add_vulnerability($mark, "robots.txt $msg", 999996, 0, "GET", "/robots.txt", \%result);
+        }
+    }
 
 1;
