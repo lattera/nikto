@@ -671,11 +671,21 @@ sub general_config {
    # Mapping for mutate for plugins
    if (defined $CLI{'mutate'}) {
       nprint("- Mutate is deprecated, use -Plugins instead");
-      if ($CLI{'mutate'} =~ /2/) {
-         $CLI{'plugins'} .= ';tests(passfiles)';
+      if ($CLI{'mutate'} =~ /2/ || $CLI{'mutate'} =~ /1/) {
+         my $parameters;
+         $parameters  = "passfiles" if ($CLI{'mutate'} =~ /2/);
+         $parameters .= ",all" if ($CLI{'mutate'} =~ /1/);
+         $CLI{'plugins'} .= ';tests(' . $parameters .')';
+      }
+      if ($CLI{'mutate'} =~ /3/ || $CLI{'mutate'} =~ /4/) {
+         my $parameters;
+         $parameters  = "tilde" if ($CLI{'mutate'} =~ /3/);
+         $parameters .= ",cgiwrap" if ($CLI{'mutate'} =~ /4/);
+         $parameters .= ",dictionary:" . $CLI{'mutate-opts'} if (defined $CLI{'mutate-opts'});
+         $CLI{'plugins'} .= ';user_enum_apache(' . $parameters . ')';
       }
       if ($CLI{'mutate'} =~ /6/) {
-         $CLI{'plugins'} .= ';dictionary(dict:' . $CLI{'mutate-opts'} . ')';
+         $CLI{'plugins'} .= ';dictionary(dictionary:' . $CLI{'mutate-opts'} . ')';
       }
    }
 
@@ -2537,17 +2547,10 @@ sub list_plugins {
 ###############################################################################
 # This is overly complicated and jumps a lot between scalars and arrays. The REs are
 # probably dodgy, but it works! W00!
-sub expand_pluginlist {
+sub expand_pluginlist
+{
    my ($pluginlist, $parent) = @_;
-   my @raw=split(/;/,$pluginlist);
-   my @cooked;
    
-   # Stop excessive recursion
-   if ($parent > 100)
-   {
-      nprint("ERROR: Recursion found whilst expanding macros");
-      return "";
-   }
    my @macros;
    foreach my $config (keys %NIKTOCONFIG) {
       if ($config =~ /^@@/) {
@@ -2557,85 +2560,95 @@ sub expand_pluginlist {
 
    # Now loop through each member of the list and expand it
    my $count=0;
-   foreach my $entry (@raw) {
+   my $npluginlist=$pluginlist;
+   do {
       $count++;
-      if ($count > 100) {
-         # we've gone recursive: blank and exit
-         nprint("ERROR: Recursion found whilst expanding macros");
-         $result="";
-      }
-      my $result=$entry;;
-      # Is it a macro
-      if ($result =~ /^-?@@/) {
-         my $original = $result;
-         
-         # break up into components
-         $prefix = ($result =~ /^-/)?"-":"";
-         $name = $suffix = $result;
-         $name =~ s/(^-?)(@@[[:alpha:]]+)(\(?.*\)?$)/$2/;
-         $suffix =~ s/(.*)(\(.*\))/$2/;
-         if ($suffix eq $result) {
-            $suffix="";
+      my @raw=split(/;/, $npluginlist);
+      # cooked contains the processed list
+      my @cooked;
+      foreach my $entry (@raw) {
+         # Is it +; if so remap to @@DEFAULT
+         if ($entry eq "+") {
+            $entry='@@DEFAULT';
          }
-         foreach my $macro (@macros)
-         {
-            if ($result =~ /-?$macro/) {
-                # It's a macro, so replace the contents with the macro
-                # Add prefix and suffix to each member of the macro
-                my @temp;
-                foreach my $child (split(/;/, $NIKTOCONFIG{$macro})) {
-                   push(@temp, "$prefix$child$suffix");
-                }
-                $result = join(';', @temp);
-                # stop an infinite loop
-                last;
+         # result contains the processed entry
+         my $result = $original = $entry;
+         # Is it a macro
+         if ($entry =~ /^-?@@/) {         
+            # break up into components
+            $prefix = ($entry =~ /^-/)?"-":"";
+            $name = $suffix = $entry;
+            $name =~ s/(^-?)(@@[[:alpha:]]+)(\(?.*\)?$)/$2/;
+            $suffix =~ s/(.*)(\(.*\))/$2/;
+            if ($suffix eq $entry) {
+               $suffix="";
+            }
+            foreach my $macro (@macros) {
+               if ($entry =~ /-?$macro/) {
+                  # It's a macro, so replace the contents with the macro
+                  # Add prefix and suffix to each member of the macro
+                  my @temp;
+                  foreach my $child (split(/;/, $NIKTOCONFIG{$macro})) {
+                     push(@temp, "$prefix$child$suffix");
+                  }
+                  $result = join(';', @temp);
+                  # stop an infinite loop
+                  last;
+               }
             }
          }
          if ($result =~ /^-?@@/ && $result eq $original) {
             # macro not found or is itself - ignore
             $result = "";
          }
+         if ($count > 100) {
+            # check for recurstion
+            nprint("ERROR: Recursion found whilst expanding macros");
+            $result="";
+            last;
+         }
+         push(@cooked, $result);
+      } 
+      $npluginlist=join(';', @cooked);
+   } while ($npluginlist =~ /@@/ && $count<=100);
+
+   #use re 'debug';
+   # Now we've expanded out macros, deal with duplicates and -
+   my @raw=split(/;/, $npluginlist);
+   # hash so we don't have to mess with duplicates
+   my %cooked;
+   foreach my $plugin (@raw) {
+      # break out components
+      my $minus;
+      my $name = my $suffix = $plugin;
+      $minus = (substr($plugin, 0, 1) eq '-');
+      $name =~ s/(^-?)([^\(]+)(\(?.*\)?$)/$2/;
+      $suffix =~ s/(.*)(\(.*\))/$2/;
+      if ($suffix eq $plugin) {
+         $suffix="";
       }
-      # Now it's been expanded - we need to recursively analyse it
-      if ($result =~ /^-?@@/ ) {
-         $result=expand_pluginlist($result, $parent+1);
-      }
-  
-      push(@cooked, $result);
-   }
-   
-   # Join, to resplit
-   my $temp=join(';', @cooked);
-   my @newraw=split(/;/, $temp);
-   @cooked=@newraw;
-   
-   # Now deal with - if we're the first instance of the function
-   if ($parent == 0) {
-      my @newcooked;
-      foreach my $plugin (@cooked)
-      {
-         if ($plugin =~ /^-/) {
-            my $name = $plugin;
-            $name =~ s/(^-)(.+)(\(?.*\)?$)/$2/;
-            # Remove $name from newcooked if it exists
-            my @toasted;
-            foreach my $newplugin (@newcooked) {
-               my $tname = $newplugin;
-               if ($tname ne $name)
-               {
-                  push(@toasted, $tname);
-               }
-            }
-            # Newcooked, should now be @toasted
-            @newcooked=@toasted;
-         } else {
-            push(@newcooked, $plugin);
+      #nprint("P:$plugin M:$minus N:$name S:$suffix"); 
+      if ($minus) {
+        # it's a minus - remove any previous entry
+         if (exists $cooked{$name}) {
+            delete $cooked{$name}
          }
       }
-      @cooked=@newcooked;
-   }      
+      else {
+         # else add it with the parameters as the value of the hash
+         $cooked{$name}=$suffix;
+      }
+   }
    
-   return join(';',@cooked);
+   # Now rejoin into one happy whole
+   my $output;
+   foreach my $plugin (keys %cooked) {
+      $output .= "$plugin" . $cooked{$plugin} . ";";
+   }
+   # remove the last ;
+   $output =~ s/;$//g;
+   
+   return $output;
 }
 #######################################################################
 sub nikto_core { return; } # trap for this plugin being called to run. lame.

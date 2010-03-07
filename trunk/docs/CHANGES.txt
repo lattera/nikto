@@ -1,3 +1,6 @@
+2010-03-07
+	- Updated user_enum_apache to use Plugins instead of mutate
+	- Rewrote the macro expanding bit to make it more efficient.
 2010-03-03
 	- Mutate 1 now wrapped into nikto_tests and doesn't take up anywhere near the amount of memory!
 2010-02-28
