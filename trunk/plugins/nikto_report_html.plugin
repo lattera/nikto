@@ -149,7 +149,7 @@ sub html_change_vars {
     # Positives Handling
     if ($template =~ /\#TEMPL_MSG/) {
         $variables{"#TEMPL_URI"}         = simple_enc($item->{'uri'});
-        $variables{"#TEMPL_MSG"}         = $item->{'message'};
+        $variables{"#TEMPL_MSG"}         = simple_enc($item->{'message'});
         $variables{"#TEMPL_HTTP_METHOD"} = $item->{'method'};
         $variables{"#TEMPL_ITEM_IP_LINK"} =
           "$protocol://$variables{\"#TEMPL_IP\"}:$mark->{'port'}$variables{\"#TEMPL_URI\"}";
