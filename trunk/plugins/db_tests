@@ -2573,7 +2573,6 @@
 "002567","3093","1","/ProductCart/pc/msg.asp?|-|0|404_Object_Not_Found","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
 "002568","3093","1","/product_info.php","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
 "002569","3093","1","/prometheus-all/index.php","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
-"002570","3093","1","/proplus/admin/login.php+-d+\"action=insert\"+-d+\"username=test\"+-d+\"password=test\"","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
 "002571","3093","1","/protected/","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
 "002572","3093","1","/protected/secret.html+","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
 "002573","3093","1","/protectedpage.php?uid=&#039;%20OR%20&#039;&#039;=&#039;&amp;pwd=&#039;%20OR%20&#039;&#039;=&#039;","GET","200","","","","","This might be interesting... has been seen in web logs from an unknown scanner.","",""
