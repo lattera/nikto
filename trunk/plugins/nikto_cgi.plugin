@@ -29,7 +29,7 @@ sub nikto_cgi_init {
                copyright    => "2008 CIRT Inc.",
                };
     return $id;
-    }
+}
 
 sub nikto_cgi {
     my ($mark) = @_;
@@ -42,18 +42,18 @@ sub nikto_cgi {
     {
         nprint("Using all known CGI directories\n", "d");
         $VARIABLES{"\@CGIDIRS"} = join(" ", @CFGCGI);
-        }
+    }
     elsif (defined $CLI{'forcecgi'} && $CLI{'forcecgi'} eq "none")    # scan no CGI directories
     {
         nprint("Using no CGI directories\n", "d");
         $VARIABLES{"\@CGIDIRS"} = "";
-        }
+    }
     elsif (defined $CLI{'forcecgi'}
            && $CLI{'forcecgi'} =~ /[a-zA-Z0-9]/)                      # scan a specific directory
     {
         nprint("Using CGI dir \'$CLI{'forcecgi'}\'\n", "d");
         $VARIABLES{"\@CGIDIRS"} = $CLI{'forcecgi'};
-        }
+    }
     else    # or normal testing of each dir
     {
         foreach $possiblecgidir (@CFGCGI) {
@@ -62,23 +62,23 @@ sub nikto_cgi {
             if (content_present($res) eq TRUE) {
                 $gotvalid++;
                 push(@POSSIBLECGI, $possiblecgidir);
-                }
             }
+        }
 
         if ($gotvalid eq 0) {
             nprint("+ No CGI Directories found (use '-C all' to force check all possible dirs)");
             $VARIABLES{"\@CGIDIRS"} = "";
-            }
+        }
         elsif ($#CFGCGI eq $#POSSIBLECGI) {
             nprint("+ All CGI directories 'found', use '-C none' to test none");
             $VARIABLES{"\@CGIDIRS"} = join(" ", @CFGCGI);
-            }
+        }
         else {
             $VARIABLES{"\@CGIDIRS"} = join(" ", @POSSIBLECGI);
-            }
-        }    # end !$CLI{'forcecgi'}
+        }
+    }    # end !$CLI{'forcecgi'}
 
     nprint("- Checking for CGI in: $VARIABLES{\"\@CGIDIRS\"}", "v");
-    }
+}
 
 1;

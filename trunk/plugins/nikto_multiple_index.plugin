@@ -30,7 +30,7 @@ sub nikto_multiple_index_init {
                };
 
     return $id;
-    }
+}
 
 sub nikto_multiple_index {
     my ($mark) = @_;
@@ -48,9 +48,9 @@ sub nikto_multiple_index {
             my $hash = LW2::md4($content);
             $found{ $item->{'index'} } = $hash;
             $hashes{$hash}++;
-            }
+        }
 
-        }    # End foreach
+    }    # End foreach
 
     if (keys(%found) > 1) {
 
@@ -59,13 +59,13 @@ sub nikto_multiple_index {
         foreach my $hash (keys %hashes) {
             if ($hashes{$hash} eq 1) {
                 $total_unique++;
-                }
             }
+        }
 
         # one unique hash... bogus responses
         if ($total_unique <= 1) {
             return;
-            }
+        }
 
         my $tempstring;
         foreach my $f (keys %found) { $tempstring .= "$f, "; }
@@ -76,13 +76,13 @@ sub nikto_multiple_index {
             add_vulnerability($mark,
                       "Multiple index files found (note, these may not all be unique): $tempstring",
                       740000, 0);
-            }
+        }
 
         # all unique... report
         if ($total_unique eq keys(%found)) {
             add_vulnerability($mark, "Multiple index files found: $tempstring", 740000, 0);
-            }
         }
     }
+}
 
 1;

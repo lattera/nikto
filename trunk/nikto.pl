@@ -8,7 +8,7 @@ Getopt::Long::Configure('no_ignore_case');
 ###############################################################################
 #                               Nikto                                         #
 # --------------------------------------------------------------------------- #
-#   $Id$                             #   
+#   $Id$                             #
 # --------------------------------------------------------------------------- #
 ###############################################################################
 #  Copyright (C) 2004-2010 CIRT, Inc.
@@ -45,11 +45,12 @@ use vars qw/%db_extensions %FoF %UPDATES @DBFILE @BUILDITEMS/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
-my $starttime        = localtime();
-$NIKTO{'DIV'}        = "-" x 75;
-$NIKTO{'version'}    = "2.1.1";
-$NIKTO{'name'}       = "Nikto";
-$NIKTO{'configfile'} = "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
+my $starttime = localtime();
+$NIKTO{'DIV'}     = "-" x 75;
+$NIKTO{'version'} = "2.1.1";
+$NIKTO{'name'}    = "Nikto";
+$NIKTO{'configfile'} =
+  "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
 
 # read the --config option
 {
@@ -62,23 +63,22 @@ $NIKTO{'configfile'} = "/etc/nikto.conf";    ### Change this line if your setup 
 
 # Read the config files in order
 my $error;
-my $config_exists=0;
-$error=load_config("$NIKTO{'configfile'}");
-$config_exists=1 if ($error eq "");
-# Guess home directory -- to support Windows
-my $home="";
-foreach my $var (split(/ /,"HOME USERPROFILE"))
-{
-   $home=$ENV{$var} if ($ENV{$var});
-}
-$error=load_config("$home/nikto.conf");
-$config_exists=1 if ($error eq "");
-$error=load_config("nikto.conf");
-$config_exists=1 if ($error eq "");
+my $config_exists = 0;
+$error = load_config("$NIKTO{'configfile'}");
+$config_exists = 1 if ($error eq "");
 
-if ($config_exists==0)
-{
-   die "- Could not find a valid nikto config file\n";
+# Guess home directory -- to support Windows
+my $home = "";
+foreach my $var (split(/ /, "HOME USERPROFILE")) {
+    $home = $ENV{$var} if ($ENV{$var});
+}
+$error         = load_config("$home/nikto.conf");
+$config_exists = 1 if ($error eq "");
+$error         = load_config("nikto.conf");
+$config_exists = 1 if ($error eq "");
+
+if ($config_exists == 0) {
+    die "- Could not find a valid nikto config file\n";
 }
 
 setup_dirs();
@@ -109,39 +109,38 @@ proxy_setup();
 nprint($NIKTO{'DIV'});
 
 # No targets - quit while we're ahead
-if ($CLI{'host'} eq "") 
-{ 
-   nprint("+ ERROR: No host specified");
-   usage(); 
+if ($CLI{'host'} eq "") {
+    nprint("+ ERROR: No host specified");
+    usage();
 }
 
-$COUNTERS{'hosts_total'}=$COUNTERS{'hosts_complete'}=0;
+$COUNTERS{'hosts_total'} = $COUNTERS{'hosts_complete'} = 0;
 load_plugins();
 
 # Parse the supplied list of targets
-my @MARKS=set_targets($CLI{'host'}, $CLI{'ports'}, $CLI{'ssl'}, $CLI{'root'});
-# Now check each target is real and remove duplicates/fill in extra information
-foreach my $mark (@MARKS)
-{
-   $mark->{'test'} = 1;
-   # Try to resolve the host
-   ($mark->{'hostname'}, $mark->{'ip'}, $mark->{'display_name'}) = resolve($mark->{'ident'});
-   
-   # Skip if we can't resolve the host - we'll error later
-   if (!defined $mark->{'ip'})
-   {
-      $mark->{'test'} = 0;
-      next;
-   }
+my @MARKS = set_targets($CLI{'host'}, $CLI{'ports'}, $CLI{'ssl'}, $CLI{'root'});
 
-   # Check that the port is open
-   my $open=port_check($mark->{'hostname'}, $mark->{'ip'}, $mark->{'port'});
-   if (defined $CLI{'vhost'}) { $mark->{'vhost'} = $CLI{'vhost'} };
-   if ($open == 0) {
-      $mark->{'test'} = 0;
-      next;
-   }
-   $mark->{'ssl'}=$open-1;
+# Now check each target is real and remove duplicates/fill in extra information
+foreach my $mark (@MARKS) {
+    $mark->{'test'} = 1;
+
+    # Try to resolve the host
+    ($mark->{'hostname'}, $mark->{'ip'}, $mark->{'display_name'}) = resolve($mark->{'ident'});
+
+    # Skip if we can't resolve the host - we'll error later
+    if (!defined $mark->{'ip'}) {
+        $mark->{'test'} = 0;
+        next;
+    }
+
+    # Check that the port is open
+    my $open = port_check($mark->{'hostname'}, $mark->{'ip'}, $mark->{'port'});
+    if (defined $CLI{'vhost'}) { $mark->{'vhost'} = $CLI{'vhost'} }
+    if ($open == 0) {
+        $mark->{'test'} = 0;
+        next;
+    }
+    $mark->{'ssl'} = $open - 1;
 }
 
 # Open reporting
@@ -149,68 +148,68 @@ report_head($CLI{'format'}, $CLI{'file'});
 
 # Now we've done the precursor, do the scan
 foreach my $mark (@MARKS) {
-   next unless ($mark->{'test'});
-   $COUNTERS{'hosts_total'}++;
-   $mark->{'start_time'} = time();
-   # These should just be passed in the hash - but it's a lot of work to move to a local $request
-   $request{'whisker'}->{'host'} = $mark->{'hostname'} || $mark->{'ip'};
-   if (defined $CLI{'vhost'})
-   {
-      $request{'Host'} = $CLI{'vhost'};
-      $mark->{'vhost'} = $CLI{'vhost'};
-   }
-   $request{'whisker'}->{'port'}    = $mark->{'port'};
-   $request{'whisker'}->{'ssl'}     = $mark->{'ssl'};
-   $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
-   if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) { $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'}; }
-   $mark->{'total_vulns'}=0;
-   $mark->{'total_checks'}=0;
-   
-   %FoF = ();
-   
-   $mark->{'banner'}=get_banner($mark);
+    next unless ($mark->{'test'});
+    $COUNTERS{'hosts_total'}++;
+    $mark->{'start_time'} = time();
 
-   # put a signal trap so we can close down reports properly
-   $SIG{'INT'} = sub
-   {
-      $mark->{'end_time'} = time();
-      report_host_end($mark);
-      report_close($mark);
-      exit(1);
-   };
-   
-   if ($CLI{'findonly'})
-   {
-      my $protocol="http";
-      if ($mark->{'ssl'}) { $protocol .= "s"; }
-      if ($mark->{'banner'} eq "")
-      {
-         $mark->{'banner'} = "(no identification possible)";
-      }
-      nprint("+ Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}");
-   }
-   else
-   {
-      dump_target_info($mark);
-      report_host_start($mark);
-      set_scan_items($mark);
-      unless (defined $CLI{'nofof'}) { map_codes() };
-      run_plugins($mark);
-   }
-   $mark->{'end_time'} = time();
-   my $time=date_disp($mark->{'end_time'});
-   my $elapsed=$mark->{'end_time'}-$mark->{'start_time'};
-   nprint("+ $mark->{'total_checks'} items checked: $mark->{'total_vulns'} item(s) reported on remote host");
-   nprint("+ End Time:           $time ($elapsed seconds)");
-   nprint($NIKTO{'DIV'});
-   
-   $COUNTERS{'hosts_completed'}++;
-   report_host_end($mark);
+    # These should just be passed in the hash - but it's a lot of work to move to a local $request
+    $request{'whisker'}->{'host'} = $mark->{'hostname'} || $mark->{'ip'};
+    if (defined $CLI{'vhost'}) {
+        $request{'Host'} = $CLI{'vhost'};
+        $mark->{'vhost'} = $CLI{'vhost'};
+    }
+    $request{'whisker'}->{'port'}    = $mark->{'port'};
+    $request{'whisker'}->{'ssl'}     = $mark->{'ssl'};
+    $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
+    if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) {
+        $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'};
+    }
+    $mark->{'total_vulns'}  = 0;
+    $mark->{'total_checks'} = 0;
+
+    %FoF = ();
+
+    $mark->{'banner'} = get_banner($mark);
+
+    # put a signal trap so we can close down reports properly
+    $SIG{'INT'} = sub {
+        $mark->{'end_time'} = time();
+        report_host_end($mark);
+        report_close($mark);
+        exit(1);
+    };
+
+    if ($CLI{'findonly'}) {
+        my $protocol = "http";
+        if ($mark->{'ssl'}) { $protocol .= "s"; }
+        if ($mark->{'banner'} eq "") {
+            $mark->{'banner'} = "(no identification possible)";
+        }
+        nprint("+ Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}");
+    }
+    else {
+        dump_target_info($mark);
+        report_host_start($mark);
+        set_scan_items($mark);
+        unless (defined $CLI{'nofof'}) { map_codes() }
+        run_plugins($mark);
+    }
+    $mark->{'end_time'} = time();
+    my $time    = date_disp($mark->{'end_time'});
+    my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
+    nprint(
+        "+ $mark->{'total_checks'} items checked: $mark->{'total_vulns'} item(s) reported on remote host"
+        );
+    nprint("+ End Time:           $time ($elapsed seconds)");
+    nprint($NIKTO{'DIV'});
+
+    $COUNTERS{'hosts_completed'}++;
+    report_host_end($mark);
 }
 report_close();
-   
+
 nprint("+ $COUNTERS{'hosts_total'} host(s) tested");
-nprint("+ $NIKTO{'totalrequests'} requests made","v");
+nprint("+ $NIKTO{'totalrequests'} requests made", "v");
 send_updates();
 nprint("T:" . localtime() . ": Ending", "d");
 
@@ -221,94 +220,81 @@ exit;
 #################################################################################
 # load config file
 # error=load_config(FILENAME)
-sub load_config
-{
-   my $configfile=$_[0];
+sub load_config {
+    my $configfile = $_[0];
 
-   open(CONF, "<$configfile") || return "+ ERROR: Unable to open config file '$configfile'";
-   my @CONFILE = <CONF>;
-   close(CONF);
+    open(CONF, "<$configfile") || return "+ ERROR: Unable to open config file '$configfile'";
+    my @CONFILE = <CONF>;
+    close(CONF);
 
-   foreach my $line (@CONFILE)
-   {
-      $line =~ s/\#.*$//;
-      chomp($line);
-      $line =~ s/\s+$//;
-      $line =~ s/^\s+//;
-      next if ($line eq "");
-      my @temp = split(/=/, $line, 2);
-      if ($temp[0] ne "") { $NIKTOCONFIG{ $temp[0] } = $temp[1]; }
-   }
+    foreach my $line (@CONFILE) {
+        $line =~ s/\#.*$//;
+        chomp($line);
+        $line =~ s/\s+$//;
+        $line =~ s/^\s+//;
+        next if ($line eq "");
+        my @temp = split(/=/, $line, 2);
+        if ($temp[0] ne "") { $NIKTOCONFIG{ $temp[0] } = $temp[1]; }
+    }
 
-   # add CONFIG{'CLIOPTS'} to ARGV if defined...
-   if (defined $NIKTOCONFIG{'CLIOPTS'})
-   {
-      my @t = split(/ /, $NIKTOCONFIG{'CLIOPTS'});
-      foreach my $c (@t) { push(@ARGV, $c); }
-   }
+    # add CONFIG{'CLIOPTS'} to ARGV if defined...
+    if (defined $NIKTOCONFIG{'CLIOPTS'}) {
+        my @t = split(/ /, $NIKTOCONFIG{'CLIOPTS'});
+        foreach my $c (@t) { push(@ARGV, $c); }
+    }
 
-   # Check for necessary config items
-   check_config_defined("CHECKMETHODS", "HEAD");
-   check_config_defined('@@MUTATE', 'dictionary;mutate;passfiles;subdomain;user_enum_apache');
-   check_config_defined('@@DEFAULT', '@@ALL,-@@MUTATE');
+    # Check for necessary config items
+    check_config_defined("CHECKMETHODS", "HEAD");
+    check_config_defined('@@MUTATE',     'dictionary;mutate;passfiles;subdomain;user_enum_apache');
+    check_config_defined('@@DEFAULT',    '@@ALL,-@@MUTATE');
 
-   return "";
+    return "";
 }
 #################################################################################
 # find plugins directory
-sub setup_dirs
-{
-   my $CURRENTDIR = $0;
-   chomp($CURRENTDIR);
-   $CURRENTDIR =~ s#[\\/]nikto.pl$##;
+sub setup_dirs {
+    my $CURRENTDIR = $0;
+    chomp($CURRENTDIR);
+    $CURRENTDIR =~ s#[\\/]nikto.pl$##;
 
-   # First assume we get it from NIKTOCONFIG
-   unless (defined $NIKTOCONFIG{'EXECDIR'})
-   {
-      if (-d "$ENV{'PWD'}/plugins")
-      {
-         $NIKTOCONFIG{'EXECDIR'}=$ENV{'PWD'};
-      }
-      elsif (-d "$CURRENTDIR/plugins")
-      {
-         $NIKTOCONFIG{'EXECDIR'}=$CURRENTDIR;
-      }
-      elsif (-d "./plugins")
-      {
-         $NIKTOCONFIG{'EXECDIR'}=$CURRENTDIR;
-      }
-      else
-      {
-         print STDERR "Could not work out the nikto EXECDIR, try setting it in nikto.conf";
-         exit;
-      }
-   }
-   unless (defined $NIKTOCONFIG{'PLUGINDIR'})
-   {
-      $NIKTOCONFIG{'PLUGINDIR'}="$NIKTOCONFIG{'EXECDIR'}/plugins";
-   }
-   unless (defined $NIKTOCONFIG{'TEMPLATEDIR'})
-   {
-      $NIKTOCONFIG{'TEMPLATEDIR'}="$NIKTOCONFIG{'EXECDIR'}/templates";
-   }
-   unless (defined $NIKTOCONFIG{'DOCUMENTDIR'})
-   {
-      $NIKTOCONFIG{'DOCUMENTDIR'}="$NIKTOCONFIG{'EXECDIR'}/docs";
-   }
-   return;
+    # First assume we get it from NIKTOCONFIG
+    unless (defined $NIKTOCONFIG{'EXECDIR'}) {
+        if (-d "$ENV{'PWD'}/plugins") {
+            $NIKTOCONFIG{'EXECDIR'} = $ENV{'PWD'};
+        }
+        elsif (-d "$CURRENTDIR/plugins") {
+            $NIKTOCONFIG{'EXECDIR'} = $CURRENTDIR;
+        }
+        elsif (-d "./plugins") {
+            $NIKTOCONFIG{'EXECDIR'} = $CURRENTDIR;
+        }
+        else {
+            print STDERR "Could not work out the nikto EXECDIR, try setting it in nikto.conf";
+            exit;
+        }
+    }
+    unless (defined $NIKTOCONFIG{'PLUGINDIR'}) {
+        $NIKTOCONFIG{'PLUGINDIR'} = "$NIKTOCONFIG{'EXECDIR'}/plugins";
+    }
+    unless (defined $NIKTOCONFIG{'TEMPLATEDIR'}) {
+        $NIKTOCONFIG{'TEMPLATEDIR'} = "$NIKTOCONFIG{'EXECDIR'}/templates";
+    }
+    unless (defined $NIKTOCONFIG{'DOCUMENTDIR'}) {
+        $NIKTOCONFIG{'DOCUMENTDIR'} = "$NIKTOCONFIG{'EXECDIR'}/docs";
+    }
+    return;
 }
 
 ######################################################################
 ## check_config_defined(item, default)
 ## Checks whether config has been set, warns and sets to a default
-sub check_config_defined
-{
-   my $item=$_[0];
-   my $default=$_[1];
- 
-   if (!defined $NIKTOCONFIG{$item})
-   {
-      print STDERR "- Warning: $item is not defined in Nikto configuration, setting to \"$default\"\n"; 
-      $NIKTOCONFIG{$item}=$default;
-   }
+sub check_config_defined {
+    my $item    = $_[0];
+    my $default = $_[1];
+
+    if (!defined $NIKTOCONFIG{$item}) {
+        print STDERR
+          "- Warning: $item is not defined in Nikto configuration, setting to \"$default\"\n";
+        $NIKTOCONFIG{$item} = $default;
+    }
 }

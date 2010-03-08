@@ -29,7 +29,7 @@ sub nikto_favicon_init {
                scan_method => \&nikto_favicon,
                };
     return $id;
-    }
+}
 
 sub nikto_favicon {
     my ($mark) = @_;
@@ -46,9 +46,9 @@ sub nikto_favicon {
                 add_vulnerability($mark,
                               "/favicon.ico file identifies this server as: $item->{'description'}",
                               $item->{'nikto_id'}, 39272);
-                }
             }
         }
     }
+}
 
 1;

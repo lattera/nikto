@@ -31,7 +31,7 @@ sub nikto_report_csv_init {
                copyright     => "2008 CIRT Inc."
                };
     return $id;
-    }
+}
 
 sub csv_open {
     my ($file) = @_;
@@ -43,7 +43,7 @@ sub csv_open {
     print OUT
       "\"meta\",\"meta\",\"$NIKTO{'name'}\",\"v$NIKTO{'version'}/$NIKTO{'core_version'}\"\n";
     return OUT;
-    }
+}
 
 sub csv_item {
     my ($handle, $mark, $item) = @_;
@@ -58,7 +58,7 @@ sub csv_item {
         $line .= $item->{'message'};
         $line .= "\"";
         print $handle "$line\n";
-        }
     }
+}
 
 1;

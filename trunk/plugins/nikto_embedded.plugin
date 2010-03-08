@@ -36,7 +36,7 @@ sub nikto_embedded_init {
                copyright   => "2009 CIRT Inc."
                };
     return $id;
-    }
+}
 
 sub nikto_embedded {
     my ($mark) = @_;
@@ -61,12 +61,12 @@ sub nikto_embedded {
                     if ($model ne "") {
                         add_vulnerability($mark, "$item->{'message'} $model",
                                           $item->{'nikto_id'}, 0, "GET", $item->{'uri'});
-                        }
                     }
                 }
             }
         }
-
     }
+
+}
 
 1;

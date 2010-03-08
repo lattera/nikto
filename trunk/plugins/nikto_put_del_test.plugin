@@ -30,7 +30,7 @@ sub nikto_put_del_test_init {
                copyright   => "2008 CIRT Inc."
                };
     return $id;
-    }
+}
 
 sub nikto_put_del_test {
     my ($mark) = @_;
@@ -58,10 +58,10 @@ sub nikto_put_del_test {
                     add_vulnerability($mark,
                            "HTTP method 'DELETE' allows clients to delete files on the web server.",
                            999994, 5646, "DELETE", $uri);
-                    }
                 }
             }
         }
     }
+}
 
 1;

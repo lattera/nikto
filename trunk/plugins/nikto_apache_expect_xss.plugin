@@ -31,7 +31,7 @@ sub nikto_apache_expect_xss_init {
         copyright   => "2008 CIRT Inc."
         };
     return $id;
-    }
+}
 
 sub nikto_apache_expect_xss {
     my ($mark) = @_;
@@ -41,7 +41,7 @@ sub nikto_apache_expect_xss {
     if ($CONTENT =~ /<script>alert\(xss\)<\/script>/) {
         add_vulnerability($mark, "Apache is vulnerable to XSS via the Expect header", 999974,
                           27487);
-        }
     }
+}
 
 1;

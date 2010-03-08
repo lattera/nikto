@@ -49,11 +49,11 @@ sub single {
         my $id = ask("Proxy ID");
         my $pw = ask("Proxy PW");
         if (($id ne "") || ($pw ne "")) { LW2::auth_set("proxy-basic", \%request, $id, $pw); }
-        }
+    }
     else {
         delete $request{'whisker'}->{'proxy_host'};
         delete $request{'whisker'}->{'proxy_port'};
-        }
+    }
 
     $VARS{'html'} = ask("Show HTML Response (1)") || 1;
     $request{'whisker'}{'version'} = ask("HTTP Version ($request{'whisker'}{'version'})")
@@ -69,7 +69,7 @@ sub single {
         $request{'Content-Length'} = length($request{'data'});
         $request{'Content-Length'} = ask("Content-Length ($request{'Content-Length'})")
           || $request{'Content-Length'};
-        }
+    }
 
     # get request->whisker hash answers
     foreach my $key (sort keys %{ $request{'whisker'} }) {
@@ -94,12 +94,12 @@ sub single {
         my $s = 0;
         foreach my $skip (@SKIPS) {
             if ($key eq $skip) { $s = 1; last; }
-            }
+        }
         if ($s) { next; }
 
         $request{'whisker'}{$key} = ask("$key ($request{'whisker'}{$key})")
           || $request{'whisker'}{$key};
-        }
+    }
 
     $request{'whisker'}->{'encode_anti_ids'} = ask("Enable Anti-IDS (0)");
     if ($request{'whisker'}->{'encode_anti_ids'} eq 1) {
@@ -116,11 +116,11 @@ sub single {
         $request{'whisker'}{'encode_anti_ids'} = ask("Anti-IDS Methods");
         if ($request{'whisker'}{'encode_anti_ids'} eq "") {
             delete($request{'whisker'}->{'encode_anti_ids'});
-            }
         }
+    }
     else {
         delete($request{'whisker'}->{'encode_anti_ids'});
-        }
+    }
 
     print "-" x $width, "  Done with questions\n";
 
@@ -129,12 +129,12 @@ sub single {
     if ($request{'whisker'}{'data'} eq "") {
         delete $request{'whisker'}{'data'};
         delete $request{'whisker'}{'Content-Length'};
-        }
+    }
 
     if ($request{'whisker'}->{'uri_user'} eq "") { delete $request{'whisker'}->{'uri_user'}; }
     if ($request{'whisker'}->{'uri_password'} eq "") {
         delete $request{'whisker'}->{'uri_password'};
-        }
+    }
     if ($request{'whisker'}->{'host'} eq "") { delete $request{'whisker'}->{'host'}; }
 
     my ($hostname, $ip) = resolve($request{'whisker'}{'host'});
@@ -155,7 +155,7 @@ sub single {
         if ($item eq "whisker")       { next; }
         if ($item eq "ssl_save_info") { next; }
         print "\t$item: $request{$item}\n";
-        }
+    }
     foreach my $item (sort keys %{ $request{'whisker'} }) {
         if ($item eq "MAGIC")                      { next; }
         if ($item eq "lowercase_incoming_headers") { next; }
@@ -165,14 +165,14 @@ sub single {
         if ($item eq "socket_state")               { next; }
         if ($item eq "http_eol")                   { next; }
         print "\t$item: $request{'whisker'}->{$item}\n";
-        }
+    }
 
     print "-" x $width, "  Response Headers\n";
 
     foreach my $item (sort keys %result) {
         if ($item eq "whisker") { next; }
         print "\t$item: $result{$item}\n";
-        }
+    }
     foreach my $item (sort keys %{ $result{'whisker'} }) {
         if ($item eq "data")                       { next; }
         if ($item eq "MAGIC")                      { next; }
@@ -182,15 +182,15 @@ sub single {
         if ($item eq "stats_syns")                 { next; }
         if ($item eq "socket_state")               { next; }
         print "\t$item: $result{'whisker'}->{$item}\n";
-        }
+    }
 
     if ($VARS{'html'}) {
         print "-" x $width, "  Response Content\n";
         print "$result{'whisker'}->{'data'}\n";
-        }
+    }
 
     exit;
-    }
+}
 
 sub ask {
     my $q = $_[0];
@@ -199,7 +199,7 @@ sub ask {
     my $input = <STDIN>;
     chomp($input);
     return $input;
-    }
+}
 
 sub nikto_single { }    # so core doesn't freak
 

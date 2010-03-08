@@ -30,7 +30,7 @@ sub nikto_apacheusers_init {
             copyright   => "2008 CIRT Inc."
             };
     return $id;
-    }
+}
 
 sub nikto_apacheusers {
     my ($mark) = @_;
@@ -53,8 +53,8 @@ sub nikto_apacheusers {
                 "GET",
                 "/~root"
                 );
-            }
         }
     }
+}
 
 1;

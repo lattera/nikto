@@ -32,7 +32,7 @@ sub nikto_report_text_init {
                copyright         => "2008 CIRT Inc."
                };
     return $id;
-    }
+}
 
 sub text_open {
     my ($file) = @_;
@@ -44,14 +44,14 @@ sub text_open {
     print OUT "- $NIKTO{'name'} v$NIKTO{'version'}/$NIKTO{'core_version'}\n";
 
     return OUT;
-    }
+}
 
 sub text_host {
     my ($handle, $mark) = @_;
     my ($curr_host, $curr_port);
     print $handle "+ Target Host: $mark->{hostname}\n";
     print $handle "+ Target Port: $mark->{port}\n";
-    }
+}
 
 sub text_item {
     my ($handle, $mark, $item) = @_;
@@ -63,7 +63,7 @@ sub text_item {
         if ($uri)            { $line .= "${uri}: " }
         $line .= $item->{message};
         print $handle "$line\n";
-        }
     }
+}
 
 1;

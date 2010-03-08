@@ -37,7 +37,7 @@ sub nikto_report_html_init {
     # load up the templates now
     html_open_templates();
     return $id;
-    }
+}
 
 sub html_head {
     my ($file) = @_;
@@ -50,7 +50,7 @@ sub html_head {
     print OUT "$html";
 
     return OUT;
-    }
+}
 ###############################################################################
 sub html_close {
     my ($handle, $mark) = @_;
@@ -59,7 +59,7 @@ sub html_close {
 
     close($handle);
     return;
-    }
+}
 ###############################################################################
 sub html_host_start {
     my ($handle, $mark) = @_;
@@ -67,7 +67,7 @@ sub html_host_start {
     print $handle "$html\n";
 
     return;
-    }
+}
 ###############################################################################
 sub html_host_end {
     my ($handle, $mark) = @_;
@@ -75,7 +75,7 @@ sub html_host_end {
     print $handle "$html\n";
 
     return;
-    }
+}
 ###############################################################################
 sub html_item {
     my ($handle, $mark, $item) = @_;
@@ -83,7 +83,7 @@ sub html_item {
     print $handle "$html\n";
 
     return;
-    }
+}
 ###############################################################################
 sub html_open_templates {
     foreach my $t (dirlist($NIKTOCONFIG{'TEMPLATEDIR'}, "htm.*")) {
@@ -93,10 +93,10 @@ sub html_open_templates {
         my $T = join("", @TEMPLATE);
         $t =~ s/\..*$//;
         $TEMPLATES{$t} = $T;
-        }
+    }
 
     return;
-    }
+}
 ###############################################################################
 sub html_change_vars {
     my ($template, $mark, $item) = @_;
@@ -110,7 +110,7 @@ sub html_change_vars {
     $variables{"#TEMPL_HOST_HEADER"} = $mark->{'hostname'};
     if (defined $mark->{'vhost'}) {
         $variables{"#TEMPL_HOST_HEADER"} = $mark->{'vhost'};
-        }
+    }
     $variables{"#TEMPL_IP"}                 = simple_enc($mark->{'ip'});
     $variables{"#TEMPL_ITEMS_TESTED"}       = $mark->{'total_checks'};
     $variables{"#TEMPL_PORT"}               = $mark->{'port'};
@@ -128,11 +128,11 @@ sub html_change_vars {
     $variables{"#TEMPL_LINK_NAME"} = "N/A";
     if ($mark->{'hostname'} ne "") {
         $variables{"#TEMPL_LINK_NAME"} = "$protocol://$mark->{'hostname'}:$mark->{'port'}/";
-        }
+    }
 
     foreach my $var (keys %variables) {
         $template =~ s/$var/$variables{$var}/g;
-        }
+    }
 
     # Scanner Messages Handling
     if ($item->{'uri'} eq '') { return $template }
@@ -144,7 +144,7 @@ sub html_change_vars {
         $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
         $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
         $template =~ s/\#ID/$item->{'nikto_id'}/;
-        }
+    }
 
     # Positives Handling
     if ($template =~ /\#TEMPL_MSG/) {
@@ -157,7 +157,7 @@ sub html_change_vars {
         if ($mark->{'hostname'} ne "") {
             $variables{"#TEMPL_ITEM_NAME_LINK"} =
               "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$mark->{'port'}$variables{\"#TEMPL_URI\"}";
-            }
+        }
 
         my $OSVDB = $item->{'osvdb'};
         if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
@@ -168,10 +168,10 @@ sub html_change_vars {
         $template =~ s/\#ID/$item->{'nikto_id'}/;
 
         foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
-        }
+    }
 
     return $template;
-    }
+}
 ###############################################################################
 sub simple_enc {
     my $var = $_[0] || return;
@@ -179,6 +179,6 @@ sub simple_enc {
     $var =~ s/>/&gt;/g;
     $var =~ s/"/&quot;/g;
     return $var;
-    }
+}
 
 1;

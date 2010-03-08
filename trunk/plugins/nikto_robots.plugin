@@ -32,7 +32,7 @@ sub nikto_robots_init {
         copyright    => "2008 CIRT Inc."
         };
     return $id;
-    }
+}
 
 sub nikto_robots {
     my ($mark) = @_;
@@ -74,8 +74,8 @@ sub nikto_robots {
                 if (($realdir  ne "") && ($realdir  ne "/")) { $DIRS{$realdir}++; }
                 if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
                 $DISCTR++;
-                }    # end if $line =~ disallow
-            }    # end foreach my $line (@DOC)_
+            }    # end if $line =~ disallow
+        }    # end foreach my $line (@DOC)_
 
         # add them  to mutate dir/file
         my $raw;
@@ -83,27 +83,27 @@ sub nikto_robots {
             $raw =~ s/\\//g;
             if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/) {
                 $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
-                }
+            }
             if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/) {
                 $VARIABLES{"\@CGIDIRS"} .= " $raw";
-                }
+            }
             if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/) {
                 $VARIABLES{"\@NUKE"} .= " $raw";
-                }
+            }
             if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/) {
                 $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
-                }
             }
+        }
 
         foreach $raw (sort keys %RFILES) {
             $raw =~ s/\\//g;
             if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/) {
                 $VARIABLES{"\@MUTATEFILES"} .= " $raw";
-                }
+            }
             if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/) {
                 $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
-                }
             }
+        }
 
         my $msg;
         if ($DISCTR eq 1) { $msg = "contains $DISCTR entry which should be manually viewed."; }
@@ -111,7 +111,7 @@ sub nikto_robots {
         else { $msg = "retrieved but it does not contain any 'disallow' entries (which is odd)."; }
 
         add_vulnerability($mark, "robots.txt $msg", 999996, 0, "GET", "/robots.txt", \%result);
-        }
     }
+}
 
 1;
