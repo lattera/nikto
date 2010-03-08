@@ -1247,7 +1247,7 @@ sub content_search {
     my ($mark) = @_;
 
     foreach my $testid (keys %CONTENTSEARCH) {
-        if ($body =~ /$CONTENTSEARCH{$testid}{string}/i) {
+        if ($body =~ /$CONTENTSEARCH{$testid}{string}/) {
             my $outmessage = "$file: $CONTENTSEARCH{$testid}{'message'}";
             add_vulnerability($mark, $outmessage,
                               $CONTENTSEARCH{$testid}{testid},
