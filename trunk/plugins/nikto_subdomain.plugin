@@ -60,7 +60,7 @@ sub nikto_subdomain {
 
     foreach my $item (@$dbarray) {
 
-        # Use fetch to minimize extra code
+        # Use nfetch to minimize extra code
         # First we need to mangle the host.
         my $newhost = $item->{'subdomain'} . "." . $host;
         $mark->{'hostname'} = $newhost;
