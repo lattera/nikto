@@ -191,7 +191,8 @@ foreach my $mark (@MARKS) {
         report_host_start($mark);
         set_scan_items($mark);
         unless (defined $CLI{'nofof'}) { map_codes() }
-        run_plugins($mark);
+        run_hooks($mark, "recon");
+        run_hooks($mark, "scan");
     }
     $mark->{'end_time'} = time();
     my $time    = date_disp($mark->{'end_time'});
@@ -244,7 +245,7 @@ sub load_config {
 
     # Check for necessary config items
     check_config_defined("CHECKMETHODS", "HEAD");
-    check_config_defined('@@MUTATE',     'dictionary;mutate;passfiles;subdomain;user_enum_apache');
+    check_config_defined('@@MUTATE',     'dictionary;subdomain;user_enum_apache');
     check_config_defined('@@DEFAULT',    '@@ALL,-@@MUTATE');
 
     return "";

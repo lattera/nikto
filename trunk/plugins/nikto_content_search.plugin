@@ -1,0 +1,69 @@
+#VERSION,1.01
+# $Id$
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+# PURPOSE:
+# Search content for known bad strings
+###############################################################################
+use vars /$CONTENTSEARCH %CSMATCHED/;
+
+sub nikto_content_search_init {
+    my $id = { name         => "content_search",
+               full_name    => "Content Search",
+               author       => "Sullo",
+               description  => "Search resultant content for interesting strings",
+               recon_method => \&nikto_content_search_load,
+               recon_weight => 1,
+               postfetch_method => \&nikto_content_search,
+               postfetch_weight => 20,
+               copyright    => "2010 CIRT Inc"
+               };
+
+    return $id;
+}
+
+sub nikto_content_search_load {
+    # Load up the database as soon as we can
+    
+    $CONTENTSEARCH=init_db("db_content_search");
+    %CSMATCHED = ();
+}
+
+sub nikto_content_search {
+    my ($mark, $request, $result, $parameters) = @_;
+    
+    my $body   = $result->{'whisker'}->{'data'};
+    my $file   = $result->{'whisker'}->{'uri'};
+    my $method = $result->{'whisker'}->{'method'} || "GET";
+    my ($mark) = @_;
+
+    foreach my $testid (@$CONTENTSEARCH) {
+        if ($body =~ /$testid->{'matchstring'}/ &&
+            !exists $CSMATCHED{$mark->{'hostname'}}{$file}) {
+            # Check whether we've already matched it
+            my $outmessage = "$file: $testid->{'message'}";
+            add_vulnerability($mark, $outmessage,
+                              $testid->{'nikto_id'},
+                              $testid->{'osvdb'},
+                              $method, $file);
+            $CSMATCHED{$mark->{'hostname'}}{$file} = 1;
+        }
+    }
+}
+
+1;

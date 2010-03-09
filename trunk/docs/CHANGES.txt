@@ -1,3 +1,8 @@
+2010-03-09
+	- Added support for prefetch and postfetch hooks.
+	- Moved content_search to a plugin
+	- Some tuning around plugin execution
+	- Ticket 126: subdomain plugin tries to guess domain on unqualified hostname
 2010-03-07
 	- Updated user_enum_apache to use Plugins instead of mutate
 	- Rewrote the macro expanding bit to make it more efficient.

@@ -706,7 +706,7 @@ sub general_config {
     # Mapping for mutate for plugins
     if (defined $CLI{'mutate'}) {
         nprint("- Mutate is deprecated, use -Plugins instead");
-        if ($CLI{'mutate'} =~ /2/ || $CLI{'mutate'} =~ /1/) {
+        if ($CLI{'mutate'} =~ /1/ || $CLI{'mutate'} =~ /2/) {
             my $parameters;
             $parameters = "passfiles" if ($CLI{'mutate'} =~ /2/);
             $parameters .= ",all" if ($CLI{'mutate'} =~ /1/);
@@ -714,10 +714,13 @@ sub general_config {
         }
         if ($CLI{'mutate'} =~ /3/ || $CLI{'mutate'} =~ /4/) {
             my $parameters;
-            $parameters = "tilde" if ($CLI{'mutate'} =~ /3/);
+            $parameters = "home" if ($CLI{'mutate'} =~ /3/);
             $parameters .= ",cgiwrap" if ($CLI{'mutate'} =~ /4/);
             $parameters .= ",dictionary:" . $CLI{'mutate-opts'} if (defined $CLI{'mutate-opts'});
             $CLI{'plugins'} .= ';user_enum_apache(' . $parameters . ')';
+        }
+        if ($CLI{'mutate'} =~ /5/) {
+            $CLI{'plugins'} .= ";subdomain";
         }
         if ($CLI{'mutate'} =~ /6/) {
             $CLI{'plugins'} .= ';dictionary(dictionary:' . $CLI{'mutate-opts'} . ')';
@@ -1365,6 +1368,8 @@ sub load_plugins {
                 $pluginhash->{recon_weight}  = 50 unless (defined $pluginhash->{recon_weight});
                 $pluginhash->{scan_weight}   = 50 unless (defined $pluginhash->{scan_weight});
                 $pluginhash->{report_weight} = 50 unless (defined $pluginhash->{report_weight});
+                $pluginhash->{postfetch_weight} = 50 unless (defined $pluginhash->{postfetch_weight});
+                $pluginhash->{postfetch_weight} = 50 unless (defined $pluginhash->{postfetch_weight});
                 push(@all_names, $pluginhash->{name});
 
                 push(@PLUGINS, $pluginhash);
@@ -1415,83 +1420,65 @@ sub load_plugins {
             }
         }
     }
+    
+    # For speed in future, create a hash of active plugins ordered by plugin weight, for
+    # each type of plugin
+    my (@rplugins, @splugins, @repplugins, @pfplugins, @prefplugins);
+    my (@rsorted, @ssorted, @repsorted, @pfsorted, @prefsorted);
+    foreach my $plugin (@PLUGINS) {
+        if ($plugin->{'run'} == 1) {
+            if (defined $plugin->{recon_method}) {
+                push(@rplugins, $plugin);
+            }
+            if (defined $plugin->{scan_method}) {
+                push(@splugins, $plugin);
+            }
+            if (defined $plugin->{report_item}) {
+                push(@repplugins, $plugin);
+            }
+            if (defined $plugin->{prefetch_method}) {
+                push(@prefplugins, $plugin);
+            }
+            if (defined $plugin->{postfetch_method}) {
+                push(@pfplugins, $plugin);
+            }
+        }
+    }
+    
+    # Now sort each array by weight
+    @rsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @rplugins;
+    $PLUGINORDER{'recon'} = \@rsorted;
+    @ssorted = sort { $a->{'weight'} <=> $b->{'weight'} } @splugins;
+    $PLUGINORDER{'scan'} = \@ssorted;
+    @repsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @repplugins;
+    $PLUGINORDER{'report'} = \@repsorted;
+    @prefsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @prefplugins;
+    $PLUGINORDER{'prefetch'} = \@prefsorted;
+    @pfsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @pfplugins;
+    $PLUGINORDER{'postfetch'} = \@pfsorted;
 }
 
-###############################################################################
-# this is ugly, and potentially dangerous if untrusted plugins are present
-###############################################################################
-sub run_plugins {
-    my ($mark) = @_;
-    nprint("- Entering recon phase", "v");
-
-    # This is a frig until I can think of a better way of achieving it
-    foreach my $i (1 .. 100) {
-        foreach my $plugin (@PLUGINS) {
-            if ($plugin->{run} && defined $plugin->{recon_method} && $plugin->{recon_weight} == $i)
-            {
-                my $run = 1;
-
-                # first check for conditionals
-                if (defined $plugin->{recon_cond}) {
-
-                    # Evaluate condition
-                    $run = eval($plugin->{recon_cond});
-                }
-                if ($run) {
-                    my $oldverbose = $OUTPUT{'verbose'};
-                    my $olddebug   = $OUTPUT{'debug'};
-                    nprint("- Running recon for \"$plugin->{full_name}\" plugin", "v");
-                    if (defined $plugin->{'parameters'}->{'verbose'}
-                        && $plugin->{'parameters'}->{'verbose'} == 1) {
-                        $OUTPUT{'verbose'} = 1;
-                    }
-                    if (defined $plugin->{'parameters'}->{'debug'}
-                        && $plugin->{'parameters'}->{'debug'} == 1) {
-                        $OUTPUT{'debug'} = 1;
-                    }
-                    &{ $plugin->{'recon_method'} }($mark, $plugin->{'parameters'});
-                    $OUTPUT{'verbose'} = $oldverbose;
-                    $OUTPUT{'debug'}   = $olddebug;
-                }
-            }
+sub run_hooks {
+    my ($mark, $type, $request, $result) = @_;
+    
+    foreach my $plugin (@{$PLUGINORDER{$type}}) {
+        my $oldverbose = $OUTPUT{'verbose'};
+        my $olddebug   = $OUTPUT{'debug'};
+        nprint("- Running $type for \"$plugin->{full_name}\" plugin", "v");
+        if (defined $plugin->{'parameters'}->{'verbose'}
+            && $plugin->{'parameters'}->{'verbose'} == 1) {
+            $OUTPUT{'verbose'} = 1;
         }
-    }
-
-    nprint("- Entering scan phase", "v");
-
-    # This is a frig until I can think of a better way of achieving it
-    foreach my $i (1 .. 100) {
-        foreach my $plugin (@PLUGINS) {
-            if ($plugin->{run} && defined $plugin->{scan_method} && $plugin->{scan_weight} == $i) {
-                my $run = 1;
-
-                # first check for conditionals
-                if (defined $plugin->{scan_cond}) {
-
-                    # Evaluate condition
-                    $run = eval "$plugin->{scan_cond}";
-                }
-                if ($run) {
-                    my $oldverbose = $OUTPUT{'verbose'};
-                    my $olddebug   = $OUTPUT{'debug'};
-                    nprint("- Running scan for \"$plugin->{full_name}\" plugin", "v");
-                    if (defined $plugin->{'parameters'}->{'verbose'}
-                        && $plugin->{'parameters'}->{'verbose'} == 1) {
-                        $OUTPUT{'verbose'} = 1;
-                    }
-                    if (defined $plugin->{'parameters'}->{'debug'}
-                        && $plugin->{'parameters'}->{'debug'} == 1) {
-                        $OUTPUT{'debug'} = 1;
-                    }
-                    &{ $plugin->{scan_method} }($mark, $plugin->{'parameters'});
-                    $OUTPUT{'verbose'} = $oldverbose;
-                    $OUTPUT{'debug'}   = $olddebug;
-                }
-            }
+        if (defined $plugin->{'parameters'}->{'debug'}
+            && $plugin->{'parameters'}->{'debug'} == 1) {
+            $OUTPUT{'debug'} = 1;
         }
+        &{ $plugin->{$type . '_method'} }($mark, $request, $result, $plugin->{'parameters'});
+        $OUTPUT{'verbose'} = $oldverbose;
+        $OUTPUT{'debug'}   = $olddebug;
     }
-
-    return;
+    
+    return $request, $result;
 }
 
 ###############################################################################
@@ -2157,7 +2144,7 @@ sub setup_hash {
 
 #######################################################################
 sub nfetch {
-    my ($mark, $uri, $method, $data, $headers, $noclean, $testid) = @_;
+    my ($mark, $uri, $method, $data, $headers, $flags, $testid) = @_;
     if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
     my (%request, %result);
     setup_hash(\%request, $mark, $testid);
@@ -2183,11 +2170,15 @@ sub nfetch {
             $request{$key} = $value;
         }
     }
-    unless ($noclean) { LW2::http_fixup_request(\%request); }
-
+    LW2::http_fixup_request(\%request) unless ($flags->{'noclean'});
+    
+    # Run pre hooks
+    (%$request, %$result) = run_hooks($mark, "prefetch", \%request, \%result);
+    
     # Cache
     if (   defined $CACHE{$uri}
         && !defined $CLI{'nocache'}
+        && !defined $flags->{'nocache'}
         && $CACHE{$uri}{method} eq $method
         && $CACHE{$uri}{mark}   eq $mark) {
 
@@ -2200,7 +2191,7 @@ sub nfetch {
         LW2::http_do_request_timeout(\%request, \%result);
         $NIKTO{'totalrequests'}++;
         unless (defined $CLI{'nocache'}) {
-            $CACHE{$uri}{'method'}  = $result{'whisker'}->{'method'};
+            $CACHE{$uri}{'method'}  = $request{'whisker'}->{'method'};
             $CACHE{$uri}{'res'}     = $result{'whisker'}->{'code'};
             $CACHE{$uri}{'content'} = $result{'whisker'}->{'data'};
             $CACHE{$uri}{'mark'}    = $mark;
@@ -2233,10 +2224,8 @@ sub nfetch {
         }
     }
 
-    # content search
-    content_search($result{'whisker'}->{'data'},
-                   $request{'whisker'}->{'uri'},
-                   $request{'whisker'}->{'method'}, $mark);
+    # Run post hooks
+    (%$request, %$result) = run_hooks($mark, "postfetch", \%request, \%result);
 
     return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'},
       $result{'whisker'}->{'error'};
