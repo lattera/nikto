@@ -1,4 +1,6 @@
 2010-03-09
+	- Removed dead code from fetch()
+	- Optimizations in nfetch(), nikto.pl, & elsewhere
 	- Added support for prefetch and postfetch hooks.
 	- Moved content_search to a plugin
 	- Some tuning around plugin execution

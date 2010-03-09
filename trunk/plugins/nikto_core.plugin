@@ -2040,8 +2040,7 @@ sub fetch {
 
     $request{'whisker'}->{'method'} = $_[1];
     delete $request{'whisker'}->{'data'};
-    delete $request{'Content-Encoding'};
-    delete $request{'Content-Length'};
+    delete $request{qw(Content-Encoding Content-Length)};
     my $header_hash = $_[3];
 
     if (defined $_[2]) {
@@ -2050,15 +2049,7 @@ sub fetch {
         $request{'whisker'}->{'data'} = $r;
     }
 
-    # check for extra HTTP headers
-    if (defined $_[3]) {
-
-        # loop through the hash ref passed and add each header to request
-        while (my ($key, $value) = each(%$header_hash)) {
-            $request{$key} = $value;
-        }
-    }
-    unless ($_[4]) { LW2::http_fixup_request(\%request); }
+    LW2::http_fixup_request(\%request); 
 
     # Cache
     if (   defined($CACHE{ $request{'whisker'}->{'uri'} })
@@ -2089,13 +2080,6 @@ sub fetch {
         && (defined($result{'whisker'}->{'cookies'}))) {
         foreach my $c (@{ $result{'whisker'}->{'cookies'} }) {
             nprint("+ $request{'whisker'}->{'uri'} sent cookie: $c");
-        }
-    }
-
-    # Clean up extra headers
-    if (defined $_[3]) {
-        while (my ($key, $value) = each(%$header_hash)) {
-            delete $request{$key};
         }
     }
 
@@ -2164,7 +2148,6 @@ sub nfetch {
 
     # check for extra HTTP headers
     if (defined $headers) {
-
         # loop through the hash ref passed and add each header to request
         while (my ($key, $value) = each(%$header_hash)) {
             $request{$key} = $value;
@@ -2214,9 +2197,10 @@ sub nfetch {
     if (defined $headers) {
 
         # First clear the hash
-        foreach my $header (keys %$headers) {
-            delete($headers->{$header});
-        }
+	%$headers = ();
+        #foreach my $header (keys %$headers) {
+        #    delete($headers->{$header});
+        #}
         while (my ($key, $value) = each(%result)) {
             if ($key ne "whisker" && $key ne "connection") {
                 $headers->{$key} = $value;
