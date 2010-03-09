@@ -4,6 +4,7 @@ use strict;
 #VERSION,2.1.1
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
+# use LW2;                   ### Change this line to use a different installed version
 
 ###############################################################################
 #                               Nikto                                         #
@@ -62,13 +63,12 @@ $NIKTO{'configfile'} =
 }
 
 # Read the config files in order
-my $error;
+my ($error, $home);
 my $config_exists = 0;
 $error = load_config("$NIKTO{'configfile'}");
 $config_exists = 1 if ($error eq "");
 
 # Guess home directory -- to support Windows
-my $home = "";
 foreach my $var (split(/ /, "HOME USERPROFILE")) {
     $home = $ENV{$var} if ($ENV{$var});
 }
@@ -87,9 +87,8 @@ nprint("T:$starttime: Starting", "d");
 require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_single.plugin";
 require "$NIKTOCONFIG{'PLUGINDIR'}/LW2.pm";
 
-# use LW2;                   ### Change this line to use a different installed version
 
-($a, $b) = split(/\./, $LW2::VERSION);
+my ($a, $b) = split(/\./, $LW2::VERSION);
 die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 
 general_config();
