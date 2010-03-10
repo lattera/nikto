@@ -6196,3 +6196,4 @@
 "006194","58472","3","/subscribe/survey~1.tml","GET","Database error inf","","","","","Lyris ListManager error information disclosure.","",""
 "006195","58463","4","/scripts/message/message_dialog.tml?how_many_back="><script>alert(1)</script>","GET","<script>alert(1)</script>","","","","","Lyris ListManager Cross-Site Scripting.","",""
 "006196","58464","04","/read/attach_file.tml?page=http://cirt.net/","GET","action=\"http://cirt.net","","","","","Lyris ListManager XSRF/File Upload.","",""
+"006197","","23","/config/config.txt","GET","200","","","","","Configuration file found.","",""
