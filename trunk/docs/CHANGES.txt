@@ -1,3 +1,5 @@
+2010-03-10
+	- Moved do_auth to a postfetch plugin
 2010-03-09
 	- Removed dead code from fetch()
 	- Optimizations in nfetch(), nikto.pl, & elsewhere

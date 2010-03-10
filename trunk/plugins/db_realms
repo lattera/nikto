@@ -14,6 +14,7 @@
 # @ANY = match any realm name (generic)
 # If ID and PW fields are blank, realm match is used for message only
 ########################################################################
+"nikto_id","realm","id","password","message"
 "700000","@ANY","","_Cisco","Cisco device"
 "700001","@ANY","","0","Accton wireless router"
 "700002","@ANY","","0000","Deutsche Telekomm T-Sinus 130 DSL"
