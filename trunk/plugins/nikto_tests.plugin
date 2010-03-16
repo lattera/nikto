@@ -63,7 +63,6 @@ sub nikto_tests {
                     next;
                 }
             }
-            #$NIKTO{'resp_counts'}{$RES}{'total'}++;
 
             # do auth/redir first, independent of test pass/fail
             if ($RES eq 401) {
