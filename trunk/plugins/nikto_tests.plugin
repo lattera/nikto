@@ -58,11 +58,12 @@ sub nikto_tests {
                 nprint("- $RES for $TESTS{$CHECKID}{'method'}:\t$request{'whisker'}{'uri'}", "v");
 
                 if (defined $result{'whisker'}->{'error'}) {
-                    nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n");
+                    $mark->{'total_errors'}++;
+                    nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
                     next;
                 }
             }
-            $NIKTO{'resp_counts'}{$RES}{'total'}++;
+            #$NIKTO{'resp_counts'}{$RES}{'total'}++;
 
             # do auth/redir first, independent of test pass/fail
             if ($RES eq 401) {
@@ -259,7 +260,8 @@ sub testfile {
     my ($result, $contents, $error) = nfetch($mark, "$uri", "GET", "", "", "", "Tests: $name");
     nprint("- $result for $uri", "v");
     if ($error) {
-        nprint("+ ERROR: $uri returned an error: $error");
+        $mark->{'total_errors'}++;
+        nprint("+ ERROR: $uri returned an error: $error", "e");
         return;
     }
     if ($result == 200) {

@@ -411,6 +411,11 @@ http://192.168.0.1:8080/
           <para>V - Verbose Output. Show verbose output, which typically shows
           where Nikto is during program execution.</para>
         </listitem>
+
+        <listitem>
+          <para>E - Error Output. Display all HTTP and communications errors,
+          which show a lot of output on some servers.</para>
+        </listitem>
       </itemizedlist>
     </section>
 

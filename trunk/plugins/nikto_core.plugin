@@ -117,6 +117,9 @@ sub nprint {
         if ($mode eq "v" && $OUTPUT{'verbose'}) {
             print "V:" . localtime() . " $line\n";
         }
+        if ($mode eq "e" && $OUTPUT{'errors'}) {
+            print "E:" . localtime() . " $line\n";
+        }
         return;
     }
 
@@ -483,8 +486,9 @@ sub general_config {
     $NIKTO{'display'}{2} = "Show cookies received";
     $NIKTO{'display'}{3} = "Show all 200/OK responses";
     $NIKTO{'display'}{4} = "Show URLs which require authentication";
-    $NIKTO{'display'}{V} = "Verbose Output";
-    $NIKTO{'display'}{D} = "Debug Output";
+    $NIKTO{'display'}{V} = "Verbose output";
+    $NIKTO{'display'}{D} = "Debug output";
+    $NIKTO{'display'}{E} = "Display all HTTP errors";
 
     $NIKTO{'tuning'}{1} = "Interesting File / Seen in logs";
     $NIKTO{'tuning'}{2} = "Misconfiguration / Default File";
@@ -589,7 +593,7 @@ sub general_config {
 
     ### CLI STUFF
     $CLI{'pause'}             = $CLI{'html'}     = $OUTPUT{'verbose'} = $CLI{'skiplookup'} =
-      $NIKTO{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'}   = 0;
+      $NIKTO{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'}   = $OUTPUT{'errors'} = 0;
     $CLI{'all_options'} = join(" ", @ARGV);
 
     # preprocess CLI options which cannot be abbreviated
@@ -667,6 +671,7 @@ sub general_config {
         if ($CLI{'display'} =~ /d/i) { $OUTPUT{'debug'}   = 1; }
         if ($CLI{'display'} =~ /v/i) { $OUTPUT{'verbose'} = 1; }
         if ($CLI{'display'} =~ /s/i) { $OUTPUT{'scrub'}   = 1; }
+        if ($CLI{'display'} =~ /e/i) { $OUTPUT{'errors'}  = 1; }
     }
 
     # port(s)
@@ -1475,6 +1480,7 @@ sub run_hooks {
         
         my $oldverbose = $OUTPUT{'verbose'};
         my $olddebug   = $OUTPUT{'debug'};
+        my $olderrors  = $OUTPUT{'errors'};
         nprint("- Running $type for \"$plugin->{full_name}\" plugin", "v");
         if (defined $plugin->{'parameters'}->{'verbose'}
             && $plugin->{'parameters'}->{'verbose'} == 1) {
@@ -1487,6 +1493,7 @@ sub run_hooks {
         &{ $plugin->{$type . '_method'} }($mark, $request, $result, $plugin->{'parameters'});
         $OUTPUT{'verbose'} = $oldverbose;
         $OUTPUT{'debug'}   = $olddebug;
+        $OUTPUT{'errors'}  = $olderrors;
     }
     
     return $request, $result;
@@ -2002,7 +2009,7 @@ sub dirlist {
 
 #######################################################################
 sub dump_var {
-    return if !$OUTPUT{debug};
+    return if !$OUTPUT{'debug'};
     my $msg     = $_[0];
     my %hash_in = %{ $_[1] };
 
@@ -2089,7 +2096,7 @@ sub fetch {
             $CACHE{ $request{'whisker'}->{'uri'} }{'res'}     = $result{'whisker'}->{'code'};
             $CACHE{ $request{'whisker'}->{'uri'} }{'content'} = $result{'whisker'}->{'data'};
         }
-        if ($OUTPUT{debug}) {
+        if ($OUTPUT{'debug'}) {
             dump_var("Request Hash", \%request);
             dump_var("Result Hash",  \%result);
         }
@@ -2207,7 +2214,7 @@ sub nfetch {
             $CACHE{$uri}{'content'} = $result{'whisker'}->{'data'};
             $CACHE{$uri}{'mark'}    = $mark;
         }
-        if ($OUTPUT{debug}) {
+        if ($OUTPUT{'debug'}) {
             dump_var("Request Hash", \%request);
             dump_var("Result Hash",  \%result);
         }
