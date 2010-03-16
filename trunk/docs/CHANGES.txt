@@ -1,3 +1,5 @@
+2010-03-15
+	- Ticket 130: Added -D E to show HTTP errors, otherwise suppress.
 2010-03-10
 	- Moved do_auth to a postfetch plugin
 2010-03-09
