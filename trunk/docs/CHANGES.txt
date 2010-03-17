@@ -1,16 +1,17 @@
 2010-03-15
 	- Ticket 130: Added -D E to show HTTP errors, otherwise suppress.
+	- Ticket 129: Change references for config.txt to nikto.conf.
 2010-03-10
-	- Moved do_auth to a postfetch plugin
+	- Moved do_auth to a postfetch plugin.
 2010-03-09
-	- Removed dead code from fetch()
-	- Optimizations in nfetch(), nikto.pl, & elsewhere
+	- Removed dead code from fetch().
+	- Optimizations in nfetch(), nikto.pl, & elsewhere.
 	- Added support for prefetch and postfetch hooks.
-	- Moved content_search to a plugin
-	- Some tuning around plugin execution
-	- Ticket 126: subdomain plugin tries to guess domain on unqualified hostname
+	- Moved content_search to a plugin.
+	- Some tuning around plugin execution.
+	- Ticket 126: subdomain plugin tries to guess domain on unqualified hostname.
 2010-03-07
-	- Updated user_enum_apache to use Plugins instead of mutate
+	- Updated user_enum_apache to use Plugins instead of mutate.
 	- Rewrote the macro expanding bit to make it more efficient.
 2010-03-03
 	- Mutate 1 now wrapped into nikto_tests and doesn't take up anywhere near the amount of memory!
