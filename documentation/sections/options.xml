@@ -10,7 +10,7 @@ brief version of this text is available by running Nikto with the -h
 be used to scan all CGI directories or none, (respectively). A
 literal value for a CGI directory such as "/cgi-test/" may be
 specified (must include trailing slash). If this is option is not
-specified, all CGI directories listed in config.txt will be
+specified, all CGI directories listed in nikto.conf will be
 tested.</para>
       </listitem>
     </varlistentry>
@@ -18,7 +18,7 @@ tested.</para>
       <term><option>-config</option></term>
       <listitem>
         <para>Specify an alternative config file to use instead of the
-config.txt located in the install directory.</para>
+nikto.conf file located in the install directory.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
