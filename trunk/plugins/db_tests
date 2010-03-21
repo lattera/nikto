@@ -6202,3 +6202,4 @@
 "006197","","2","/log/readme.txt","GET","200","","","","","Readme file found.","",""
 "006197","","2","/logs/readme.txt","GET","200","","","","","Readme file found.","",""
 "006197","","2","/uploads/readme.txt","GET","200","","","","","Readme file found.","",""
+"006198","","23","/htaccess.txt","GET","RewriteEngine On","","","","","Default Joomla! htacess.txt file found. This should be removed or renamed.","",""
