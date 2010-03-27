@@ -552,8 +552,9 @@ sub general_config {
     $NIKTO{'options'} .=
       "       -findonly          Find http(s) ports only, don't perform a full scan
        -Format+           Save file (-o) format:
-                                htm   HTML Format
                                 csv   Comma-separated-value
+                                htm   HTML Format
+                                nbe   Nessus NBE format
                                 txt   Plain text (default if not specified)
                                 xml   XML Format
        -host+             Target host
@@ -651,6 +652,7 @@ sub general_config {
     if    ($CLI{'format'} =~ /te?xt/i) { $CLI{'format'} = "txt"; }
     elsif ($CLI{'format'} =~ /html?/i) { $CLI{'format'} = "htm"; }
     elsif ($CLI{'format'} =~ /csv/i)   { $CLI{'format'} = "csv"; }
+    elsif ($CLI{'format'} =~ /nbe/i)   { $CLI{'format'} = "nbe"; }
     elsif ($CLI{'format'} =~ /xml/i)   { $CLI{'format'} = "xml"; }
     elsif ($CLI{'format'} eq 'none') { }
     else                             { nprint("+ ERROR: Invalid output format"); exit; }

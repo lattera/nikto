@@ -1,3 +1,5 @@
+2010-03-26
+	- Added nbe output plugin written by Frank Breedijk
 2010-03-15
 	- Ticket 130: Added -D E to show HTTP errors, otherwise suppress.
 	- Ticket 129: Change references for config.txt to nikto.conf.
