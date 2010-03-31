@@ -303,9 +303,11 @@ http://192.168.0.1:8080/
       <para>Nessus (<ulink
       url="http://www.nessus.org/">http://www.nessus.org/nessus/</ulink>) can
       be configured to automatically launch Nikto when it finds a web server.
-      Ensure Nikto works properly, then place the directory containing
-      nikto.pl in root's PATH environment variable. When nessusd starts, it
-      should see the nikto.pl program and enable usage through the GUI.</para>
+      Ensure Nikto works properly, that nikto.pl is in the PATH, and that nikto.nasl
+      is present in the Nessus install. Run 'nessusd -R' and then restart nessusd.</para>
+      <para>See <ulink url="http://blog.tenablesecurity.com/2008/09/using-nessus-to.html">
+      http://blog.tenablesecurity.com/2008/09/using-nessus-to.html</ulink> for detailed
+      instructions.</para>
     </section>
   </chapter>
 
