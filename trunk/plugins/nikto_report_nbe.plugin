@@ -22,7 +22,7 @@
 ###############################################################################
 sub nikto_report_nbe_init {
     my $id = { name          => "report_nbe",
-               full_name     => "CSV reports",
+               full_name     => "NBE reports",
                author        => "Seccbus",
                description   => "Produces a NBE report.",
                report_head   => \&nbe_open,
@@ -40,8 +40,7 @@ sub nbe_open {
     open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
 
     # Write header
-    print OUT
-      "\"timestamps\"|\"network\"|\"host\"|\"port\"|\"nikto_id\"|\"prio\"|\"$NIKTO{'name'} v$NIKTO{'version'}/$NIKTO{'core_version'}\"\n";
+    print OUT "timestamps|network|host|port|nikto_id|prio|$NIKTO{'name'} v$NIKTO{'version'}/$NIKTO{'core_version'}\n";
     return OUT;
 }
 
@@ -53,19 +52,17 @@ sub nbe_item {
         if ($item->{'mark'}->{'hostname'} =~ /^(\d+\.\d+\.\d+)\.\d+$/) {
             $network = $1;
         }
-        $line .= "\"results\"|";
-        $line .= "\"$network\"|";
-        $line .= "\"$item->{'mark'}->{'hostname'}\"|";
-        $line .= "\"$item->{'mark'}->{'port'}\"|";
-        $line .= "\"$item->{'nikto_id'}\"|";
-        $line .= "\"Security Warning\"|";
-        $line .= "\"";
-        if ($item->{'osvdb'})  { $line .= "OSVDB-$item->{'osvdb'}: " }
-        if ($item->{'method'}) { $line .= "$item->{'method'} " }
-        if ($uri)              { $line .= "${'uri'}: " }
-        $line .= $item->{'message'};
-        $line .= "\"";
-        print $handle "$line\n";
+       $line.="results|";
+       $line.="$network|";
+       $line.="$item->{'mark'}->{'hostname'}|";
+       $line.="$item->{'mark'}->{'port'}|";
+       $line.="$item->{'nikto_id'}|";
+       $line.="Security Warning|";
+       if ($item->{'osvdb'})  { $line.="OSVDB-$item->{'osvdb'}: " };
+       if ($item->{'method'}) { $line.="$item->{'method'} " };
+       if ($uri)            { $line.="${'uri'}: " };
+       $line.=$item->{'message'};
+       print $handle "$line\n";
     }
 }
 
