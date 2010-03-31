@@ -83,7 +83,7 @@ extension specified in the -output option. Valid formats are:</para>
       <term><option>-host</option></term>
       <listitem>
         <para>Host(s) to target. Can be an IP address, hostname or text file
-of hosts. A single dash (-) maybe used for stdout. Can also parse nmap -oG
+of hosts. A single dash (-) maybe used for stdin. Can also parse nmap -oG
 style output</para>
       </listitem>
     </varlistentry>
@@ -234,9 +234,9 @@ is 10 seconds.</para>
       <term><option>-Tuning</option></term>
       <listitem>
         <para>Tuning options will control the test that Nikto will use
-against a target. By default, if any options are specified, only
-those tests will be performed. If the "x" option is used, it will
-reverse the logic and exclude only those tests. Use the reference
+against a target. By default, all tests are performed. If any options are 
+specified, only those tests will be performed. If the "x" option is used, 
+it will reverse the logic and exclude only those tests. Use the reference
 number or letter to specify the type, multiple may be used:</para>
         <para>0 - File Upload</para>
         <para>1 - Interesting File / Seen in logs</para>
