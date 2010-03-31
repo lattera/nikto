@@ -23,7 +23,7 @@
 sub nikto_report_nbe_init {
     my $id = { name          => "report_nbe",
                full_name     => "NBE reports",
-               author        => "Seccbus",
+               author        => "Seccubus",
                description   => "Produces a NBE report.",
                report_head   => \&nbe_open,
                report_item   => \&nbe_item,
