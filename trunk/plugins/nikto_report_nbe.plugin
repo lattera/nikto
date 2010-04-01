@@ -45,25 +45,41 @@ sub nbe_open {
 }
 
 sub nbe_item {
-    my ($handle, $mark, $item) = @_;
-    foreach my $uri (split(' ', $item->{'uri'})) {
-        my $line;
-        my $network;
-        if ($item->{'mark'}->{'hostname'} =~ /^(\d+\.\d+\.\d+)\.\d+$/) {
-            $network = $1;
-        }
-       $line.="results|";
-       $line.="$network|";
-       $line.="$item->{'mark'}->{'hostname'}|";
-       $line.="$item->{'mark'}->{'port'}|";
-       $line.="$item->{'nikto_id'}|";
-       $line.="Security Warning|";
-       if ($item->{'osvdb'})  { $line.="OSVDB-$item->{'osvdb'}: " };
-       if ($item->{'method'}) { $line.="$item->{'method'} " };
-       if ($uri)            { $line.="${'uri'}: " };
-       $line.=$item->{'message'};
-       print $handle "$line\n";
-    }
+	my ($handle, $mark, $item) = @_;
+	foreach my $uri (split(' ', $item->{'uri'})) {
+		my ( $line, $network );
+		if ( $item->{'mark'}->{'hostname'} && $item->{'mark'}->{'port'} && $item->{'nikto_id'} ) {
+			if ($item->{'mark'}->{'hostname'} =~ /^(\d+\.\d+\.\d+)\.\d+$/) {
+				$network = $1;
+			}
+			$line.="results|";
+			$line.="$network|";
+			$line.="$item->{'mark'}->{'hostname'}|";
+			$line.="$item->{'mark'}->{'port'}|";
+			$line.="$item->{'nikto_id'}|";
+			$line.="Security Warning|";
+			if ($item->{'osvdb'})  { $line.="OSVDB-$item->{'osvdb'}: " };
+			if ($item->{'method'}) { $line.="$item->{'method'} " };
+			if ($uri)            { $line.="${'uri'}: " };
+			$line.=$item->{'message'};
+			print $handle "$line\n";
+		} else {
+			#my $debug = "Data provided:\n$handle, $mark, $item";
+			#$debug.= "\nContents of \$mark:";
+			#foreach my $key ( sort keys %$mark ) {
+			#	$debug .= "\n$key - $mark->{$key}";
+			#}
+			#$debug.= "\nContents of \$item:";
+			#foreach my $key ( sort keys %$item ) {
+			#	$debug .= "\n$key - $item->{$key}";
+			#}
+			#$debug.= "\nContents of \$item->{mark}:";
+			#foreach my $key ( sort keys %{$item->{mark}} ) {
+			#	$debug .= "\n$key - $item->{mark}->{$key}";
+			#}
+			#die $debug;
+		}
+	}
 }
 
 1;
