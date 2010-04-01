@@ -2573,7 +2573,7 @@ sub list_plugins {
     load_plugins();
 
     foreach my $plugin (@PLUGINS) {
-        nprint("Plugin $plugin->{'name'}");
+        nprint("Plugin: $plugin->{'name'}");
         push(@all_names, $plugin->{'name'});
         nprint(" $plugin->{'full_name'} - $plugin->{'description'}");
         nprint(" Written by $plugin->{'author'}, Copyright (C) $plugin->{'copyright'}");
