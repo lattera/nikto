@@ -325,7 +325,7 @@
 "000298","0","3","/typo3conf/localconf.php","GET","200","","","","","Typo3 config file found.","",""
 "000299","0","3","/vchat/msg.txt","GET","200","","","","","VChat allows user information to be retrieved.","",""
 "000300","0","3","/vgn/license","GET","200","","","","","Vignette server license file found.","",""
-"000301","3092","3","/web.config","GET","200","","","","","ASP config file found.","",""
+"000301","3092","3","/web.config","GET","<?xml version","","200","","","ASP config file is accessible.","",""
 "000302","3233","3","/webamil/test.php?mode=phpinfo","GET","PHP Version","","","","","Horde allows phpinfo() to be run, which gives detailed system information.","",""
 "000303","0","3","/webcart-lite/config/import.txt","GET","200","","","","","This may allow attackers to read credit card data. Reconfigure to make this file not accessible via the web.","",""
 "000304","0","3","/webcart-lite/orders/import.txt","GET","200","","","","","This may allow attackers to read credit card data. Reconfigure to make this file not accessible via the web.","",""
