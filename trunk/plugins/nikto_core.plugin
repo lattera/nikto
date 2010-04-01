@@ -506,6 +506,7 @@ sub general_config {
     $NIKTO{'tuning'}{x} = "Reverse Tuning Options (i.e., include all except specified)";
 
     $NIKTO{'options_short'} = "
+       -config+            Use this config file
        -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -dbcheck            check database and other key files for syntax errors (cannot be abbreviated)
        -evasion+           ids evasion technique
