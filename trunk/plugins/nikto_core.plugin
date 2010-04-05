@@ -586,7 +586,7 @@ sub general_config {
         $NIKTO{'options'} .= "                               $k     $NIKTO{'tuning'}{$k}\n";
     }
 
-    $NIKTO{'options'} .= "       -useproxy          Use the proxy defined in config.txt
+    $NIKTO{'options'} .= "       -useproxy          Use the proxy defined in nikto.conf
        -update            Update databases and plugins from cirt.net (cannot be abbreviated)
        -Version           Print plugin and database versions
        -vhost+            Virtual host (for Host header)
