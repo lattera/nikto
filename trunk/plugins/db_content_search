@@ -23,3 +23,4 @@
 "750005","0","sqlite_p?open\(","Potential PHP SQLite database connection string found."
 "750006","0","mssql_p?connect\(","Potential PHP MSSQL database connection string found."
 "750007","0","Call to undefined function.*\(\) in \/","PHP error reveals file system path."
+"750008","36099","FrameworkLog.xsl\"\\?>.*<version>(?:[0-2]|3\.(?:[0-5]|6\.0\.(?:[0-4]|5(?:[0-3]|4[0-5]))))","McAfee Common Management Agent 3.6.0.546 and below contain multiple overflows."
