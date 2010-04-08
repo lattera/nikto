@@ -267,3 +267,4 @@
 "800251","Netscape-Enterprise\/4.","0","Netscape-Enterprise 4.x was made End of Life by Sun in December  2002. http://www.sun.com/software/products/web_srvr/lifecycle.xml"
 "800252","CERN\/3","0","CERN 3.0A has not been updated since July, 1996 and likely has a few flaws."
 "800253","Agent-ListenServer-HttpSvr\/1\.0","0","McAfee ePolicy Orchestra Agent. This may reveal information about anti-virus and software update schedules."
+"800254","HP System Management Homepage\/([0-2]|3\.0\.(0|1\.([0-6]|7[0-2])))",54608","HP System Management Homepage version contains multiple vulnerabilities."
