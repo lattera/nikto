@@ -523,7 +523,7 @@ sub general_config {
                "Tuning=s"         => \$CLI{'tuning'},
                "Version"          => \$CLI{'version'},
                "Plugins=s"        => \$CLI{'plugins'},
-               "list-plugins"     => \$CLI{'list-plugins'},
+               "list-plugins"     => \$CLI{'list-plugins'}
                ) or usage(0);
 
     if    ($CLI{'help'})         { usage(2); }
@@ -533,7 +533,6 @@ sub general_config {
 
     # output file
     if (!defined $CLI{'format'}) {
-
         # Check what output has
         $CLI{'format'} = "none";
         if (defined $CLI{'file'}) {
@@ -2383,7 +2382,6 @@ sub send_updates {
 #######################################################################
 sub usage {
     if ($_[0] eq 2) {
-
         print "
    Options:
        -config+            Use this config file
