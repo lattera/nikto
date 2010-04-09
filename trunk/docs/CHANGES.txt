@@ -1,5 +1,5 @@
 2010-04-09
-	- Ticket 143: Added -ask to override nikto.conf's UPDATES value (same options)
+	- Ticket 137: Added -ask to override nikto.conf's UPDATES value (same options)
 2010-04-01
 	- Ticket 134: Added documentation of -config to usage_short
 2010-03-26 
