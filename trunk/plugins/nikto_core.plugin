@@ -461,7 +461,9 @@ sub dump_target_info {
 ###############################################################################
 sub general_config {
     ## gotta set these first
-    $|                    = 1;
+    $| = 1;
+
+    # This is used in dump_target_info(), not just help output
     $NIKTO{'anti_ids'}{1} = "Random URI encoding (non-UTF8)";
     $NIKTO{'anti_ids'}{2} = "Directory self-reference (/./)";
     $NIKTO{'anti_ids'}{3} = "Premature URL ending";
@@ -473,6 +475,7 @@ sub general_config {
     $NIKTO{'anti_ids'}{A} = "Use a carriage return (0x0d) as a request spacer";
     $NIKTO{'anti_ids'}{B} = "Use binary value 0x0b as a request spacer";
 
+    # This is used in dump_target_info(), not just help output
     $NIKTO{'mutate_opts'}{1} = "Test all files with all root directories";
     $NIKTO{'mutate_opts'}{2} = "Guess for password file names";
     $NIKTO{'mutate_opts'}{3} = "Enumerate user names via Apache (/~user type requests)";
@@ -482,120 +485,9 @@ sub general_config {
       "Attempt to brute force sub-domain names, assume that the host name is the parent domain";
     $NIKTO{'mutate_opts'}{6} = "Attempt to guess directory names from the supplied dictionary file";
 
-    $NIKTO{'display'}{1} = "Show redirects";
-    $NIKTO{'display'}{2} = "Show cookies received";
-    $NIKTO{'display'}{3} = "Show all 200/OK responses";
-    $NIKTO{'display'}{4} = "Show URLs which require authentication";
-    $NIKTO{'display'}{V} = "Verbose output";
-    $NIKTO{'display'}{D} = "Debug output";
-    $NIKTO{'display'}{E} = "Display all HTTP errors";
-
-    $NIKTO{'tuning'}{1} = "Interesting File / Seen in logs";
-    $NIKTO{'tuning'}{2} = "Misconfiguration / Default File";
-    $NIKTO{'tuning'}{3} = "Information Disclosure";
-    $NIKTO{'tuning'}{4} = "Injection (XSS/Script/HTML)";
-    $NIKTO{'tuning'}{5} = "Remote File Retrieval - Inside Web Root";
-    $NIKTO{'tuning'}{6} = "Denial of Service";
-    $NIKTO{'tuning'}{7} = "Remote File Retrieval - Server Wide";
-    $NIKTO{'tuning'}{8} = "Command Execution / Remote Shell";
-    $NIKTO{'tuning'}{9} = "SQL Injection";
-    $NIKTO{'tuning'}{0} = "File Upload";
-    $NIKTO{'tuning'}{a} = "Authentication Bypass";
-    $NIKTO{'tuning'}{b} = "Software Identification";
-    $NIKTO{'tuning'}{c} = "Remote Source Inclusion";
-    $NIKTO{'tuning'}{x} = "Reverse Tuning Options (i.e., include all except specified)";
-
-    $NIKTO{'options_short'} = "
-       -config+            Use this config file
-       -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
-       -dbcheck            check database and other key files for syntax errors (cannot be abbreviated)
-       -evasion+           ids evasion technique
-       -Format+            save file (-o) format
-       -host+              target host
-       -Help               Extended help information
-       -id+                host authentication to use, format is userid:password
-       -list-plugins       List all available plugins
-       -mutate+            Guess additional file names
-       -mutate-options+    Provide extra information for mutations
-       -output+            Write output to this file
-       -nocache            Disables the URI cache
-       -nossl              Disables using SSL
-       -no404              Disables 404 checks
-       -Plugins		   List of plugins to run (default ALL)
-       -port+              Port to use (default 80)
-       -Display+           Turn on/off display outputs
-       -ssl                Force ssl mode on port
-       -Single             Single request mode
-       -timeout+           Timeout (default 2 seconds)
-       -Tuning+            Scan tuning
-       -update             Update databases and plugins from cirt.net (cannot be abbreviated)
-       -Version            Print plugin and database versions
-       -vhost+             Virtual host (for Host header)
-   + requires a value
-   ";
-
-    $NIKTO{'options'} = "
-   Options:
-       -config+            Use this config file
-       -Cgidirs+           Scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
-       -Display+           Turn on/off display outputs:\n";
-    foreach my $k (sort keys %{ $NIKTO{'display'} }) {
-        $NIKTO{'options'} .= "                               $k     $NIKTO{'display'}{$k}\n";
-    }
-
-    $NIKTO{'options'} .=
-      "       -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
-       -evasion+          IDS evasion technique:\n";
-    foreach my $k (sort keys %{ $NIKTO{'anti_ids'} }) {
-        $NIKTO{'options'} .= "                               $k     $NIKTO{'anti_ids'}{$k}\n";
-    }
-
-    $NIKTO{'options'} .=
-      "       -findonly          Find http(s) ports only, don't perform a full scan
-       -Format+           Save file (-o) format:
-                                csv   Comma-separated-value
-                                htm   HTML Format
-                                nbe   Nessus NBE format
-                                txt   Plain text (default if not specified)
-                                xml   XML Format
-       -host+             Target host
-       -Help              Extended help information
-       -id+               Host authentication to use, format is userid:password
-       -list-plugins      List all available plugins, perform no testing
-       -mutate+           Guess additional file names:\n";
-    foreach my $k (sort keys %{ $NIKTO{'mutate_opts'} }) {
-        $NIKTO{'options'} .= "                               $k     $NIKTO{'mutate_opts'}{$k}\n";
-    }
-
-    $NIKTO{'options'} .= "       -mutate-options    Provide information for mutates
-       -nocache           Disables the URI cache
-       -nossl             Disables using SSL
-       -no404             Disables nikto attempting to guess a 404 page
-       -output+           Write output to this file
-       -Plugins           List of plugins to run (default ALL)
-       -port+             Port to use (default 80)
-       -Pause+            Pause between tests (seconds)\n";
-
-    $NIKTO{'options'} .=
-      "       -root+             Prepend root value to all requests, format is /directory
-       -ssl               Force ssl mode on port
-       -Single            Single request mode
-       -timeout+          Timeout (default 2 seconds)
-       -Tuning+           Scan tuning:\n";
-    foreach my $k (sort keys %{ $NIKTO{'tuning'} }) {
-        $NIKTO{'options'} .= "                               $k     $NIKTO{'tuning'}{$k}\n";
-    }
-
-    $NIKTO{'options'} .= "       -useproxy          Use the proxy defined in nikto.conf
-       -update            Update databases and plugins from cirt.net (cannot be abbreviated)
-       -Version           Print plugin and database versions
-       -vhost+            Virtual host (for Host header)
-   + requires a value
-   ";
-
     ### CLI STUFF
-    $CLI{'pause'}             = $CLI{'html'}     = $OUTPUT{'verbose'} = $CLI{'skiplookup'} =
-      $NIKTO{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'}   = $OUTPUT{'errors'} = 0;
+    $CLI{'pause'} = $CLI{'html'} = $OUTPUT{'verbose'} = $CLI{'skiplookup'} =
+      $NIKTO{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'} = $OUTPUT{'errors'} = 0;
     $CLI{'all_options'} = join(" ", @ARGV);
 
     # preprocess CLI options which cannot be abbreviated
@@ -1376,8 +1268,10 @@ sub load_plugins {
                 $pluginhash->{recon_weight}  = 50 unless (defined $pluginhash->{recon_weight});
                 $pluginhash->{scan_weight}   = 50 unless (defined $pluginhash->{scan_weight});
                 $pluginhash->{report_weight} = 50 unless (defined $pluginhash->{report_weight});
-                $pluginhash->{postfetch_weight} = 50 unless (defined $pluginhash->{postfetch_weight});
-                $pluginhash->{postfetch_weight} = 50 unless (defined $pluginhash->{postfetch_weight});
+                $pluginhash->{postfetch_weight} = 50
+                  unless (defined $pluginhash->{postfetch_weight});
+                $pluginhash->{postfetch_weight} = 50
+                  unless (defined $pluginhash->{postfetch_weight});
                 push(@all_names, $pluginhash->{name});
 
                 push(@PLUGINS, $pluginhash);
@@ -1428,11 +1322,11 @@ sub load_plugins {
             }
         }
     }
-    
+
     # For speed in future, create a hash of active plugins ordered by plugin weight, for
     # each type of plugin
     my (@rplugins, @splugins, @repplugins, @pfplugins, @prefplugins);
-    my (@rsorted, @ssorted, @repsorted, @pfsorted, @prefsorted);
+    my (@rsorted,  @ssorted,  @repsorted,  @pfsorted,  @prefsorted);
     foreach my $plugin (@PLUGINS) {
         if ($plugin->{'run'} == 1) {
             if (defined $plugin->{recon_method}) {
@@ -1452,7 +1346,7 @@ sub load_plugins {
             }
         }
     }
-    
+
     # Now sort each array by weight
     @rsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @rplugins;
     $PLUGINORDER{'recon'} = \@rsorted;
@@ -1468,19 +1362,20 @@ sub load_plugins {
 
 sub run_hooks {
     my ($mark, $type, $request, $result) = @_;
-    
-    foreach my $plugin (@{$PLUGINORDER{$type}}) {
-        my ($run) = 1; 
-	 	 
-	 	# first check for conditionals 
-        my $condition = $plugin->{$type . '_cond'};
-	 	if (defined $plugin->{$type . '_cond'}) {  
-	 	    # Evaluate condition 
-	 	    $run = eval($condition); 
-	 	}
-        
-        next if ($run != 1) ;
-        
+
+    foreach my $plugin (@{ $PLUGINORDER{$type} }) {
+        my ($run) = 1;
+
+        # first check for conditionals
+        my $condition = $plugin->{ $type . '_cond' };
+        if (defined $plugin->{ $type . '_cond' }) {
+
+            # Evaluate condition
+            $run = eval($condition);
+        }
+
+        next if ($run != 1);
+
         my $oldverbose = $OUTPUT{'verbose'};
         my $olddebug   = $OUTPUT{'debug'};
         my $olderrors  = $OUTPUT{'errors'};
@@ -1493,12 +1388,12 @@ sub run_hooks {
             && $plugin->{'parameters'}->{'debug'} == 1) {
             $OUTPUT{'debug'} = 1;
         }
-        &{ $plugin->{$type . '_method'} }($mark, $request, $result, $plugin->{'parameters'});
+        &{ $plugin->{ $type . '_method' } }($mark, $request, $result, $plugin->{'parameters'});
         $OUTPUT{'verbose'} = $oldverbose;
         $OUTPUT{'debug'}   = $olddebug;
         $OUTPUT{'errors'}  = $olderrors;
     }
-    
+
     return $request, $result;
 }
 
@@ -2192,10 +2087,10 @@ sub nfetch {
         }
     }
     LW2::http_fixup_request(\%request) unless ($flags->{'noclean'});
-    
+
     # Run pre hooks
     (%$request, %$result) = run_hooks($mark, "prefetch", \%request, \%result);
-    
+
     # Cache
     if (   defined $CACHE{$uri}
         && !defined $CLI{'nocache'}
@@ -2440,7 +2335,7 @@ sub send_updates {
       the Nikto database or is newer than the known string. Would you like
       to submit this information (*no server specific data*) to CIRT.net
       for a Nikto update (or you may email to sullo\@cirt.net) (y/n)? ", ""
-            );
+        );
     }
 
     if ($answer !~ /y/i) { return; }
@@ -2488,10 +2383,106 @@ sub send_updates {
 #######################################################################
 sub usage {
     if ($_[0] eq 2) {
-        nprint($NIKTO{'options'});
+
+        print "
+   Options:
+       -config+            Use this config file
+       -Cgidirs+           Scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
+       -Display+           Turn on/off display outputs:
+                               1     Show redirects
+                               2     Show cookies received
+                               3     Show all 200/OK responses
+                               4     Show URLs which require authentication
+                               V     Verbose output
+                               D     Debug output
+                               E     Display all HTTP errors
+       -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
+       -evasion+          IDS evasion technique:\n";
+
+        foreach my $k (sort keys %{ $NIKTO{'anti_ids'} }) {
+            print "                               $k     $NIKTO{'anti_ids'}{$k}\n";
+        }
+
+        print "       -findonly          Find http(s) ports only, don't perform a full scan
+       -Format+           Save file (-o) format:
+                                csv   Comma-separated-value
+                                htm   HTML Format
+                                nbe   Nessus NBE format
+                                txt   Plain text (default if not specified)
+                                xml   XML Format
+       -host+             Target host
+       -Help              Extended help information
+       -id+               Host authentication to use, format is userid:password
+       -list-plugins      List all available plugins, perform no testing
+       -mutate+           Guess additional file names:\n";
+
+        foreach my $k (sort keys %{ $NIKTO{'mutate_opts'} }) {
+            print "                               $k     $NIKTO{'mutate_opts'}{$k}\n";
+        }
+
+        print "       -mutate-options    Provide information for mutates
+       -nocache           Disables the URI cache
+       -nossl             Disables using SSL
+       -no404             Disables nikto attempting to guess a 404 page
+       -output+           Write output to this file
+       -Plugins           List of plugins to run (default ALL)
+       -port+             Port to use (default 80)
+       -Pause+            Pause between tests (seconds)
+       -root+             Prepend root value to all requests, format is /directory
+       -ssl               Force ssl mode on port
+       -Single            Single request mode
+       -timeout+          Timeout (default 2 seconds)
+       -Tuning+           Scan tuning:
+                               1     Interesting File / Seen in logs
+                               2     Misconfiguration / Default File
+                               3     Information Disclosure
+                               4     Injection (XSS/Script/HTML)
+                               5     Remote File Retrieval - Inside Web Root
+                               6     Denial of Service
+                               7     Remote File Retrieval - Server Wide
+                               8     Command Execution / Remote Shell
+                               9     SQL Injection
+                               0     File Upload
+                               a     Authentication Bypass
+                               b     Software Identification
+                               c     Remote Source Inclusion
+                               x     Reverse Tuning Options (i.e., include all except specified)
+       -useproxy          Use the proxy defined in nikto.conf
+       -update            Update databases and plugins from cirt.net (cannot be abbreviated)
+       -Version           Print plugin and database versions
+       -vhost+            Virtual host (for Host header)
+   + requires a value
+   ";
     }
     else {
-        nprint($NIKTO{'options_short'});
+        print "
+       -config+            Use this config file
+       -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
+       -dbcheck            check database and other key files for syntax errors (cannot be abbreviated)
+       -evasion+           ids evasion technique
+       -Format+            save file (-o) format
+       -host+              target host
+       -Help               Extended help information
+       -id+                host authentication to use, format is userid:password
+       -list-plugins       List all available plugins
+       -mutate+            Guess additional file names
+       -mutate-options+    Provide extra information for mutations
+       -output+            Write output to this file
+       -nocache            Disables the URI cache
+       -nossl              Disables using SSL
+       -no404              Disables 404 checks
+       -Plugins		   List of plugins to run (default ALL)
+       -port+              Port to use (default 80)
+       -Display+           Turn on/off display outputs
+       -ssl                Force ssl mode on port
+       -Single             Single request mode
+       -timeout+           Timeout (default 2 seconds)
+       -Tuning+            Scan tuning
+       -update             Update databases and plugins from cirt.net (cannot be abbreviated)
+       -Version            Print plugin and database versions
+       -vhost+             Virtual host (for Host header)
+   + requires a value
+   ";
     }
     exit;
 }
