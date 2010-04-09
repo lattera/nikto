@@ -523,7 +523,8 @@ sub general_config {
                "Tuning=s"         => \$CLI{'tuning'},
                "Version"          => \$CLI{'version'},
                "Plugins=s"        => \$CLI{'plugins'},
-               "list-plugins"     => \$CLI{'list-plugins'}
+               "list-plugins"     => \$CLI{'list-plugins'},
+               "ask=s"            => \$CLI{'ask'}
                ) or usage(0);
 
     if    ($CLI{'help'})         { usage(2); }
@@ -533,6 +534,7 @@ sub general_config {
 
     # output file
     if (!defined $CLI{'format'}) {
+
         # Check what output has
         $CLI{'format'} = "none";
         if (defined $CLI{'file'}) {
@@ -555,7 +557,7 @@ sub general_config {
     }
 
     # verify readable dtd
-    if ($CLI{'format'} eq 'xml' && !-r $NIKTOCONFIG{NIKTODTD}) {
+    if ($CLI{'format'} eq 'xml' && !-r $NIKTOCONFIG{'NIKTODTD'}) {
         nprint("+ ERROR: reading DTD");
         exit;
     }
@@ -624,6 +626,12 @@ sub general_config {
         if ($CLI{'mutate'} =~ /6/) {
             $CLI{'plugins'} .= ';dictionary(dictionary:' . $CLI{'mutate-opts'} . ')';
         }
+    }
+
+    # Asking questions?
+    if ($CLI{'ask'} =~ /^(auto|yes|no)$/) {
+        $NIKTOCONFIG{'UPDATES'} = $CLI{'ask'};    # override nikto.conf setting
+        undef($CLI{'ask'});
     }
 
     $NIKTO{'timeout'} = $CLI{'timeout'} || 10;
@@ -1204,7 +1212,7 @@ sub port_check {
     if ($CLI{'ssl'})   { shift(@checktypes); }
     if ($CLI{'nossl'}) { pop(@checktypes); }
 
-    foreach my $method (split(/ /, $NIKTOCONFIG{CHECKMETHODS})) {
+    foreach my $method (split(/ /, $NIKTOCONFIG{'CHECKMETHODS'})) {
         $request{'whisker'}->{'method'} = $method;
         foreach my $checkssl (@checktypes) {
             nprint("- Checking for $checkssl on port $ip:$port, using $method", "v", $m);
@@ -2285,7 +2293,7 @@ sub version {
 
 #######################################################################
 sub send_updates {
-    return if ($NIKTOCONFIG{UPDATES} !~ /yes|auto/i);
+    return if ($NIKTOCONFIG{'UPDATES'} !~ /yes|auto/i);
 
     my $have_updates = 0;
     my ($updated_version, $answer, $RES);
@@ -2323,7 +2331,7 @@ sub send_updates {
     $updated_version =~ s/\s+$//;
     $updated_version =~ s/^\s+//;
 
-    if ($NIKTOCONFIG{UPDATES} eq "auto") {
+    if ($NIKTOCONFIG{'UPDATES'} eq "auto") {
         $answer = "y";
     }
     else {
@@ -2384,6 +2392,10 @@ sub usage {
     if ($_[0] eq 2) {
         print "
    Options:
+       -ask+               Whether to ask about submitting updates
+                               yes   Ask about each (default)
+                               no    Don't ask, don't send
+                               auto  Don't ask, just send
        -config+            Use this config file
        -Cgidirs+           Scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -Display+           Turn on/off display outputs:
@@ -2403,11 +2415,11 @@ sub usage {
 
         print "       -findonly          Find http(s) ports only, don't perform a full scan
        -Format+           Save file (-o) format:
-                                csv   Comma-separated-value
-                                htm   HTML Format
-                                nbe   Nessus NBE format
-                                txt   Plain text (default if not specified)
-                                xml   XML Format
+                               csv   Comma-separated-value
+                               htm   HTML Format
+                               nbe   Nessus NBE format
+                               txt   Plain text (default if not specified)
+                               xml   XML Format
        -host+             Target host
        -Help              Extended help information
        -id+               Host authentication to use, format is userid:password
