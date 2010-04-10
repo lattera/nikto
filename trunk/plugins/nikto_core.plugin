@@ -2578,6 +2578,12 @@ sub list_plugins {
         push(@all_names, $plugin->{'name'});
         nprint(" $plugin->{'full_name'} - $plugin->{'description'}");
         nprint(" Written by $plugin->{'author'}, Copyright (C) $plugin->{'copyright'}");
+        if (defined $plugin->{'options'}) {
+            nprint(" Options:");
+            while (my ($option, $description) = each(%{$plugin->{'options'}})) {
+                nprint("  $option: $description");
+            }
+        }
         nprint("\n");
     }
 
