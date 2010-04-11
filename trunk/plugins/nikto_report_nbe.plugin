@@ -64,20 +64,21 @@ sub nbe_item {
 			$line.=$item->{'message'};
 			print $handle "$line\n";
 		} else {
-			#my $debug = "Data provided:\n$handle, $mark, $item";
-			#$debug.= "\nContents of \$mark:";
-			#foreach my $key ( sort keys %$mark ) {
-			#	$debug .= "\n$key - $mark->{$key}";
-			#}
-			#$debug.= "\nContents of \$item:";
-			#foreach my $key ( sort keys %$item ) {
-			#	$debug .= "\n$key - $item->{$key}";
-			#}
-			#$debug.= "\nContents of \$item->{mark}:";
-			#foreach my $key ( sort keys %{$item->{mark}} ) {
-			#	$debug .= "\n$key - $item->{mark}->{$key}";
-			#}
+			my $debug = "Data provided:\n$handle, $mark, $item";
+			$debug.= "\nContents of \$mark:";
+			foreach my $key ( sort keys %$mark ) {
+				$debug .= "\n$key - $mark->{$key}";
+			}
+			$debug.= "\nContents of \$item:";
+			foreach my $key ( sort keys %$item ) {
+				$debug .= "\n$key - $item->{$key}";
+			}
+			$debug.= "\nContents of \$item->{mark}:";
+			foreach my $key ( sort keys %{$item->{mark}} ) {
+				$debug .= "\n$key - $item->{mark}->{$key}";
+			}
 			#die $debug;
+			nprint("+ Invalid reporting line: $debug");
 		}
 	}
 }
