@@ -42,6 +42,11 @@ sub nikto_content_search_load {
     
     $CONTENTSEARCH=init_db("db_content_search");
     %CSMATCHED = ();
+
+    # to try and speed it up - precompile the regular expressions
+    foreach my $testid (@$CONTENTSEARCH) {
+        $testid->{'compiled'} = qr/$testid->{'matchstring'}/;
+    }
 }
 
 sub nikto_content_search {
@@ -53,7 +58,7 @@ sub nikto_content_search {
     my ($mark) = @_;
 
     foreach my $testid (@$CONTENTSEARCH) {
-        if ($body =~ /$testid->{'matchstring'}/ &&
+        if ($body =~ $testid->{'compiled'} &&
             !exists $CSMATCHED{$mark->{'hostname'}}{$file}) {
             # Check whether we've already matched it
             my $outmessage = "$file: $testid->{'message'}";
@@ -64,6 +69,7 @@ sub nikto_content_search {
             $CSMATCHED{$mark->{'hostname'}}{$file} = 1;
         }
     }
+    return $request, $result;
 }
 
 1;

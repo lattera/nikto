@@ -37,7 +37,7 @@ sub nikto_tests_init {
 
 sub nikto_tests {
     my ($mark, $parameters) = @_;
-    my %headers;
+
 
     # this is the actual the looped code for all the checks
     foreach my $checkid (sort keys %TESTS) {
@@ -47,8 +47,9 @@ sub nikto_tests {
 
         # Now repeat for each uri
         foreach my $uri (@urilist) {
+            my %headers;
             (my $res, $content, $error) =
-              nfetch($mark, $uri, $TESTS{$checkid}{'method'}, $TESTS{$checkid}{'data'}, \%headers,  "", $checkid);
+                nfetch($mark, $uri, $TESTS{$checkid}{'method'}, $TESTS{$checkid}{'data'}, \%headers,  "", $checkid);
 
             # auth is now done in nfetch
             if ($res eq 200) {
@@ -140,7 +141,7 @@ sub nikto_tests {
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;
                 add_vulnerability($mark,
-                                  "$request{'whisker'}{'uri'}: $TESTS{$checkid}{'message'}",
+                                  "$uri: $TESTS{$checkid}{'message'}",
                                   $checkid,
                                   $TESTS{$checkid}{'osvdb'},
                                   $TESTS{$checkid}{'method'},
