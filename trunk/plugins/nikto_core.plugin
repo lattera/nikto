@@ -615,10 +615,11 @@ sub general_config {
         }
         if ($CLI{'mutate'} =~ /3/ || $CLI{'mutate'} =~ /4/) {
             my $parameters;
-            $parameters = "home" if ($CLI{'mutate'} =~ /3/);
+            $parameters = "enumerate";
+            $parameters .= ",home" if ($CLI{'mutate'} =~ /3/);
             $parameters .= ",cgiwrap" if ($CLI{'mutate'} =~ /4/);
             $parameters .= ",dictionary:" . $CLI{'mutate-opts'} if (defined $CLI{'mutate-opts'});
-            $CLI{'plugins'} .= ';user_enum_apache(' . $parameters . ')';
+            $CLI{'plugins'} .= ';apacheusers(' . $parameters . ')';
         }
         if ($CLI{'mutate'} =~ /5/) {
             $CLI{'plugins'} .= ";subdomain";

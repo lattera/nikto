@@ -32,7 +32,9 @@ sub nikto_apacheusers_init {
             options     =>  {
                                 enumerate   => "Flag to indicate whether to attempt to enumerate users",
                                 dictionary  => "Filename for a dictionary file of users",
-                                size        => "Maximum size of username if bruteforcing"
+                                size        => "Maximum size of username if bruteforcing",
+                                home        => "Look for ~user to enumerate",
+                                cgiwrap     => "User cgi-bin/cgiwrap to enumerate"
                             }
             };
     return $id;
@@ -111,8 +113,7 @@ sub nikto_apacheusers {
             }
         }
     }
-    else {
-        # Assume we're using ~ if not told to use cgiwrap
+    if (defined $parameters->{'home'}) {
         $url = "/~";
 
         # First check whether we use a dictionary attack of brute force it
