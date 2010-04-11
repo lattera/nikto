@@ -1386,7 +1386,8 @@ sub run_hooks {
         my $oldverbose = $OUTPUT{'verbose'};
         my $olddebug   = $OUTPUT{'debug'};
         my $olderrors  = $OUTPUT{'errors'};
-        nprint("- Running $type for \"$plugin->{full_name}\" plugin", "v");
+        nprint("- Running $type for \"$plugin->{full_name}\" plugin", "v")
+            unless ($type eq "prefetch" || $type eq "postfetch");
         if (defined $plugin->{'parameters'}->{'verbose'}
             && $plugin->{'parameters'}->{'verbose'} == 1) {
             $OUTPUT{'verbose'} = 1;
@@ -1948,90 +1949,6 @@ sub content_present {
 }
 
 #######################################################################
-sub fetch {
-    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-    LW2::http_close(\%request);    # force-close any old connections
-    $request{'whisker'}->{'uri'} = $_[0];
-    if (defined $CLI{'root'}) {
-        $request{'whisker'}->{'uri'} = $CLI{'root'} . $_[0];    # prepend -root option value
-    }
-
-    # Set testid in UA
-    my $temp_ua = $request{'User-Agent'};
-    my $testid  = $_[3];
-    $request{'User-Agent'} =~ s/\@TESTID/$testid/g;
-
-    $request{'whisker'}->{'method'} = $_[1];
-    delete $request{'whisker'}->{'data'};
-    delete $request{'Content-Encoding'};
-    delete $request{'Content-Length'};
-    my $header_hash = $_[3];
-
-    if (defined $_[2]) {
-        my $r = $_[2];
-        $r =~ s/\\\"/\"/g;
-        $request{'whisker'}->{'data'} = $r;
-    }
-
-    # check for extra HTTP headers
-    if (defined $_[3]) {
-
-        # loop through the hash ref passed and add each header to request
-        while (my ($key, $value) = each(%$header_hash)) {
-            $request{$key} = $value;
-        }
-    }
-    unless ($_[4]) { LW2::http_fixup_request(\%request); }
-
-    # Cache
-    if (   defined($CACHE{ $request{'whisker'}->{'uri'} })
-        && !defined($CLI{'nocache'})
-        && ($CACHE{ $request{'whisker'}->{'uri'} }{'method'} eq $request{'whisker'}->{'method'})) {
-
-        # Get from cache
-        nprint("- Retrieving $request{'whisker'}->{'uri'} from cache.", "v");
-        $result{'whisker'}->{'code'} = $CACHE{ $request{'whisker'}->{'uri'} }{'res'};
-        $result{'whisker'}->{'data'} = $CACHE{ $request{'whisker'}->{'uri'} }{'content'};
-    }
-    else {
-        LW2::http_do_request_timeout(\%request, \%result);
-        $NIKTO{'totalrequests'}++;
-        unless (defined $CLI{'nocache'}) {
-            $CACHE{ $request{'whisker'}->{'uri'} }{'method'}  = $request{'whisker'}->{'method'};
-            $CACHE{ $request{'whisker'}->{'uri'} }{'res'}     = $result{'whisker'}->{'code'};
-            $CACHE{ $request{'whisker'}->{'uri'} }{'content'} = $result{'whisker'}->{'data'};
-        }
-        if ($OUTPUT{'debug'}) {
-            dump_var("Request Hash", \%request);
-            dump_var("Result Hash",  \%result);
-        }
-    }
-
-    if (   defined $CLI{'display'}
-        && ($CLI{'display'} =~ /2/)
-        && (defined($result{'whisker'}->{'cookies'}))) {
-        foreach my $c (@{ $result{'whisker'}->{'cookies'} }) {
-            nprint("+ $request{'whisker'}->{'uri'} sent cookie: $c");
-        }
-    }
-
-    # Clean up extra headers
-    if (defined $_[3]) {
-        while (my ($key, $value) = each(%$header_hash)) {
-            delete $request{$key};
-        }
-    }
-
-    # content search
-    content_search($result{'whisker'}->{'data'},
-                   $request{'whisker'}->{'uri'},
-                   $request{'whisker'}->{'method'});
-
-    $request{'User-Agent'} = $temp_ua;    # reset UA
-    return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'};
-}
-
-#######################################################################
 sub setup_hash {
     my ($reqhash, $mark, $testid) = @_;
 
@@ -2124,8 +2041,16 @@ sub nfetch {
             dump_var("Result Hash",  \%result);
         }
     }
+    nprint("- $result{'whisker'}{'code'} for $method:\t$uri", "v");
 
-    if (   defined $CLI{'display'}
+    # Check for errors to reduce false positives
+    if (defined $result{'whisker'}->{'error'}) {
+        $mark->{'total_errors'}++;
+        nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
+        next;
+    }
+    
+    if ( defined $CLI{'display'}
         && ($CLI{'display'} =~ /2/)
         && (defined($result{'whisker'}->{'cookies'}))) {
         foreach my $c (@{ $result{'whisker'}->{'cookies'} }) {
