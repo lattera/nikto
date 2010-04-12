@@ -191,7 +191,7 @@ foreach my $mark (@MARKS) {
         dump_target_info($mark);
         report_host_start($mark);
         set_scan_items($mark);
-        unless (defined $CLI{'nofof'}) { map_codes() }
+        unless (defined $CLI{'nofof'}) { map_codes($mark) }
         run_hooks($mark, "recon");
         run_hooks($mark, "scan");
     }

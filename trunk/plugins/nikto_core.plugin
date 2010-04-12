@@ -22,7 +22,6 @@
 ###############################################################################
 
 sub change_variables {
-
     # $line is the unfiltered variable
     my $line = $_[0];
     my @subtests;    # @subtests is the returned array of expanded variables
@@ -171,35 +170,21 @@ sub date_disp {
 
 ###############################################################################
 sub map_codes {
+    my ($mark) = @_;
     my %REQS;
     my $rs = LW2::utils_randstr(8);
-
+    my $res, $content, $error, %headers;
+ 
     # / for OK response
-    $NIKTO{'totalrequests'}++;
-    $request{'whisker'}->{'uri'} = "/";
-    delete $request{'whisker'}->{'data'};
-    $request{'whisker'}->{'method'} = GET;
-
-    delete $request{'whisker'}->{'Content-Length'};
-    LW2::http_close(\%request);    # force-close any old connections
-    dump_var("Request Hash", \%request);
-    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-    LW2::http_do_request_timeout(\%request, \%result);
-    $NIKTO{'totalrequests'}++;
-    dump_var("Result Hash", \%result);
-    if (defined $result{'location'}) {
+    ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
+ 
+    if (defined $headers{'location'}) {
         nprint("- Root page / redirects to: $result{'location'}");
-        if ($result{'location'} =~ /^$request{'whisker'}{'host'}/i)    # same host
+        if ($headers{'location'} =~ /^$mark->{'hostname'}/i)    # same host
         {
-            $request{'whisker'}->{'uri'} = $result{'location'};
-            $request{'whisker'}->{'uri'} =~ s/^http(s)?\:\/\/$request{'whisker'}{'host'}//i;
-            LW2::http_close(\%request);    # force-close any old connections
-            LW2::http_fixup_request(\%request);
-            dump_var("Request Hash", \%request);
-            if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-            LW2::http_do_request_timeout(\%request, \%result);
-            $NIKTO{'totalrequests'}++;
-            dump_var("Result Hash", \%result);
+            my $uri = $headers{'location'};
+            %headers = ();
+            ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
         }
         else                               # different host... ugh... guess
         {
@@ -208,12 +193,12 @@ sub map_codes {
         }
     }
     else {
-        $FoF{'okay'}{'response'} = $result{'whisker'}->{'code'};
-        my $content = rm_active_content($result{'whisker'}->{'data'});
+        $FoF{'okay'}{'response'} = $res;
+        my $cooked = rm_active_content($content);
         $FoF{'okay'}{'type'}  = "HASH";
-        $FoF{'okay'}{'match'} = LW2::md4($content);
+        $FoF{'okay'}{'match'} = LW2::md4($cooked);
     }
-
+ 
     # these are some used in mutate that may not be in the db_tests
     $db_extensions{'bak'}  = 1;
     $db_extensions{'data'} = 1;
@@ -221,54 +206,37 @@ sub map_codes {
     $db_extensions{'dbf'}  = 1;
     $db_extensions{'lst'}  = 1;
     $db_extensions{'htx'}  = 1;
-
+ 
     foreach my $ext (keys %db_extensions) {
-        if ($ext eq "DIRECTORY") {
-            next;
-        }    # don't test generic type holder as real extension (added to db_extensions by get_ext)
-        if ($ext eq "NONE") {
-            next;
-        }    # don't test generic type holder as real extension (added to db_extensions by get_ext)
-        if ($ext eq "DOTFILE") {
-            next;
-        }    # don't test generic type holder as real extension (added to db_extensions by get_ext)
-        $REQS{"/$rs.$ext"} = $ext;
+        if ($ext ne "DIRECTORY" &&
+            $ext ne "NONE" &&
+            $ext ne "DOTFILE") {
+            $REQS{"/$rs.$ext"} = $ext;
+        }
     }
-
+ 
     # add those generic type holders back as real files
     $REQS{"/$rs/"} = "DIRECTORY";
     $REQS{"/$rs"}  = "NONE";
     $REQS{"/.$rs"} = "DOTFILE";
-
+ 
     foreach my $file (keys %REQS) {
         nprint("- Testing error for file: $file\n", "v");
-        $NIKTO{'totalrequests'}++;
-        $request{'whisker'}->{'uri'}    = $file;
-        $request{'whisker'}->{'method'} = GET;
-        LW2::http_close(\%request);    # force-close any old connections
-        delete $request{'whisker'}->{'data'};
-        delete $request{'Content-Encoding'};
-        delete $request{'Content-Length'};
-        LW2::http_fixup_request(\%request);
-
-        dump_var("Request Hash", \%request);
-        if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-        LW2::http_do_request_timeout(\%request, \%result);
-        $NIKTO{'totalrequests'}++;
-        dump_var("Result Hash", \%result);
-
+        %headers = ();
+        ($res, $content, $error) = nfetch($mark, $file, "GET", "", \%headers, "", "map_codes");
+ 
         $ext = $REQS{$file};
-        $FoF{$ext}{'response'} = $result{'whisker'}->{'code'};
-
+        $FoF{$ext}{'response'} = $res;
+ 
         # handle .com to .org redirs or whatnot
-        if (defined $result{'location'}) {
-            $FoF{$ext}{'location'} = $result{'location'};
+        if (defined $headers{'location'}) {
+            $FoF{$ext}{'location'} = $headers{'location'};
             $file = char_escape($file);
             $FoF{$ext}{'location'} =~ s/$file//;
         }
-
+ 
         # if it is not specific type, figure out Content or HASH method...
-        if ($FoF{$ext}{'response'} eq 404) { $FoF{$ext}{'mode'} = "STD"; next; }
+        if ($FoF{$ext}{'response'} eq 404)    { $FoF{$ext}{'mode'} = "STD"; next; }
         elsif ($FoF{$ext}{'response'} eq 200) { $FoF{$ext}{'mode'} = "OK"; }
         elsif ($FoF{$ext}{'response'} eq 410) { $FoF{$ext}{'mode'} = "STD"; next; }
         elsif ($FoF{$ext}{'response'} eq 401) { $FoF{$ext}{'mode'} = "STD"; next; }
@@ -279,41 +247,28 @@ sub map_codes {
         elsif ($FoF{$ext}{'response'} eq 303) { $FoF{$ext}{'mode'} = "REDIR"; next; }
         elsif ($FoF{$ext}{'response'} eq 307) { $FoF{$ext}{'mode'} = "REDIR"; next; }
         else                                  { $FoF{$ext}{'mode'} = "OTHER"; }
-
+ 
         # if we've got an OK/OTHER response, look at content first
         # blank content, or hash...
-        if (length($result{'whisker'}->{'data'}) eq 0) {
+        if (length($content) == 0) {
             $FoF{$ext}{'type'}  = "BLANK";
             $FoF{$ext}{'match'} = "";
         }
         else {
-            my $content = rm_active_content($result{'whisker'}->{'data'});
-            $FoF{$ext}{'match'} = LW2::md4($content);
+            my $cooked = rm_active_content($content);
             $FoF{$ext}{'type'}  = "HASH";
+            $FoF{$ext}{'match'} = LW2::md4($cooked);
         }
     }
-
+ 
     # lastly, get a hash of index.php so we can cut down on some false positives...
-    $NIKTO{'totalrequests'}++;
-    $request{'whisker'}->{'uri'}    = "/index.php?";
-    $request{'whisker'}->{'method'} = GET;
-    LW2::http_close(\%request);    # force-close any old connections
-    delete $request{'whisker'}->{'data'};
-    delete $request{'Content-Encoding'};
-    delete $request{'Content-Length'};
-    LW2::http_fixup_request(\%request);
-
-    dump_var("Request Hash", \%request);
-    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-    LW2::http_do_request_timeout(\%request, \%result);
-    $NIKTO{'totalrequests'}++;
-    dump_var("Result Hash", \%result);
-
-    my $content = rm_active_content($result{'whisker'}->{'data'});
-    $FoF{"index.php"}{'match'} = LW2::md4($content);
+    %headers = ();
+    ($res, $content, $error) = nfetch($mark, "/index.php?", "GET", "", \%headers, "", "map_codes");
+ 
+    my $cooked = rm_active_content($content);
+    $FoF{"index.php"}{'match'} = LW2::md4($cooked);
     $FoF{"index.php"}{'type'}  = "HASH";
-
-# foreach $ext (keys %FoF)   { nprint "$ext: mode $FoF{$ext}{'mode'}, response $FoF{$ext}{'response'}, type $FoF{$ext}{'type'}\n"; }
+ 
     return;
 }
 
