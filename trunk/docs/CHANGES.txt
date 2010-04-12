@@ -1,5 +1,6 @@
 2010-04-12
 	- Ticket 144: Cleaned up map_codes to use general rules, still needs some for redirection
+	- Ticket 145: Added OSVDB 0 to orphan items in db_tests
 2010-04-11
 	- Ticket 125: fetch is dead, long live nfetch
 	- Moved URI error handling and reporting result to nfetch, rather than being in nikto_tests (Ticket 139, partial)
