@@ -157,15 +157,10 @@ sub get_ext {
 ###############################################################################
 sub date_disp {
     my @time = localtime($_[0]);
-    $time[5] += 1900;
-    $time[4]++;
-    if (length($time[4]) eq 1) { $time[4] = "0$time[4]"; }
-    $time[3]++;
-    if (length($time[3]) eq 1) { $time[3] = "0$time[3]"; }
-    if (length($time[0]) eq 1) { $time[0] = "0$time[0]"; }
-    if (length($time[1]) eq 1) { $time[1] = "0$time[1]"; }
-    if (length($time[2]) eq 1) { $time[0] = "0$time[2]"; }
-    return "$time[5]-$time[4]-$time[3] $time[2]:$time[1]:$time[0]";
+    my $result = sprintf("%d-%02d-%02d %02d:%02d:%02d", $time[5] + 1900,
+                            $time[4]+1, $time[3]+1, $time[2], $time[1],
+                            $time[0]);
+    return $result;
 }
 
 ###############################################################################
@@ -1103,26 +1098,6 @@ sub dbcheck {
 
     nprint "\n";
     exit;
-}
-
-###############################################################################
-sub content_search {
-    my $body   = shift;
-    my $file   = shift;
-    my $method = shift || "GET";
-    my ($mark) = @_;
-
-    foreach my $testid (keys %CONTENTSEARCH) {
-        if ($body =~ /$CONTENTSEARCH{$testid}{string}/) {
-            my $outmessage = "$file: $CONTENTSEARCH{$testid}{'message'}";
-            add_vulnerability($mark, $outmessage,
-                              $CONTENTSEARCH{$testid}{testid},
-                              $CONTENTSEARCH{$testid}{osvdb},
-                              $method, $file);
-        }
-    }
-
-    return;
 }
 
 ###############################################################################
