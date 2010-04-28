@@ -1136,7 +1136,7 @@
 "001114","0","13","/sqldump.sql","GET","200","","","","","Database SQL?","",""
 "001115","0","13","/structure.sql","GET","200","","","","","Database SQL?","",""
 "001116","0","2","/servlet/SessionManager","GET","200","Error Occurred","","","","IBM WebSphere reconfigure servlet (user=servlet, password=manager). All default code should be removed from servers.","",""
-"001117","0","23","/php.ini","GET","200","","","","","This file should not be available through the web interface.","",""
+"001117","0","23","/php.ini","GET","[PHP]","","","","","This file should not be available through the web interface.","",""
 "001118","0","2a","/SiteScope/cgi/go.exe/SiteScope?page=eventLog&machine=&logName=System&account=administrator","GET","Event Log","","","","","SiteScope service has no password set. Restrict by IP and set a password.","",""
 "001119","0","3","/ip.txt","GET","200","","","","","This may be User Online from http://www.elpar.net version 2.0, which has a remotely accessible log file.","",""
 "001120","15301","3","/JUNK(6).cfm?mode=debug","GET","Execution Time","","","","","Coldfusion debug information contains sensitive information and can be viewed by appending ?Mode=debug at the end of the request.","",""
@@ -6203,3 +6203,4 @@
 "006197","0","2","/uploads/readme.txt","GET","200","","","","","Readme file found.","",""
 "006198","0","23","/htaccess.txt","GET","RewriteEngine On","","","","","Default Joomla! htacess.txt file found. This should be removed or renamed.","",""
 "006199","0","1b","/typo3/","GET","200","","c-password","","","Typo3 login found","",""
+"006200","0","12","@CGIDIRSphp.ini","GET","[PHP]","","","","","php.ini file found","",""
