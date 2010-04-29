@@ -1925,7 +1925,6 @@ sub nfetch {
         $request{'whisker'}->{'uri'} = $CLI{'root'} . $uri;    # prepend -root option value
     }
     $request{'whisker'}->{'method'} = $method;
-    my $header_hash = $headers;
 
     if (defined $data) {
         my $r = $data;
@@ -1937,7 +1936,7 @@ sub nfetch {
     if (defined $headers) {
 
         # loop through the hash ref passed and add each header to request
-        while (my ($key, $value) = each(%$header_hash)) {
+        while (my ($key, $value) = each(%$headers)) {
             $request{$key} = $value;
         }
     }
@@ -1978,7 +1977,6 @@ sub nfetch {
     if (defined $result{'whisker'}->{'error'}) {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
-        next;
     }
     
     if ( defined $CLI{'display'}
