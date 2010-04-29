@@ -1926,15 +1926,13 @@ sub nfetch {
     }
     $request{'whisker'}->{'method'} = $method;
 
-    if (defined $data) {
-        my $r = $data;
-        $r =~ s/\\\"/\"/g;
-        $request{'whisker'}->{'data'} = $r;
+    if ($data ne "") {
+        $data =~ s/\\\"/\"/g;
+        $request{'whisker'}->{'data'} = $data;
     }
 
     # check for extra HTTP headers
     if (defined $headers) {
-
         # loop through the hash ref passed and add each header to request
         while (my ($key, $value) = each(%$headers)) {
             $request{$key} = $value;
