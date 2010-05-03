@@ -2249,7 +2249,7 @@ sub usage {
                                no    Don't ask, don't send
                                auto  Don't ask, just send
        -config+            Use this config file
-       -Cgidirs+           Scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
+       -Cgidirs+           Scan these CGI dirs: "none", "all", or values like \"/cgi/ /cgi-a/\"
        -Display+           Turn on/off display outputs:
                                1     Show redirects
                                2     Show cookies received
