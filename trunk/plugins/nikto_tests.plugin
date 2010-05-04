@@ -136,7 +136,7 @@ sub nikto_tests {
 
                 # lastly check for a false positive based on file extension or type
                 if (($m1_method eq "code") || ($m1o_method eq "code")) {
-                    if (is_404($uri, $content, $res)) { next; }
+                    if (is_404($uri, $content, $res, $headers{'location'})) { next; }
                 }
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;

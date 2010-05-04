@@ -36,11 +36,12 @@ sub nikto_robots_init {
 
 sub nikto_robots {
     my ($mark) = @_;
-    (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", "", "", "robots");
+    my %headers;
+    (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", \%headers, "", "robots");
 
-    if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'}))    # got one!
+    if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'}))
     {
-        if (is_404("robots.txt", $CONTENT, $RES)) { return; }
+        if (is_404("robots.txt", $CONTENT, $RES, $headers{'location'})) { return; }
 
         my ($DIRS, $RFILES) = "";
         my $DISCTR = 0;
