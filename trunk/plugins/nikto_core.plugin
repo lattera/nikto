@@ -61,9 +61,13 @@ sub is_404 {
         return 1;
     }
     elsif ($FoF{$ext}{'mode'} eq "REDIR") {
+	my $file=$loc_header;
+	$file=~ s/^https?:\/\/[^\/]+//;
+        $file= char_escape($file);
+	$loc_header =~ s/$file//;
         if ($loc_header eq $FoF{$ext}{'location'}) {
             return 1;
-        }
+		}
     }
     elsif (($FoF{$ext}{'type'} eq "BLANK") && ($content eq "")) {
         return 1;
