@@ -144,6 +144,8 @@ foreach my $mark (@MARKS) {
 
 # Open reporting
 report_head($CLI{'format'}, $CLI{'file'});
+# Load db_tests
+set_scan_items();
 
 # Now we've done the precursor, do the scan
 foreach my $mark (@MARKS) {
@@ -190,7 +192,6 @@ foreach my $mark (@MARKS) {
     else {
         dump_target_info($mark);
         report_host_start($mark);
-        set_scan_items($mark);
         unless (defined $CLI{'nofof'}) { map_codes($mark) }
         run_hooks($mark, "recon");
         run_hooks($mark, "scan");

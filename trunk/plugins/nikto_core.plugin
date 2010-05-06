@@ -2013,10 +2013,7 @@ sub nfetch {
 
 #######################################################################
 sub set_scan_items {
-    my ($mark) = @_;
-
     # load the tests
-    my $shname = $mark->{hostname} || $mark->{ip};
     %TESTS = ();
     my @SKIPLIST = ();
     if (defined $NIKTOCONFIG{SKIPIDS}) {
@@ -2068,7 +2065,7 @@ sub set_scan_items {
 # This escapes regex characters in the conditionals. This will have to change if regex is ever allowed in the db
                 for (my $y = 5 ; $y <= 9 ; $y++) { $item[$y] =~ s/([^a-zA-Z0-9\s])/\\$1/g; }
 
-                $mark->{total_checks}++;
+                $NIKTO{total_checks}++;
                 $TESTS{ $item[0] }{uri}         = $item[3];
                 $TESTS{ $item[0] }{osvdb}       = $item[1];
                 $TESTS{ $item[0] }{method}      = $item[4];
@@ -2085,8 +2082,8 @@ sub set_scan_items {
     }
 
     undef @DBFILE;    # this memory hog is no longer needed!
-    nprint("- $mark->{total_checks} server checks loaded", "v");
-    if ($mark->{total_checks} eq 0 && !defined $CLI{'tuning'}) {
+    nprint("- $NIKTO{total_checks} server checks loaded", "v");
+    if ($NIKTO{total_checks} eq 0 && !defined $CLI{'tuning'}) {
         nprint("+ Unable to load valid checks!");
         exit;
     }

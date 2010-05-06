@@ -1,3 +1,5 @@
+2010-05-06
+	- Ticket 136: Moved set_scan_items to only run once, should speed things up with multiple targets
 2010-04-12
 	- Ticket 144: Cleaned up map_codes to use general rules, still needs some for redirection
 	- Ticket 145: Added OSVDB 0 to orphan items in db_tests
