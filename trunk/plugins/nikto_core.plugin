@@ -1130,7 +1130,8 @@ sub get_banner {
 ###############################################################################
 sub port_check {
     my ($hostname, $ip, $port) = @_;
-    my (%m, %headers);
+    my (%headers);
+    my $m = {};
 
     # Check SKIPPORTS
     if ($NIKTOCONFIG{'SKIPPORTS'} =~ /\b$port\b/) {
