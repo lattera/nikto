@@ -27,3 +27,4 @@
 "300011","/cab/top.shtml","(^.*<span class=\"product_name\">)([A-Z0-9]*)(<\/span><\/td>)","$2","Host seems to be a Canon printer, model:"
 "300012","/home.asp","(^.*<td><b class=\"is\"><center>)([\._\-A-Z0-9a-z\(\)\/ ]*)(<\/center><\/td><\/tr>)","$2","Host seems to be a Cyclades terminal server, version:"
 "300013","/","(^serverName=\")([A-Za-z0-9\-\.]+)(\";$)","$2","Host seems to be an HP iLO device, hostname:"
+"300014","/","(^<html><head><title>)(Remote Access Controller)(</title>$)","$2","Host seems to be a Dell"
