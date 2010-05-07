@@ -61,11 +61,7 @@ sub is_404 {
         return 1;
     }
     elsif ($FoF{$ext}{'mode'} eq "REDIR") {
-	my $file=$loc_header;
-	$file=~ s/^https?:\/\/[^\/]+//;
-        $file= char_escape($file);
-	$loc_header =~ s/$file//;
-        if ($loc_header eq $FoF{$ext}{'location'}) {
+        if (get_base_host($loc_header) eq $FoF{$ext}{'location'}) {
             return 1;
 		}
     }
@@ -164,7 +160,18 @@ sub date_disp {
     my $result = sprintf("%d-%02d-%02d %02d:%02d:%02d", $time[5] + 1900,
                             $time[4]+1, $time[3]+1, $time[2], $time[1],
                             $time[0]);
-    return $result;
+return $result;
+}
+
+###############################################################################
+sub get_base_host {
+	my $uri = $_[0] || return;
+	# uri, protocol, host, port, params, frag, user, password.
+	my @hd = LW2::uri_split($uri);
+	my $base = $hd[1] . "://" . $hd[2];
+	if (($hd[3] != 80) && ($hd[3] != 443)) { $base .= ":" . $hd[3]; }
+	$base .= "/";
+	return $base;
 }
 
 ###############################################################################
@@ -229,9 +236,7 @@ sub map_codes {
  
         # handle .com to .org redirs or whatnot
         if (defined $headers{'location'}) {
-            $FoF{$ext}{'location'} = $headers{'location'};
-            $file = char_escape($file);
-            $FoF{$ext}{'location'} =~ s/$file//;
+            	$FoF{$ext}{'location'} = get_base_host($headers{'location'});
         }
  
         # if it is not specific type, figure out Content or HASH method...
