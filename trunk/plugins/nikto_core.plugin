@@ -22,6 +22,7 @@
 ###############################################################################
 
 sub change_variables {
+
     # $line is the unfiltered variable
     my $line = $_[0];
     my @subtests;    # @subtests is the returned array of expanded variables
@@ -63,7 +64,7 @@ sub is_404 {
     elsif ($FoF{$ext}{'mode'} eq "REDIR") {
         if (get_base_host($loc_header) eq $FoF{$ext}{'location'}) {
             return 1;
-		}
+        }
     }
     elsif (($FoF{$ext}{'type'} eq "BLANK") && ($content eq "")) {
         return 1;
@@ -156,22 +157,25 @@ sub get_ext {
 
 ###############################################################################
 sub date_disp {
-    my @time = localtime($_[0]);
-    my $result = sprintf("%d-%02d-%02d %02d:%02d:%02d", $time[5] + 1900,
-                            $time[4]+1, $time[3]+1, $time[2], $time[1],
-                            $time[0]);
-return $result;
+    my @time   = localtime($_[0]);
+    my $result = sprintf("%d-%02d-%02d %02d:%02d:%02d",
+                         $time[5] + 1900,
+                         $time[4] + 1,
+                         $time[3] + 1,
+                         $time[2], $time[1], $time[0]);
+    return $result;
 }
 
 ###############################################################################
 sub get_base_host {
-	my $uri = $_[0] || return;
-	# uri, protocol, host, port, params, frag, user, password.
-	my @hd = LW2::uri_split($uri);
-	my $base = $hd[1] . "://" . $hd[2];
-	if (($hd[3] != 80) && ($hd[3] != 443)) { $base .= ":" . $hd[3]; }
-	$base .= "/";
-	return $base;
+    my $uri = $_[0] || return;
+
+    # uri, protocol, host, port, params, frag, user, password.
+    my @hd   = LW2::uri_split($uri);
+    my $base = $hd[1] . "://" . $hd[2];
+    if (($hd[3] != 80) && ($hd[3] != 443)) { $base .= ":" . $hd[3]; }
+    $base .= "/";
+    return $base;
 }
 
 ###############################################################################
@@ -179,11 +183,11 @@ sub map_codes {
     my ($mark) = @_;
     my %REQS;
     my $rs = LW2::utils_randstr(8);
-    my $res, $content, $error, %headers;
- 
+    my ($res, $content, $error, %headers);
+
     # / for OK response
     ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
- 
+
     if (defined $headers{'location'}) {
         nprint("- Root page / redirects to: $result{'location'}");
         if ($headers{'location'} =~ /^$mark->{'hostname'}/i)    # same host
@@ -192,7 +196,7 @@ sub map_codes {
             %headers = ();
             ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
         }
-        else                               # different host... ugh... guess
+        else                                                    # different host... ugh... guess
         {
             $FoF{'okay'}{'response'} = 200;
             $FoF{'okay'}{'type'}     = "STD";
@@ -204,7 +208,7 @@ sub map_codes {
         $FoF{'okay'}{'type'}  = "HASH";
         $FoF{'okay'}{'match'} = LW2::md4($cooked);
     }
- 
+
     # these are some used in mutate that may not be in the db_tests
     $db_extensions{'bak'}  = 1;
     $db_extensions{'data'} = 1;
@@ -212,35 +216,35 @@ sub map_codes {
     $db_extensions{'dbf'}  = 1;
     $db_extensions{'lst'}  = 1;
     $db_extensions{'htx'}  = 1;
- 
+
     foreach my $ext (keys %db_extensions) {
-        if ($ext ne "DIRECTORY" &&
-            $ext ne "NONE" &&
-            $ext ne "DOTFILE") {
+        if (   $ext ne "DIRECTORY"
+            && $ext ne "NONE"
+            && $ext ne "DOTFILE") {
             $REQS{"/$rs.$ext"} = $ext;
         }
     }
- 
+
     # add those generic type holders back as real files
     $REQS{"/$rs/"} = "DIRECTORY";
     $REQS{"/$rs"}  = "NONE";
     $REQS{"/.$rs"} = "DOTFILE";
- 
+
     foreach my $file (keys %REQS) {
         nprint("- Testing error for file: $file\n", "v");
         %headers = ();
         ($res, $content, $error) = nfetch($mark, $file, "GET", "", \%headers, "", "map_codes");
- 
+
         $ext = $REQS{$file};
         $FoF{$ext}{'response'} = $res;
- 
+
         # handle .com to .org redirs or whatnot
         if (defined $headers{'location'}) {
-            	$FoF{$ext}{'location'} = get_base_host($headers{'location'});
+            $FoF{$ext}{'location'} = get_base_host($headers{'location'});
         }
- 
+
         # if it is not specific type, figure out Content or HASH method...
-        if ($FoF{$ext}{'response'} eq 404)    { $FoF{$ext}{'mode'} = "STD"; next; }
+        if ($FoF{$ext}{'response'} eq 404) { $FoF{$ext}{'mode'} = "STD"; next; }
         elsif ($FoF{$ext}{'response'} eq 200) { $FoF{$ext}{'mode'} = "OK"; }
         elsif ($FoF{$ext}{'response'} eq 410) { $FoF{$ext}{'mode'} = "STD"; next; }
         elsif ($FoF{$ext}{'response'} eq 401) { $FoF{$ext}{'mode'} = "STD"; next; }
@@ -251,7 +255,7 @@ sub map_codes {
         elsif ($FoF{$ext}{'response'} eq 303) { $FoF{$ext}{'mode'} = "REDIR"; next; }
         elsif ($FoF{$ext}{'response'} eq 307) { $FoF{$ext}{'mode'} = "REDIR"; next; }
         else                                  { $FoF{$ext}{'mode'} = "OTHER"; }
- 
+
         # if we've got an OK/OTHER response, look at content first
         # blank content, or hash...
         if (length($content) == 0) {
@@ -264,15 +268,15 @@ sub map_codes {
             $FoF{$ext}{'match'} = LW2::md4($cooked);
         }
     }
- 
+
     # lastly, get a hash of index.php so we can cut down on some false positives...
     %headers = ();
     ($res, $content, $error) = nfetch($mark, "/index.php?", "GET", "", \%headers, "", "map_codes");
- 
+
     my $cooked = rm_active_content($content);
     $FoF{"index.php"}{'match'} = LW2::md4($cooked);
     $FoF{"index.php"}{'type'}  = "HASH";
- 
+
     return;
 }
 
@@ -575,7 +579,7 @@ sub general_config {
         if ($CLI{'mutate'} =~ /3/ || $CLI{'mutate'} =~ /4/) {
             my $parameters;
             $parameters = "enumerate";
-            $parameters .= ",home" if ($CLI{'mutate'} =~ /3/);
+            $parameters .= ",home"    if ($CLI{'mutate'} =~ /3/);
             $parameters .= ",cgiwrap" if ($CLI{'mutate'} =~ /4/);
             $parameters .= ",dictionary:" . $CLI{'mutate-opts'} if (defined $CLI{'mutate-opts'});
             $CLI{'plugins'} .= ';apacheusers(' . $parameters . ')';
@@ -1328,7 +1332,7 @@ sub run_hooks {
         my $olddebug   = $OUTPUT{'debug'};
         my $olderrors  = $OUTPUT{'errors'};
         nprint("- Running $type for \"$plugin->{full_name}\" plugin", "v")
-            unless ($type eq "prefetch" || $type eq "postfetch");
+          unless ($type eq "prefetch" || $type eq "postfetch");
         if (defined $plugin->{'parameters'}->{'verbose'}
             && $plugin->{'parameters'}->{'verbose'} == 1) {
             $OUTPUT{'verbose'} = 1;
@@ -1924,6 +1928,54 @@ sub setup_hash {
 }
 
 #######################################################################
+sub cache_add {
+    unless (defined $CLI{'nocache'}) {
+        my $method   = shift;
+        my $code     = shift;
+        my $content  = shift;
+        my $uri      = shift;
+        my $postdata = shift;
+        my ($mark)   = @_;
+
+        my $key =
+          LW2::md5(  $mark->{'ip'} . "|"
+                   . $mark->{'hostname'} . "|"
+                   . $mark->{'port'} . "|"
+                   . $mark->{'ssl'} . "|"
+                   . $method . "|"
+                   . $uri . "|"
+                   . $postdata);
+
+        $CACHE{$key}{'method'}  = $method;
+        $CACHE{$key}{'code'}    = $code;
+        $CACHE{$key}{'content'} = $content;
+    }
+}
+
+#######################################################################
+sub cache_fetch {
+    my $method   = shift;
+    my $uri      = shift;
+    my $postdata = shift;
+    my ($mark)   = @_;
+    my $key =
+      LW2::md5(  $mark->{'ip'} . "|"
+               . $mark->{'hostname'} . "|"
+               . $mark->{'port'} . "|"
+               . $mark->{'ssl'} . "|"
+               . $method . "|"
+               . $uri . "|"
+               . $postdata);
+
+    if ($CACHE{$key}{'code'} ne '') {
+        return (1, $CACHE{$key}{'code'}, $CACHE{$key}{'content'});
+    }
+    else {
+        return 0;
+    }
+}
+
+#######################################################################
 sub nfetch {
     my ($mark, $uri, $method, $data, $headers, $flags, $testid) = @_;
     if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
@@ -1943,6 +1995,7 @@ sub nfetch {
 
     # check for extra HTTP headers
     if (defined $headers) {
+
         # loop through the hash ref passed and add each header to request
         while (my ($key, $value) = each(%$headers)) {
             $request{$key} = $value;
@@ -1953,27 +2006,26 @@ sub nfetch {
     # Run pre hooks
     (%$request, %$result) = run_hooks($mark, "prefetch", \%request, \%result);
 
-    # Cache
-    if (   defined $CACHE{$uri}
-        && !defined $CLI{'nocache'}
-        && !defined $flags->{'nocache'}
-        && $CACHE{$uri}{method} eq $method
-        && $CACHE{$uri}{mark}   eq $mark) {
-
-        # Get from cache
+    # Check cache
+    my $incache = 0;
+    if ((!defined $CLI{'nocache'}) && (!defined $flags->{'nocache'})) {
         nprint("- Retrieving $uri from cache.", "v");
-        $result{'whisker'}->{'code'} = $CACHE{$uri}{'res'};
-        $result{'whisker'}->{'data'} = $CACHE{$uri}{'content'};
+        ($incache, my $code, my $content) =
+          cache_fetch($request{'whisker'}->{'method'}, $uri, $data, $mark);
+        if ($incache) {
+            $result{'whisker'}->{'code'} = $code;
+            $result{'whisker'}->{'data'} = $content;
+        }
     }
-    else {
+
+    if (!$incache) {
         LW2::http_do_request_timeout(\%request, \%result);
         $NIKTO{'totalrequests'}++;
-        unless (defined $CLI{'nocache'}) {
-            $CACHE{$uri}{'method'}  = $request{'whisker'}->{'method'};
-            $CACHE{$uri}{'res'}     = $result{'whisker'}->{'code'};
-            $CACHE{$uri}{'content'} = $result{'whisker'}->{'data'};
-            $CACHE{$uri}{'mark'}    = $mark;
-        }
+        cache_add($request{'whisker'}->{'method'},
+                  $result{'whisker'}->{'code'},
+                  $result{'whisker'}->{'data'},
+                  $uri, $data, $mark);
+
         if ($OUTPUT{'debug'}) {
             dump_var("Request Hash", \%request);
             dump_var("Result Hash",  \%result);
@@ -1986,8 +2038,8 @@ sub nfetch {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
     }
-    
-    if ( defined $CLI{'display'}
+
+    if (   defined $CLI{'display'}
         && ($CLI{'display'} =~ /2/)
         && (defined($result{'whisker'}->{'cookies'}))) {
         foreach my $c (@{ $result{'whisker'}->{'cookies'} }) {
@@ -2018,6 +2070,7 @@ sub nfetch {
 
 #######################################################################
 sub set_scan_items {
+
     # load the tests
     %TESTS = ();
     my @SKIPLIST = ();
@@ -2439,7 +2492,7 @@ sub list_plugins {
         nprint(" Written by $plugin->{'author'}, Copyright (C) $plugin->{'copyright'}");
         if (defined $plugin->{'options'}) {
             nprint(" Options:");
-            while (my ($option, $description) = each(%{$plugin->{'options'}})) {
+            while (my ($option, $description) = each(%{ $plugin->{'options'} })) {
                 nprint("  $option: $description");
             }
         }
