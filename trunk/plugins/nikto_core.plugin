@@ -1938,13 +1938,13 @@ sub cache_add {
         my ($mark)   = @_;
 
         my $key =
-          LW2::md5(  $mark->{'ip'} . "|"
-                   . $mark->{'hostname'} . "|"
-                   . $mark->{'port'} . "|"
-                   . $mark->{'ssl'} . "|"
-                   . $method . "|"
-                   . $uri . "|"
-                   . $postdata);
+          LW2::md5(  $mark->{'ip'} .
+                   $mark->{'hostname'} .
+                   $mark->{'port'} .
+                   $mark->{'ssl'} . 
+                   $method . 
+                   $uri . 
+                   $postdata);
 
         $CACHE{$key}{'method'}  = $method;
         $CACHE{$key}{'code'}    = $code;
@@ -1959,13 +1959,13 @@ sub cache_fetch {
     my $postdata = shift;
     my ($mark)   = @_;
     my $key =
-      LW2::md5(  $mark->{'ip'} . "|"
-               . $mark->{'hostname'} . "|"
-               . $mark->{'port'} . "|"
-               . $mark->{'ssl'} . "|"
-               . $method . "|"
-               . $uri . "|"
-               . $postdata);
+      LW2::md5(  $mark->{'ip'} .
+               $mark->{'hostname'} . 
+               $mark->{'port'} . 
+               $mark->{'ssl'} . 
+               $method . 
+               $uri . 
+               $postdata);
 
     if ($CACHE{$key}{'code'} ne '') {
         return (1, $CACHE{$key}{'code'}, $CACHE{$key}{'content'});
