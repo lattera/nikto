@@ -1,3 +1,5 @@
+2010-05-11
+	- Tickets 132 and 153: Properly check for HTTP and HTTPS ports in cache.
 2010-05-06
 	- Ticket 136: Moved set_scan_items to only run once, should speed things up with multiple targets
 2010-04-12
