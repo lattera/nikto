@@ -1929,14 +1929,15 @@ sub setup_hash {
 
 #######################################################################
 sub cache_add {
-    if ((!defined $CLI{'nocache'}) && (!defined $flags->{'nocache'})) {
-        my $method   = shift;
-        my $code     = shift;
-        my $content  = shift;
-        my $uri      = shift;
-        my $postdata = shift;
-        my ($mark)   = @_;
+    my $method        = shift;
+    my $code          = shift;
+    my $content       = shift;
+    my $uri           = shift;
+    my $postdata      = shift;
+    my $flags_nocache = shift;
+    my ($mark)        = @_;
 
+    if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
         my $key =
           LW2::md5(  $mark->{'ip'}
                    . $mark->{'hostname'}
@@ -1954,31 +1955,30 @@ sub cache_add {
 
 #######################################################################
 sub cache_fetch {
+    my $method        = shift;
+    my $uri           = shift;
+    my $postdata      = shift;
+    my $flags_nocache = shift;
+    my ($mark)        = @_;
 
-    # quick exit if cache is disabled
-    if ((defined $CLI{'nocache'}) || (defined $flags->{'nocache'})) {
-        return 0;
-    }
+    if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
+        my $key =
+          LW2::md5(  $mark->{'ip'}
+                   . $mark->{'hostname'}
+                   . $mark->{'port'}
+                   . $mark->{'ssl'}
+                   . $method
+                   . $uri
+                   . $postdata);
 
-    my $method   = shift;
-    my $uri      = shift;
-    my $postdata = shift;
-    my ($mark)   = @_;
-    my $key =
-      LW2::md5(  $mark->{'ip'}
-               . $mark->{'hostname'}
-               . $mark->{'port'}
-               . $mark->{'ssl'}
-               . $method
-               . $uri
-               . $postdata);
-
-    if ($CACHE{$key}{'code'} ne '') {
-        return (1, $CACHE{$key}{'code'}, $CACHE{$key}{'content'});
+        if ($CACHE{$key}{'code'} ne '') {
+            return (1, $CACHE{$key}{'code'}, $CACHE{$key}{'content'});
+        }
+        else {
+            return 0;
+        }
     }
-    else {
-        return 0;
-    }
+    return 0;
 }
 
 #######################################################################
@@ -2016,7 +2016,7 @@ sub nfetch {
     my $incache = 0;
     nprint("- Checking $uri in cache.", "d");
     ($incache, my $code, my $content) =
-      cache_fetch($request{'whisker'}->{'method'}, $uri, $data, $mark);
+      cache_fetch($request{'whisker'}->{'method'}, $uri, $data, $flags->{'nocache'}, $mark);
     if ($incache) {
         $result{'whisker'}->{'code'} = $code;
         $result{'whisker'}->{'data'} = $content;
@@ -2028,7 +2028,7 @@ sub nfetch {
         cache_add($request{'whisker'}->{'method'},
                   $result{'whisker'}->{'code'},
                   $result{'whisker'}->{'data'},
-                  $uri, $data, $mark);
+                  $uri, $data, $flags->{'nocache'}, $mark);
 
         if ($OUTPUT{'debug'}) {
             dump_var("Request Hash", \%request);
