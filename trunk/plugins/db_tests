@@ -6210,3 +6210,4 @@
 "006209","0","2","/uploads/readme.txt","GET","200","","","","","Readme file found.","",""
 "006210","0","b","/cadence/help/help.htm","GET","Cadre Technologies","","","","","Cadre Technologies Cadence WebAccess help files found.","",""
 "006211","0","b","/","GET","img src=\"welcome.png\" alt=\"IIS7\"","","","","","Appears to be a default IIS 7 install.","",""
+"006212","0","3","/install/install.aspx","GET","dtsoftware&nbsp;Configuration","","","","","dtsoftware 404 page reveals detailed application information.","",""
