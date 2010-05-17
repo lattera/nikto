@@ -1013,7 +1013,7 @@ DOCDIR=EXECDIR/docs</screen>
       <title>Scan Database Field Values</title>
 
       <para>Though some checks can be found in other plugins, the
-      <filename>scan_database.db</filename> contains the bulk of the web test
+      <filename>db_tests</filename> contains the bulk of the web test
       information. Here is a description of the field values:</para>
 
       <table>
