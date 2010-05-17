@@ -6211,5 +6211,5 @@
 "006210","0","b","/cadence/help/help.htm","GET","Cadre Technologies","","","","","Cadre Technologies Cadence WebAccess help files found.","",""
 "006211","0","b","/","GET","img src=\"welcome.png\" alt=\"IIS7\"","","","","","Appears to be a default IIS 7 install.","",""
 "006212","0","3","/install/install.aspx","GET","dtsoftware&nbsp;Configuration","","","","","dtsoftware 404 page reveals detailed application information.","",""
-"006213","0","23","/webresource.axd?d=junk","GET","NET Framework Version:","","[FileNotFoundException]:","","","ASP.NET reveals its version in error messages when verbose debugging is enabled.","",""
-"006214","0","23","/scriptresource.axd?d=junk","GET","NET Framework Version:","","[FileNotFoundException]:","","","ASP.NET reveals its version in error messages when verbose debugging is enabled.","",""
+"006213","0","23","/webresource.axd?d=junk","GET","NET Framework Version:","","Invalid viewstate."","","ASP.NET reveals its version in error messages when verbose debugging is enabled.","",""
+"006214","0","23","/scriptresource.axd?d=junk","GET","NET Framework Version:","","Invalid viewstate.","","","ASP.NET reveals its version in error messages when verbose debugging is enabled.","",""
