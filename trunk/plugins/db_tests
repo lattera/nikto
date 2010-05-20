@@ -6419,3 +6419,6 @@
 "006420","0","1","/yonetim.asp","GET","200","","","","","Admin login page/section found.","",""
 "006421","0","1","/yonetim.html","GET","200","","","","","Admin login page/section found.","",""
 "006422","0","1","/yonetim.php","GET","200","","","","","Admin login page/section found.","",""
+"006423","3092","1","/test.asp","GET","200","","","","","This might be interesting...","",""
+"006424","3092","1","/test.aspx","GET","200","","","","","This might be interesting...","",""
+"006425","3092","1","/test.php","GET","200","","","","","This might be interesting...","",""
