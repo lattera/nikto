@@ -171,8 +171,8 @@ foreach my $mark (@MARKS) {
 
     %FoF = ();
 
-    $mark->{'banner'} = get_banner($mark);
-
+    nfetch($mark, "/", "GET", "", "", { nocache => 1 }, "getinfo");
+	
     # put a signal trap so we can close down reports properly
     $SIG{'INT'} = sub {
         $mark->{'end_time'} = time();

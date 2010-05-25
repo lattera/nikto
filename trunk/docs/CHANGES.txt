@@ -1,3 +1,5 @@
+2010-05-25
+	- Ticket 147: Grab HTTP information on the fly, deprecate get_banner
 2010-05-11
 	- Tickets 132 and 153: Properly check for HTTP and HTTPS ports in cache.
 2010-05-06

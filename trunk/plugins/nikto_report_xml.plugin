@@ -112,9 +112,9 @@ sub xml_change_vars {
         $variables{"#TEMPL_HOST_HEADER"} = $mark->{vhost};
     }
     $variables{"#TEMPL_SSL_INFO"} = "";
-    if (defined $mark->{sslcyphers}) {
+    if (defined $mark->{ssl_cipher}) {
         $variables{"#TEMPL_SSL_INFO"} =
-          "<ssl ciphers=\"$mark->{sslcyphers}\" issuers=\"$mark->{sslissuers}\" info=\"$mark->{sslinfo}\" />";
+          "<ssl ciphers=\"$mark->{ssl_cipher}\" issuers=\"$mark->{ssl_cert_issuer}\" info=\"$mark->{ssl_cert_subject}\" />";
     }
     $variables{"#TEMPL_IP"}                 = simple_enc($mark->{ip});
     $variables{"#TEMPL_ITEMS_TESTED"}       = $mark->{total_checks};

@@ -104,22 +104,19 @@ sub nikto_auth {
         
         if ($result->{'www-authenticate'} =~ /^ntlm/i) {
             $authtype='ntlm';
-        }
-        
+        }       
         # Set up LW hash
-        LW2::http_close($request);
         LW2::auth_set($authtype, $request, $entry->{'id'}, $entry->{'password'});
         # Patch to fix short reads
-        $request->{'whisker'}->{'allow_short_reads'} = 1;
-        LW2::http_fixup_request($request);
-        
+		$request->{'whisker'}->{'allow_short_reads'} = 1;
+        LW2::http_fixup_request($request);     
         # pause if needed
         if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
 
         LW2::http_do_request_timeout($request, $result);    # test auth
         $NIKTO{'totalrequests'}++;
-        dump_var("Auth Request",  \%request);
-        dump_var("Auth Response", \%result);
+        dump_var("Auth Request",  $request);
+        dump_var("Auth Response", $result);
         
         if ($result{'www-authenticate'} =~ /^ntlm/i) {
             # Deal with ntlm
@@ -132,7 +129,7 @@ sub nikto_auth {
         my $uridir = $request->{'whisker'}->{'uri'};
         $uridir =~ s#/[^/]*$#/#g;
        
-        if ($result{'www-authenticate'} eq ''
+        if ($result->{'www-authenticate'} eq ''
             && !defined $result->{'whisker'}->{'error'}) {
             
             my $message="Default account found for '$realm' at $uridir ($request->{'whisker'}->{'uri'}) (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";

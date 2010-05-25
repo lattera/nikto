@@ -354,16 +354,11 @@ sub dump_target_info {
     my $sslprint = "";
 
     if ($mark->{ssl}) {
-        my $sslcyphers = $result{'whisker'}->{'ssl_cipher'}       || "Unknown";
-        my $sslissuers = $result{'whisker'}->{'ssl_cert_issuer'}  || "Unknown";
-        my $sslinfo    = $result{'whisker'}->{'ssl_cert_subject'} || "Unknown";
         $sslprint = "$NIKTO{'DIV'}\n";
         $sslprint .=
-          "+ SSL Info:        Ciphers: $sslcyphers\n                   Info:    $sslissuers\n                   Subject: $sslinfo";
-
-        $mark->{sslcyphers} = $sslcyphers;
-        $mark->{sslissuers} = $sslissuers;
-        $mark->{sslinfo}    = $sslinfo;
+            "+ SSL Info:        Ciphers: $mark->{'ssl_cipher'}\n" .
+            "                   Info:    $mark->{'ssl_cert_issuer'}\n" . 
+            "                   Subject: $mark->{'ssl_cert_subject'}";
     }
 
     if ($mark->{ip} =~ /[a-z]/i) {
@@ -1124,16 +1119,6 @@ sub count_fields {
     my @L = parse_csv($line);
     if ($checkid && ($L[0] ne 'nikto_id') && (($L[0] =~ /[^0-9]/) || ($L[0] eq ''))) { return -1; }
     return $#L;
-}
-
-###############################################################################
-sub get_banner {
-    my ($mark) = @_;
-    my %headers;
-
-    (my $res, $CONTENT) = nfetch($mark, "/", "GET", "", \%headers, "", "Get Banner");
-
-    return $headers{server};
 }
 
 ###############################################################################
@@ -2034,6 +2019,26 @@ sub nfetch {
             dump_var("Request Hash", \%request);
             dump_var("Result Hash",  \%result);
         }
+
+        # Snarf what we can from the whisker hash and put in mark
+		if (!exists $result{'whisker'}->{'error'}) {		
+			if (!exists $mark->{'banner'}) {
+				$mark->{'banner'} = $result{'server'};
+			}
+			else {
+				# Check banner hasn't changed
+				if ($mark->{'banner'} ne $result{'server'}) {
+					nprint("+ Server banner has changed from $mark->{banner} to $result{server}, this may suggest a WAF is in place");
+				}
+			}
+			
+			if (!exists $mark->{'ssl_cipher'} && $mark->{'ssl'}) {
+				# Grab ssl details
+				$mark->{'ssl_cipher'} = $result{'whisker'}->{'ssl_cipher'};
+				$mark->{'ssl_cert_issuer'} = $result{'whisker'}->{'ssl_cert_issuer'};
+				$mark->{'ssl_cert_subject'} = $result{'whisker'}->{'ssl_cert_subject'};
+			}
+		}
     }
     nprint("- $result{'whisker'}{'code'} for $method:\t$uri", "v");
 

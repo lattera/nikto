@@ -3537,7 +3537,7 @@
 "003536","3233","2","/doc/Judy/Judy_3x.htm","GET","Judy functions","","","","","HP server Judy documentation.","",""
 "003537","3233","2","/doc/Judy/JudySL_3x.htm","GET","JudySL macros","","","","","HP server Judy documentation.","",""
 "003538","3233","2","/doc/Judy/JudyL_3x.htm","GET","JudyL macros","","","","","HP server Judy documentation.","",""
-"003539","3233","2","/doc/Judy/LICENSE","GET","Software License","","","","","HP server Judy documentation.","",""
+"003539","3233","2","/doc/Judy/LICENSE","GET","Software License","","200","","","HP server Judy documentation.","",""
 "003540","3233","2","/doc/Judy/demo/JudySort.c","GET","static char","","","","","HP server Judy code.","",""
 "003541","3233","2","/doc/Judy/demo/Makefile","GET","libJudy.a","","","","","HP server Judy code.","",""
 "003542","3233","2","/doc/Judy/demo/funhist.c","GET","FUNCTION HISTOGRAM","","","","","HP server Judy code.","",""
