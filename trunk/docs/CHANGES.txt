@@ -1,5 +1,6 @@
 2010-05-25
 	- Ticket 147: Grab HTTP information on the fly, deprecate get_banner
+	- Stop Whisker producing an error when talking HTTP to HTTPS during port_check
 2010-05-11
 	- Tickets 132 and 153: Properly check for HTTP and HTTPS ports in cache.
 2010-05-06

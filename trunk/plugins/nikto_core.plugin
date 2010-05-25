@@ -1148,7 +1148,7 @@ sub port_check {
             nprint("- Checking for $checkssl on port $ip:$port, using $method", "v", $m);
             $m->{ssl} = ($checkssl eq "HTTP") ? 0 : 1;
             proxy_check($m);
-            my ($res, $content) = nfetch($m, "/", $method, "", \%headers, "", "Port Check");
+            my ($res, $content) = nfetch($m, "/", $method, "", \%headers, { noerror => 1 }, "Port Check");
 
             if ($res) {
 
@@ -2043,7 +2043,7 @@ sub nfetch {
     nprint("- $result{'whisker'}{'code'} for $method:\t$uri", "v");
 
     # Check for errors to reduce false positives
-    if (defined $result{'whisker'}->{'error'}) {
+    if (defined $result{'whisker'}->{'error'} && !exists $flags->{'noerror'}) {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
     }
