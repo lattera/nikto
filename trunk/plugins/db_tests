@@ -6428,4 +6428,4 @@
 "006429","","1","/maint/","GET","200","","","","","This might be interesting...","",""
 "006430","","1","/maint.asp","GET","200","","","","","This might be interesting...","",""
 "006431","","1","/maint.aspx","GET","200","","","","","This might be interesting...","",""
-"006431","59440","z","/sdk/%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/etc/vmware/hostd/vmInventory.xml","GET","200","","","","","VMWare ESX is vulnerable to a directory traversal attack","",""
+"006432","59440","57","/sdk/%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/etc/vmware/hostd/vmInventory.xml","GET","200","","","","","VMWare ESX is vulnerable to a directory traversal attack","",""
