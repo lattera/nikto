@@ -29,7 +29,8 @@ sub nikto_tests_init {
                scan_method => \&nikto_tests,
                scan_weight => 99,
                options     =>   {   passfiles   => "Flag to indicate whether to check for common password files",  
-                                    all         => "Flag to indicate whether to check all files with all directories"
+                                    all         => "Flag to indicate whether to check all files with all directories",
+									report		=> "Report a status after the passed number of tests",
                                 }
                };
     return $id;
@@ -38,7 +39,7 @@ sub nikto_tests_init {
 sub nikto_tests {
     my ($mark, $parameters) = @_;
 
-
+	my $progress = 0;
     # this is the actual the looped code for all the checks
     foreach my $checkid (sort keys %TESTS) {
         if ($checkid >= 500000) { next; }    # skip TESTS added manually during run (for reports)
@@ -149,6 +150,14 @@ sub nikto_tests {
                                   );
             }
         }
+		# Percentages
+		$progress++;
+		if ($parameters->{'report'}) {
+			if (($progress % $parameters->{'report'}) == 0) {
+				my $line = sprintf("- Tests completed: %d %.0f%%", $progress, ($progress / $NIKTO{total_checks})*100);
+				nprint($line)
+			}
+		}
     }    # end check loop
 
     # Perform mutation tests

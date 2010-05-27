@@ -48,7 +48,7 @@ sub nikto_auth_load {
 }
 
 sub nikto_auth_pre {
-    my ($mark, $request, $result, $parameters) = @_;
+    my ($mark, $parameters, $request, $result) = @_;
     # If we know the realm then don't bother guessing it
     # See whether we've already guessed it
     
@@ -66,7 +66,7 @@ sub nikto_auth_pre {
 }
 
 sub nikto_auth {
-    my ($mark, $request, $result, $parameters) = @_;
+    my ($mark, $parameters, $request, $result) = @_;
     my ($authtype)  = 'basic';
     my ($body)      = $result->{'whisker'}->{'data'};
     my ($uri)       = $result->{'whisker'}->{'uri'};
@@ -74,7 +74,7 @@ sub nikto_auth {
     my ($realm, $save_auth);
 
     unless (defined $result->{'www-authenticate'}) {
-        nprint("+ ERROR: No authentication header defined");
+        nprint("+ ERROR: No authentication header defined: $uri");
         return $request, $result;
     }
     

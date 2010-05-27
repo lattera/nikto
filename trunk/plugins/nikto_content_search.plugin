@@ -50,7 +50,7 @@ sub nikto_content_search_load {
 }
 
 sub nikto_content_search {
-    my ($mark, $request, $result, $parameters) = @_;
+    my ($mark, $parameters, $request, $result) = @_;
     
     my $body   = $result->{'whisker'}->{'data'};
     my $file   = $result->{'whisker'}->{'uri'};

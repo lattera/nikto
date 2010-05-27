@@ -1,3 +1,6 @@
+2010-05-27
+	- Fixed a bug with the order of parameters in hooks (broke parameters being passed to some plugins)
+	- Added the parameter "report" to tests plugin to report when completed x number of tests
 2010-05-25
 	- Ticket 147: Grab HTTP information on the fly, deprecate get_banner
 	- Stop Whisker producing an error when talking HTTP to HTTPS during port_check

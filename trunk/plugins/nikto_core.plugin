@@ -526,6 +526,7 @@ sub general_config {
         if ($CLI{'display'} =~ /v/i) { $OUTPUT{'verbose'} = 1; }
         if ($CLI{'display'} =~ /s/i) { $OUTPUT{'scrub'}   = 1; }
         if ($CLI{'display'} =~ /e/i) { $OUTPUT{'errors'}  = 1; }
+		if ($CLI{'display'} =~ /p/i) { $OUTPUT{'percent'} = 1; }
     }
 
     # port(s)
@@ -1326,7 +1327,7 @@ sub run_hooks {
             && $plugin->{'parameters'}->{'debug'} == 1) {
             $OUTPUT{'debug'} = 1;
         }
-        &{ $plugin->{ $type . '_method' } }($mark, $request, $result, $plugin->{'parameters'});
+        &{ $plugin->{ $type . '_method' } }($mark, $plugin->{'parameters'}, $request, $result);
         $OUTPUT{'verbose'} = $oldverbose;
         $OUTPUT{'debug'}   = $olddebug;
         $OUTPUT{'errors'}  = $olderrors;
@@ -1553,106 +1554,6 @@ sub check_updates {
     if ($#DBTOGET < 0) { nprint "+ No updates required.\n"; }
     if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
     exit;
-}
-
-###############################################################################
-# do_auth
-# Inputs: $request, $result
-# Returns: $request
-sub do_auth {
-    my $request  = $_[0];
-    my $result   = $_[1];
-    my $mark     = $_[2];
-    my $authtype = "basic";
-    my $realm    = "";
-
-    unless (defined $result{'www-authenticate'}) {
-        nprint("+ ERROR: No authentication header defined");
-    }
-
-    # Split up www-authenticate to realm and method
-    my @authenticate = split(/ /, $result{'www-authenticate'});
-    if ($#authenticate == 0) {    # Only one parameter: realm
-        $realm = $authenticate[0];
-        if ($realm =~ /^ntlm/i) {
-            $realm    = "";
-            $authtype = $authenticate[0];
-        }
-    }
-    else {
-        $authtype = $authenticate[0];
-        $realm    = $authenticate[1];
-        $realm =~ s/^realm=//;
-    }
-
-    # Now we have this we can try guessing the password
-    foreach my $REALM (keys %REALMS) {
-        next unless ($realm =~ /$REALMS{$REALM}{realm}/i || $REALMS{$REALM}{realm} eq '@ANY');
-        if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq "")) {
-            my $uridir = $request{'whisker'}->{'uri'};
-            $uridir =~ s#/[^/]*$#/#g;
-            add_vulnerability(
-                $mark,
-                "Blank credentials found at $uridir ($request{whisker}->{uri}), $REALMS{$REALM}{realm}: $REALMS{$REALM}{msg}",
-                $REALMS{$REALM}{tid},
-                0,
-                "GET",
-                $uridir,
-                \%result
-                );
-        }
-        else {
-            my $save_auth = $result{'www-authenticate'};
-            LW2::http_close(\%request);    # force-close any old connections
-            LW2::auth_set($authtype, \%request, $REALMS{$REALM}{id}, $REALMS{$REALM}{pw});
-
-            # Path to fix short reads
-            $request{'whisker'}->{allow_short_reads} = 1;
-            LW2::http_fixup_request(\%request);
-            if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
-            LW2::http_do_request_timeout(\%request, \%result);    # test auth
-            $NIKTO{'totalrequests'}++;
-            dump_var("Auth Request",  \%request);
-            dump_var("Auth Response", \%result);
-            if ($result{'www-authenticate'} =~ /^ntlm/i) {
-
-                # Deal with ntlm
-                my @ntlm_x = split(/ /, $result{'www-authenticate'});
-                if ($#ntlm_x == 1) {
-                    LW2::http_do_request_timeout(\%request, \%result);
-                    $NIKTO{'totalrequests'}++;
-                }
-            }
-            if ($result{'www-authenticate'} eq ""
-                && !defined $result{'whisker'}->{'error'}) {
-                unless (   $REALMS{$REALM}{tid} == 700500
-                        || $REALMS{$REALM}{checked} == 1) {
-                    my $uridir = $request{'whisker'}->{'uri'};
-                    $uridir =~ s#/[^/]*$#/#g;
-                    add_vulnerability(
-                        $mark,
-                        "Default account found for '$realm' at $uridir ($request{whisker}->{uri}) (ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}'). $REALMS{$REALM}{msg}",
-                        $REALMS{$REALM}{tid},
-                        0,
-                        "GET",
-                        $uridir,
-                        \%result
-                        );
-                    $REALMS{$REALM}{checked} = 1;
-                }
-
-                # Finally repeat the check
-                LW2::http_do_request_timeout(\%request, \%result);    # test auth
-                $NIKTO{'totalrequests'}++;
-
-                # and leave
-                last;
-            }
-            else { $result->{'www-authenticate'} = $save_auth; }
-        }
-    }
-    LW2::auth_unset(\%request);
-    return $result;
 }
 
 ###############################################################################
