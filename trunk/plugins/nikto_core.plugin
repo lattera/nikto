@@ -2303,8 +2303,9 @@ sub usage {
        -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
-       -Plugins		   List of plugins to run (default ALL)
+       -Plugins		       List of plugins to run (default ALL)
        -port+              Port to use (default 80)
+	   -root+			   Prepend root value to all requests, format is /directory 
        -Display+           Turn on/off display outputs
        -ssl                Force ssl mode on port
        -Single             Single request mode
