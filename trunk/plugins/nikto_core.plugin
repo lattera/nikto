@@ -1496,30 +1496,25 @@ sub check_updates {
 
     # check main nikto versions
     foreach my $remotefile (keys %REMOTE) {
-        if ($remotefile eq "nikto") {
-            if ($REMOTE{$remotefile} > $NIKTO{'version'}) {
-                nprint
-                  "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
-                nprint
-                  "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n";
-                if ($remotemsg ne "") {
-                    nprint "+ $server message: $remotemsg\n";
-                }
-                exit;
-            }
-            next;
-        }
+	my @l = split(/\./, $LOCAL{$remotefile});
+	my @r = split(/\./, $REMOTE{$remotefile});
+	my $update=0;
+	if ($LOCAL{$remotefile} eq '') { $update=1; }
+	elsif ($r[0] > $l[0]) { $update=1; }
+	elsif ($r[1] > $l[1]) { $update=1; }
+	elsif ($r[2] > $l[2]) { $update=1; }
 
-        if (   ($LOCAL{$remotefile} eq "")
-            || ($REMOTE{$remotefile} > $LOCAL{$remotefile})) {
-            push(@DBTOGET, $remotefile);
-            if ($remotefile !~ /^db_/) { $code_updates = 1; }
-        }
-        elsif ($REMOTE{$remotefile} < $LOCAL{$remotefile}) {
-            print STDERR
-              "+ ERROR: Local '$remotefile' (ver $LOCAL{$remotefile}) is NEWER than remote (ver $REMOTE{$remotefile}).\n";
-        }
-    }
+	if ($update) {
+       		if ($remotefile eq "nikto") {
+               			nprint "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
+                		nprint "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n";
+                		if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
+                		exit;
+            		}
+            	push(@DBTOGET, $remotefile);
+            	if ($remotefile !~ /^db_/) { $code_updates = 1; }
+        	}
+    	}
 
     # replace local files if updated
     foreach my $toget (@DBTOGET) {
