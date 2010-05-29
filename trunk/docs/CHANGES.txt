@@ -1,5 +1,6 @@
 2010-05-29
 	- Ticket 156: Update system couldn't update nikto_core.plugin
+	- Ticket 152: HTTP Version set in nikto.conf over-ridden
 2010-05-27
 	- Fixed a bug with the order of parameters in hooks (broke parameters being passed to some plugins)
 	- Added the parameter "report" to tests plugin to report when completed x number of tests
