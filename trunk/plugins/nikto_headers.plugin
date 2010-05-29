@@ -133,6 +133,7 @@ sub nikto_headers {
     }
 
     LW2::http_close(\%request);    # force-close any old connections
+    $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
     LW2::http_fixup_request(\%request);
     LW2::http_reset();
     $request{'whisker'}->{'uri'}    = "/images";
@@ -163,6 +164,7 @@ sub nikto_headers {
     #######################################################################
     # Location header in WebLogic
     LW2::http_close(\%request);    # force-close any old connections
+    $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
     LW2::http_fixup_request(\%request);
     LW2::http_reset();
     $request{'whisker'}->{'uri'}    = ".";
@@ -182,6 +184,9 @@ sub nikto_headers {
             "."
             );
     }
+    $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
 
     #######################################################################
     # All other interesting headers

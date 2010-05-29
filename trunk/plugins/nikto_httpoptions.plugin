@@ -110,7 +110,6 @@ sub nikto_httpoptions {
     # Special checks for TRACE/TRACK to see whether its vulnerable
     %headers = ("Host" => "Nikto",);
     foreach my $method (split(/ /, "TRACE TRACK")) {
-
         # Check for all flavours of HTTP
         foreach my $version (split(/ /, "1.0 1.1")) {
             $request{'whisker'}{'version'} = $version;
@@ -128,6 +127,8 @@ sub nikto_httpoptions {
             }
         }
     }
+
+    $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
 
     # Now release memory for the dbarray
     undef @$dbarray;
