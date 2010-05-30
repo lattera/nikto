@@ -1298,6 +1298,7 @@ sub load_plugins {
     $PLUGINORDER{'postfetch'} = \@pfsorted;
 }
 
+###############################################################################
 sub run_hooks {
     my ($mark, $type, $request, $result) = @_;
 
@@ -1312,7 +1313,7 @@ sub run_hooks {
             $run = eval($condition);
         }
 
-        next if ($run != 1);
+	if (!$run) { next; }
 
         my $oldverbose = $OUTPUT{'verbose'};
         my $olddebug   = $OUTPUT{'debug'};
@@ -1787,7 +1788,7 @@ sub setup_hash {
         $reqhash->{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'};
     }
     $reqhash->{'User-Agent'} = $NIKTO{'useragent'};
-    $reqhash->{'User-Agent'} =~ s/\@TESTID/$testid/g;
+    $reqhash->{'User-Agent'} =~ s/\@TESTID/$testid/;
     $reqhash->{'whisker'}->{'retry'} = 0;
     $reqhash->{'whisker'}->{'host'} = $mark->{'hostname'} || $mark->{'ip'};
 
@@ -1869,10 +1870,12 @@ sub nfetch {
     my (%request, %result);
     setup_hash(\%request, $mark, $testid);
 
-    $request{'whisker'}->{'uri'} = $uri;
     if (defined $CLI{'root'}) {
         $request{'whisker'}->{'uri'} = $CLI{'root'} . $uri;    # prepend -root option value
-    }
+    	}
+    else {
+    	$request{'whisker'}->{'uri'} = $uri;
+	}
     $request{'whisker'}->{'method'} = $method;
 
     if ($data ne "") {
@@ -1882,7 +1885,6 @@ sub nfetch {
 
     # check for extra HTTP headers
     if (defined $headers) {
-
         # loop through the hash ref passed and add each header to request
         while (my ($key, $value) = each(%$headers)) {
             $request{$key} = $value;

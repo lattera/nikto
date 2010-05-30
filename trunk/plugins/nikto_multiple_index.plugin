@@ -44,7 +44,7 @@ sub nikto_multiple_index {
           nfetch($mark, "/$item->{'index'}", "GET", "", "", "", "multiple_index");
 
         if (($res == 200) || ($res == 404)) {
-            $content = rm_active_content($result{'whisker'}->{'data'}, "/$item->{'index'}");
+            $content = rm_active_content($content, "/$item->{'index'}");
             my $hash = LW2::md4($content);
             $found{ $item->{'index'} } = $hash;
             $hashes{$hash}++;

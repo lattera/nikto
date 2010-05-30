@@ -55,7 +55,6 @@ sub nikto_content_search {
     my $body   = $result->{'whisker'}->{'data'};
     my $file   = $result->{'whisker'}->{'uri'};
     my $method = $result->{'whisker'}->{'method'} || "GET";
-    my ($mark) = @_;
 
     foreach my $testid (@$CONTENTSEARCH) {
         if ($body =~ $testid->{'compiled'} &&
