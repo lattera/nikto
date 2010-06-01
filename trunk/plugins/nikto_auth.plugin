@@ -20,7 +20,7 @@
 # PURPOSE:
 # Search content for known bad strings
 ###############################################################################
-use vars /$REALMS %REALMSMATCHED/;
+use vars qw/$REALMS %REALMSMATCHED/;
 
 sub nikto_auth_init {
     my $id = { name             => 'auth',

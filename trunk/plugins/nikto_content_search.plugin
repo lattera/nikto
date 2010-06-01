@@ -20,7 +20,7 @@
 # PURPOSE:
 # Search content for known bad strings
 ###############################################################################
-use vars /$CONTENTSEARCH %CSMATCHED/;
+use vars qw/$CONTENTSEARCH %CSMATCHED/;
 
 sub nikto_content_search_init {
     my $id = { name         => "content_search",
