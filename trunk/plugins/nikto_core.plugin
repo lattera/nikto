@@ -1925,7 +1925,7 @@ sub nfetch {
 			}
 			else {
 				# Check banner hasn't changed
-				if ($mark->{'banner'} ne $result{'server'}) {
+				if (exists $result{'server'} && $mark->{'banner'} ne $result{'server'}) {
 					nprint("+ Server banner has changed from $mark->{banner} to $result{server}, this may suggest a WAF is in place");
 				}
 			}
