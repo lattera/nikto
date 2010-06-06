@@ -129,14 +129,11 @@ sub nprint {
     # don't print to STDOUT if output file is "-"
     if ((defined $CLI{'file'}) && ($CLI{'file'} eq "-")) { return; }
 
-# print to scan details to standard output if the users wants another format and is saving results to a file
-    $line =~
-      s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
-    $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
+    # print to scan details to standard output if the users wants another format and is saving results to a file
+    $line =~ s/(CVE\-[12][0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
+    $line =~ s/(CA\-[12][0-9]{3}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
     $line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
-    $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
-    $line =~
-      s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
+    $line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
     print "$line\n";
 
     return;
@@ -422,26 +419,26 @@ sub general_config {
     $| = 1;
 
     # This is used in dump_target_info(), not just help output
-    $NIKTO{'anti_ids'}{1} = "Random URI encoding (non-UTF8)";
-    $NIKTO{'anti_ids'}{2} = "Directory self-reference (/./)";
-    $NIKTO{'anti_ids'}{3} = "Premature URL ending";
-    $NIKTO{'anti_ids'}{4} = "Prepend long random string";
-    $NIKTO{'anti_ids'}{5} = "Fake parameter";
-    $NIKTO{'anti_ids'}{6} = "TAB as request spacer";
-    $NIKTO{'anti_ids'}{7} = "Change the case of the URL";
-    $NIKTO{'anti_ids'}{8} = "Use Windows directory separator (\\)";
-    $NIKTO{'anti_ids'}{A} = "Use a carriage return (0x0d) as a request spacer";
-    $NIKTO{'anti_ids'}{B} = "Use binary value 0x0b as a request spacer";
+    $NIKTO{'anti_ids'}{'1'} = "Random URI encoding (non-UTF8)";
+    $NIKTO{'anti_ids'}{'2'} = "Directory self-reference (/./)";
+    $NIKTO{'anti_ids'}{'3'} = "Premature URL ending";
+    $NIKTO{'anti_ids'}{'4'} = "Prepend long random string";
+    $NIKTO{'anti_ids'}{'5'} = "Fake parameter";
+    $NIKTO{'anti_ids'}{'6'} = "TAB as request spacer";
+    $NIKTO{'anti_ids'}{'7'} = "Change the case of the URL";
+    $NIKTO{'anti_ids'}{'8'} = "Use Windows directory separator (\\)";
+    $NIKTO{'anti_ids'}{'A'} = "Use a carriage return (0x0d) as a request spacer";
+    $NIKTO{'anti_ids'}{'B'} = "Use binary value 0x0b as a request spacer";
 
     # This is used in dump_target_info(), not just help output
-    $NIKTO{'mutate_opts'}{1} = "Test all files with all root directories";
-    $NIKTO{'mutate_opts'}{2} = "Guess for password file names";
-    $NIKTO{'mutate_opts'}{3} = "Enumerate user names via Apache (/~user type requests)";
-    $NIKTO{'mutate_opts'}{4} =
+    $NIKTO{'mutate_opts'}{'1'} = "Test all files with all root directories";
+    $NIKTO{'mutate_opts'}{'2'} = "Guess for password file names";
+    $NIKTO{'mutate_opts'}{'3'} = "Enumerate user names via Apache (/~user type requests)";
+    $NIKTO{'mutate_opts'}{'4'} =
       "Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type requests)";
-    $NIKTO{'mutate_opts'}{5} =
+    $NIKTO{'mutate_opts'}{'5'} =
       "Attempt to brute force sub-domain names, assume that the host name is the parent domain";
-    $NIKTO{'mutate_opts'}{6} = "Attempt to guess directory names from the supplied dictionary file";
+    $NIKTO{'mutate_opts'}{'6'} = "Attempt to guess directory names from the supplied dictionary file";
 
     ### CLI STUFF
     $CLI{'pause'} = $CLI{'html'} = $OUTPUT{'verbose'} = $CLI{'skiplookup'} =
@@ -928,7 +925,7 @@ sub load_databases {
                 foreach my $l (@file) {
                     my @T = parse_csv($l);
                     $OVERS{ $T[1] }{ $T[2] } = $T[3];
-                    $OVERS{ $T[1] }{tid} = $T[0];
+                    $OVERS{ $T[1] }{'tid'} = $T[0];
                 }
             }
 
@@ -937,11 +934,11 @@ sub load_databases {
                 my $db_realms_ctr = keys %REALMS;
                 foreach my $l (@file) {
                     my @t = parse_csv($l);
-                    $REALMS{$db_realms_ctr}{tid}   = $t[0];
-                    $REALMS{$db_realms_ctr}{realm} = $t[1];
-                    $REALMS{$db_realms_ctr}{id}    = $t[2];
-                    $REALMS{$db_realms_ctr}{pw}    = $t[3];
-                    $REALMS{$db_realms_ctr}{msg}   = $t[4];
+                    $REALMS{$db_realms_ctr}{'tid'}   = $t[0];
+                    $REALMS{$db_realms_ctr}{'realm'} = $t[1];
+                    $REALMS{$db_realms_ctr}{'id'}    = $t[2];
+                    $REALMS{$db_realms_ctr}{'pw'}    = $t[3];
+                    $REALMS{$db_realms_ctr}{'msg'}   = $t[4];
                     $db_realms_ctr++;
                 }
 
@@ -949,11 +946,11 @@ sub load_databases {
                 if (defined $CLI{'hostauth'}) {
                     my @x = split(/:/, $CLI{'hostauth'});
 
-                    $REALMS{$db_realms_ctr}{tid}   = "700500";
-                    $REALMS{$db_realms_ctr}{realm} = (defined $x[2]) ? $x[2] : '@ANY';
-                    $REALMS{$db_realms_ctr}{pw}    = $x[1];
-                    $REALMS{$db_realms_ctr}{id}    = $x[0];
-                    $REALMS{$db_realms_ctr}{msg}   = "Credentials provided by CLI.";
+                    $REALMS{$db_realms_ctr}{'tid'}   = "700500";
+                    $REALMS{$db_realms_ctr}{'realm'} = (defined $x[2]) ? $x[2] : '@ANY';
+                    $REALMS{$db_realms_ctr}{'pw'}    = $x[1];
+                    $REALMS{$db_realms_ctr}{'id'}    = $x[0];
+                    $REALMS{$db_realms_ctr}{'msg'}   = "Credentials provided by CLI.";
                 }
             }
 
@@ -1451,9 +1448,9 @@ sub check_updates {
     # retrieve versions file
     (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
     if ($RES eq 407) {
-        if ($NIKTOCONFIG{PROXYUSER} eq "") {
-            $NIKTOCONFIG{PROXYUSER} = read_data("Proxy ID: ",   "");
-            $NIKTOCONFIG{PROXYPASS} = read_data("Proxy Pass: ", "noecho");
+        if ($NIKTOCONFIG{'PROXYUSER'} eq "") {
+            $NIKTOCONFIG{'PROXYUSER'} = read_data("Proxy ID: ",   "");
+            $NIKTOCONFIG{'PROXYPASS'} = read_data("Proxy Pass: ", "noecho");
         }
 
         # and try again
@@ -1764,7 +1761,7 @@ sub content_present {
     # perform an extra check just in case the web server lies about finds
     # basically assume that the value for a non-extension is the true
     # code for "File not Found".
-    if ($res ne $FoF{NONE}{response}) {
+    if ($res ne $FoF{'NONE'}{'response'}) {
         foreach $found (split(' ', $VARIABLES{"\@HTTPFOUND"})) {
             if ($res eq $found) {
                 $result = TRUE;
@@ -2027,28 +2024,29 @@ sub set_scan_items {
                 my $ext = get_ext($item[3]);
                 $db_extensions{$ext} = 1;
 
-# This escapes regex characters in the conditionals. This will have to change if regex is ever allowed in the db
+                # This escapes regex characters in the conditionals. 
+                # This will have to change if regex is ever allowed in the db
                 for (my $y = 5 ; $y <= 9 ; $y++) { $item[$y] =~ s/([^a-zA-Z0-9\s])/\\$1/g; }
 
                 $NIKTO{total_checks}++;
-                $TESTS{ $item[0] }{uri}         = $item[3];
-                $TESTS{ $item[0] }{osvdb}       = $item[1];
-                $TESTS{ $item[0] }{method}      = $item[4];
-                $TESTS{ $item[0] }{match_1}     = $item[5];
-                $TESTS{ $item[0] }{match_1_or}  = $item[6];
-                $TESTS{ $item[0] }{match_1_and} = $item[7];
-                $TESTS{ $item[0] }{fail_1}      = $item[8];
-                $TESTS{ $item[0] }{fail_2}      = $item[9];
-                $TESTS{ $item[0] }{message}     = $item[10];
-                $TESTS{ $item[0] }{data}        = $item[11];
-                $TESTS{ $item[0] }{headers}     = $item[12];
+                $TESTS{ $item[0] }{'uri'}         = $item[3];
+                $TESTS{ $item[0] }{'osvdb'}       = $item[1];
+                $TESTS{ $item[0] }{'method'}      = $item[4];
+                $TESTS{ $item[0] }{'match_1'}     = $item[5];
+                $TESTS{ $item[0] }{'match_1_or'}  = $item[6];
+                $TESTS{ $item[0] }{'match_1_and'} = $item[7];
+                $TESTS{ $item[0] }{'fail_1'}      = $item[8];
+                $TESTS{ $item[0] }{'fail_2'}      = $item[9];
+                $TESTS{ $item[0] }{'message'}     = $item[10];
+                $TESTS{ $item[0] }{'data'}        = $item[11];
+                $TESTS{ $item[0] }{'headers'}     = $item[12];
             }
         }
     }
 
     undef @DBFILE;    # this memory hog is no longer needed!
-    nprint("- $NIKTO{total_checks} server checks loaded", "v");
-    if ($NIKTO{total_checks} eq 0 && !defined $CLI{'tuning'}) {
+    nprint("- $NIKTO{'total_checks'} server checks loaded", "v");
+    if ($NIKTO{'total_checks'} eq 0 && !defined $CLI{'tuning'}) {
         nprint("+ Unable to load valid checks!");
         exit;
     }
