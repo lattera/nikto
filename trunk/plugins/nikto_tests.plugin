@@ -28,18 +28,19 @@ sub nikto_tests_init {
                copyright   => "2008 CIRT Inc.",
                scan_method => \&nikto_tests,
                scan_weight => 99,
-               options     =>   {   passfiles   => "Flag to indicate whether to check for common password files",  
-                                    all         => "Flag to indicate whether to check all files with all directories",
-									report		=> "Report a status after the passed number of tests",
-                                }
-               };
+               options     => {
+                         passfiles => "Flag to indicate whether to check for common password files",
+                         all => "Flag to indicate whether to check all files with all directories",
+                         report => "Report a status after the passed number of tests",
+                         }
+                 };
     return $id;
-}
+    }
 
 sub nikto_tests {
     my ($mark, $parameters) = @_;
+    my $progress = 0;
 
-	my $progress = 0;
     # this is the actual the looped code for all the checks
     foreach my $checkid (sort keys %TESTS) {
         if ($checkid >= 500000) { next; }    # skip TESTS added manually during run (for reports)
@@ -50,19 +51,22 @@ sub nikto_tests {
         foreach my $uri (@urilist) {
             my %headers;
             (my $res, $content, $error) =
-                nfetch($mark, $uri, $TESTS{$checkid}{'method'}, $TESTS{$checkid}{'data'}, \%headers,  "", $checkid);
+              nfetch($mark, $uri,
+                     $TESTS{$checkid}{'method'},
+                     $TESTS{$checkid}{'data'},
+                     \%headers, "", $checkid);
 
             # auth is now done in nfetch
             if ($res eq 200) {
                 nprint("+ $uri - 200/OK Response could be $TESTS{$checkid}{'message'}")
                   if $CLI{'display'} =~ /3/;
-            }
+                }
             elsif ($res =~ /30([0-3]|7)/) {
                 nprint(  "+ $uri - Redirects ($res) to "
                        . $headers{'location'}
                        . " , $TESTS{$checkid}{'message'}")
                   if $CLI{'display'} =~ /1/;
-            }
+                }
 
             my $m1_method = my $m1o_method = my $m1a_method = my $f2_method = my $f1_method =
               "content";
@@ -79,97 +83,96 @@ sub nikto_tests {
             if ($m1_method eq "content") {
                 if ($content =~ /$TESTS{$checkid}{'match_1'}/) {
                     $positive = 1;
+                    }
                 }
-            }
             else {
                 if (($res eq $TESTS{$checkid}{'match_1'}) || ($res eq $FoF{'okay'}{'response'})) {
                     $positive = 1;
+                    }
                 }
-            }
 
             # no match, check optional match
             if ((!$positive) && ($TESTS{$checkid}{'match_1_or'} ne "")) {
                 if ($m1o_method eq "content") {
                     if ($content =~ /$TESTS{$checkid}{'match_1_or'}/) {
                         $positive = 1;
+                        }
                     }
-                }
                 else {
                     if (   ($res eq $TESTS{$checkid}{'match_1_or'})
                         || ($res eq $FoF{'okay'}{'response'})) {
                         $positive = 1;
+                        }
                     }
                 }
-            }
 
             # matched on something, check fails/ands
             if ($positive) {
                 if ($TESTS{$checkid}{'fail_1'} ne "") {
                     if ($f1_method eq "content") {
                         if ($content =~ /$TESTS{$checkid}{'fail_1'}/) { next; }
-                    }
+                        }
                     else {
                         if ($res eq $TESTS{$checkid}{'fail_1'}) { next; }
+                        }
                     }
-                }
                 if ($TESTS{$checkid}{'fail_2'} ne "") {
                     if ($f2_method eq "content") {
                         if ($content =~ /$TESTS{$checkid}{'fail_2'}/) { next; }
-                    }
+                        }
                     else {
                         if ($res eq $TESTS{$checkid}{'fail_2'}) { next; }
+                        }
                     }
-                }
                 if ($TESTS{$checkid}{'match_1_and'} ne "") {
                     if ($m1a_method eq "content") {
                         if ($content !~ /$TESTS{$checkid}{'match_1_and'}/) { next; }
-                    }
+                        }
                     else {
                         if ($res ne $TESTS{$checkid}{'match_1_and'}) { next; }
+                        }
                     }
-                }
 
                 # if it's an index.php, check for normal /index.php to see if it's a FP
                 if ($uri =~ /^\/index.php\?/) {
                     my $content = rm_active_content($content, $uri);
                     if (LW2::md4($content) eq $FoF{'index.php'}{'match'}) { next; }
-                }
+                    }
 
                 # lastly check for a false positive based on file extension or type
                 if (($m1_method eq "code") || ($m1o_method eq "code")) {
                     if (is_404($uri, $content, $res, $headers{'location'})) { next; }
-                }
+                    }
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;
-                add_vulnerability($mark,
-                                  "$uri: $TESTS{$checkid}{'message'}",
+                add_vulnerability($mark, "$uri: $TESTS{$checkid}{'message'}",
                                   $checkid,
                                   $TESTS{$checkid}{'osvdb'},
-                                  $TESTS{$checkid}{'method'},
-                                  $uri
-                                  );
+                                  $TESTS{$checkid}{'method'}, $uri);
+                }
             }
-        }
-		# Percentages
-		$progress++;
-		if ($parameters->{'report'}) {
-			if (($progress % $parameters->{'report'}) == 0) {
-				my $line = sprintf("- Tests completed: %d %.0f%%", $progress, ($progress / $NIKTO{total_checks})*100);
-				nprint($line)
-			}
-		}
-    }    # end check loop
+
+        # Percentages
+        $progress++;
+        if ($parameters->{'report'}) {
+            if (($progress % $parameters->{'report'}) == 0) {
+                my $line = sprintf("- Tests completed: %d %.0f%%",
+                                   $progress, ($progress / $NIKTO{total_checks}) * 100);
+                nprint($line);
+                }
+            }
+        }    # end check loop
 
     # Perform mutation tests
     if ($parameters->{'passfiles'}) {
         passchecks($mark);
-    }
+        }
     if ($parameters->{'all'}) {
         allchecks($mark);
-    }
+        }
 
     return;
-}
+    }
 
 sub passchecks {
     my ($mark) = @_;
@@ -198,11 +201,11 @@ sub passchecks {
 
                     # dir/file
                     testfile($mark, "$cgi$dir$file", "passfiles", "299998");
+                    }
                 }
             }
         }
     }
-}
 
 sub allchecks {
     my ($mark) = @_;
@@ -226,20 +229,20 @@ sub allchecks {
                 $DIRS{$dir} = "";
                 $dir  =~ s/([^a-zA-Z0-9])/\\$1/g;
                 $file =~ s/$dir//;
-            }
+                }
             if (($file ne "") && ($file !~ /^\?/)) {
                 $FILES{$file} = "";
+                }
             }
         }
-    }
 
     # Now do a check for each item - just check the return status, nothing else
     foreach my $dir (keys %DIRS) {
         foreach my $file (keys %FILES) {
             testfile($mark, "$dir$file", "all checks", 299999);
+            }
         }
     }
-}
 
 sub testfile {
     my ($mark, $uri, $name, $tid) = @_;
@@ -249,10 +252,10 @@ sub testfile {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $error", "e");
         return;
-    }
+        }
     if ($res == 200) {
         add_vulnerability($mark, "$uri: file found during $name mutation", "$tid", "0", "GET");
+        }
     }
-}
 
 1;
