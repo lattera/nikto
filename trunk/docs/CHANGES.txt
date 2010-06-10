@@ -1,3 +1,6 @@
+2010-06-10
+	- Updates to read known headers on the fly, rather than make requests
+	  for them
 2010-05-29
 	- Ticket 156: Update system couldn't update nikto_core.plugin
 	- Ticket 152: HTTP Version set in nikto.conf over-ridden

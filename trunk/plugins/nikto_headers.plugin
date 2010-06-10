@@ -26,41 +26,62 @@ sub nikto_headers_init {
          full_name   => "HTTP Headers",
          author      => "Sullo",
          description => "Performs various checks against the headers returned from a HTTP request.",
+         postfetch_method => \&nikto_headers_postfetch,
          scan_method => \&nikto_headers,
          copyright   => "2008 CIRT Inc."
          };
+   
+    # some global variables
+    use vars qw/%HFOUND/;
+
     return $id;
+}
+
+sub nikto_headers_postfetch {
+    my ($mark, $parameters, $request, $result) = @_;
+   
+    if (exists $result->{'whisker'}->{'error'}) {
+        return $request, $result;
+    }
+
+    # Check for know headers
+    my @interesting_headers =
+      qw /x-powered-by servlet-engine microsoftofficewebserver ms-author-via dasl dav daap-server x-aspnet-version/;
+
+    foreach my $header (@interesting_headers) {
+        nikto_headers_check($mark, $result, $header, 'Retrieved ' . $header . ' header:', 999986);
+    }
+
+    return $request, $result;
+}
+
+sub nikto_headers_check {
+    my ($mark, $result, $header, $message, $tid) = @_;
+
+    if (exists $result->{$header})
+    {
+        my $key = LW2::md5(  $mark->{'ip'}
+                           . $mark->{'hostname'}
+                           . $mark->{'port'}
+                           . $mark->{'ssl'}
+                           . $result->{'whisker'}->{'method'}
+                           . $header);
+
+        if (!exists $HFOUND{$key}) {
+            my $value = $result->{$header};
+            $HFOUND{$key} = $value;
+        
+            add_vulnerability($mark, $message . " " . $value, $tid, "0",
+                              $result->{'whisker'}->{'method'},
+                              $result->{'whisker'}->{'uri'});
+        }
+    }
 }
 
 sub nikto_headers {
     my ($mark) = @_;
     my $dbarray = init_db("db_headers");
-    my @interesting_headers =
-      qw /microsoftofficewebserver ms-author-via dasl dav daap-server x-aspnet-version/;
     my %headers;
-
-    # Standard headers, whisker is added to stop false positives
-    # Host Pragma
-
-    #######################################################################
-    # look for a powered-by header...could require a valid file, maybe not
-    my %xpb;
-    foreach my $f (
-        qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/
-        ) {
-        (my $res, $content) = nfetch($mark, $f, "GET", "", \%headers, "", "headers: powered-by");
-        if (defined $headers{'x-powered-by'}) { $xpb{ $headers{'x-powered-by'} } = 1; }
-    }
-
-    foreach my $x (sort keys %xpb) {
-        my $message;
-
-        # push version to BUILDITEMS so it can be evaluated later
-        push(@BUILDITEMS, $x);
-
-        $message .= " $x";
-        add_vulnerability($mark, "Retrieved X-Powered-By header:$message", 999992, 0);
-    }
 
     #######################################################################
     # look for to see whether its vulnerable to the Translate: f
@@ -87,22 +108,6 @@ sub nikto_headers {
                     last;
                 }
             }
-        }
-    }
-
-    #######################################################################
-    # Servlet-Engine info
-    if (defined $headers{'servlet-engine'}) {
-        my $x = $headers{'servlet-engine'};
-        $x = ~s/\(.*$//;
-        $x =~ s/\s+//g;
-        push(@BUILDITEMS, $x);
-
-        add_vulnerability($mark, "Retrieved servlet-engine headers: $x", 999991, 0);
-
-        my @bits = split(/;/, $x);
-        foreach my $bit (@bits) {
-            push(@BUILDITEMS, $bit);
         }
     }
 
@@ -187,21 +192,6 @@ sub nikto_headers {
     $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
     LW2::http_fixup_request(\%request);
     LW2::http_reset();
-
-    #######################################################################
-    # All other interesting headers
-
-    # First let's hit something we know should return something
-    my ($res, $content) = nfetch($mark, "/", "GET", "", \%headers, "", "headers: base");
-
-    foreach my $header (@interesting_headers) {
-        if ($headers{$header} ne '') {
-            my $x = $headers{$header};
-            $x =~ s/\s+.*$//;
-            push(@BUILDITEMS, $x);
-            add_vulnerability($mark, "Retrieved $header header: $headers{$header}", 999986, 0);
-        }
-    }
 
     #######################################################################
     # Look for any uncommon headers

@@ -171,7 +171,7 @@ foreach my $mark (@MARKS) {
 
     %FoF = ();
 
-    nfetch($mark, "/", "GET", "", "", { nocache => 1 }, "getinfo");
+    nfetch($mark, "/", "GET", "", "", { nocache => 1, noprefetch => 1, nopostfetch => 1 }, "getinfo");
 	
     # put a signal trap so we can close down reports properly
     $SIG{'INT'} = sub {

@@ -1146,7 +1146,7 @@ sub port_check {
             nprint("- Checking for $checkssl on port $ip:$port, using $method", "v", $m);
             $m->{ssl} = ($checkssl eq "HTTP") ? 0 : 1;
             proxy_check($m);
-            my ($res, $content) = nfetch($m, "/", $method, "", \%headers, { noerror => 1 }, "Port Check");
+            my ($res, $content) = nfetch($m, "/", $method, "", \%headers, { noerror => 1, noprefetch => 1, nopostfetch => 1 }, "Port Check");
 
             if ($res) {
 
@@ -1869,10 +1869,10 @@ sub nfetch {
 
     if (defined $CLI{'root'}) {
         $request{'whisker'}->{'uri'} = $CLI{'root'} . $uri;    # prepend -root option value
-    	}
+    }
     else {
     	$request{'whisker'}->{'uri'} = $uri;
-	}
+    }
     $request{'whisker'}->{'method'} = $method;
 
     if ($data ne "") {
@@ -1890,7 +1890,9 @@ sub nfetch {
     LW2::http_fixup_request(\%request) unless ($flags->{'noclean'});
 
     # Run pre hooks
-    (%$request, %$result) = run_hooks($mark, "prefetch", \%request, \%result);
+    unless ($flags->{'noprefetch'}) {
+        (%$request, %$result) = run_hooks($mark, "prefetch", \%request, \%result);
+    }
 
     # Check cache
     my $incache = 0;
@@ -1966,7 +1968,9 @@ sub nfetch {
     }
 
     # Run post hooks
-    (%$request, %$result) = run_hooks($mark, "postfetch", \%request, \%result);
+    unless ($flags->{'nopostfetch'}) {
+        (%$request, %$result) = run_hooks($mark, "postfetch", \%request, \%result);
+    }
 
     return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'},
       $result{'whisker'}->{'error'};
