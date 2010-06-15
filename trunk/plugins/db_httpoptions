@@ -24,3 +24,4 @@
 "0","LOCK","0","webdav"
 "0","UNLOCK","0","webdav"
 "0","SEARCH","0","webdav"
+"0","MKCOL","0","webdav"

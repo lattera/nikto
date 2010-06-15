@@ -84,11 +84,11 @@ sub nikto_httpoptions {
     }
     
     if (scalar(keys(%davmethods)) > 0) {
-        $message = "HTTP method(s) ";
+        $message = "WebDAV enabled (";
         for my $key (keys %davmethods) {
             $message .= "$key ";
         }
-        $message .= "indicate(s) that DAV/WebDAV is installed.";
+        $message .= "listed as allowed)";
         add_vulnerability($mark, "$message", "999977", "0");
     }
     # Check for other weirdness
