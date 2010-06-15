@@ -1,3 +1,6 @@
+2010-06-15
+	- Fix for #127: dav methods are treated specially and reported all at once
+	- Update nikto.conf to switch tests to always have the (report:500) parameter
 2010-06-10
 	- Updates to read known headers on the fly, rather than make requests
 	  for them

@@ -63,21 +63,34 @@ sub nikto_httpoptions {
     }
     $public_methods =~ s/^[ ]?, //;
 
-    # proxy can impose it's methods... should actually check this not just warn
+    # proxy can impose its methods... should actually check this not just warn
     if ($CLI{'useproxy'} ne "") { $txt = "(May be proxy's methods, not server's)"; }
 
+    %davmethods = ();
     if ($allow_methods ne "") {
         add_vulnerability($mark, "Allowed HTTP Methods: $allow_methods $txt", 999990, 0);
-        foreach my $m (split /,? /, $allow_methods) { eval_methods($m, "Allow", $dbarray, $mark); }
+        foreach my $m (split /,? /, $allow_methods) {
+            my $method = eval_methods($m, "Allow", $dbarray, $mark);
+            if ($method ne "") { $davmethods{$method} = 1 };
+        }
     }
 
     if ($public_methods ne "") {
         add_vulnerability($mark, "Public HTTP Methods: $public_methods $txt", 999985, 0);
         foreach my $m (split /,? /, $public_methods) {
-            eval_methods($m, "Public", $dbarray, $mark);
+            my $method = eval_methods($m, "Public", $dbarray, $mark);
+            if ($method ne "") { $davmethods{$method} = 1 };
         }
     }
-
+    
+    if (scalar(keys(%davmethods)) > 0) {
+        $message = "HTTP method(s) ";
+        for my $key (keys %davmethods) {
+            $message .= "$key ";
+        }
+        $message .= "indicate(s) that DAV/WebDAV is installed.";
+        add_vulnerability($mark, "$message", "999977", "0");
+    }
     # Check for other weirdness
     # IIS Debug
 
@@ -145,12 +158,26 @@ sub eval_methods {
 
     # Now search database for the method.
     foreach my $item (@$dbarray) {
+        if ($method eq "PROPPATCH" || $method eq "SEARCH" ||
+            $method eq "PROPFIND" || $method eq "COPY" ||
+            $method eq "LOCK" || $method eq "UNLOCK") {
+            return $method;
+        }
+
         if ($item->{'method'} eq $method) {
-            $message = $item->{'message'};
-            $message =~ s/\@TYPE\@/$type/;
-            add_vulnerability($mark, "$message", $item->{'nikto_id'}, $item->{'osvdb'});
+            if ($item->{'nikto_id'} eq "0") {
+                # is webdav
+                return $method;
+            }
+            else {
+                $message = $item->{'message'};
+                $message =~ s/\@TYPE\@/$type/;
+                add_vulnerability($mark, "$message", $item->{'nikto_id'}, $item->{'osvdb'});
+            }
         }
     }
+       
+    return "";
 }
 
 1;
