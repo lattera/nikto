@@ -1817,14 +1817,13 @@ sub cache_add {
     my ($mark)        = @_;
 
     if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
-        my $key =
-          LW2::md5(  $mark->{'ip'}
+        my $key =  $mark->{'ip'}
                    . $mark->{'hostname'}
                    . $mark->{'port'}
                    . $mark->{'ssl'}
                    . $method
                    . $uri
-                   . $postdata);
+                   . $postdata;
 
         $CACHE{$key}{'method'}  = $method;
         $CACHE{$key}{'code'}    = $code;
@@ -1924,8 +1923,9 @@ sub nfetch {
 			}
 			else {
 				# Check banner hasn't changed
-				if (exists $result{'server'} && $mark->{'banner'} ne $result{'server'}) {
+				if (exists $result{'server'} && $mark->{'banner'} ne $result{'server'} && !exists $mark->{'bannerchanged'}) {
 					nprint("+ Server banner has changed from $mark->{banner} to $result{server}, this may suggest a WAF is in place");
+					$mark->{'bannerchanged'} = 1;
 				}
 			}
 			
