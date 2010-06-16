@@ -6433,5 +6433,5 @@
 "006434","0","3","/jk-status","GET","200","","","","","mod_jk status page is visible.","",""
 "006435","0","3","/balancer-manager","GET","200","","","","","mod_proxy_balancer management page is visible.","",""
 "006436","0","3","/balancer-manager","GET","200","","","","","mod_proxy_balancer management page is visible.","",""
-"006437","0","1","/servlets-examples/","GET","","","","","","Tomcat servlets examples are visible.","",""
-"006438","0","1","/admin-console","GET","","","","","","JBoss admin console is visible.","",""
+"006437","0","1","/servlets-examples/","GET","200","","","","","Tomcat servlets examples are visible.","",""
+"006438","0","1","/admin-console","GET","200","","","","","JBoss admin console is visible.","",""
