@@ -52,10 +52,10 @@ sub nikto_robots {
             {
                 chomp($line);
                 $line =~ s/\#.*$//;
-                $line =~ s/(^\s+|\s+$)//g;
+                $line =~ s/(?:^\s+|\s+$)//g;
                 $line =~ s/\s+/ /g;
                 $line =~ s/\\t/ /g;
-                $line =~ s/(dis)?allow(\\:)?( )?//i;
+                $line =~ s/(?:dis)?allow(?:\\:)?\s?//i;
                 $line =~ s/\*//g;
                 $line =~ s/\/+/\//g;
 

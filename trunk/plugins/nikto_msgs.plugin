@@ -53,7 +53,7 @@ sub nikto_msgs {
 
     # Special stuff to pull information from results
     # McAfee ePO
-    if ($mark->{'banner'} =~ /(Agent-ListenServer-HttpSvr\/1\.0)\b/i) {
+    if ($mark->{'banner'} =~ /Agent-ListenServer-HttpSvr\/1\.0\b/i) {
         my ($RES, $CONTENT) =
           nfetch($mark, "/", "GET", "", "", "", "msgs: Agent-ListenServer-HttpSvr");
         next unless ($RES == 200);
@@ -72,7 +72,7 @@ sub nikto_msgs {
     }
 
     # HP WBEM
-    if ($mark->{'banner'} =~ /(CompaqHTTPServer)/i) {
+    if ($mark->{'banner'} =~ /CompaqHTTPServer/i) {
         my ($RES, $CONTENT) =
           nfetch($mark, "/cpqlogin.htm", "GET", "", "", "", "msgs: CompaqHTTPServer");
         next unless ($RES == 200);

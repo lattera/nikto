@@ -61,7 +61,7 @@ sub nikto_tests {
                 nprint("+ $uri - 200/OK Response could be $TESTS{$checkid}{'message'}")
                   if $CLI{'display'} =~ /3/;
                 }
-            elsif ($res =~ /30([0-3]|7)/) {
+            elsif ($res =~ /30(?:[0-3]|7)/) {
                 nprint(  "+ $uri - Redirects ($res) to "
                        . $headers{'location'}
                        . " , $TESTS{$checkid}{'message'}")
