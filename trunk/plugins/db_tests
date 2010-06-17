@@ -1252,8 +1252,6 @@
 "001231","568","3","/blahb.ida","GET","200","","","file blahb.ida could not","","Reveals physical path. To fix: Preferences -> Home directory -> Application & check 'Check if file exists' for the ISAPI mappings. MS01-033.","",""
 "001232","568","3","/blahb.idq","GET","200","","","file blahb.idq could not","","Reveals physical path. To fix: Preferences -> Home directory -> Application & check 'Check if file exists' for the ISAPI mappings. MS01-033.","",""
 "001233","19957","a","/ab2/\@AdminViewError","GET","200","","","","","Sun Answerbook allows viewing of the error logs without authentication.","",""
-"001234","6694","3","/.DS_Store","GET","200","","","","","Apache on Mac OSX will serve the .DS_Store file, which contains sensitive information. Configure Apache to ignore this file or upgrade to a newer version.","",""
-"001235","644","3","/.FBCIndex","GET","200","","","","","Apache on Mac OSX will serve the .FBCIndex file, which contains sensitive information. Configure Apache to ignore this file or upgrade to a newer version.","",""
 "001236","16014","4","/\"><img%20src=\"javascript:alert(document.domain)\">","GET","<img src=\"javascript:alert(document.domain)\">","","","","","The IBM Web Traffic Express Caching Proxy is vulnerable to Cross Site Scripting (XSS). CA-2000-02.","",""
 "001237","3233","3","/Survey/Survey.Htm","GET","System Components","","","","","This Compaq device, without authentication, gives lots of system information.","",""
 "001238","3233","3","/WEBAGENT/CQMGSERV/CF-SINFO.TPF","GET","General Information","","","","","This Compaq device, without authentication, gives lots of system information. Load all the pages at /WEBAGENT/FINDEX.TPL","",""
