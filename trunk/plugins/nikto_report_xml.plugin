@@ -106,7 +106,7 @@ sub xml_change_vars {
 
     $variables{"#TEMPL_HCTR"}        = $NIKTO{'TEMPL_HCTR'};
     $variables{"#TEMPL_END"}         = date_disp($mark->{end_time});
-    $variables{"#TEMPL_HOSTNAME"}    = simple_enc($mark->{hostname});
+    $variables{"#TEMPL_HOSTNAME"}    = hex_enc($mark->{hostname});
     $variables{"#TEMPL_HOST_HEADER"} = $mark->{hostname};
     if (defined $mark->{vhost}) {
         $variables{"#TEMPL_HOST_HEADER"} = $mark->{vhost};
@@ -122,7 +122,7 @@ sub xml_change_vars {
     $variables{"#TEMPL_START"}              = date_disp($mark->{start_time});
     $variables{"#TEMPL_END"}                = date_disp($mark->{end_time});
     $variables{"#TEMPL_NIKTO_VER"}          = $NIKTO{'version'};
-    $variables{"#TEMPL_BANNER"}             = simple_enc($mark->{banner});
+    $variables{"#TEMPL_BANNER"}             = hex_enc($mark->{banner});
     $variables{"#TEMPL_NIKTO_CLI"}          = $CLI{'all_options'};
     $variables{"#TEMPL_CTR"}                = $mark->{total_checks};
     $variables{"#TEMPL_NIKTO_HOSTS_TESTED"} = $COUNTERS{hosts_total};
@@ -182,10 +182,15 @@ sub xml_change_vars {
     return $template;
 }
 ###############################################################################
-sub simple_xml_enc {
-    my $var = $_[0] || return;
-    $var =~ s/&/%26/g;
-    return $var;
+sub hex_enc {
+    my $invar = $_[0] || return;
+    my $outvar;
+    foreach my $c (split(//, $invar)) {
+        my $n = ord($c);
+        if (($n > 127) || ($n < 32) || ($n == 38) || ($n == 60) || ($n == 62) | ($n == 34)) { $outvar .= sprintf '%#x', $n; }
+        else { $outvar .= $c; }
+        }
+    return $outvar;
 }
 ###############################################################################
 sub simple_enc {
