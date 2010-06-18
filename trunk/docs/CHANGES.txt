@@ -1,4 +1,5 @@
 2010-06-17
+	- Fix for #150: Special characters in XML output
 	- Fix for #133: regular expression matching causes errors. Removed char_escape and some other
 	  regexs in favor of the faster quotemeta(). Also set many regexs to non-capturing for speed.
 	- Optimized rm_active_content() a little by shuffling code and reducing some mem copies/regexs. Needs more work.
