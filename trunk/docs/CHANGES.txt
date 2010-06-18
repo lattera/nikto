@@ -1,3 +1,7 @@
+2010-06-17
+	- Fix for #133: regular expression matching causes errors. Removed char_escape and some other
+	  regexs in favor of the faster quotemeta(). Also set many regexs to non-capturing for speed.
+	- Optimized rm_active_content() a little by shuffling code and reducing some mem copies/regexs. Needs more work.
 2010-06-15
 	- Fix for #127: dav methods are treated specially and reported all at once
 	- Update nikto.conf to switch tests to always have the (report:500) parameter

@@ -47,13 +47,13 @@ sub nikto_apacheusers {
     # First ensure that the server is vulnerable
     (my $result, $content) = nfetch($mark, "/~root", "GET", "", "", "", "apacheusers: known user");
 
-    $content = char_escape($content);
+    $content = quotemeta($content);
     if ($content =~ /forbidden/i)    # good on "root"
     {
         (my $result, $content) = nfetch($mark, "/~" . LW2::utils_randstr(8),
                                         "GET", "", "", "", "apacheusers: invalid user");
 
-        $content = char_escape($content);
+        $content = quotemeta($content);
         if ($content !~ /forbidden/i)    # Good, it gave an error instead of forbidden
         {
             add_vulnerability(

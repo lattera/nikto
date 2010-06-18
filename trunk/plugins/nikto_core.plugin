@@ -281,14 +281,7 @@ sub map_codes {
 sub rm_active_content {
 
     # Try to remove active content which could mess up the file's signature
-    my $cont = $_[0];
-    my $file = $_[1];
-
-    # filename
-    if ($file ne '') {
-        $file =~ s/([^a-zA-Z0-9\s])/\\$1/g;
-        $cont =~ s/$file//g;
-    }
+    my ($cont, $file) = @_;
 
     # Dates
     $cont =~ s/(?:[0-9]{4}|[0-9]{1,2})[-.\/][0-9]{1,2}[-.\/](?:[0-9]{4}|[0-9]{1,2})//g;
@@ -300,19 +293,12 @@ sub rm_active_content {
 
     # URI, if provided, plus encoded versions of it
     # $_[1] has unescaped file name, and $file has escaped. use appropriate one!
-    if (defined $file) {
-
-        # match pages which link to themselves w/diff args
-        my $e = $file;
-        $e    =~ s/^\/$file\??//;
-        $cont =~ s/$e//gs;
-
-        # again but with the index in place
-        $e = $file;
-        $cont =~ s/$e//gs;
+    if ($file ne '') {
+        $file = quotemeta($file);
+        $cont =~ s/$file//g;
 
         # base 64
-        $e = LW2::encode_base64($_[1]);
+        my $e = LW2::encode_base64($_[1]);
         $cont =~ s/$e//gs;
 
         # hex encoded
@@ -329,13 +315,15 @@ sub rm_active_content {
         $cont =~ s/$e//gs;
 
         # url encoding, query portion
-        if ($file =~ /\?/) {
-            $e = $file;
-            $e =~ s/\?(.*$)//;
-            my $qs = $1;
+        if ($file =~ /\?(.*$)/) {
+	    my $qs = $1;
+
+       	    # match pages which link to themselves w/diff args
+       	    $cont =~ s/$qs//gs;
+
+            # url encoded
             $qs =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-            $e .= "?$qs";
-            $cont =~ s/$e//gs;
+            $cont =~ s/$qs//gs;
         }
     }
 
@@ -2025,9 +2013,8 @@ sub set_scan_items {
                 my $ext = get_ext($item[3]);
                 $db_extensions{$ext} = 1;
 
-                # This escapes regex characters in the conditionals. 
-                # This will have to change if regex is ever allowed in the db
-                for (my $y = 5 ; $y <= 9 ; $y++) { $item[$y] =~ s/([^a-zA-Z0-9\s])/\\$1/g; }
+                # Escape chars in the conditionals.  This must change if regexs are allowed in the db.
+                for (my $y = 5 ; $y <= 9 ; $y++) { $item[$y] = quotemeta($item[$y]); }
 
                 $NIKTO{total_checks}++;
                 $TESTS{ $item[0] }{'uri'}         = $item[3];
@@ -2057,12 +2044,6 @@ sub set_scan_items {
 #######################################################################
 sub max_test_id {
     return (sort { $a <=> $b } keys %TESTS)[-1];
-}
-
-#######################################################################
-sub char_escape {
-    $_[0] =~ s/([^a-zA-Z0-9 ])/\\$1/g;
-    return $_[0];
 }
 
 #######################################################################

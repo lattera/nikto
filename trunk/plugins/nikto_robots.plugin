@@ -47,7 +47,7 @@ sub nikto_robots {
         my $DISCTR = 0;
         my @DOC = split(/\n/, $CONTENT);
         foreach my $line (@DOC) {
-            $line = char_escape($line);
+            $line = quotemeta($line);
             if ($line =~ /allow/i)
             {
                 chomp($line);
