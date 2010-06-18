@@ -697,7 +697,7 @@ sub check_input {
 		if ($OUTPUT{'show_auth'}) { $OUTPUT{'show_auth'}=0; }
 		else { $OUTPUT{'show_auth'}=1; }
 	}
-	elsif ($key eq 'q') { 
+       elsif (($key eq 'q') || (ord($key) eq 3)){ 
 		safe_quit();
 	}
 	return;
