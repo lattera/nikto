@@ -660,47 +660,48 @@ sub check_input {
 
 	lc($key);
 	if ($key eq ' ') { 
-                my $line = sprintf("- Tests completed: %d %.0f%%", $NIKTO{'totalrequests'}, ($NIKTO{'totalrequests'} / $NIKTO{'total_checks'}) * 100);
-                nprint($line);
+        nprint("- Currently in plugin $NIKTO{'current_plugin'}");
+        my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete", $NIKTO{'totalrequests'}, ($NIKTO{'totalrequests'} / $NIKTO{'total_checks'}) * 100);
+        nprint($line);
 		return;
-		}
+    }
 	elsif ($key eq 'v') { 
 		if ($OUTPUT{'verbose'}) { $OUTPUT{'verbose'}=0; }
 		else { $OUTPUT{'verbose'}=1; }
-		}
+	}
 	elsif ($key eq 'd') { 
 		if ($OUTPUT{'debug'}) { $OUTPUT{'debug'}=0; }
 		else { $OUTPUT{'debug'}=1; }
-		}
+	}
 	elsif ($key eq 'e') { 
 		if ($OUTPUT{'errors'}) { $OUTPUT{'errors'}=0; }
 		else { $OUTPUT{'errors'}=1; }
-		}
+	}
 	elsif ($key eq 'p') { 
 		if ($OUTPUT{'progress'}) { $OUTPUT{'progress'}=0; }
 		else { $OUTPUT{'progress'}=1; }
-		}
+	}
 	elsif ($key eq 'r') { 
 		if ($OUTPUT{'show_redirects'}) { $OUTPUT{'show_redirects'}=0; }
 		else { $OUTPUT{'show_redirects'}=1; }
-		}
+	}
 	elsif ($key eq 'c') { 
 		if ($OUTPUT{'show_cookies'}) { $OUTPUT{'show_cookies'}=0; }
 		else { $OUTPUT{'show_cookies'}=1; }
-		}
+	}
 	elsif ($key eq 'o') { 
 		if ($OUTPUT{'show_ok'}) { $OUTPUT{'show_ok'}=0; }
 		else { $OUTPUT{'show_ok'}=1; }
-		}
+	}
 	elsif ($key eq 'a') { 
 		if ($OUTPUT{'show_auth'}) { $OUTPUT{'show_auth'}=0; }
 		else { $OUTPUT{'show_auth'}=1; }
-		}
+	}
 	elsif ($key eq 'q') { 
 		safe_quit();
-		}
-	return;
 	}
+	return;
+}
 
 ###############################################################################
 sub readkey {
@@ -1402,7 +1403,7 @@ sub run_hooks {
         my $oldverbose = $OUTPUT{'verbose'};
         my $olddebug   = $OUTPUT{'debug'};
         my $olderrors  = $OUTPUT{'errors'};
-        nprint("- Running $type for \"$plugin->{full_name}\" plugin", "v")
+        nprint("- Running $type for \"$plugin->{'full_name'}\" plugin", "v")
           unless ($type eq "prefetch" || $type eq "postfetch");
         if (defined $plugin->{'parameters'}->{'verbose'}
             && $plugin->{'parameters'}->{'verbose'} == 1) {
@@ -1412,6 +1413,7 @@ sub run_hooks {
             && $plugin->{'parameters'}->{'debug'} == 1) {
             $OUTPUT{'debug'} = 1;
         }
+        unless ($type eq "prefetch" || $type eq "postfetch") { $NIKTO{'current_plugin'}=$plugin->{'full_name'}; }
         &{ $plugin->{ $type . '_method' } }($mark, $plugin->{'parameters'}, $request, $result);
         $OUTPUT{'verbose'} = $oldverbose;
         $OUTPUT{'debug'}   = $olddebug;
@@ -1952,7 +1954,7 @@ sub nfetch {
 
     # check for keyboard input
     if (($NIKTO{'totalrequests'} % 10) == 0) {
-	check_input();
+        check_input();
 	}
 
     if (defined $CLI{'root'}) {
