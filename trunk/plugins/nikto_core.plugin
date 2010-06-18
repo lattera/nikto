@@ -641,7 +641,6 @@ sub general_config {
 ###############################################################################
 sub reset_term {
         $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'oterm'});
-        $NIKTO{'POSIX'}{'term'}->setcc(VTIME, 0);
 	$NIKTO{'POSIX'}{'support'}=0; 
 	}
 
@@ -709,7 +708,6 @@ sub readkey {
 
         my $key;
         $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'noecho'});
-        $NIKTO{'POSIX'}{'term'}->setcc(VTIME, 1);
         $NIKTO{'POSIX'}{'term'}->setattr($NIKTO{'POSIX'}{'fd_stdin'}, TCSANOW);
 	eval {
 		local $SIG{ALRM} = sub { die; };
@@ -718,7 +716,6 @@ sub readkey {
 		ualarm(0);
 		};
         $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'oterm'});
-        $NIKTO{'POSIX'}{'term'}->setcc(VTIME, 0);
         $NIKTO{'POSIX'}{'term'}->setattr($NIKTO{'POSIX'}{'fd_stdin'}, TCSANOW);
 
 	return $key;
