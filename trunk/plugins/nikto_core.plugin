@@ -508,8 +508,12 @@ sub general_config {
         if ($CLI{'display'} =~ /v/i) { $OUTPUT{'verbose'} = 1; }
         if ($CLI{'display'} =~ /s/i) { $OUTPUT{'scrub'}   = 1; }
         if ($CLI{'display'} =~ /e/i) { $OUTPUT{'errors'}  = 1; }
-		if ($CLI{'display'} =~ /p/i) { $OUTPUT{'percent'} = 1; }
-    }
+        if ($CLI{'display'} =~ /p/i) { $OUTPUT{'progress'} = 1; }
+        if ($CLI{'display'} =~ /1/i) { $OUTPUT{'show_redirects'} = 1; }
+        if ($CLI{'display'} =~ /2/i) { $OUTPUT{'show_cookies'} = 1; }
+        if ($CLI{'display'} =~ /3/i) { $OUTPUT{'show_ok'} = 1; }
+        if ($CLI{'display'} =~ /4/i) { $OUTPUT{'show_auth'} = 1; }
+        }
 
     # port(s)
     if (defined $CLI{'ports'}) {
@@ -616,8 +620,109 @@ sub general_config {
     $NIKTO{'TMPL_HCTR'}    = 0;
     $NIKTO{'TMPL_SUMMARY'} = 0;
 
+    # POSIX support for status?
+    $NIKTO{'POSIX'}{'support'}=0;
+    eval "use POSIX qw(:termios_h)";
+    if ( !$@ ) {
+	eval "use Time::HiRes qw(ualarm)";
+    	if ( !$@ ) {
+		$NIKTO{'POSIX'}{'support'}=1; 
+		$NIKTO{'POSIX'}{'echo'} = ECHO | ECHOK | ICANON;
+		$NIKTO{'POSIX'}{'noecho'} = $oterm & ~$echo;
+        	$NIKTO{'POSIX'}{'fd_stdin'} = fileno(STDIN);
+		$NIKTO{'POSIX'}{'term'} = POSIX::Termios->new();
+		$NIKTO{'POSIX'}{'term'}->getattr($fd_stdin);
+		$NIKTO{'POSIX'}{'oterm'} = $NIKTO{'POSIX'}{'term'}->getlflag();
+		}
+	}
     return;
 }
+
+###############################################################################
+sub reset_term {
+        $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'oterm'});
+        $NIKTO{'POSIX'}{'term'}->setcc(VTIME, 0);
+	$NIKTO{'POSIX'}{'support'}=0; 
+	}
+
+###############################################################################
+sub safe_quit {
+        $mark->{'end_time'} = time();
+        report_host_end($mark);
+        report_close($mark);
+        reset_term();
+        exit(1);
+	}
+
+###############################################################################
+sub check_input {
+	my $key = readkey();
+	if ($key eq '') { return; }
+
+	lc($key);
+	if ($key eq ' ') { 
+                my $line = sprintf("- Tests completed: %d %.0f%%", $NIKTO{'totalrequests'}, ($NIKTO{'totalrequests'} / $NIKTO{'total_checks'}) * 100);
+                nprint($line);
+		return;
+		}
+	elsif ($key eq 'v') { 
+		if ($OUTPUT{'verbose'}) { $OUTPUT{'verbose'}=0; }
+		else { $OUTPUT{'verbose'}=1; }
+		}
+	elsif ($key eq 'd') { 
+		if ($OUTPUT{'debug'}) { $OUTPUT{'debug'}=0; }
+		else { $OUTPUT{'debug'}=1; }
+		}
+	elsif ($key eq 'e') { 
+		if ($OUTPUT{'errors'}) { $OUTPUT{'errors'}=0; }
+		else { $OUTPUT{'errors'}=1; }
+		}
+	elsif ($key eq 'p') { 
+		if ($OUTPUT{'progress'}) { $OUTPUT{'progress'}=0; }
+		else { $OUTPUT{'progress'}=1; }
+		}
+	elsif ($key eq 'r') { 
+		if ($OUTPUT{'show_redirects'}) { $OUTPUT{'show_redirects'}=0; }
+		else { $OUTPUT{'show_redirects'}=1; }
+		}
+	elsif ($key eq 'c') { 
+		if ($OUTPUT{'show_cookies'}) { $OUTPUT{'show_cookies'}=0; }
+		else { $OUTPUT{'show_cookies'}=1; }
+		}
+	elsif ($key eq 'o') { 
+		if ($OUTPUT{'show_ok'}) { $OUTPUT{'show_ok'}=0; }
+		else { $OUTPUT{'show_ok'}=1; }
+		}
+	elsif ($key eq 'a') { 
+		if ($OUTPUT{'show_auth'}) { $OUTPUT{'show_auth'}=0; }
+		else { $OUTPUT{'show_auth'}=1; }
+		}
+	elsif ($key eq 'q') { 
+		safe_quit();
+		}
+	return;
+	}
+
+###############################################################################
+sub readkey {
+	if (!$NIKTO{'POSIX'}{'support'}) { return; }
+
+        my $key;
+        $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'noecho'});
+        $NIKTO{'POSIX'}{'term'}->setcc(VTIME, 1);
+        $NIKTO{'POSIX'}{'term'}->setattr($NIKTO{'POSIX'}{'fd_stdin'}, TCSANOW);
+	eval {
+		local $SIG{ALRM} = sub { die; };
+		ualarm(1_000);
+        	sysread(STDIN, $key, 1);
+		ualarm(0);
+		};
+        $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'oterm'});
+        $NIKTO{'POSIX'}{'term'}->setcc(VTIME, 0);
+        $NIKTO{'POSIX'}{'term'}->setattr($NIKTO{'POSIX'}{'fd_stdin'}, TCSANOW);
+
+	return $key;
+	}
 
 ###############################################################################
 sub resolve {
@@ -1547,9 +1652,6 @@ sub read_data {
     my ($prompt, $mode, $POSIX) = @_;
     my $input = "";
 
-    if   ($^O =~ /Win32/) { $POSIX = 0; }
-    else                  { $POSIX = 1; }
-
     my %SPECIAL = ("\x03" => 'INT',    # Control-C, Interrupt
                    "\x08" => 'DEL',    # Backspace
                    "\x7f" => 'DEL',    # Delete
@@ -1562,7 +1664,7 @@ sub read_data {
     # POSIX::Termios. We would be best to get rid of this
     # entirely and use another way...
 
-    if ($POSIX) {
+    if ($NIKTO{'POSIX'}{'support'}) {
         local (*TTY, *TTYOUT);
         open TTY,    "<&STDIN"   or return;
         open TTYOUT, ">>&STDOUT" or return;
@@ -1851,6 +1953,11 @@ sub nfetch {
     my (%request, %result);
     setup_hash(\%request, $mark, $testid);
 
+    # check for keyboard input
+    if (($NIKTO{'totalrequests'} % 10) == 0) {
+	check_input();
+	}
+
     if (defined $CLI{'root'}) {
         $request{'whisker'}->{'uri'} = $CLI{'root'} . $uri;    # prepend -root option value
     }
@@ -1930,9 +2037,7 @@ sub nfetch {
         nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
     }
 
-    if (   defined $CLI{'display'}
-        && ($CLI{'display'} =~ /2/)
-        && (defined($result{'whisker'}->{'cookies'}))) {
+    if ($OUTPUT{'show_cookies'} && (defined($result{'whisker'}->{'cookies'}))) {
         foreach my $c (@{ $result{'whisker'}->{'cookies'} }) {
             nprint("+ $uri sent cookie: $c");
         }
@@ -2202,9 +2307,10 @@ sub usage {
                                2     Show cookies received
                                3     Show all 200/OK responses
                                4     Show URLs which require authentication
-                               V     Verbose output
                                D     Debug output
                                E     Display all HTTP errors
+                               P     Print progress to STDOUT
+                               V     Verbose output
        -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
        -evasion+          IDS evasion technique:\n";
 

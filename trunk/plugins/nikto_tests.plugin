@@ -58,14 +58,13 @@ sub nikto_tests {
 
             # auth is now done in nfetch
             if ($res eq 200) {
-                nprint("+ $uri - 200/OK Response could be $TESTS{$checkid}{'message'}")
-                  if $CLI{'display'} =~ /3/;
+                nprint("+ $uri - 200/OK Response could be $TESTS{$checkid}{'message'}") if $OUTPUT{'show_ok'};
                 }
             elsif ($res =~ /30(?:[0-3]|7)/) {
                 nprint(  "+ $uri - Redirects ($res) to "
                        . $headers{'location'}
                        . " , $TESTS{$checkid}{'message'}")
-                  if $CLI{'display'} =~ /1/;
+                  if $OUTPUT{'show_redirects'};
                 }
 
             my $m1_method = my $m1o_method = my $m1a_method = my $f2_method = my $f1_method =
@@ -153,14 +152,16 @@ sub nikto_tests {
             }
 
         # Percentages
-        $progress++;
-        if ($parameters->{'report'}) {
-            if (($progress % $parameters->{'report'}) == 0) {
-                my $line = sprintf("- Tests completed: %d %.0f%%",
+	if ($OUTPUT{'progress'}) {
+        	if ($parameters->{'report'}) {
+        	    $progress++;
+        	    if (($progress % $parameters->{'report'}) == 0) {
+        	        my $line = sprintf("- Tests completed: %d %.0f%%",
                                    $progress, ($progress / $NIKTO{total_checks}) * 100);
                 nprint($line);
                 }
             }
+	}
         }    # end check loop
 
     # Perform mutation tests

@@ -96,7 +96,7 @@ sub nikto_auth {
         $realm    =~ s/^realm=//;
     }
     
-    nprint("+ $uri - Requires Authentication for realm '$realm'") if $CLI{'display'} =~ /4/;
+    nprint("+ $uri - Requires Authentication for realm '$realm'") if $OUTPUT{'show_auth'};
 
     # Now we have this we can try guessing the password
     foreach my $entry (@{$REALMS}) {

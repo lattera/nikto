@@ -53,6 +53,9 @@ $NIKTO{'name'}    = "Nikto";
 $NIKTO{'configfile'} =
   "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
 
+# put a signal trap so we can close down reports properly
+$SIG{'INT'} = \&safe_quit;
+
 # read the --config option
 {
     my %optcfg;
@@ -173,14 +176,6 @@ foreach my $mark (@MARKS) {
 
     nfetch($mark, "/", "GET", "", "", { nocache => 1, noprefetch => 1, nopostfetch => 1 }, "getinfo");
 	
-    # put a signal trap so we can close down reports properly
-    $SIG{'INT'} = sub {
-        $mark->{'end_time'} = time();
-        report_host_end($mark);
-        report_close($mark);
-        exit(1);
-    };
-
     if ($CLI{'findonly'}) {
         my $protocol = "http";
         if ($mark->{'ssl'}) { $protocol .= "s"; }
