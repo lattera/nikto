@@ -660,10 +660,10 @@ sub check_input {
 
 	lc($key);
 	if ($key eq ' ') { 
-        nprint("- Currently in plugin $NIKTO{'current_plugin'}");
         my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete", $NIKTO{'totalrequests'}, ($NIKTO{'totalrequests'} / $NIKTO{'total_checks'}) * 100);
+	if ($NIKTO{'current_plugin'} ne '') { $line .= " (in plugin $NIKTO{'current_plugin'})"; }
         nprint($line);
-		return;
+	return;
     }
 	elsif ($key eq 'v') { 
 		if ($OUTPUT{'verbose'}) { $OUTPUT{'verbose'}=0; }
