@@ -124,18 +124,18 @@ sub nprint {
     }
 
     # print errors to STDERR
-    if ($line =~ /^\+ ERROR\:/) { print STDERR "$line\n"; return; }
+    if ($line =~ /^\+ ERROR:/) { print STDERR "$line\n"; return; }
 
     # don't print to STDOUT if output file is "-"
     if ((defined $CLI{'file'}) && ($CLI{'file'} eq "-")) { return; }
 
-# print to scan details to standard output if the users wants another format and is saving results to a file
     $line =~ s/(CVE\-[12][0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
     $line =~ s/(CA\-[12][0-9]{3}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
     $line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
     $line =~
       s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
-    print "$line\n";
+
+    print $line ."\n";
 
     return;
 }
@@ -194,7 +194,7 @@ sub map_codes {
             %headers = ();
             ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
         }
-        else                                                    # different host... ugh... guess
+        else                                                    # different host... ugh... just guess
         {
             $FoF{'okay'}{'response'} = 200;
             $FoF{'okay'}{'type'}     = "STD";
@@ -224,9 +224,9 @@ sub map_codes {
     }
 
     # add those generic type holders back as real files
-    $REQS{'/$rs/'} = "DIRECTORY";
-    $REQS{'/$rs'}  = "NONE";
-    $REQS{'/.$rs'} = "DOTFILE";
+    $REQS{"/$rs/"} = "DIRECTORY";
+    $REQS{"/$rs"}  = "NONE";
+    $REQS{"/.$rs"} = "DOTFILE";
 
     foreach my $file (keys %REQS) {
         nprint("- Testing error for file: $file\n", "v");
@@ -912,8 +912,8 @@ sub set_targets {
 ###############################################################################
 sub parse_hostfile {
     my ($file) = @_;
-    my $nmap = 0;
-    my (@results, $hostdesc);
+    my (@results, $hostdesc, $nmap);
+    $nmap = 0;
 
     open(IN, $file) || die print STDERR "+ ERROR: Cannot open '$file':$@\n";
     while (<IN>) {
@@ -928,7 +928,7 @@ sub parse_hostfile {
         if ($_ eq "") { next; }
 
         # Parse for nmap files
-        if ($nmap == 1) {
+        if ($nmap) {
 
             # First get the host name
             my @line = split(/ /);
@@ -959,11 +959,7 @@ sub parse_hostfile {
 ###############################################################################
 sub load_databases {
     my @dbs = qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
-    my $prefix = $_[0];
-
-    unless (defined $prefix) {
-        $prefix = "";
-    }
+    my $prefix = $_[0] || "";
 
     # verify required files
     for my $file (@dbs) {
