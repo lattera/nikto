@@ -187,9 +187,11 @@ sub hex_enc {
     my $outvar;
     foreach my $c (split(//, $invar)) {
         my $n = ord($c);
-        if (($n > 127) || ($n < 32) || ($n == 38) || ($n == 60) || ($n == 62) | ($n == 34)) { $outvar .= sprintf '%#x', $n; }
-        else { $outvar .= $c; }
+        if (($n > 127) || ($n < 32) || ($n == 38) || ($n == 60) || ($n == 62) | ($n == 34)) {
+            $outvar .= sprintf '%#x', $n;
         }
+        else { $outvar .= $c; }
+    }
     return $outvar;
 }
 ###############################################################################

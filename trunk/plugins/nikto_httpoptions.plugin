@@ -71,7 +71,7 @@ sub nikto_httpoptions {
         add_vulnerability($mark, "Allowed HTTP Methods: $allow_methods $txt", 999990, 0);
         foreach my $m (split /,? /, $allow_methods) {
             my $method = eval_methods($m, "Allow", $dbarray, $mark);
-            if ($method ne "") { $davmethods{$method} = 1 };
+            if ($method ne "") { $davmethods{$method} = 1 }
         }
     }
 
@@ -79,10 +79,10 @@ sub nikto_httpoptions {
         add_vulnerability($mark, "Public HTTP Methods: $public_methods $txt", 999985, 0);
         foreach my $m (split /,? /, $public_methods) {
             my $method = eval_methods($m, "Public", $dbarray, $mark);
-            if ($method ne "") { $davmethods{$method} = 1 };
+            if ($method ne "") { $davmethods{$method} = 1 }
         }
     }
-    
+
     if (scalar(keys(%davmethods)) > 0) {
         $message = "WebDAV enabled (";
         for my $key (keys %davmethods) {
@@ -91,6 +91,7 @@ sub nikto_httpoptions {
         $message .= "listed as allowed)";
         add_vulnerability($mark, "$message", "999977", "0");
     }
+
     # Check for other weirdness
     # IIS Debug
 
@@ -108,7 +109,8 @@ sub nikto_httpoptions {
     # IIS PROPFIND HEADER
     %headers = ("Host"           => "",
                 "Content-Length" => "0",);
-    ($res, $content) = nfetch($mark, "/", "PROPFIND", "", \%headers, { noclean => 1 }, "httpoptions: PROPFIND");
+    ($res, $content) =
+      nfetch($mark, "/", "PROPFIND", "", \%headers, { noclean => 1 }, "httpoptions: PROPFIND");
     if ($res == 207) {
         if ($content =~ "<a:href>http://") {
             my $ipfound = $content;
@@ -123,6 +125,7 @@ sub nikto_httpoptions {
     # Special checks for TRACE/TRACK to see whether its vulnerable
     %headers = ("Host" => "Nikto",);
     foreach my $method (split(/ /, "TRACE TRACK")) {
+
         # Check for all flavours of HTTP
         foreach my $version (split(/ /, "1.0 1.1")) {
             $request{'whisker'}{'version'} = $version;
@@ -158,14 +161,18 @@ sub eval_methods {
 
     # Now search database for the method.
     foreach my $item (@$dbarray) {
-        if ($method eq "PROPPATCH" || $method eq "SEARCH" ||
-            $method eq "PROPFIND" || $method eq "COPY" ||
-            $method eq "LOCK" || $method eq "UNLOCK") {
+        if (   $method eq "PROPPATCH"
+            || $method eq "SEARCH"
+            || $method eq "PROPFIND"
+            || $method eq "COPY"
+            || $method eq "LOCK"
+            || $method eq "UNLOCK") {
             return $method;
         }
 
         if ($item->{'method'} eq $method) {
             if ($item->{'nikto_id'} eq "0") {
+
                 # is webdav
                 return $method;
             }
@@ -176,7 +183,7 @@ sub eval_methods {
             }
         }
     }
-       
+
     return "";
 }
 

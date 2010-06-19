@@ -29,21 +29,21 @@ sub nikto_apacheusers_init {
             description => "Checks whether we can enumerate usernames directly from the web server",
             scan_method => \&nikto_apacheusers,
             copyright   => "2008 CIRT Inc.",
-            options     =>  {
-                                enumerate   => "Flag to indicate whether to attempt to enumerate users",
-                                dictionary  => "Filename for a dictionary file of users",
-                                size        => "Maximum size of username if bruteforcing",
-                                home        => "Look for ~user to enumerate",
-                                cgiwrap     => "User cgi-bin/cgiwrap to enumerate"
-                            }
-            };
+            options     => {
+                         enumerate  => "Flag to indicate whether to attempt to enumerate users",
+                         dictionary => "Filename for a dictionary file of users",
+                         size       => "Maximum size of username if bruteforcing",
+                         home       => "Look for ~user to enumerate",
+                         cgiwrap    => "User cgi-bin/cgiwrap to enumerate"
+                         }
+              };
     return $id;
 }
 
 sub nikto_apacheusers {
     my ($mark, $parameters) = @_;
-    my $apacheusers=0;
-    
+    my $apacheusers = 0;
+
     # First ensure that the server is vulnerable
     (my $result, $content) = nfetch($mark, "/~root", "GET", "", "", "", "apacheusers: known user");
 
@@ -65,15 +65,16 @@ sub nikto_apacheusers {
                 "/~root"
                 );
         }
-        $apacheusers=1;
+        $apacheusers = 1;
     }
-    
+
     # If we can't enumerate users then return
     return unless ($apacheusers == 1);
+
     # If we haven't been asked to enumerate users then return
-    return unless (defined $parameters->{'enumerate'} &&
-                   $parameters->{'enumerate'} == 1);
-    
+    return unless (defined $parameters->{'enumerate'}
+                   && $parameters->{'enumerate'} == 1);
+
     # Now we can attempt to enumerate the users
     my ($url, $dictfile, $size);
     my @cgiwraps;
@@ -93,7 +94,7 @@ sub nikto_apacheusers {
         foreach my $cgidir (@CFGCGI) {
             my $curl = "$cgidir" . "cgiwrap";
             (my $result, $content) =
-                nfetch($mark, $curl, "GET", "", "", "", "user_enum_apache: cgiwrap");
+              nfetch($mark, $curl, "GET", "", "", "", "user_enum_apache: cgiwrap");
             if ($content =~ /check your URL/i) {
                 push(@cgiwraps, "$curl");
             }

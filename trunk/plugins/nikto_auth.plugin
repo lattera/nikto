@@ -41,23 +41,31 @@ sub nikto_auth_init {
 }
 
 sub nikto_auth_load {
+
     # Load up the database as soon as we can
-    
-    $REALMS=init_db("db_realms");
+
+    $REALMS        = init_db("db_realms");
     %REALMSMATCHED = ();
 }
 
 sub nikto_auth_pre {
     my ($mark, $parameters, $request, $result) = @_;
+
     # If we know the realm then don't bother guessing it
     # See whether we've already guessed it
-    
+
     my ($uridir) = $request->{'whisker'}->{'uri'};
     $uridir =~ s#/[^/]*$#/#g;
 
-    if (exists $REALMSMATCHED{$mark->{'hostname'}}{$uridir}) {
+    if (exists $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}) {
+
         # Just set up the auth and return the valid result
-        LW2::auth_set($REALMSMATCHED{$mark->{'hostname'}}{$uridir}{'authtype'}, $request, $REALMSMATCHED{$mark->{'hostname'}}{$uridir}{'id'}, $REALMSMATCHED{$mark->{'hostname'}}{$uridir}{'password'});
+        LW2::auth_set($REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'authtype'},
+                      $request,
+                      $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'id'},
+                      $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'password'}
+                      );
+
         # Patch to fix short reads
         $request->{'whisker'}->{'allow_short_reads'} = 1;
         LW2::http_fixup_request($request);
@@ -67,20 +75,20 @@ sub nikto_auth_pre {
 
 sub nikto_auth {
     my ($mark, $parameters, $request, $result) = @_;
-    my ($authtype)  = 'basic';
-    my ($body)      = $result->{'whisker'}->{'data'};
-    my ($uri)       = $result->{'whisker'}->{'uri'};
-    my ($method)    = $result->{'whisker'}->{'method'} || "GET";
+    my ($authtype) = 'basic';
+    my ($body)     = $result->{'whisker'}->{'data'};
+    my ($uri)      = $result->{'whisker'}->{'uri'};
+    my ($method)   = $result->{'whisker'}->{'method'} || "GET";
     my ($realm, $save_auth);
 
     unless (defined $result->{'www-authenticate'}) {
         nprint("+ ERROR: No authentication header defined: $uri");
         return $request, $result;
     }
-    
+
     # Save to revert
     $save_auth = $result{'www-authenticate'};
-    
+
     # Split up www-authenticate to realm and method
     my @authenticate = split(/ /, $result->{'www-authenticate'});
     if ($#authenticate == 0) {    # Only one parameter: realm
@@ -93,23 +101,26 @@ sub nikto_auth {
     else {
         $authtype = $authenticate[0];
         $realm    = $authenticate[1];
-        $realm    =~ s/^realm=//;
+        $realm =~ s/^realm=//;
     }
-    
+
     nprint("+ $uri - Requires Authentication for realm '$realm'") if $OUTPUT{'show_auth'};
 
     # Now we have this we can try guessing the password
     foreach my $entry (@{$REALMS}) {
         unless ($realm =~ /$entry->{'realm'}/i || $entry->{realm} eq '@ANY') { next; }
-        
+
         if ($result->{'www-authenticate'} =~ /^ntlm/i) {
-            $authtype='ntlm';
-        }       
+            $authtype = 'ntlm';
+        }
+
         # Set up LW hash
         LW2::auth_set($authtype, $request, $entry->{'id'}, $entry->{'password'});
+
         # Patch to fix short reads
-		$request->{'whisker'}->{'allow_short_reads'} = 1;
-        LW2::http_fixup_request($request);     
+        $request->{'whisker'}->{'allow_short_reads'} = 1;
+        LW2::http_fixup_request($request);
+
         # pause if needed
         if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
 
@@ -117,8 +128,9 @@ sub nikto_auth {
         $NIKTO{'totalrequests'}++;
         dump_var("Auth Request",  $request);
         dump_var("Auth Response", $result);
-        
+
         if ($result{'www-authenticate'} =~ /^ntlm/i) {
+
             # Deal with ntlm
             my @ntlm_x = split(/ /, $result{'www-authenticate'});
             if ($#ntlm_x == 1) {
@@ -128,37 +140,31 @@ sub nikto_auth {
         }
         my $uridir = $request->{'whisker'}->{'uri'};
         $uridir =~ s#/[^/]*$#/#g;
-       
+
         if ($result->{'www-authenticate'} eq ''
             && !defined $result->{'whisker'}->{'error'}) {
-            
-            my $message="Default account found for '$realm' at $uridir ($request->{'whisker'}->{'uri'}) (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
+
+            my $message =
+              "Default account found for '$realm' at $uridir ($request->{'whisker'}->{'uri'}) (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
             if ($entry->{'id'} eq '' && $entry->{'password'} eq '') {
-                $message="Blank credentials found at $uridir ($request{whisker}->{uri}), $entry->{'realm'}: $entry->{'msg'}"
+                $message =
+                  "Blank credentials found at $uridir ($request{whisker}->{uri}), $entry->{'realm'}: $entry->{'msg'}";
             }
-            unless ( $entry->{'checked'} == 1) {
-                add_vulnerability(
-                    $mark,
-                    $message,
-                    $entry->{tid},
-                    0,
-                    "GET",
-                    $uridir,
-                    $result
-                    );
+            unless ($entry->{'checked'} == 1) {
+                add_vulnerability($mark, $message, $entry->{tid}, 0, "GET", $uridir, $result);
                 $entry->{checked} = 1;
             }
 
             # Finally repeat the check
             LW2::http_do_request_timeout($request, $result);    # test auth
             $NIKTO{'totalrequests'}++;
-            
+
             # Set up so we don't have to repeat in future
             # / isn't a valid entry in a hash  - more stupid perl
 
-            $REALMSMATCHED{$mark->{hostname}}{$uridir}{'id'}=$entry->{'id'};
-            $REALMSMATCHED{$mark->{hostname}}{$uridir}{'password'}=$entry->{'password'};
-            $REALMSMATCHED{$mark->{hostname}}{$uridir}{'authtype'}=$authtype;
+            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'id'}       = $entry->{'id'};
+            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'password'} = $entry->{'password'};
+            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'authtype'} = $authtype;
 
             # and leave
             last;

@@ -27,10 +27,10 @@ sub nikto_headers_init {
          author      => "Sullo",
          description => "Performs various checks against the headers returned from a HTTP request.",
          postfetch_method => \&nikto_headers_postfetch,
-         scan_method => \&nikto_headers,
-         copyright   => "2008 CIRT Inc."
+         scan_method      => \&nikto_headers,
+         copyright        => "2008 CIRT Inc."
          };
-   
+
     # some global variables
     use vars qw/%HFOUND/;
 
@@ -39,7 +39,7 @@ sub nikto_headers_init {
 
 sub nikto_headers_postfetch {
     my ($mark, $parameters, $request, $result) = @_;
-   
+
     if (exists $result->{'whisker'}->{'error'}) {
         return $request, $result;
     }
@@ -58,20 +58,21 @@ sub nikto_headers_postfetch {
 sub nikto_headers_check {
     my ($mark, $result, $header, $message, $tid) = @_;
 
-    if (exists $result->{$header})
-    {
-        my $key = LW2::md5(  $mark->{'ip'}
-                           . $mark->{'hostname'}
-                           . $mark->{'port'}
-                           . $mark->{'ssl'}
-                           . $result->{'whisker'}->{'method'}
-                           . $header);
+    if (exists $result->{$header}) {
+        my $key =
+          LW2::md5(  $mark->{'ip'}
+                   . $mark->{'hostname'}
+                   . $mark->{'port'}
+                   . $mark->{'ssl'}
+                   . $result->{'whisker'}->{'method'}
+                   . $header);
 
         if (!exists $HFOUND{$key}) {
             my $value = $result->{$header};
             $HFOUND{$key} = $value;
-        
-            add_vulnerability($mark, $message . " " . $value, $tid, "0",
+
+            add_vulnerability($mark, $message . " " . $value,
+                              $tid, "0",
                               $result->{'whisker'}->{'method'},
                               $result->{'whisker'}->{'uri'});
         }

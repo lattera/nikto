@@ -39,8 +39,7 @@ sub nikto_robots {
     my %headers;
     (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", \%headers, "", "robots");
 
-    if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'}))
-    {
+    if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'})) {
         if (is_404("robots.txt", $CONTENT, $RES, $headers{'location'})) { return; }
 
         my ($DIRS, $RFILES) = "";
@@ -48,8 +47,7 @@ sub nikto_robots {
         my @DOC = split(/\n/, $CONTENT);
         foreach my $line (@DOC) {
             $line = quotemeta($line);
-            if ($line =~ /allow/i)
-            {
+            if ($line =~ /allow/i) {
                 chomp($line);
                 $line =~ s/\#.*$//;
                 $line =~ s/(?:^\s+|\s+$)//g;

@@ -31,7 +31,7 @@ sub nikto_subdomain_init {
                };
 
     return $id;
-    }
+}
 
 sub nikto_subdomain {
     my ($mark) = @_;
@@ -47,14 +47,14 @@ sub nikto_subdomain {
         nprint("Host supply to subdomain is an IP address or an unqualified hostname; skipping",
                "v");
         return;
-        }
+    }
 
     # Check if the start of the domain is "www"
     if ($host =~ /^www\./) {
 
         # Remove the www.
         $host =~ s/^www\.//;
-        }
+    }
 
     my $nocache_enabled = 0;
     if ($CLI{'nocache'}) { $nocache_enabled = 1; }
@@ -71,10 +71,10 @@ sub nikto_subdomain {
         if ($error eq "") {
             add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'},
                               0);
-            }    # End if
+        }    # End if
 
-        }    # End foreach
+    }    # End foreach
     if (!$nocache_enabled) { undef $CLI{'nocache'}; }
-    }    # End sub
+}    # End sub
 
 1;

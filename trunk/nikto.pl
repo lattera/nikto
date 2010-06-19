@@ -4,6 +4,7 @@ use strict;
 #VERSION,2.1.1
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
+
 # use LW2;                   ### Change this line to use a different installed version
 
 ###############################################################################
@@ -90,7 +91,6 @@ nprint("T:$starttime: Starting", "d");
 require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_single.plugin";
 require "$NIKTOCONFIG{'PLUGINDIR'}/LW2.pm";
 
-
 my ($a, $b) = split(/\./, $LW2::VERSION);
 die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 
@@ -147,6 +147,7 @@ foreach my $mark (@MARKS) {
 
 # Open reporting
 report_head($CLI{'format'}, $CLI{'file'});
+
 # Load db_tests
 set_scan_items();
 
@@ -174,8 +175,9 @@ foreach my $mark (@MARKS) {
 
     %FoF = ();
 
-    nfetch($mark, "/", "GET", "", "", { nocache => 1, noprefetch => 1, nopostfetch => 1 }, "getinfo");
-	
+    nfetch($mark, "/", "GET", "", "", { nocache => 1, noprefetch => 1, nopostfetch => 1 },
+           "getinfo");
+
     if ($CLI{'findonly'}) {
         my $protocol = "http";
         if ($mark->{'ssl'}) { $protocol .= "s"; }
