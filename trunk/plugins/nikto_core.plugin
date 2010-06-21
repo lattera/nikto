@@ -604,12 +604,12 @@ sub general_config {
     }
     else {
         nprint(
-            "- ***** RFIURL is not defined in nikto.conf, which means no RFI tests will run *****");
+            "- ***** RFIURL is not defined in nikto.conf--no RFI tests will run *****");
     }
 
     # SSL Test
     if (!LW2::ssl_is_available()) {
-        nprint("- ***** SSL support not available (see docs for SSL install instructions) *****");
+        nprint("- ***** SSL support not available (see docs for SSL install) *****");
     }
 
     # Notices
