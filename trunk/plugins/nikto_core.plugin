@@ -672,7 +672,8 @@ sub check_input {
     if ($key eq ' ') {
         my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete",
                            $NIKTO{'totalrequests'},
-                           ($NIKTO{'totalrequests'} / $NIKTO{'total_checks'}) * 100);
+                           ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'})) * 100);
+        if ($NIKTO{'total_targets'} > 1) { $line .=" (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})"; }
         if ($NIKTO{'current_plugin'} ne '') { $line .= " (in plugin $NIKTO{'current_plugin'})"; }
         nprint($line);
         return;

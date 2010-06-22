@@ -51,8 +51,7 @@ my $starttime = localtime();
 $NIKTO{'DIV'}     = "-" x 75;
 $NIKTO{'version'} = "2.1.1";
 $NIKTO{'name'}    = "Nikto";
-$NIKTO{'configfile'} =
-  "/etc/nikto.conf";    ### Change this line if your setup is having trouble finding it
+$NIKTO{'configfile'} = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
 
 # put a signal trap so we can close down reports properly
 $SIG{'INT'} = \&safe_quit;
@@ -116,7 +115,7 @@ if ($CLI{'host'} eq "") {
     usage();
 }
 
-$COUNTERS{'hosts_total'} = $COUNTERS{'hosts_complete'} = 0;
+$NIKTO{'total_targets'} = $COUNTERS{'hosts_completed'} = 0;
 load_plugins();
 
 # Parse the supplied list of targets
@@ -142,6 +141,9 @@ foreach my $mark (@MARKS) {
         $mark->{'test'} = 0;
         next;
     }
+    else {
+	$NIKTO{'total_targets'}++;
+	}
     $mark->{'ssl'} = $open - 1;
 }
 
@@ -154,7 +156,6 @@ set_scan_items();
 # Now we've done the precursor, do the scan
 foreach my $mark (@MARKS) {
     next unless ($mark->{'test'});
-    $COUNTERS{'hosts_total'}++;
     $mark->{'start_time'} = time();
 
     # These should just be passed in the hash - but it's a lot of work to move to a local $request
@@ -207,7 +208,7 @@ foreach my $mark (@MARKS) {
 }
 report_close();
 
-nprint("+ $COUNTERS{'hosts_total'} host(s) tested");
+nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
 nprint("+ $NIKTO{'totalrequests'} requests made", "v");
 send_updates();
 nprint("T:" . localtime() . ": Ending", "d");

@@ -125,7 +125,7 @@ sub xml_change_vars {
     $variables{"#TEMPL_BANNER"}             = hex_enc($mark->{banner});
     $variables{"#TEMPL_NIKTO_CLI"}          = $CLI{'all_options'};
     $variables{"#TEMPL_CTR"}                = $mark->{total_checks};
-    $variables{"#TEMPL_NIKTO_HOSTS_TESTED"} = $COUNTERS{hosts_total};
+    $variables{"#TEMPL_NIKTO_HOSTS_TESTED"} = $COUNTERS{'hosts_completed'};
     $variables{"#TEMPL_ELAPSED"}            = $mark->{end_time} - $mark->{start_time};
     $variables{"#TEMPL_LINK_NAME"}          = "$protocol://$mark->{hostname}:$mark->{port}";
     $variables{"#TEMPL_LINK_IP"}            = "$protocol://$mark->{ip}:$mark->{port}/";
