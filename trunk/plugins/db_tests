@@ -6437,3 +6437,4 @@
 "006440","0","23","@CGIDIRSawstats.pl","GET","SiteDomain parameter","","","","","AWStats logfile analyzer is misconfigured.","",""
 "006441","0","2","@CGIDIRSawredir.pl","GET","200","","","","","AWStats redirection file.","",""
 "006442","0","1","/help.php","GET","200","","","","","A help file was found.","",""
+"006443","0","b","/wordpress/","GET","/wp-content/","","","","","A Wordpress installation was found.","",""
