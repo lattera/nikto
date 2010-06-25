@@ -21,15 +21,21 @@
 # General HTTP headers checks
 ###############################################################################
 sub nikto_headers_init {
-    my $id = {
-         name        => "headers",
-         full_name   => "HTTP Headers",
-         author      => "Sullo",
-         description => "Performs various checks against the headers returned from a HTTP request.",
-         postfetch_method => \&nikto_headers_postfetch,
-         scan_method      => \&nikto_headers,
-         copyright        => "2008 CIRT Inc."
-         };
+    my $id =    {
+                    name        => "headers",
+                    full_name   => "HTTP Headers",
+                    author      => "Sullo",
+                    description => "Performs various checks against the headers returned from a HTTP request.",
+                    hooks       => {
+                                        scan =>  {
+                                            method => \&nikto_headers,
+                                        },
+                                        postfetch => {
+                                            method => \&nikto_headers_postfetch,
+                                        },
+                                    },
+                    copyright   => "2008 CIRT Inc."
+                };
 
     # some global variables
     use vars qw/%HFOUND/;

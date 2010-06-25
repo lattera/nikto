@@ -26,8 +26,12 @@ sub nikto_tests_init {
                author      => "Sullo, Deity",
                description => "Test host with the standard Nikto tests",
                copyright   => "2008 CIRT Inc.",
-               scan_method => \&nikto_tests,
-               scan_weight => 99,
+               hooks       => {
+                                 scan => {
+                                    method => \&nikto_tests,
+                                    weight => 99,
+                                 },
+                              },              
                options     => {
                          passfiles => "Flag to indicate whether to check for common password files",
                          all => "Flag to indicate whether to check all files with all directories",

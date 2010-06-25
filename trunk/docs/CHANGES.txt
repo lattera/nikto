@@ -1,3 +1,5 @@
+2010-06-25
+	- Enhancement to allow easier addition of hooks, (ticket #142)
 2010-06-17
 	- Fix for #8: interactive scan status, as well as changing config on the fly.
 	- Fix for #150: Special characters in XML output

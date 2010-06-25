@@ -32,7 +32,12 @@ sub nikto_msgs_init {
                full_name   => "Server Messages",
                author      => "Sullo",
                description => "Checks the server version against known issues.",
-               scan_method => \&nikto_msgs,
+               hooks       => {
+                                 scan => {
+                                    method => \&nikto_msgs,
+                                    weight => 20,
+                                 },
+                              },                                  
                copyright   => "2008 CIRT Inc."
                };
     return $id;

@@ -26,7 +26,11 @@ sub nikto_put_del_test_init {
                author    => "Sullo",
                description =>
                  "Attempts to upload and delete files through the PUT and DELETE HTTP methods.",
-               scan_method => \&nikto_put_del_test,
+               hooks       => {
+                                 scan => {
+                                    method => \&nikto_put_del_test,
+                                 },
+                              },                                    
                copyright   => "2008 CIRT Inc."
                };
     return $id;

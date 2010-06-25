@@ -25,8 +25,12 @@ sub nikto_subdomain_init {
                full_name   => "Sub-domain forcer",
                author      => "Ryan Dewhurst",
                description => "Attempts to bruteforce commonly known sub-domains",
-               scan_method => \&nikto_subdomain,
-               scan_weight => 20,
+               hooks       => {
+                                 scan => {
+                                    method => \&nikto_subdomain,
+                                    weight => 20,
+                                 },
+                              },
                copyright   => "2009 Ryan Dewhurst"
                };
 

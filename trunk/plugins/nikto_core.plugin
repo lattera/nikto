@@ -1300,13 +1300,9 @@ sub load_plugins {
                 my $pluginhash = &$plugin_init;
 
                 # Add default weights if not already assigned
-                $pluginhash->{recon_weight}  = 50 unless (defined $pluginhash->{recon_weight});
-                $pluginhash->{scan_weight}   = 50 unless (defined $pluginhash->{scan_weight});
-                $pluginhash->{report_weight} = 50 unless (defined $pluginhash->{report_weight});
-                $pluginhash->{postfetch_weight} = 50
-                  unless (defined $pluginhash->{postfetch_weight});
-                $pluginhash->{postfetch_weight} = 50
-                  unless (defined $pluginhash->{postfetch_weight});
+                while (my ($hook, $hook_params) = each(%{$pluginhash->{'hooks'}})) {
+                    $hook_params->{$hook}->{'weight'} = 50 unless (defined $hook_params->{$hook}->{'weight'});
+                }
                 push(@all_names, $pluginhash->{name});
 
                 push(@PLUGINS, $pluginhash);
@@ -1360,39 +1356,31 @@ sub load_plugins {
 
     # For speed in future, create a hash of active plugins ordered by plugin weight, for
     # each type of plugin
-    my (@rplugins, @splugins, @repplugins, @pfplugins, @prefplugins);
-    my (@rsorted,  @ssorted,  @repsorted,  @pfsorted,  @prefsorted);
+    
+    # first build a temporary hash of all known hooks
+    my %hooks;
     foreach my $plugin (@PLUGINS) {
-        if ($plugin->{'run'} == 1) {
-            if (defined $plugin->{recon_method}) {
-                push(@rplugins, $plugin);
-            }
-            if (defined $plugin->{scan_method}) {
-                push(@splugins, $plugin);
-            }
-            if (defined $plugin->{report_item}) {
-                push(@repplugins, $plugin);
-            }
-            if (defined $plugin->{prefetch_method}) {
-                push(@prefplugins, $plugin);
-            }
-            if (defined $plugin->{postfetch_method}) {
-                push(@pfplugins, $plugin);
+        foreach my $hook (keys(%{$plugin->{'hooks'}})) {
+            $hooks{$hook} = ();
+        }
+    }
+    
+    # now we know the types of hooks, look through each plugin for them
+    foreach my $hook (keys(%hooks)) {
+        foreach my $plugin (@PLUGINS) {
+            if ($plugin->{'run'} == 1) {
+                if (defined $plugin->{'hooks'}->{$hook}->{'method'}) {
+                    push(@{$hooks{$hook}}, $plugin);
+                }
             }
         }
     }
 
     # Now sort each array by weight
-    @rsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @rplugins;
-    $PLUGINORDER{'recon'} = \@rsorted;
-    @ssorted = sort { $a->{'weight'} <=> $b->{'weight'} } @splugins;
-    $PLUGINORDER{'scan'} = \@ssorted;
-    @repsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @repplugins;
-    $PLUGINORDER{'report'} = \@repsorted;
-    @prefsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @prefplugins;
-    $PLUGINORDER{'prefetch'} = \@prefsorted;
-    @pfsorted = sort { $a->{'weight'} <=> $b->{'weight'} } @pfplugins;
-    $PLUGINORDER{'postfetch'} = \@pfsorted;
+    foreach my $hook (keys(%hooks)) {
+        my @sorted=sort { $a->{'hooks'}->{$hook}->{'weight'} <=> $b->{'hooks'}->{$hook}->{'weight'} } @{$hooks{$hook}};
+        $PLUGINORDER{$hook} = \@sorted;
+    }    
 }
 
 ###############################################################################
@@ -1403,8 +1391,8 @@ sub run_hooks {
         my ($run) = 1;
 
         # first check for conditionals
-        my $condition = $plugin->{ $type . '_cond' };
-        if (defined $plugin->{ $type . '_cond' }) {
+        my $condition = $plugin->{'hooks'}->{$type}->{'cond'};
+        if (defined $plugin->{'hooks'}->{$type}->{'cond'}) {
 
             # Evaluate condition
             $run = eval($condition);
@@ -1428,7 +1416,7 @@ sub run_hooks {
         unless ($type eq "prefetch" || $type eq "postfetch") {
             $NIKTO{'current_plugin'} = $plugin->{'full_name'};
         }
-        &{ $plugin->{ $type . '_method' } }($mark, $plugin->{'parameters'}, $request, $result);
+        &{ $plugin->{'hooks'}->{$type}->{'method'} }($mark, $plugin->{'parameters'}, $request, $result);
         $OUTPUT{'verbose'} = $oldverbose;
         $OUTPUT{'debug'}   = $olddebug;
         $OUTPUT{'errors'}  = $olderrors;

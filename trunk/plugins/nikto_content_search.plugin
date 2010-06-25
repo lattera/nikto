@@ -27,10 +27,16 @@ sub nikto_content_search_init {
                full_name        => "Content Search",
                author           => "Sullo",
                description      => "Search resultant content for interesting strings",
-               recon_method     => \&nikto_content_search_load,
-               recon_weight     => 1,
-               postfetch_method => \&nikto_content_search,
-               postfetch_weight => 20,
+               hooks       => {
+                                 recon => {
+                                    method => \&nikto_content_search_load,
+                                    weight => 1,
+                                 },
+                                 postfetch => {
+                                    method => \&nikto_content_search,
+                                    weight => 20,
+                                 },
+                              },                   
                copyright        => "2010 CIRT Inc"
                };
 

@@ -25,8 +25,12 @@ sub nikto_dictionary_attack_init {
                full_name    => "Dictionary attack",
                author       => "Deity",
                description  => "Attempts to dictionary attack commonly known directories/files",
-               recon_method => \&nikto_dictionary_attack,
-               recon_weight => 20,
+               hooks       => {
+                                 recon => {
+                                    method => \&nikto_dictionary_attack,
+                                    weight => 20,
+                                 },
+                              },                   
                copyright    => "2009 CIRT Inc"
                };
 

@@ -26,7 +26,12 @@ sub nikto_httpoptions_init {
                author    => "Sullo",
                description =>
                  "Performs a variety of checks against the HTTP options returned from the server.",
-               scan_method => \&nikto_httpoptions,
+               hooks       => {
+                                 scan => {
+                                    method => \&nikto_httpoptions,
+                                    weight => 20,
+                                 },
+                              },                   
                copyright   => "2008 CIRT Inc."
                };
     return $id;

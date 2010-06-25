@@ -26,7 +26,11 @@ sub nikto_outdated_init {
                author      => "Sullo",
                description => "Checks to see whether the web server is the latest version.",
                copyright   => "2008 CIRT Inc.",
-               scan_method => \&nikto_outdated,
+               hooks       => {
+                                 scan => {
+                                    method => \&nikto_outdated,
+                                 },
+                              },                   
                };
     return $id;
 }

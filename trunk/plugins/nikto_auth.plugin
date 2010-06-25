@@ -27,13 +27,21 @@ sub nikto_auth_init {
                full_name        => 'Guess authentication',
                author           => 'Sullo/Deity',
                description      => 'Attempt to guess authentication realms',
-               recon_method     => \&nikto_auth_load,
-               recon_weight     => 1,
-               postfetch_cond   => '$result->{whisker}->{code} eq 401',
-               postfetch_method => \&nikto_auth,
-               postfetch_weight => 19,
-               prefetch_method  => \&nikto_auth_pre,
-               prefetch_weight  => 19,
+               hooks            => {
+                                    recon => {
+                                       method => \&nikto_auth_load,
+                                       weight => 1,
+                                    },
+                                    postfetch => {
+                                       method => \&nikto_auth,
+                                       weight => 19,
+                                       cond   => '$result->{whisker}->{code} eq 401',
+                                    },
+                                    prefetch => {
+                                       method => \&nikto_auth_pre,
+                                       weight => 19,
+                                    },
+                                   },                   
                copyright        => "2010 CIRT Inc"
                };
 
