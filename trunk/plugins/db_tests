@@ -6438,3 +6438,4 @@
 "006441","0","2","@CGIDIRSawredir.pl","GET","200","","","","","AWStats redirection file.","",""
 "006442","0","1","/help.php","GET","200","","","","","A help file was found.","",""
 "006443","0","b","/wordpress/","GET","/wp-content/","","","","","A Wordpress installation was found.","",""
+"006444","0","3","/webmail/src/configtest.php","GET","SquirrelMail configtest","","","","","SquirrelMail configuration test information disclosure.","",""
