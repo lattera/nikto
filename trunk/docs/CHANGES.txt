@@ -1,3 +1,6 @@
+2010-06-28
+	- Partial fix for #146 with new "start" hook which is run at the start
+	  of nikto after target enumeration.
 2010-06-25
 	- Enhancement to allow easier addition of hooks, (ticket #142)
 2010-06-17

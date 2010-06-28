@@ -28,7 +28,7 @@ sub nikto_content_search_init {
                author           => "Sullo",
                description      => "Search resultant content for interesting strings",
                hooks       => {
-                                 recon => {
+                                 start => {
                                     method => \&nikto_content_search_load,
                                     weight => 1,
                                  },

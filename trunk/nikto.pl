@@ -153,6 +153,9 @@ report_head($CLI{'format'}, $CLI{'file'});
 # Load db_tests
 set_scan_items();
 
+# Start hook to allow plugins to load databases etc
+run_hooks("", "start");
+
 # Now we've done the precursor, do the scan
 foreach my $mark (@MARKS) {
     next unless ($mark->{'test'});

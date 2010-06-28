@@ -28,7 +28,7 @@ sub nikto_auth_init {
                author           => 'Sullo/Deity',
                description      => 'Attempt to guess authentication realms',
                hooks            => {
-                                    recon => {
+                                    start => {
                                        method => \&nikto_auth_load,
                                        weight => 1,
                                     },
