@@ -1303,6 +1303,7 @@ sub load_plugins {
                 while (my ($hook, $hook_params) = each(%{$pluginhash->{'hooks'}})) {
                     $hook_params->{$hook}->{'weight'} = 50 unless (defined $hook_params->{$hook}->{'weight'});
                 }
+                $pluginhash->{report_weight} = 50 unless (defined $pluginhash->{report_weight}); 
                 push(@all_names, $pluginhash->{name});
 
                 push(@PLUGINS, $pluginhash);
