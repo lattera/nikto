@@ -650,6 +650,7 @@ sub general_config {
 
 ###############################################################################
 sub reset_term {
+    if (!$NIKTO{'POSIX'}{'support'}) { return; }
     $NIKTO{'POSIX'}{'term'}->setlflag($NIKTO{'POSIX'}{'oterm'});
     $NIKTO{'POSIX'}{'support'} = 0;
 }
