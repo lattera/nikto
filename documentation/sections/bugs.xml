@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<para>The current features are not supported:</para>
-<itemizedlist>
-  <listitem><para>SOCKS Proxies</para></listitem>
-</itemizedlist>
+<para>For issues and unsupported features, please see http://trac2.assembla.com/Nikto_2/report/1</para>
 

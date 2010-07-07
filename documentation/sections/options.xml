@@ -32,12 +32,14 @@ nikto.conf file located in the install directory.</para>
       <listitem>
         <para>Control the output that Nikto shows. See Chapter 5 for
 detailed information on these options. Use the reference number or
-letter to specify the type, multiple may be used:</para>
+letter to specify the type. Multiple may be used:</para>
         <para>1 - Show redirects</para>
         <para>2 - Show cookies received</para>
         <para>3 - Show all 200/OK responses</para>
         <para>4 - Show URLs which require authentication</para>
         <para>D - Debug Output</para>
+        <para>E - Display all HTTP errors</para>
+        <para>P - Print progress to STDOUT</para>
         <para>V - Verbose Output</para>
       </listitem>
     </varlistentry>

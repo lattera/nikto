@@ -20,7 +20,7 @@
       <filename>${NIKTO_DIR}/plugins/db*</filename>
     </term>
     <listitem>
-      <para>db files are the databases that nikto uses to check for vulnerabilities and issues within the web server.</para>
+      <para>db files are the databases that Nikto uses to check for vulnerabilities and issues within the web server.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -28,7 +28,7 @@
       <filename>${NIKTO_DIR}/plugins/*.plugin</filename>
     </term>
     <listitem>
-      <para>All nikto's plugins exist here. Nikto itself is just a wrapper script to manage CLI and pass through to the plugins.</para>
+      <para>All Nikto's plugins exist here. Nikto itself is just a wrapper script to manage CLI and pass through to the plugins.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -36,7 +36,7 @@
       <filename>${NIKTO_DIR}/templates</filename>
     </term>
     <listitem>
-      <para>Contains the templates for nikto's output formats.</para>
+      <para>Contains the templates for some of Nikto's output formats.</para>
     </listitem>
   </varlistentry>
 </variablelist>

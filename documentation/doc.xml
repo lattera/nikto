@@ -5,7 +5,7 @@
 <!ENTITY options SYSTEM "sections/options.xml">
 ]>
 <book>
-  <title>Nikto v2.1.1 - The Manual</title>
+  <title>Nikto v2.1.2 - The Manual</title>
 
   <chapter id="introduction">
     <title>Introduction</title>
@@ -410,6 +410,16 @@ http://192.168.0.1:8080/
         </listitem>
 
         <listitem>
+          <para>E - Display all HTTP errors. Show details for any HTTP error 
+          encountered.</para>
+        </listitem>
+
+        <listitem>
+          <para>P - Print progress to STDOUT. Show status report to STDOUT 
+          during testing (interval set in nikto.conf).</para>
+        </listitem>
+
+        <listitem>
           <para>V - Verbose Output. Show verbose output, which typically shows
           where Nikto is during program execution.</para>
         </listitem>
@@ -550,8 +560,8 @@ http://192.168.0.1:8080/
 
       <screen>
 
-[dave@yggdrasil nikto-2.03]$ ./nikto.pl -Single
---------------------------------------------  Nikto 2.1.1
+[dave@yggdrasil nikto]$ ./nikto.pl -Single
+--------------------------------------------  Nikto 2.1.2
 --------------------------------------------  Single Request Mode
                               Hostname or IP: localhost
                                    Port (80):
@@ -562,7 +572,7 @@ http://192.168.0.1:8080/
                       Show HTML Response (1):
                           HTTP Version (1.1):
                            HTTP Method (GET):
-      User-Agent (Mozilla/4.75 (Nikto/2.1.1):
+      User-Agent (Mozilla/4.75 (Nikto/2.1.2):
                      Connection (Keep-Alive):
                                         Data:
                         force_bodysnatch (0):
@@ -589,7 +599,7 @@ http://192.168.0.1:8080/
 --------------------------------------------  Connection Details
         Connection: Keep-Alive
         Host: localhost
-        User-Agent: Mozilla/4.75 (Nikto/2.1.1
+        User-Agent: Mozilla/4.75 (Nikto/2.1.2)
         data:
         force_bodysnatch: 0
         force_close: 1
