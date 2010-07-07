@@ -1,81 +1,55 @@
-2010-06-28
-	- Partial fix for #146 with new "start" hook which is run at the start
-	  of nikto after target enumeration.
-2010-06-25
-	- Enhancement to allow easier addition of hooks, (ticket #142)
-2010-06-17
-	- Fix for #8: interactive scan status, as well as changing config on the fly.
-	- Fix for #150: Special characters in XML output
-	- Fix for #133: regular expression matching causes errors. Removed char_escape and some other
-	  regexs in favor of the faster quotemeta(). Also set many regexs to non-capturing for speed.
-	- Optimized rm_active_content() a little by shuffling code and reducing some mem copies/regexs. Needs more work.
-2010-06-15
-	- Fix for #127: dav methods are treated specially and reported all at once
-	- Update nikto.conf to switch tests to always have the (report:500) parameter
-2010-06-10
-	- Updates to read known headers on the fly, rather than make requests
-	  for them
-2010-05-29
-	- Ticket 156: Update system couldn't update nikto_core.plugin
-	- Ticket 152: HTTP Version set in nikto.conf over-ridden
-2010-05-27
-	- Fixed a bug with the order of parameters in hooks (broke parameters being passed to some plugins)
-	- Added the parameter "report" to tests plugin to report when completed x number of tests
-2010-05-25
-	- Ticket 147: Grab HTTP information on the fly, deprecate get_banner
-	- Stop Whisker producing an error when talking HTTP to HTTPS during port_check
-2010-05-11
-	- Tickets 132 and 153: Properly check for HTTP and HTTPS ports in cache.
-2010-05-06
-	- Ticket 136: Moved set_scan_items to only run once, should speed things up with multiple targets
-2010-04-12
-	- Ticket 144: Cleaned up map_codes to use general rules, still needs some for redirection
-	- Ticket 145: Added OSVDB 0 to orphan items in db_tests
-2010-04-11
-	- Ticket 125: fetch is dead, long live nfetch
-	- Moved URI error handling and reporting result to nfetch, rather than being in nikto_tests (Ticket 139, partial)
-	- Ticket 141: pre-compile RE in content_search to give some speed-up
-2010-04-10
-	- Merged apacheusers and apache_enum_users together
-	- Add facillity for a plugin to inform which options it can take
-2010-04-09
-	- Ticket 137: Added -ask to override nikto.conf's UPDATES value (same options)
-2010-04-01
-	- Ticket 134: Added documentation of -config to usage_short
-2010-03-26 
-	- Added nbe output plugin written by Frank Breedijk 
-2010-03-15 
-	- Ticket 130: Added -D E to show HTTP errors, otherwise suppress. 
-	- Ticket 129: Change references for config.txt to nikto.conf. 
-2010-03-10 
-	- Moved do_auth to a postfetch plugin. 
-2010-03-09 
-	- Removed dead code from fetch(). 
-	- Optimizations in nfetch(), nikto.pl, & elsewhere. 
-	- Added support for prefetch and postfetch hooks. 
-	- Moved content_search to a plugin. 
-	- Some tuning around plugin execution. 
+2010-07-07 Nikto 2.1.2 release
+	- Ticket 8: Interactive scan status.
+	- Ticket 122: Cleanup db_404_strings to prevent over-matching.
+	- Ticket 122: Use db_404_strings as a higher priority.
+	- Ticket 125: fetch is dead, long live nfetch!
 	- Ticket 126: subdomain plugin tries to guess domain on unqualified hostname. 
-2010-03-07 
-	- Updated user_enum_apache to use Plugins instead of mutate. 
-	- Rewrote the macro expanding bit to make it more efficient. 
-2010-03-03 
-	- Mutate 1 now wrapped into nikto_tests and doesn't take up anywhere near the amount of memory! 
-2010-02-28 
-	- Starting to deprecate mutate by replacing with plugin options. -mutate 2 (passfiles) is now implemented within tests and uses less memory. 
-2010-02-10 
-	- Updated -check_updates to use nfetch instead of fetch 
-2010-02-09 
-	- Updated -Plugins support 
-2010-02-08 
-	- Add filename support to rm_active_content  
-	- Ticket 122: Use db_404_strings as a higher priority 
-	- Ticket 122: Cleanup db_404_strings to prevent over-matching 
-2010-02-05 
-	- Added basic support for -D s (scrub, removes some information from the log) 
-2010-02-04 
-	- Match plugin names case-insensitive 
-	- Warn if RFIURL is undefined 
+	- Ticket 127: dav methods are treated specially and reported all at once.
+	- Ticket 129: Change references for config.txt to nikto.conf. 
+	- Ticket 130: Added -D E to show HTTP errors, otherwise suppress. 
+	- Ticket 132: Properly check for HTTP and HTTPS ports in cache.
+	- Ticket 133: Regular expression matching causes errors. Removed char_escape and some other
+		regexs in favor of the faster quotemeta(). Also set many regexs to non-capturing for speed.
+	- Ticket 134: Added documentation of -config to usage_short.
+	- Ticket 136: Moved set_scan_items to only run once, should speed things up with multiple targets.
+	- Ticket 137: Added -ask to override nikto.conf's UPDATES value (same options).
+	- Ticket 139: Partial fix: Moved URI error handling and reporting result to nfetch, rather than being in nikto_tests.
+	- Ticket 141: pre-compile RE in content_search to give some speed-up.
+	- Ticket 142: Enhancement to allow easier addition of hooks.
+	- Ticket 144: Cleaned up map_codes to use general rules, still needs some for redirection.
+	- Ticket 145: Added OSVDB 0 to orphan items in db_tests.
+	- Ticket 146: Paritial fix: with new "start" hook which is run at the start after target enumeration.
+	- Ticket 147: Grab HTTP information on the fly, deprecate get_banner.
+	- Ticket 150: Special characters in XML output.
+	- Ticket 152: HTTP Version set in nikto.conf over-ridden.
+	- Ticket 153: Properly check for HTTP and HTTPS ports in cache.
+	- Ticket 156: Update system couldn't update nikto_core.plugin.
+	- Allow changing certain config settings during scans.
+	- Optimized rm_active_content() a little by shuffling code and reducing some mem copies/regexs. Needs more work.
+	- Update nikto.conf to switch tests to always have the (report:500) parameter.
+	- Updates to read known headers on the fly, rather than make requests for them.
+	- Fixed a bug with the order of parameters in hooks (broke parameters being passed to some plugins).
+	- Added the parameter "report" to tests plugin to report when completed x number of tests.
+	- Stop LibWhisker producing an error when talking HTTP to HTTPS during port_check.
+	- Merged apacheusers and apache_enum_users.
+	- Add facillity for a plugin to inform which options it can take.
+	- Added nbe output plugin which written by Frank Breedijk of the Seccubus project.
+	- Moved do_auth to a postfetch plugin. 
+	- Removed dead code from fetch().
+	- Optimizations in nfetch(), nikto.pl, & elsewhere.
+	- Added support for prefetch and postfetch hooks.
+	- Moved content_search to a plugin.
+	- Some tuning around plugin execution.
+	- Updated user_enum_apache to use Plugins instead of mutate.
+	- Rewrote the macro expanding bit to make it more efficient.
+	- Mutate 1 now wrapped into nikto_tests and doesn't take up anywhere near the amount of memory!
+	- Starting to deprecate mutate by replacing with plugin options. -mutate 2 (passfiles) is now implemented within tests and uses less memory.
+	- Updated -check_updates to use nfetch instead of fetch.
+	- Updated -Plugins support.
+	- Add filename support to rm_active_content.
+	- Added basic support for -D s (scrub, removes some information from the log).
+	- Match plugin names case-insensitive.
+	- Warn if RFIURL is undefined.
 2010-01-20 Nikto 2.1.1
 	- Ticket 117: Fixed SKIPPORTS
 	- Ticket 116: Moved User-Agent string to nikto.conf
