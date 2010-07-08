@@ -24,6 +24,7 @@
 	- Ticket 152: HTTP Version set in nikto.conf over-ridden.
 	- Ticket 153: Properly check for HTTP and HTTPS ports in cache.
 	- Ticket 156: Update system couldn't update nikto_core.plugin.
+	- Ticket 163: Scan details not appearing in XML reports.
 	- Allow changing certain config settings during scans.
 	- Optimized rm_active_content() a little by shuffling code and reducing some mem copies/regexs. Needs more work.
 	- Update nikto.conf to switch tests to always have the (report:500) parameter.
