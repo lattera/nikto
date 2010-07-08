@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
-#VERSION,2.1.1
+#VERSION,2.1.2
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
 
@@ -13,7 +13,7 @@ Getopt::Long::Configure('no_ignore_case');
 #   $Id$                             #
 # --------------------------------------------------------------------------- #
 ###############################################################################
-#  Copyright (C) 2004-2010 CIRT, Inc.
+#  Copyright (C) 2001 CIRT, Inc.
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -49,7 +49,7 @@ use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
 # setup
 my $starttime = localtime();
 $NIKTO{'DIV'}     = "-" x 75;
-$NIKTO{'version'} = "2.1.1";
+$NIKTO{'version'} = "2.1.2";
 $NIKTO{'name'}    = "Nikto";
 $NIKTO{'configfile'} = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
 
@@ -182,17 +182,18 @@ foreach my $mark (@MARKS) {
     nfetch($mark, "/", "GET", "", "", { nocache => 1, noprefetch => 1, nopostfetch => 1 },
            "getinfo");
 
+    report_host_start($mark);
     if ($CLI{'findonly'}) {
         my $protocol = "http";
         if ($mark->{'ssl'}) { $protocol .= "s"; }
         if ($mark->{'banner'} eq "") {
             $mark->{'banner'} = "(no identification possible)";
         }
+	add_vulnerability($mark, "Web server banner: " . $mark->{'banner'}, 0);
         nprint("+ Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}");
     }
     else {
         dump_target_info($mark);
-        report_host_start($mark);
         unless (defined $CLI{'nofof'}) { map_codes($mark) }
         run_hooks($mark, "recon");
         run_hooks($mark, "scan");

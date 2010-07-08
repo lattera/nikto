@@ -1430,7 +1430,7 @@ sub run_hooks {
 ###############################################################################
 sub report_head {
     my ($format, $file) = @_;
-    nprint("- Opening reports", "v");
+    nprint("- Opening reports ($format, $file)", "v");
 
     # For tuning set up a list of report methods, formats and handles
 
