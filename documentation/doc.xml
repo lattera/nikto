@@ -90,7 +90,7 @@
     <section>
       <title>Requirements</title>
 
-      <para>Any system which supports a basic PERL installation should allow
+      <para>Any system which supports a basic Perl installation should allow
       Nikto to run. It has been extensively tested on:</para>
 
       <itemizedlist>
@@ -108,20 +108,20 @@
         </listitem>
       </itemizedlist>
 
-      <para>The only required PERL module that does not come standard is
+      <para>The only required Perl module that does not come standard is
       LibWhisker. Nikto comes with and is configured to use a local LW.pm file
       (in the plugins directory), but users may wish to change Nikto to use a
       version installed on the system. See Section 2 for further
       information.</para>
 
-      <para>For SSL support the Net::SSLeay PERL module must be installed
+      <para>For SSL support the Net::SSLeay Perl module must be installed
       (which in turn requires OpenSSL on the Unix platform). Windows support
       for SSL is dependent on the installation package, but is rumored to
       exist for ActiveState's Perl.</para>
 
       <itemizedlist>
         <listitem>
-          <para>PERL: <ulink
+          <para>Perl: <ulink
           url="http://www.cpan.org/">http://www.cpan.org/</ulink></para>
         </listitem>
 
@@ -145,8 +145,8 @@
     <section>
       <title>Install</title>
 
-      <para>These instructions do not include information on installing PERL,
-      PERL Modules, OpenSSL, LibWhisker or any of the utilities that may be
+      <para>These instructions do not include information on installing Perl,
+      Perl Modules, OpenSSL, LibWhisker or any of the utilities that may be
       needed during installation (such as gzip, tar, etc.). Please see the
       distributor's documentation for information on how to install and
       configure those software packages.</para>
@@ -155,7 +155,7 @@
 
       <screen>tar -xvfz nikto-current.tar.gz</screen>
 
-      <para>Assuming a standard OS/PERL installation, Nikto should now be
+      <para>Assuming a standard OS/Perl installation, Nikto should now be
       usable. See Chapter 4 (Options) or Chapter 8 (Troubleshooting) for
       further configuration information.</para>
     </section>
