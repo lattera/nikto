@@ -187,7 +187,7 @@ sub map_codes {
     ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
 
     if (defined $headers{'location'}) {
-        nprint("- Root page / redirects to: $result{'location'}");
+        nprint("+ Root page / redirects to: $result{'location'}");
         if ($headers{'location'} =~ /^$mark->{'hostname'}/i)    # same host
         {
             my $uri = $headers{'location'};
@@ -366,12 +366,12 @@ sub dump_target_info {
     }
     if (defined $request{'whisker'}->{'proxy_host'}) {
         nprint(
-            "- Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"
+            "+ Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"
             );
     }
     if (defined $NIKTO{'hostid'}) {
         nprint(
-            "- Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}",
+            "+ Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}",
             "v"
             );
     }
