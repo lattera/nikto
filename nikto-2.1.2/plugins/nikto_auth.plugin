@@ -1,0 +1,189 @@
+#VERSION,2.01
+# $Id: nikto_auth.plugin 483 2010-07-11 04:19:01Z sullo $
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+# PURPOSE:
+# Search content for known bad strings
+###############################################################################
+use vars qw/$REALMS %REALMSMATCHED/;
+
+sub nikto_auth_init {
+    my $id = { name             => 'auth',
+               full_name        => 'Guess authentication',
+               author           => 'Sullo/Deity',
+               description      => 'Attempt to guess authentication realms',
+               hooks            => {
+                                    start => {
+                                       method => \&nikto_auth_load,
+                                       weight => 1,
+                                    },
+                                    postfetch => {
+                                       method => \&nikto_auth,
+                                       weight => 19,
+                                       cond   => '$result->{whisker}->{code} eq 401',
+                                    },
+                                    prefetch => {
+                                       method => \&nikto_auth_pre,
+                                       weight => 19,
+                                    },
+                                   },                   
+               copyright        => "2010 CIRT Inc"
+               };
+
+    return $id;
+}
+
+sub nikto_auth_load {
+
+    # Load up the database as soon as we can
+
+    $REALMS        = init_db("db_realms");
+    %REALMSMATCHED = ();
+}
+
+sub nikto_auth_pre {
+    my ($mark, $parameters, $request, $result) = @_;
+
+    # If we know the realm then don't bother guessing it
+    # See whether we've already guessed it
+
+    my ($uridir) = $request->{'whisker'}->{'uri'};
+    $uridir =~ s#/[^/]*$#/#g;
+
+    if (exists $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}) {
+
+        # Just set up the auth and return the valid result
+        LW2::auth_set($REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'authtype'},
+                      $request,
+                      $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'id'},
+                      $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'password'}
+                      );
+
+        # Patch to fix short reads
+        $request->{'whisker'}->{'allow_short_reads'} = 1;
+        LW2::http_fixup_request($request);
+    }
+    return $request, $result;
+}
+
+sub nikto_auth {
+    my ($mark, $parameters, $request, $result) = @_;
+    my ($authtype) = 'basic';
+    my ($body)     = $result->{'whisker'}->{'data'};
+    my ($uri)      = $result->{'whisker'}->{'uri'};
+    my ($method)   = $result->{'whisker'}->{'method'} || "GET";
+    my ($realm, $save_auth);
+
+    unless (defined $result->{'www-authenticate'}) {
+        nprint("+ ERROR: No authentication header defined: $uri");
+        return $request, $result;
+    }
+
+    # Save to revert
+    $save_auth = $result{'www-authenticate'};
+
+    # Split up www-authenticate to realm and method
+    my @authenticate = split(/ /, $result->{'www-authenticate'});
+    if ($#authenticate == 0) {    # Only one parameter: realm
+        $realm = $authenticate[0];
+        if ($realm =~ /^ntlm/i) {
+            $realm    = "";
+            $authtype = $authenticate[0];
+        }
+    }
+    else {
+        $authtype = $authenticate[0];
+        $realm    = $authenticate[1];
+        $realm =~ s/^realm=//;
+    }
+
+    nprint("+ $uri - Requires Authentication for realm '$realm'") if $OUTPUT{'show_auth'};
+
+    # Now we have this we can try guessing the password
+    foreach my $entry (@{$REALMS}) {
+        unless ($realm =~ /$entry->{'realm'}/i || $entry->{realm} eq '@ANY') { next; }
+
+        if ($result->{'www-authenticate'} =~ /^ntlm/i) {
+            $authtype = 'ntlm';
+        }
+
+        # Set up LW hash
+        LW2::auth_set($authtype, $request, $entry->{'id'}, $entry->{'password'});
+
+        # Patch to fix short reads
+        $request->{'whisker'}->{'allow_short_reads'} = 1;
+        LW2::http_fixup_request($request);
+
+        # pause if needed
+        if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
+
+        LW2::http_do_request_timeout($request, $result);    # test auth
+        $NIKTO{'totalrequests'}++;
+        dump_var("Auth Request",  $request);
+        dump_var("Auth Response", $result);
+
+        if ($result{'www-authenticate'} =~ /^ntlm/i) {
+
+            # Deal with ntlm
+            my @ntlm_x = split(/ /, $result{'www-authenticate'});
+            if ($#ntlm_x == 1) {
+                LW2::http_do_request_timeout(\%request, \%result);
+                $NIKTO{'totalrequests'}++;
+            }
+        }
+        my $uridir = $request->{'whisker'}->{'uri'};
+        $uridir =~ s#/[^/]*$#/#g;
+
+        if ($result->{'www-authenticate'} eq ''
+            && !defined $result->{'whisker'}->{'error'}) {
+
+            my $message =
+              "Default account found for '$realm' at $uridir ($request->{'whisker'}->{'uri'}) (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
+            if ($entry->{'id'} eq '' && $entry->{'password'} eq '') {
+                $message =
+                  "Blank credentials found at $uridir ($request{whisker}->{uri}), $entry->{'realm'}: $entry->{'msg'}";
+            }
+            unless ($entry->{'checked'} == 1) {
+                add_vulnerability($mark, $message, $entry->{tid}, 0, "GET", $uridir, $result);
+                $entry->{checked} = 1;
+            }
+
+            # Finally repeat the check
+            LW2::http_do_request_timeout($request, $result);    # test auth
+            $NIKTO{'totalrequests'}++;
+
+            # Set up so we don't have to repeat in future
+            # / isn't a valid entry in a hash  - more stupid perl
+
+            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'id'}       = $entry->{'id'};
+            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'password'} = $entry->{'password'};
+            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'authtype'} = $authtype;
+
+            # and leave
+            last;
+        }
+        else {
+            $result->{'www-authenticate'} = $save_auth;
+        }
+    }
+    LW2::auth_unset(\%request);
+
+    return $request, $result;
+}
+
+1;
