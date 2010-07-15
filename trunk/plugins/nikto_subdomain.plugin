@@ -70,7 +70,7 @@ sub nikto_subdomain {
         # First we need to mangle the host.
         my $newhost = $item->{'subdomain'} . "." . $host;
         $mark->{'hostname'} = $newhost;
-        my ($result, $content, $error) = nfetch($mark, "/", "HEAD", "", "subdomain");
+        my ($result, $content, $error) = nfetch($mark, "/", "GET", "", "subdomain");
 
         if ($error eq "") {
             add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'},

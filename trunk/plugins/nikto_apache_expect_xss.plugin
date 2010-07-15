@@ -22,7 +22,7 @@
 ###############################################################################
 sub nikto_apache_expect_xss_init {
     my $id = {
-        name        => "apache_export_xss",
+        name        => "apache_expect_xss",
         full_name   => "Apache Expect XSS",
         author      => "Sullo",
         description =>

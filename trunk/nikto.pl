@@ -274,7 +274,7 @@ sub setup_dirs {
             $NIKTOCONFIG{'EXECDIR'} = $CURRENTDIR;
         }
         else {
-            print STDERR "Could not work out the nikto EXECDIR, try setting it in nikto.conf";
+            print STDERR "Could not work out the nikto EXECDIR, try setting it in nikto.conf\n";
             exit;
         }
     }
