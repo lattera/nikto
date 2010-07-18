@@ -1,0 +1,17 @@
+#VERSION,1.04
+#LASTMOD,02.11.2007
+# (c) 2001-2007 cirt.net, All Rights Reserved
+# run the plugins in the following order
+
+nikto_realms
+nikto_headers
+nikto_robots
+nikto_httpoptions
+nikto_outdated
+nikto_msgs
+nikto_put_del_test
+nikto_apacheusers
+nikto_mutate
+nikto_passfiles
+nikto_user_enum_apache
+nikto_user_enum_cgiwrap

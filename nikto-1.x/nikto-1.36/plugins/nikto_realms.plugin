@@ -1,0 +1,78 @@
+#VERSION,1.02
+#LASTMOD,09.07.2004
+# (c) 2001-2007 CIRT, Inc., All Rights Reserved
+
+# this plugin checks auth realms for default ids/passwords
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+sub nikto_realms
+{
+ (my $RES, my $CONTENT) = fetch("/","GET","");
+ if ($result{'www-authenticate'} eq "") { return; }
+
+ my %REALMS=load_realms("$NIKTO{plugindir}/realms.db");
+
+ # check for ident only messages first
+ foreach my $REALM (keys %REALMS)
+  {
+   if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq "") && ($result{'www-authenticate'} =~ /$REALM/i))
+    { print "+ $REALM: $REALMS{$REALM}{msg}\n"; }
+  } 
+
+ # check for 'broken' web server, returns a blank www-auth header no matter what the id/pw sent
+ my $tid=LW::utils_randstr();
+ LW::auth_set_header("basic",\%request,$tid,$tid);
+ LW::http_fixup_request(\%request);
+ LW::http_do_request(\%request,\%result); # test auth
+ if ($result{'www-authenticate'} eq "")  { return; }
+
+ foreach my $RID (keys %REALMS)
+  {
+   if (($result{'www-authenticate'} =~ /$REALMS{$RID}{name}/i) || ($REALMS{$RID}{name} eq "\@ANY"))
+    { 
+     my $realm_temp=$result{'www-authenticate'}; # grab name
+     LW::auth_set_header("basic",\%request,$REALMS{$RID}{id},$REALMS{$RID}{pw});   # set auth
+     LW::http_fixup_request(\%request);
+     LW::http_do_request(\%request,\%result); # test auth
+     if ($result{'www-authenticate'} eq "")
+      { nprint("+ Default account found for '$REALMS{$RID}{name}'(ID '$REALMS{$RID}{id}', PW '$REALMS{$RID}{pw}). $REALMS{$RID}{msg}'"); 
+        #set auth stuff & run auth_check again
+        $NIKTO{hostid}=$REALMS{$RID}{id};
+        $NIKTO{hostpw}=$REALMS{$RID}{pw};
+        $result{'www-authenticate'}=$realm_temp; # set it back so auth_check properly ids it
+        &auth_check;
+      }
+    } 
+  }
+ return;
+}
+
+sub load_realms
+{
+ my %AUTHREALMS;
+ my $AFILE=$_[0]; 
+ open(IN,"<$AFILE") || die nprint("ERROR: Can't open $AFILE:$!");
+ my @file=<IN>;
+ close(IN);
+ my $rid=0;
+ foreach my $line (@file)
+ {
+  chomp($line);
+  $line=~s/\#.*$//;
+  $line=~s/\s+$//;
+  if ($line eq "") { next; }
+  my @t=parse_csv($line);
+  $AUTHREALMS{$rid}{name} = $t[0];
+  $AUTHREALMS{$rid}{id}   = $t[1];
+  $AUTHREALMS{$rid}{pw}   = $t[2];
+  $AUTHREALMS{$rid}{msg}  = $t[3];
+  nprint("Loaded:$t[0] -- $t[1], $t[2], $t[3]","d");
+  $rid++;
+ }
+return %AUTHREALMS;
+
+}
+
+1;

@@ -1,0 +1,38 @@
+#VERSION,1.00
+#LASTMOD,02.11.2007
+# (c) 2001-2007 CIRT, Inc., All Rights Reserved
+
+###############################################################################
+# Try put, and then delete a file
+
+sub nikto_put_del_test
+{
+    # PUT a page
+    my $uri = "/nikto-test-" . LW::utils_randstr(8) . ".html";
+    (my $RES, $CONTENT) = fetch($uri, "PUT", "This was a Nikto test.");
+
+    # Request it back
+    if ($RES eq 201)
+     {
+      (my $RES, $CONTENT) = fetch($uri, "GET");
+      if ($CONTENT =~ /This was a Nikto test/)
+       {
+        $VULS++;
+        nprint("+ OSVDB-397: HTTP method 'PUT' allows clients to save files on the web server. File '$uri' was created.", "", "kb"); 
+
+        # we were able to put it there--can we delete it?
+        (my $RES, $CONTENT) = fetch($uri, "DELETE");
+        if ($RES eq 200)
+         {
+           (my $RES, $CONTENT) = fetch($uri, "GET");
+           if ($CONTENT !~ /This was a Nikto test/)  # gone now
+            {
+             $VULS++;
+             nprint("+ OSVDB-5646: HTTP method 'DELETE' allows clients to delete file on the web server. File '$uri' was deleted.", "", "kb");
+            }
+         } 
+       }
+     }
+}
+
+1;

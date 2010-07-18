@@ -1,0 +1,51 @@
+#VERSION,1.02
+#LASTMOD,06.17.2003
+# (c) 2001-2007 CIRT, Inc., All Rights Reserved
+
+# Enumeration of users and directories in system 
+# (in Apache using ~username)
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# This plugin tries to enumerate all the users and directories
+# in the system (of course the bruteforce attack is limited to a given range).
+# In some Apache/UNIX systems this might give out many local users
+# (which could later on be used for a ssh brute-force attack)
+
+# this plugin was written by Javier Fernandez-Sanguino Pe–a
+
+sub nikto_user_enum_apache 
+{
+ if ($CLI{mutate} !~ /3/) { return; }
+
+ nprint("- Enumerating Apache users (1 to 5 characters).","d");
+
+ # Note1: This script only generates names with letters A-Z (no numbers)
+ #
+ # Note2: this script will generate SUM(26^n)(n=$min to $max) 
+ # it's probably faster to write this to a file than to generate it
+ # on the fly BTW.
+ # 
+ # Of course, it could be optimized to skip some "strange"
+ # combinations of usernames, but hey, then it wouldn't
+ # be 'brute force' would it? (jfs)
+
+ my $text = "a";
+ my $ctr=0;
+ while ( length($text) <= 5 ) 
+  {
+   if (($ctr % 500) eq 0) { nprint("\tUser enumeration guess $ctr ($text)","d"); }
+   (my $RES , $CONTENT) = fetch("/~".$text,"HEAD");
+   if ( $RES eq 301 || $RES eq 200 ) # this is a valid user
+    { 
+     $VULS++;
+     nprint("+ /~".$text." - Is a valid user on the system.");
+    }
+   $text++;
+   $ctr++;
+  }
+}
+
+
+1;

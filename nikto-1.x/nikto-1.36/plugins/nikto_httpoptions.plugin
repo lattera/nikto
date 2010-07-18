@@ -1,0 +1,68 @@
+#VERSION,1.06
+#LASTMOD,02.12.2007
+# (c) 2001-2007 cirt.net, All Rights Reserved
+# HTTP Options check
+# see RFC 2626 for info...
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this just gets the options & checks 'em out.
+
+sub nikto_httpoptions
+{
+ (my $RES , $CONTENT) = fetch("/","OPTIONS");
+ 
+ # proxy can impose it's methods... should actually check this not just warn
+ my $TXT="";
+ if ($CLI{useproxy} ne "") { $TXT="(May be proxy's methods, not server's)"; }
+
+ if ($result{allow} ne "")
+    { 
+     nprint("+ Allowed HTTP Methods: $result{allow} $TXT"); 
+     foreach my $m (split/,? /, $result{allow}) { eval_methods($m,"Allow"); }
+    }
+
+ if ($result{public} ne "")
+    {
+     nprint("+ Public HTTP Methods: $result{public} $TXT");
+     foreach my $m (split/,? /, $result{public}) { eval_methods($m,"Public"); }
+    }
+
+return;
+}
+
+sub eval_methods
+{
+ my $method=$_[0] || return;
+ my $type=$_[1];
+ $method=uc($method);
+ my $prefix="+ HTTP method ('$type' Header):";
+
+ if ($method eq "CONNECT") 
+    { nprint("$prefix 'CONNECT' may allow server to proxy client requests."); }
+
+ elsif ($method eq "PUT")
+    { nprint("$prefix 'PUT' method may allow clients to save files on the web server."); }
+
+ elsif ($method eq "DELETE")
+    { nprint("$prefix 'DELETE' may allow clients to remove files on the web server."); }
+
+ elsif ($method eq "PROPFIND")
+    { nprint("$prefix 'PROPFIND' may indicate DAV/WebDAV is installed. This may be used to get directory listings if indexing is allowed but a default page exists. OSVDB-13431."); }
+
+ elsif ($method eq "SEARCH")
+    { nprint("$prefix 'SEARCH' may be used to get directory listings if Index Server is running. OSVDB-425."); }
+
+ elsif ($method eq "PROPPATCH")
+    { nprint("$prefix 'PROPPATCH' may indicate DAV/WebDAV is installed."); }
+    
+ elsif ($method eq "TRACE")
+    { nprint("$prefix 'TRACE' is typically only used for debugging--it should be disabled. Note, this does not mean the server is vulnerable to XST. OSVDB-877."); }
+ 
+ elsif ($method eq "TRACK")
+    { nprint("$prefix 'TRACK' is typically only used for debugging--it should be disabled. Note, this does not mean the server is vulnerable to XST. OSVDB-877."); }
+
+}
+
+1;
