@@ -187,7 +187,7 @@ sub map_codes {
     ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
 
     if (defined $headers{'location'}) {
-        nprint("+ Root page / redirects to: $result{'location'}");
+        nprint("+ Root page / redirects to: $headers{'location'}");
         if ($headers{'location'} =~ /^$mark->{'hostname'}/i)    # same host
         {
             my $uri = $headers{'location'};
