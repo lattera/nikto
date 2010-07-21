@@ -714,6 +714,17 @@ sub check_input {
     elsif (($key eq 'q') || (ord($key) eq 3)) {
         safe_quit();
     }
+    elsif ($key eq 'P') {
+	my $sleep=1;
+	nprint("- Pausing, press P to resume.");
+	while ($sleep) { 
+		sleep 1;
+		if (readkey() eq 'P') { 
+			$sleep=0; 
+			nprint("- Resuming.");
+			}
+		}
+    }
     return;
 }
 
