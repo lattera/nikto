@@ -119,6 +119,10 @@
       for SSL is dependent on the installation package, but is rumored to
       exist for ActiveState's Perl.</para>
 
+      <para>For support for logging to Metasploit, the RPC::XML and RPC::XML::Client
+      modules must be installed. Nikto will operate with these modules, 
+      but the functionality will not be available.</para>
+
       <itemizedlist>
         <listitem>
           <para>Perl: <ulink
@@ -2430,7 +2434,7 @@ $TESTS{999999}{osvdb}=637;</screen>
       <title>LibWhisker</title>
 
       <para>LibWhisker is licensed under the GNU General Public License (GPL),
-      and copyrighted by Rain Forrest Puppy.</para>
+      and Copyright (c) 2009, Jeff Forristal (wiretrip.net)</para>
     </section>
 
     <section>
@@ -2447,9 +2451,8 @@ $TESTS{999999}{osvdb}=637;</screen>
     <section>
       <title>Nikto</title>
 
-      <para>Nikto was originally written and maintained by Sullo, CIRT, Inc.
-      It is currently maintained by David Lodge. LibWhisker was written by
-      Rain Forrest Puppy</para>
+      <para>Nikto is written and maintained by Chris Sullo and David Lodge.
+      LibWhisker was written by Rain Forrest Puppy</para>
     </section>
 
     <section>
