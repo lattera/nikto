@@ -1,4 +1,4 @@
-#VERSION,2.1.3
+#VERSION,2.1.4
 # $Id$
 ###############################################################################
 #  Copyright (C) 2006 CIRT, Inc.
@@ -124,7 +124,7 @@ sub nprint {
     }
 
     # print errors to STDERR
-    if ($line =~ /^\+ ERROR:/) { print STDERR "$line\n"; return; }
+    if ($line =~ /^\t?\+ ERROR:/) { print STDERR "$line\n"; return; }
 
     # don't print to STDOUT if output file is "-"
     if ((defined $CLI{'file'}) && ($CLI{'file'} eq "-")) { return; }
@@ -135,7 +135,7 @@ sub nprint {
     $line =~
       s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
 
-    print $line ."\n";
+    print $line . "\n";
 
     return;
 }
@@ -194,7 +194,7 @@ sub map_codes {
             %headers = ();
             ($res, $content, $error) = nfetch($mark, "/", "GET", "", \%headers, "", "map_codes");
         }
-        else                                                    # different host... ugh... just guess
+        else    # different host... ugh... just guess
         {
             $FoF{'okay'}{'response'} = 200;
             $FoF{'okay'}{'type'}     = "STD";
@@ -498,6 +498,7 @@ sub general_config {
     elsif ($CLI{'format'} =~ /csv/i)   { $CLI{'format'} = "csv"; }
     elsif ($CLI{'format'} =~ /nbe/i)   { $CLI{'format'} = "nbe"; }
     elsif ($CLI{'format'} =~ /xml/i)   { $CLI{'format'} = "xml"; }
+    elsif ($CLI{'format'} =~ /msf/i)   { $CLI{'format'} = "msf"; }
     elsif ($CLI{'format'} eq 'none') { }
     else                             { nprint("+ ERROR: Invalid output format"); exit; }
 
@@ -603,8 +604,7 @@ sub general_config {
         $VARIABLES{'@RFIURL'} = $NIKTOCONFIG{'RFIURL'};
     }
     else {
-        nprint(
-            "- ***** RFIURL is not defined in nikto.conf--no RFI tests will run *****");
+        nprint("- ***** RFIURL is not defined in nikto.conf--no RFI tests will run *****");
     }
 
     # SSL Test
@@ -673,8 +673,13 @@ sub check_input {
     if ($key eq ' ') {
         my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete",
                            $NIKTO{'totalrequests'},
-                           ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'})) * 100);
-        if ($NIKTO{'total_targets'} > 1) { $line .=" (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})"; }
+                           ($NIKTO{'totalrequests'} /
+                              ($NIKTO{'total_checks'} * $NIKTO{'total_targets'})
+                              ) * 100
+                             );
+        if ($NIKTO{'total_targets'} > 1) {
+            $line .= " (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})";
+        }
         if ($NIKTO{'current_plugin'} ne '') { $line .= " (in plugin $NIKTO{'current_plugin'})"; }
         nprint($line);
         return;
@@ -715,15 +720,15 @@ sub check_input {
         safe_quit();
     }
     elsif ($key eq 'P') {
-	my $sleep=1;
-	nprint("- Pausing, press P to resume.");
-	while ($sleep) { 
-		sleep 1;
-		if (readkey() eq 'P') { 
-			$sleep=0; 
-			nprint("- Resuming.");
-			}
-		}
+        my $sleep = 1;
+        nprint("- Pausing, press P to resume.");
+        while ($sleep) {
+            sleep 1;
+            if (readkey() eq 'P') {
+                $sleep = 0;
+                nprint("- Resuming.");
+            }
+        }
     }
     return;
 }
@@ -1075,14 +1080,14 @@ sub dbcheck {
     my @dbs =
       qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
     my $prefix = $_[0];
-    if ($prefix eq "")  { nprint "\n-->\tNikto Databases\n"; }
-    if ($prefix eq "u") { nprint "\n-->\tUser Databases\n"; }
+    if ($prefix eq "")  { nprint("\n-->\tNikto Databases"); }
+    if ($prefix eq "u") { nprint("\n-->\tUser Databases"); }
 
     for my $file (@dbs) {
         my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
         if (!-r $filename) { next; }
         open(IN, "<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
-        nprint "Syntax Check: $filename\n";
+        nprint("Syntax Check: $filename");
 
         if ($file eq 'db_outdated') {
             foreach $line (<IN>) {
@@ -1091,15 +1096,15 @@ sub dbcheck {
                 chomp($line);
                 if ($line eq "") { next; }
                 my @L = parse_csv($line);
-                if ($#L ne 3) { print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n"; next; }
+                if ($#L ne 3) { nprint("\t+ ERROR: Invalid syntax ($#L): $line"); next; }
                 $ENTRIES{"$L[0]"}++;
             }
             foreach $entry (keys %ENTRIES) {
                 if ($ENTRIES{$entry} > 1) {
-                    print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n";
+                    nprint("\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry");
                 }
             }
-            nprint "\t" . keys(%ENTRIES) . " entries\n";
+            nprint("\t" . keys(%ENTRIES) . " entries");
         }
         elsif ($file eq 'db_tests') {
             my %ENTRIES;
@@ -1107,51 +1112,51 @@ sub dbcheck {
                 if ($line !~ /^\"/) { next; }
                 my @L = parse_csv($line);
                 if ($L[4] !~ /(GET|POST|TRACE|TRACK|OPTIONS|SEARCH|INDEX)/i) {
-                    print STDERR "\t+ ERROR: Possibly invalid method: $L[4] on ($line)\n";
+                    nprint("\t+ ERROR: Possibly invalid method: $L[4] on ($line)");
                 }
-                if ($L[5] eq "") { print STDERR "\t+ ERROR: blank conditional: $line"; next; }
+                if ($L[5] eq "") { nprint("\t+ ERROR: blank conditional: $line"); next; }
                 if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) {
-                    print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n";
+                    nprint("\t+ ERROR: Invalid syntax ($#L): $line");
                     next;
                 }
                 if ($line !~ /^(\".*\",){11}\".*\"/) {
-                    print STDERR "\t+ ERROR: Invalid syntax ($#L): $line\n";
+                    nprint("\t+ ERROR: Invalid syntax ($#L): $line");
                     next;
                 }
                 if (($L[3] =~ /^\@CG/) && ($L[3] !~ /^\@CGIDIRS/)) {
-                    print STDERR "\t+ ERROR: Possible \@CGIDIRS misspelling: $line";
+                    nprint("\t+ ERROR: Possible \@CGIDIRS misspelling: $line");
                 }
-                if ($L[1] =~ /[^0-9]/) { print STDERR "\t+ ERROR: Invalid OSVDB ID: $line"; }
+                if ($L[1] =~ /[^0-9]/) { nprint("\t+ ERROR: Invalid OSVDB ID: $line"); }
                 $ENTRIES{"$L[3],$L[4],$L[5],$L[6],$L[7],$L[8],$L[9],$L[11],$L[12]"}++;
                 if ((count_fields($line, 1) ne 12) && (count_fields($line) ne '')) {
-                    print STDERR "\t+ ERROR: Invalid syntax: $line\n";
+                    nprint("\t+ ERROR: Invalid syntax: $line");
                 }
             }
             foreach $entry (keys %ENTRIES) {
                 if ($ENTRIES{$entry} > 1) {
-                    print STDERR "\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry\n";
+                    nprint("\t+ ERROR: Duplicate ($ENTRIES{$entry}): $entry");
                 }
             }
-            nprint "\t" . keys(%ENTRIES) . " entries\n";
+            nprint("\t" . keys(%ENTRIES) . " entries");
         }
         elsif ($file eq 'db_variables') {
             my $ctr = 0;
             foreach $line (<IN>) {
                 if ($line !~ /^\@/)         { next; }
-                if ($line !~ /^\@.+\=.+$/i) { print STDERR "\t+ ERROR: Invalid syntax: $line\n"; }
+                if ($line !~ /^\@.+\=.+$/i) { nprint("\t+ ERROR: Invalid syntax: $line"); }
                 $ctr++;
             }
-            nprint "\t$ctr entries\n";
+            nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_realms') {
             my $ctr = 0;
             foreach $line (<IN>) {
                 if ((count_fields($line, 1) ne 4) && (count_fields($line) ne '')) {
-                    print STDERR "\t+ ERROR: Invalid syntax: $line";
+                    nprint("\t+ ERROR: Invalid syntax: $line");
                 }
                 $ctr++;
             }
-            nprint "\t$ctr entries\n";
+            nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_404_strings') {
             my $ctr = 0;
@@ -1160,27 +1165,27 @@ sub dbcheck {
                 # not really any syntax to check
                 $ctr++;
             }
-            nprint "\t$ctr entries\n";
+            nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_headers') {
             my $ctr = 0;
             foreach $line (<IN>) {
                 if ((count_fields($line) ne 0) && (count_fields($line) ne '')) {
-                    print STDERR "\t+ ERROR: Invalid syntax: $line";
+                    nprint("\t+ ERROR: Invalid syntax: $line");
                 }
                 $ctr++;
             }
-            nprint "\t$ctr entries\n";
+            nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_multiple_index') {
             my $ctr = 0;
             foreach $line (<IN>) {
                 if ((count_fields($line) ne 0) && (count_fields($line) ne '')) {
-                    print STDERR "\t+ ERROR: Invalid syntax: $line";
+                    nprint("\t+ ERROR: Invalid syntax: $line");
                 }
                 $ctr++;
             }
-            nprint "\t$ctr entries\n";
+            nprint("\t$ctr entries");
         }
         else {
 
@@ -1199,11 +1204,11 @@ sub dbcheck {
                 }
                 if (   (count_fields($line, 1) != $fields - 1)
                     && (count_fields($line) ne '')) {
-                    print STDERR "\t+ ERROR: Invalid syntax: $line";
+                    nprint("\t+ ERROR: Invalid syntax: $line");
                 }
                 $ctr++;
             }
-            nprint "\t$ctr entries\n";
+            nprint("\t$ctr entries");
         }
 
         close(IN);
@@ -1211,7 +1216,7 @@ sub dbcheck {
 
     if ($_[0] eq "") { dbcheck('u'); }    # do this once
 
-    nprint "\n";
+    nprint("\n");
     exit;
 }
 
@@ -1312,10 +1317,11 @@ sub load_plugins {
                 my $pluginhash = &$plugin_init;
 
                 # Add default weights if not already assigned
-                while (my ($hook, $hook_params) = each(%{$pluginhash->{'hooks'}})) {
-                    $hook_params->{$hook}->{'weight'} = 50 unless (defined $hook_params->{$hook}->{'weight'});
+                while (my ($hook, $hook_params) = each(%{ $pluginhash->{'hooks'} })) {
+                    $hook_params->{$hook}->{'weight'} = 50
+                      unless (defined $hook_params->{$hook}->{'weight'});
                 }
-                $pluginhash->{report_weight} = 50 unless (defined $pluginhash->{report_weight}); 
+                $pluginhash->{report_weight} = 50 unless (defined $pluginhash->{report_weight});
                 push(@all_names, $pluginhash->{name});
 
                 push(@PLUGINS, $pluginhash);
@@ -1369,21 +1375,21 @@ sub load_plugins {
 
     # For speed in future, create a hash of active plugins ordered by plugin weight, for
     # each type of plugin
-    
+
     # first build a temporary hash of all known hooks
     my %hooks;
     foreach my $plugin (@PLUGINS) {
-        foreach my $hook (keys(%{$plugin->{'hooks'}})) {
+        foreach my $hook (keys(%{ $plugin->{'hooks'} })) {
             $hooks{$hook} = ();
         }
     }
-    
+
     # now we know the types of hooks, look through each plugin for them
     foreach my $hook (keys(%hooks)) {
         foreach my $plugin (@PLUGINS) {
             if ($plugin->{'run'} == 1) {
                 if (defined $plugin->{'hooks'}->{$hook}->{'method'}) {
-                    push(@{$hooks{$hook}}, $plugin);
+                    push(@{ $hooks{$hook} }, $plugin);
                 }
             }
         }
@@ -1391,9 +1397,11 @@ sub load_plugins {
 
     # Now sort each array by weight
     foreach my $hook (keys(%hooks)) {
-        my @sorted=sort { $a->{'hooks'}->{$hook}->{'weight'} <=> $b->{'hooks'}->{$hook}->{'weight'} } @{$hooks{$hook}};
+        my @sorted =
+          sort { $a->{'hooks'}->{$hook}->{'weight'} <=> $b->{'hooks'}->{$hook}->{'weight'} }
+          @{ $hooks{$hook} };
         $PLUGINORDER{$hook} = \@sorted;
-    }    
+    }
 }
 
 ###############################################################################
@@ -1429,7 +1437,8 @@ sub run_hooks {
         unless ($type eq "prefetch" || $type eq "postfetch") {
             $NIKTO{'current_plugin'} = $plugin->{'full_name'};
         }
-        &{ $plugin->{'hooks'}->{$type}->{'method'} }($mark, $plugin->{'parameters'}, $request, $result);
+        &{ $plugin->{'hooks'}->{$type}->{'method'} }($mark, $plugin->{'parameters'}, $request,
+                                                     $result);
         $OUTPUT{'verbose'} = $oldverbose;
         $OUTPUT{'debug'}   = $olddebug;
         $OUTPUT{'errors'}  = $olderrors;
@@ -1566,8 +1575,8 @@ sub check_updates {
     }
 
     if ($RES ne 200) {
-        print STDERR
-          "+ ERROR ($RES): Unable to get $request{'whisker'}->{'host'}$serverdir/versions.txt\n";
+        nprint(
+              "+ ERROR ($RES): Unable to get $request{'whisker'}->{'host'}$serverdir/versions.txt");
         exit;
     }
 
@@ -1612,7 +1621,7 @@ sub check_updates {
                   "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
                 nprint
                   "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n";
-                if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
+                if ($remotemsg ne "") { nprint("+ $server message: $remotemsg"); }
                 exit;
             }
             push(@DBTOGET, $remotefile);
@@ -1622,10 +1631,10 @@ sub check_updates {
 
     # replace local files if updated
     foreach my $toget (@DBTOGET) {
-        nprint "+ Retrieving '$toget'\n";
+        nprint("+ Retrieving '$toget'");
         (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/$toget", "GET");
         if ($RES ne 200) {
-            print STDERR "+ ERROR: Unable to get $server$serverdir/$toget\n";
+            nprint("+ ERROR: Unable to get $server$serverdir/$toget");
             exit;
         }
         if ($CONTENT ne "") {
@@ -1639,7 +1648,7 @@ sub check_updates {
 
     # CHANGES file
     if ($code_updates) {
-        nprint "+ Retrieving 'CHANGES.txt'\n";
+        nprint("+ Retrieving 'CHANGES.txt'");
         (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/CHANGES.txt", "GET");
         if (($CONTENT ne "") && ($RES eq 200)) {
             open(OUT, ">$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt")
@@ -1650,8 +1659,8 @@ sub check_updates {
         }
     }
 
-    if ($#DBTOGET < 0) { nprint "+ No updates required.\n"; }
-    if ($remotemsg ne "") { nprint "+ $server message: $remotemsg\n"; }
+    if ($#DBTOGET < 0) { nprint("+ No updates required."); }
+    if ($remotemsg ne "") { nprint("+ $server message: $remotemsg"); }
     exit;
 }
 
@@ -1713,7 +1722,7 @@ sub read_data {
         # Done with waiting for input. Let's not leave the cursor sitting
         # there, after the prompt.
         print TTY "\n";
-        nprint "\n";
+        nprint("\n");
 
         # Let's put everything back where we found it.
         $term->setlflag($original_flags);
@@ -2183,13 +2192,13 @@ sub parse_csv {
 #######################################################################
 sub version {
     my @NIKTOFILES = dirlist($NIKTOCONFIG{PLUGINDIR}, "(^nikto|^db_)");
-    nprint "$NIKTO{'DIV'}\n";
-    nprint "$NIKTO{'name'} Versions\n";
-    nprint "$NIKTO{'DIV'}\n";
-    nprint "File                               Version      Last Mod\n";
-    nprint "-----------------------------      --------     ----------\n";
-    nprint "Nikto main                         $NIKTO{'version'}\n";
-    nprint "LibWhisker                         $LW2::VERSION\n";
+    nprint($NIKTO{'DIV'});
+    nprint("$NIKTO{'name'} Versions");
+    nprint($NIKTO{'DIV'});
+    nprint("File                               Version      Last Mod");
+    nprint("-----------------------------      --------     ----------");
+    nprint("Nikto main                         $NIKTO{'version'}");
+    nprint("LibWhisker                         $LW2::VERSION");
 
     foreach my $FILE (sort @NIKTOFILES) {
         open(FI, "<$NIKTOCONFIG{PLUGINDIR}/$FILE")
@@ -2204,9 +2213,9 @@ sub version {
         $VERS[0] =~ s/^#VERSION,//;
         my $ws1 = (35 - length($FILE));
         my $ws2 = (13 - length($VERS[0]));
-        nprint "$FILE" . " " x $ws1 . "$VERS[0]" . " " x $ws2 . "$modification[4]\n";
+        nprint("$FILE" . " " x $ws1 . "$VERS[0]" . " " x $ws2 . "$modification[4]");
     }
-    nprint "$NIKTO{'DIV'}\n";
+    nprint($NIKTO{'DIV'});
 
     exit;
 }
@@ -2298,10 +2307,10 @@ sub send_updates {
     }
 
     if ($CONTENT !~ /SUCCESS/) {
-        print STDERR "+ ERROR: ($RES, $CONTENT): Unable to send update info to CIRT.net\n";
+        nprint("+ ERROR: ($RES, $CONTENT): Unable to send update info to cirt.net");
     }
     else {
-        nprint "- Sent updated info to CIRT.net -- Thank you!\n";
+        nprint("- Sent updated info to CIRT.net -- Thank you!");
     }
 
     return;
@@ -2338,6 +2347,7 @@ sub usage {
        -Format+           Save file (-o) format:
                                csv   Comma-separated-value
                                htm   HTML Format
+                               msf+  Log to Metasploit
                                nbe   Nessus NBE format
                                txt   Plain text (default if not specified)
                                xml   XML Format
@@ -2356,7 +2366,7 @@ sub usage {
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
-       -Plugins           List of plugins to run (default ALL)
+       -Plugins+          List of plugins to run (default: ALL)
        -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds)
        -root+             Prepend root value to all requests, format is /directory
@@ -2402,9 +2412,9 @@ sub usage {
        -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
-       -Plugins		       List of plugins to run (default ALL)
+       -Plugins+           List of plugins to run (default: ALL)
        -port+              Port to use (default 80)
-	   -root+			   Prepend root value to all requests, format is /directory 
+       -root+              Prepend root value to all requests, format is /directory 
        -Display+           Turn on/off display outputs
        -ssl                Force ssl mode on port
        -Single             Single request mode

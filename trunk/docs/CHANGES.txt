@@ -1,3 +1,7 @@
+2010-08-04 
+	- Implementing MSF output
+	- Minor standardization stuff
+
 2010-07-07 Nikto 2.1.2 release
 	- Ticket 8: Interactive scan status.
 	- Ticket 122: Cleanup db_404_strings to prevent over-matching.

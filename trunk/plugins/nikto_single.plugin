@@ -1,4 +1,4 @@
-#VERSION,2.01
+#VERSION,2.02
 # $Id$
 ###############################################################################
 #  Copyright (C) 2004 CIRT, Inc.
@@ -138,7 +138,7 @@ sub single {
     if ($request{'whisker'}->{'host'} eq "") { delete $request{'whisker'}->{'host'}; }
 
     my ($hostname, $ip) = resolve($request{'whisker'}{'host'});
-    if ($ip eq "") { print STDERR "+ ERROR: could not resolve host name\n"; exit; }
+    if ($ip eq "") { nprint("+ ERROR: could not resolve host name"); exit; }
 
 #### do request
     LW2::http_reset();    # force-close any old connections
