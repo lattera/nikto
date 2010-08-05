@@ -720,15 +720,9 @@ sub check_input {
         safe_quit();
     }
     elsif ($key eq 'P') {
-        my $sleep = 1;
-        nprint("- Pausing, press P to resume.");
-        while ($sleep) {
-            sleep 1;
-            if (readkey() eq 'P') {
-                $sleep = 0;
-                nprint("- Resuming.");
-            }
-        }
+        nprint("- Pausing--press P to resume.");
+        while (readkey() ne 'P') { }
+        nprint("- Resuming.");
     }
     return;
 }
@@ -2215,6 +2209,17 @@ sub version {
         my $ws2 = (13 - length($VERS[0]));
         nprint("$FILE" . " " x $ws1 . "$VERS[0]" . " " x $ws2 . "$modification[4]");
     }
+    nprint($NIKTO{'DIV'});
+
+    # Check dependencies
+    eval "require RPC::XML";
+    if ($@) {
+	nprint("Module RPC::XML missing. Logging to Metasploit is disabled.");
+	}
+    eval "require RPC::XML::Client";
+    if ($@) {
+	nprint("Module RPC::XML::Client missing. Logging to Metasploit is disabled.");
+	}
     nprint($NIKTO{'DIV'});
 
     exit;
