@@ -190,8 +190,8 @@ foreach my $mark (@MARKS) {
         if ($mark->{'banner'} eq "") {
             $mark->{'banner'} = "(no identification possible)";
         }
-	add_vulnerability($mark, "Web server banner: " . $mark->{'banner'}, 0);
-        nprint("+ Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}");
+	#add_vulnerability($mark, "Web server banner: " . $mark->{'banner'}, 0);
+        add_vulnerability($mark, "Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}", 0);
     }
     else {
         dump_target_info($mark);
@@ -202,10 +202,12 @@ foreach my $mark (@MARKS) {
     $mark->{'end_time'} = time();
     my $time    = date_disp($mark->{'end_time'});
     my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
+    if (!$CLI{'findonly'}) { 
     nprint(
         "+ $NIKTO{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
         );
-    nprint("+ End Time:           $time ($elapsed seconds)");
+    	nprint("+ End Time:           $time ($elapsed seconds)");
+	}
     nprint($NIKTO{'DIV'});
 
     $COUNTERS{'hosts_completed'}++;
