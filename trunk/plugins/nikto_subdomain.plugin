@@ -48,17 +48,12 @@ sub nikto_subdomain {
     if (index($host, '.') < 0 || $host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/) {
 
         # Host is an IP address, don't bother!
-        nprint("Host supply to subdomain is an IP address or an unqualified hostname; skipping",
-               "v");
+        nprint("Host given to subdomain is an IP address or an unqualified hostname; skipping", "v");
         return;
     }
 
     # Check if the start of the domain is "www"
-    if ($host =~ /^www\./) {
-
-        # Remove the www.
-        $host =~ s/^www\.//;
-    }
+    $host =~ s/^www\.//;
 
     my $nocache_enabled = 0;
     if ($CLI{'nocache'}) { $nocache_enabled = 1; }
@@ -68,14 +63,12 @@ sub nikto_subdomain {
 
         # Use nfetch to minimize extra code
         # First we need to mangle the host.
-        my $newhost = $item->{'subdomain'} . "." . $host;
-        $mark->{'hostname'} = $newhost;
+        $mark->{'hostname'} = $item->{'subdomain'} . "." . $host;
         my ($result, $content, $error) = nfetch($mark, "/", "GET", "", "subdomain");
 
         if ($error eq "") {
-            add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'},
-                              0);
-        }    # End if
+            add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'}, 0);
+        }
 
     }    # End foreach
     if (!$nocache_enabled) { undef $CLI{'nocache'}; }
