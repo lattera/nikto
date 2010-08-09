@@ -759,15 +759,14 @@ sub resolve {
             exit;
         }
         $ip = gethostbyname($ident);
-        if (   ($ip eq "")
-            && ($request{'whisker'}->{'proxy_host'} ne "")
-            )                    # can't resolve name to IP, but using proxy
+	# can't resolve name to IP, but using proxy
+        if (($ip eq "") && ($request{'whisker'}->{'proxy_host'} ne ""))
         {
             $name = $ident;
             $ip   = $name;
         }
-        elsif (($ip eq "")
-            && ($request{'whisker'}->{'proxy_host'} eq "")) # can't resolve name to IP, no proxy set
+	# can't resolve name to IP, no proxy set
+        elsif (($ip eq "") && ($request{'whisker'}->{'proxy_host'} eq ""))
         {
             nprint("+ ERROR: Cannot resolve hostname '$ident'\n");
             return;
@@ -1539,18 +1538,19 @@ sub check_updates {
     my $serverdir    = "/nikto/UPDATES/$NIKTO{'version'}";
 
     # set up our mark
-    my %mark = ('ident' => 'www.cirt.net',
+    my %mark = (
+		'ident' => 'cirt.net',
                 'ssl'   => 0,
                 'port'  => 80
                 );
-    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('www.cirt.net');
 
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
-        if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
+	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
             last;
         }
     }
+    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
 
     # retrieve versions file
     (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
@@ -1768,13 +1768,13 @@ sub proxy_check {
         if (exists $result{'whisker'}{'error'}) {
             if ($result{'whisker'}{'error'} =~ /Transport endpoint is not connected/) {
                 nprint("+ ERROR: Could not connect to the defined proxy $NIKTOCONFIG{PROXYHOST}");
-                exit 1;
             }
-            nprint("+ ERROR: Proxy error: $result{'whisker'}{'error'}", "v");
+            nprint("+ ERROR: Proxy error: $result{'whisker'}{'error'}");
+            exit 1;
         }
+
         if ($result{'whisker'}{'code'} eq "407")    # proxy requires auth
         {
-
             # have id/pw?
             if ($NIKTOCONFIG{PROXYUSER} eq "") {
                 $NIKTOCONFIG{PROXYUSER} = read_data("Proxy ID: ",   "");
@@ -2286,14 +2286,15 @@ sub send_updates {
                 'ssl'   => 0,
                 'port'  => 80
                 );
-    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('www.cirt.net');
 
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
-        if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
+	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
             last;
         }
     }
+
+    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
 
     ($RES, $CONTENT) = nfetch(\%mark, "/cgi-bin/versions?DATA=$updated_version", "GET");
 
