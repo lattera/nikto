@@ -751,6 +751,12 @@ sub resolve {
     my $ident = $_[0] || return;
     my ($name, $ip, $dn) = "";
 
+    if ($request{'whisker'}->{'proxy_host'} ne '') {
+        $name = $ident;
+        $ip   = $name;
+        return $name, $ip, $name;
+    }
+
     # ident is name, lookup IP
     if ($ident =~ /[^0-9\.]/)    # not an IP, assume name
     {
@@ -759,35 +765,25 @@ sub resolve {
             exit;
         }
         $ip = gethostbyname($ident);
-	# can't resolve name to IP, but using proxy
-        if (($ip eq "") && ($request{'whisker'}->{'proxy_host'} ne ""))
-        {
-            $name = $ident;
-            $ip   = $name;
-        }
-	# can't resolve name to IP, no proxy set
-        elsif (($ip eq "") && ($request{'whisker'}->{'proxy_host'} eq ""))
-        {
+
+        # can't resolve name to IP
+        if ($ip eq "") {
             nprint("+ ERROR: Cannot resolve hostname '$ident'\n");
             return;
         }
         else {
             use IO::Socket;
             $ip = inet_ntoa($ip);
-            if (   ($ip !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/)
-                && ($ip ne ""))                             # trap for proxy...
-            {
+            if ($ip !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/) {
                 nprint("+ ERROR: Invalid IP '$ip'\n\n");
                 return;
             }
             $name = $ident;
         }
     }
-    else                                                    # ident is IP, lookup name
+    else    # ident is IP, lookup name
     {
-        if (   ($ident !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/)
-            && ($ident ne ""))                              # trap for proxy...
-        {
+        if ($ident !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/) {
             nprint("+ ERROR: Invalid IP '$ident'\n\n");
             return;
         }
@@ -1538,19 +1534,21 @@ sub check_updates {
     my $serverdir    = "/nikto/UPDATES/$NIKTO{'version'}";
 
     # set up our mark
-    my %mark = (
-		'ident' => 'cirt.net',
+    my %mark = ('ident' => 'cirt.net',
                 'ssl'   => 0,
                 'port'  => 80
                 );
 
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
-	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
+        if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
+            proxy_setup();
             last;
         }
     }
     ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
+
+    print "here\n";
 
     # retrieve versions file
     (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
@@ -1775,6 +1773,7 @@ sub proxy_check {
 
         if ($result{'whisker'}{'code'} eq "407")    # proxy requires auth
         {
+
             # have id/pw?
             if ($NIKTOCONFIG{PROXYUSER} eq "") {
                 $NIKTOCONFIG{PROXYUSER} = read_data("Proxy ID: ",   "");
@@ -2214,12 +2213,12 @@ sub version {
     # Check dependencies
     eval "require RPC::XML";
     if ($@) {
-	nprint("Module RPC::XML missing. Logging to Metasploit is disabled.");
-	}
+        nprint("Module RPC::XML missing. Logging to Metasploit is disabled.");
+    }
     eval "require RPC::XML::Client";
     if ($@) {
-	nprint("Module RPC::XML::Client missing. Logging to Metasploit is disabled.");
-	}
+        nprint("Module RPC::XML::Client missing. Logging to Metasploit is disabled.");
+    }
     nprint($NIKTO{'DIV'});
 
     exit;
@@ -2288,7 +2287,7 @@ sub send_updates {
                 );
 
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
-	if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
+        if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
             last;
         }
