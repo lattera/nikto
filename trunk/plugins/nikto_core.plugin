@@ -2053,6 +2053,9 @@ sub nfetch {
     if (defined $result{'whisker'}->{'error'} && !exists $flags->{'noerror'}) {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
+        if (($result{'whisker'}->{'code'} eq 502) && ($CLI{'useproxy'})) {
+        	nprint("+ ERROR: Revieved 502 'Bad Gateway' from proxy\n");
+		}
     }
 
     if ($OUTPUT{'show_cookies'} && (defined($result{'whisker'}->{'cookies'}))) {
