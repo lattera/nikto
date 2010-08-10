@@ -5,7 +5,7 @@
 <!ENTITY options SYSTEM "sections/options.xml">
 ]>
 <book>
-  <title>Nikto v2.1.2 - The Manual</title>
+  <title>Nikto v2.1.3 - The Manual</title>
 
   <chapter id="introduction">
     <title>Introduction</title>
@@ -78,9 +78,9 @@
       vulnerability scanner. The 2.0 release, in November, 2007 represents
       several years of improvements.</para>
 
-      <para>In 2008, due to other commitments, Sullo, the original author
-      couldn't continue to support Nikto and the code was released under the
-      GPL and passed to the community for support.</para>
+      <para>In 2008, David Lodge officially joined the development team and
+      assumed leadership of Nikto while Chris Sullo pursued another
+      committment. In 2009, Sullo rejoined the project.</para>
     </section>
   </chapter>
 
@@ -119,9 +119,9 @@
       for SSL is dependent on the installation package, but is rumored to
       exist for ActiveState's Perl.</para>
 
-      <para>For support for logging to Metasploit, the RPC::XML and RPC::XML::Client
-      modules must be installed. Nikto will operate with these modules, 
-      but the functionality will not be available.</para>
+      <para>For support for logging to Metasploit, the RPC::XML and
+      RPC::XML::Client modules must be installed. Nikto will operate with
+      these modules, but the functionality will not be available.</para>
 
       <itemizedlist>
         <listitem>
@@ -142,6 +142,11 @@
         <listitem>
           <para>OpenSSL: <ulink
           url="http://www.openssl.org/">http://www.openssl.org/</ulink></para>
+        </listitem>
+
+        <listitem>
+          <para>Perl modules RPC::XML::Client and RPC::XML for Metasploit
+          logging integration</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -307,11 +312,73 @@ http://192.168.0.1:8080/
       <para>Nessus (<ulink
       url="http://www.nessus.org/">http://www.nessus.org/nessus/</ulink>) can
       be configured to automatically launch Nikto when it finds a web server.
-      Ensure Nikto works properly, that nikto.pl is in the PATH, and that nikto.nasl
-      is present in the Nessus install. Run 'nessusd -R' and then restart nessusd.</para>
-      <para>See <ulink url="http://blog.tenablesecurity.com/2008/09/using-nessus-to.html">
-      http://blog.tenablesecurity.com/2008/09/using-nessus-to.html</ulink> for detailed
-      instructions.</para>
+      Ensure Nikto works properly, that nikto.pl is in the PATH, and that
+      nikto.nasl is present in the Nessus install. Run 'nessusd -R' and then
+      restart nessusd.</para>
+
+      <para>See <ulink
+      url="http://blog.tenablesecurity.com/2008/09/using-nessus-to.html">http://blog.tenablesecurity.com/2008/09/using-nessus-to.html</ulink>
+      for detailed instructions.</para>
+    </section>
+
+    <section>
+      <title>Interactive Features</title>
+
+      <para>Nikto contains several options which can be changed during an
+      active scan, provided it is running on a system which provides POSIX
+      support, which includes *nix and some other operating systems. On
+      systems without POSIX support, these features will be silently
+      disabled.</para>
+
+      <para>During an active scan, pressing any of the keys below will turn on
+      or off the listed feature or perform the listed action. Note that these
+      are case sensitive.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>SPACE - Report current scan status</para>
+        </listitem>
+
+        <listitem>
+          <para>v - Turn verbose mode on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>d - Turn debug mode on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>e - Turn error reporting on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>p - Turn progress reporting on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>r - Turn redirect display on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>c - Turn cookie display on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>o - Turn OK display on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>a - Turn auth display on/off</para>
+        </listitem>
+
+        <listitem>
+          <para>q - Quit</para>
+        </listitem>
+
+        <listitem>
+          <para>P - Pause</para>
+        </listitem>
+      </itemizedlist>
     </section>
   </chapter>
 
@@ -414,12 +481,12 @@ http://192.168.0.1:8080/
         </listitem>
 
         <listitem>
-          <para>E - Display all HTTP errors. Show details for any HTTP error 
+          <para>E - Display all HTTP errors. Show details for any HTTP error
           encountered.</para>
         </listitem>
 
         <listitem>
-          <para>P - Print progress to STDOUT. Show status report to STDOUT 
+          <para>P - Print progress to STDOUT. Show status report to STDOUT
           during testing (interval set in nikto.conf).</para>
         </listitem>
 
@@ -746,7 +813,7 @@ http://192.168.0.1:8080/
             may use the default cirt.net file, but please keep in mind there
             must be connectivity from the target server to cirt.net, it's
             subject to cirt.net's availability, and successful requests will
-            be logged (by Apache). We recommend you use your own. </para>
+            be logged (by Apache). We recommend you use your own.</para>
 
             <para>Default Setting</para>
 
@@ -759,7 +826,7 @@ http://192.168.0.1:8080/
 
           <listitem>
             <para>This configuration item defines ports that would never be
-            scanned by Nikto. </para>
+            scanned by Nikto.</para>
 
             <para>Default Setting</para>
 
@@ -870,7 +937,8 @@ http://192.168.0.1:8080/
 
           <listitem>
             <para>Disables Nikto prompts if set to "no". This is currently
-            only used to prompt for proxy authentication and sending updates.</para>
+            only used to prompt for proxy authentication and sending
+            updates.</para>
 
             <para>Default Setting</para>
 
@@ -888,7 +956,7 @@ http://192.168.0.1:8080/
 
             <para>Default Setting</para>
 
-            <screen>CIRT=209.172.49.178</screen>
+            <screen>CIRT=174.142.17.165</screen>
           </listitem>
         </varlistentry>
 
@@ -1017,6 +1085,35 @@ DOCDIR=EXECDIR/docs</screen>
       <filename>htm_end.tmpl</filename> without placing them in another of the
       templates. It is a violation of the Nikto licence to remove these
       notices.</para>
+    </section>
+  </chapter>
+
+  <chapter id="developing">
+    <title>OSS Development</title>
+
+    <section>
+      <title>Open Source Contributions</title>
+
+      <para>Nikto is an open source project licensed under the GNU GPL
+      license. As such, code updates are welcomed and very much
+      appreciated.</para>
+    </section>
+
+    <section>
+      <title>Development Source</title>
+
+      <para>The Nikto development source code is located in a Subversion (SVN)
+      repository which is publicly accessible. To download the source code,
+      install Subversion and issue the following command:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>svn co http://svn2.assembla.com/svn/Nikto_2</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>For more information on the development enviornment, please see:
+      http://www.assembla.com/spaces/Nikto_2/trac_subversion_tool</para>
     </section>
   </chapter>
 
@@ -2050,8 +2147,9 @@ array[0]-&gt;{description}</screen>
             <term><varname>%CONTENTSEARCH</varname> (read)</term>
 
             <listitem>
-              <para>Hash to contain all the entries in db_content_search - a list of
-              strings and related info to alert on from any request (regardless of test result).</para>
+              <para>Hash to contain all the entries in db_content_search - a
+              list of strings and related info to alert on from any request
+              (regardless of test result).</para>
             </listitem>
           </varlistentry>
 
@@ -2211,14 +2309,6 @@ array[0]-&gt;{description}</screen>
             <listitem>
               <para>Flag to see whether connection through the proxy has been
               checked.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><varname>$http_eol</varname> (read) (deprecated)</term>
-
-            <listitem>
-              <para>Contains the http end of line pattern.</para>
             </listitem>
           </varlistentry>
 
@@ -2418,6 +2508,16 @@ $TESTS{999999}{osvdb}=637;</screen>
       output a vast amount of extra information to the screen, so it is
       advised to redirect output to a file when using them.</para>
     </section>
+
+    <section>
+      <title>Assistance</title>
+
+      <para>If you need assistance with development or running Nikto, the
+      Nikto-discuss mailing list can be an excellent resource and is an easy
+      way to contact the developers and other knowledgeable users. For more
+      information on the maling list, including archives and subscription
+      options, please see http://cirt.net/nikto-discuss.</para>
+    </section>
   </chapter>
 
   <chapter id="licences">
@@ -2452,20 +2552,21 @@ $TESTS{999999}{osvdb}=637;</screen>
       <title>Nikto</title>
 
       <para>Nikto is written and maintained by Chris Sullo and David Lodge.
-      LibWhisker was written by Rain Forrest Puppy</para>
+      LibWhisker is written and maintained by Jeff Forristal (Rain Forrest
+      Puppy).</para>
     </section>
 
     <section>
       <title>Thanks</title>
 
       <para>Many people have provided feedback, fixes, and suggestions. This
-      list attempts to make note of those people, though not all contributors
-      are listed. In no particular order:</para>
+      list is a feeble attempt to thank a few people, in no particular
+      order:</para>
 
       <itemizedlist>
         <listitem>
           <para>Nikto 2 Testing: Paul Woroshow, Mark G. Spencer, Michel Arboi,
-          Jericho, rfp</para>
+          Jericho, rfp.</para>
         </listitem>
 
         <listitem>
@@ -2492,15 +2593,12 @@ $TESTS{999999}{osvdb}=637;</screen>
         </listitem>
 
         <listitem>
-          <para>Stephen Valdez. Extensive testing. We all miss you.</para>
+          <para>Stephen Valdez for extensive testing and being a great
+          guy.</para>
         </listitem>
 
         <listitem>
           <para>S Saady. Extensive testing.</para>
-        </listitem>
-
-        <listitem>
-          <para>Zeno (cgisecurity.com). Nikto mirroring.</para>
         </listitem>
 
         <listitem>
@@ -2510,10 +2608,6 @@ $TESTS{999999}{osvdb}=637;</screen>
         <listitem>
           <para>M Arboi. Great support by writing the code to make Nikto work
           within Nessus, as well as bug reports.</para>
-        </listitem>
-
-        <listitem>
-          <para>T Seyrat. Maintains Nikto for the Debian releases.</para>
         </listitem>
 
         <listitem>

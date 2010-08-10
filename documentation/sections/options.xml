@@ -176,7 +176,7 @@ type requests)</para>
 		Existing files will have new information appended.</para>
 	<para>For '-Format msf' the output option takes special meaning. It should contain
 		the password and location of the Metasploit RPC service. For example, it 
-		may look like: '-o msf:<password>@http://localhost:55553/RPC2'</para>
+		may look like: '-o msf:&lt;password&gt;@http://localhost:55553/RPC2'</para>
       </listitem>
     </varlistentry>
 	<varlistentry>
