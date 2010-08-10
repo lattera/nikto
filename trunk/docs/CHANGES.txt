@@ -1,6 +1,7 @@
-2010-08-04 
+2010-08-09 
 	- Implementing MSF output
 	- Minor standardization stuff
+	- Documentation updates
 
 2010-07-07 Nikto 2.1.2 release
 	- Ticket 8: Interactive scan status.
