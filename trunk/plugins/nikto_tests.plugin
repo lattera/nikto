@@ -43,7 +43,6 @@ sub nikto_tests_init {
 
 sub nikto_tests {
     my ($mark, $parameters) = @_;
-    my $progress = 0;
 
     # this is the actual the looped code for all the checks
     foreach my $checkid (sort keys %TESTS) {
@@ -159,10 +158,9 @@ sub nikto_tests {
         # Percentages
         if ($OUTPUT{'progress'}) {
             if ($parameters->{'report'}) {
-                $progress++;
-                if (($progress % $parameters->{'report'}) == 0) {
-                    my $line = sprintf("- Tests completed: %d %.0f%%",
-                                       $progress, ($progress / $NIKTO{total_checks}) * 100);
+                if (($NIKTO{'totalrequests'} % $parameters->{'report'}) == 0) {
+                    my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete", $NIKTO{'totalrequests'}, 
+                                       ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) * 100));
                     nprint($line);
                 }
             }
