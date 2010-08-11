@@ -768,7 +768,7 @@ sub resolve {
     my $ident = $_[0] || return;
     my ($name, $ip, $dn) = "";
 
-    if ($request{'whisker'}->{'proxy_host'} ne '') {
+    if (($request{'whisker'}->{'proxy_host'} ne '') && $CLI{'useproxy'}) {
         $name = $ident;
         $ip   = $name;
         return $name, $ip, $name;
