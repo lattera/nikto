@@ -27,12 +27,11 @@ sub nikto_tests_init {
                description => "Test host with the standard Nikto tests",
                copyright   => "2008 CIRT Inc.",
                hooks       => {
-                                 scan => {
-                                    method => \&nikto_tests,
+                          scan => { method => \&nikto_tests,
                                     weight => 99,
-                                 },
-                              },              
-               options     => {
+                                    },
+                            },
+               options => {
                          passfiles => "Flag to indicate whether to check for common password files",
                          all => "Flag to indicate whether to check all files with all directories",
                          report => "Report a status after the passed number of tests",
@@ -156,13 +155,9 @@ sub nikto_tests {
         }
 
         # Percentages
-        if ($OUTPUT{'progress'}) {
-            if ($parameters->{'report'}) {
-                if (($NIKTO{'totalrequests'} % $parameters->{'report'}) == 0) {
-                    my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete", $NIKTO{'totalrequests'}, 
-                                       ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) * 100));
-                    nprint($line);
-                }
+        if (($OUTPUT{'progress'}) && ($parameters->{'report'})) {
+            if (($NIKTO{'totalrequests'} % $parameters->{'report'}) == 0) {
+                status_report();
             }
         }
     }    # end check loop

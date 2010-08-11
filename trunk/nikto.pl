@@ -48,11 +48,11 @@ use vars qw/%db_extensions %FoF %UPDATES @DBFILE @BUILDITEMS/;
 use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
-my $starttime = localtime();
-$NIKTO{'DIV'}     = "-" x 75;
-$NIKTO{'version'} = "2.1.2";
-$NIKTO{'name'}    = "Nikto";
-$NIKTO{'configfile'} = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
+$COUNTERS{'startsec'} = time();
+$NIKTO{'DIV'}         = "-" x 75;
+$NIKTO{'version'}     = "2.1.2";
+$NIKTO{'name'}        = "Nikto";
+$NIKTO{'configfile'}  = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
 
 # put a signal trap so we can close down reports properly
 $SIG{'INT'} = \&safe_quit;
@@ -87,7 +87,7 @@ if ($config_exists == 0) {
 
 setup_dirs();
 require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_core.plugin";
-nprint("T:$starttime: Starting", "d");
+nprint("T:" . localtime($COUNTERS{'startsec'}) . ": Starting");
 require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_single.plugin";
 require "$NIKTOCONFIG{'PLUGINDIR'}/LW2.pm";
 
@@ -143,8 +143,8 @@ foreach my $mark (@MARKS) {
         next;
     }
     else {
-	$NIKTO{'total_targets'}++;
-	}
+        $NIKTO{'total_targets'}++;
+    }
     $mark->{'ssl'} = $open - 1;
 }
 
@@ -190,8 +190,11 @@ foreach my $mark (@MARKS) {
         if ($mark->{'banner'} eq "") {
             $mark->{'banner'} = "(no identification possible)";
         }
-	#add_vulnerability($mark, "Web server banner: " . $mark->{'banner'}, 0);
-        add_vulnerability($mark, "Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}", 0);
+
+        #add_vulnerability($mark, "Web server banner: " . $mark->{'banner'}, 0);
+        add_vulnerability($mark,
+                   "Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}",
+                   0);
     }
     else {
         dump_target_info($mark);
@@ -202,12 +205,12 @@ foreach my $mark (@MARKS) {
     $mark->{'end_time'} = time();
     my $time    = date_disp($mark->{'end_time'});
     my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
-    if (!$CLI{'findonly'}) { 
-    nprint(
-        "+ $NIKTO{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
-        );
-    	nprint("+ End Time:           $time ($elapsed seconds)");
-	}
+    if (!$CLI{'findonly'}) {
+        nprint(
+            "+ $NIKTO{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
+            );
+        nprint("+ End Time:           $time ($elapsed seconds)");
+    }
     nprint($NIKTO{'DIV'});
 
     $COUNTERS{'hosts_completed'}++;
@@ -216,7 +219,7 @@ foreach my $mark (@MARKS) {
 report_close();
 
 nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
-nprint("+ $NIKTO{'totalrequests'} requests made", "v");
+nprint( "+ $NIKTO{'totalrequests'} requests made in " .(time()-$COUNTERS{'startsec'}) . " seconds","v");
 send_updates();
 nprint("T:" . localtime() . ": Ending", "d");
 

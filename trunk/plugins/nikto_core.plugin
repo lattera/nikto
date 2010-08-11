@@ -154,6 +154,33 @@ sub get_ext {
 }
 
 ###############################################################################
+sub status_report {
+    my $secleft =
+      ((time() - $COUNTERS{'startsec'}) / $NIKTO{'totalrequests'}) *
+      (($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) - $NIKTO{'totalrequests'});
+    my $perc_compl =
+      ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) * 100);
+    my $line;
+
+    # This 'if' is because I am a lazy, bad programmer.
+    # And also because total_checks only takes into account db_tests, not other stuff. I swear.
+    if (($perc_compl < 100) && ($secleft > 0)) {
+        $line = "- STATUS: Completed $NIKTO{'totalrequests'} tests";
+        if ($NIKTO{'total_targets'} > 1) {
+            $line .= " (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})";
+        }
+        $line .= sprintf(" (~%.0f%% complete, ~%d seconds left", $perc_compl, $secleft);
+        if ($NIKTO{'current_plugin'} ne '') {
+            $line .= ": currently in plugin '$NIKTO{'current_plugin'}'";
+        }
+        $line .= ")";
+    }
+    else { $line = "- STATUS: Finishing up!"; }
+
+    nprint($line);
+    return;
+}
+###############################################################################
 sub date_disp {
     my @time   = localtime($_[0]);
     my $result = sprintf("%d-%02d-%02d %02d:%02d:%02d",
@@ -671,17 +698,7 @@ sub check_input {
 
     lc($key);
     if ($key eq ' ') {
-        my $line = sprintf("- Completed: %d tests, approximately %.0f%% complete",
-                           $NIKTO{'totalrequests'},
-                           ($NIKTO{'totalrequests'} /
-                              ($NIKTO{'total_checks'} * $NIKTO{'total_targets'})
-                              ) * 100
-                             );
-        if ($NIKTO{'total_targets'} > 1) {
-            $line .= " (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})";
-        }
-        if ($NIKTO{'current_plugin'} ne '') { $line .= " (in plugin $NIKTO{'current_plugin'})"; }
-        nprint($line);
+        status_report();
         return;
     }
     elsif ($key eq 'v') {
@@ -2054,8 +2071,8 @@ sub nfetch {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $result{'whisker'}{'error'}\n", "e");
         if (($result{'whisker'}->{'code'} eq 502) && ($CLI{'useproxy'})) {
-        	nprint("+ ERROR: Revieved 502 'Bad Gateway' from proxy\n");
-		}
+            nprint("+ ERROR: Revieved 502 'Bad Gateway' from proxy\n");
+        }
     }
 
     if ($OUTPUT{'show_cookies'} && (defined($result{'whisker'}->{'cookies'}))) {
