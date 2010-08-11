@@ -87,7 +87,7 @@ if ($config_exists == 0) {
 
 setup_dirs();
 require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_core.plugin";
-nprint("T:" . localtime($COUNTERS{'startsec'}) . ": Starting");
+nprint("T:" . localtime($COUNTERS{'startsec'}) . ": Starting", "d");
 require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_single.plugin";
 require "$NIKTOCONFIG{'PLUGINDIR'}/LW2.pm";
 
@@ -106,7 +106,10 @@ $request{'whisker'}->{'timeout'}                    = $CLI{'timeout'} || 10;
 if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'}; }
 $request{'User-Agent'} = $NIKTO{'useragent'};
 $request{'whisker'}->{'retry'} = 0;
-proxy_setup();
+if (($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
+   $request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
+   $request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
+   }
 
 nprint($NIKTO{'DIV'});
 

@@ -1559,13 +1559,15 @@ sub check_updates {
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
         if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
-            proxy_setup();
-            last;
+		if (($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
+    	    		$request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
+            		$request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
+			}
+	     proxy_check();
+             last;
         }
     }
     ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
-
-    print "here\n";
 
     # retrieve versions file
     (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
@@ -1585,7 +1587,7 @@ sub check_updates {
 
     if ($RES ne 200) {
         nprint(
-              "+ ERROR ($RES): Unable to get $request{'whisker'}->{'host'}$serverdir/versions.txt");
+              "+ ERROR ($RES): Unable to get $mark{'hostname'}$serverdir/versions.txt");
         exit;
     }
 
@@ -1750,17 +1752,6 @@ sub read_data {
 }
 
 ###############################################################################
-sub proxy_setup {
-    if (!$CLI{'useproxy'}) { return; }
-
-    # HTTP proxy
-    $request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
-    $request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
-
-    return;
-}
-
-###############################################################################
 sub proxy_check {
     my ($mark) = @_;
 
@@ -1913,8 +1904,10 @@ sub setup_hash {
     if (defined $NIKTOCONFIG{PROXYHOST} && defined $CLI{'useproxy'}) {
         $reqhash->{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{'PROXYHOST'};
         $reqhash->{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{'PROXYPORT'};
-        LW2::auth_set("proxy-basic", $reqhash, $NIKTOCONFIG{'PROXYUSER'},
+	if ($NIKTOCONFIG{'PROXYUSER'} ne '') { 
+        	LW2::auth_set("proxy-basic", $reqhash, $NIKTOCONFIG{'PROXYUSER'},
                       $NIKTOCONFIG{'PROXYPASS'});
+		}
     }
 
     return $reqhash;
