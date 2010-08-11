@@ -54,6 +54,19 @@ sub nikto_auth_load {
 
     $REALMS        = init_db("db_realms");
     %REALMSMATCHED = ();
+        
+    if (defined $CLI{'hostauth'}) {
+        my @x = split(/:/, $CLI{'hostauth'});
+
+        my $HOSTAUTH = {
+            nikto_id    => "700500",
+            realm       => (defined $x[2]) ? $x[2] : '@ANY',
+            password    => $x[1],
+            id          => $x[0],
+            message     => "Credentials provided by CLI.",
+        };
+        unshift(@{$REALMS}, $HOSTAUTH);
+    }
 }
 
 sub nikto_auth_pre {
@@ -151,7 +164,6 @@ sub nikto_auth {
 
         if ($result->{'www-authenticate'} eq ''
             && !defined $result->{'whisker'}->{'error'}) {
-
             my $message =
               "Default account found for '$realm' at $uridir ($request->{'whisker'}->{'uri'}) (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
             if ($entry->{'id'} eq '' && $entry->{'password'} eq '') {

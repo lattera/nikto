@@ -982,7 +982,7 @@ sub parse_hostfile {
 
 ###############################################################################
 sub load_databases {
-    my @dbs = qw/db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
+    my @dbs = qw/db_404_strings  db_outdated  db_tests  db_variables db_content_search/;
     my $prefix = $_[0] || "";
 
     # verify required files
@@ -1046,31 +1046,6 @@ sub load_databases {
                     my @T = parse_csv($l);
                     $OVERS{ $T[1] }{ $T[2] } = $T[3];
                     $OVERS{ $T[1] }{'tid'} = $T[0];
-                }
-            }
-
-            # db_realms
-            elsif ($file eq 'db_realms') {
-                my $db_realms_ctr = keys %REALMS;
-                foreach my $l (@file) {
-                    my @t = parse_csv($l);
-                    $REALMS{$db_realms_ctr}{'tid'}   = $t[0];
-                    $REALMS{$db_realms_ctr}{'realm'} = $t[1];
-                    $REALMS{$db_realms_ctr}{'id'}    = $t[2];
-                    $REALMS{$db_realms_ctr}{'pw'}    = $t[3];
-                    $REALMS{$db_realms_ctr}{'msg'}   = $t[4];
-                    $db_realms_ctr++;
-                }
-
-                # Cheat and add CLI directly to REALMS
-                if (defined $CLI{'hostauth'}) {
-                    my @x = split(/:/, $CLI{'hostauth'});
-
-                    $REALMS{$db_realms_ctr}{'tid'}   = "700500";
-                    $REALMS{$db_realms_ctr}{'realm'} = (defined $x[2]) ? $x[2] : '@ANY';
-                    $REALMS{$db_realms_ctr}{'pw'}    = $x[1];
-                    $REALMS{$db_realms_ctr}{'id'}    = $x[0];
-                    $REALMS{$db_realms_ctr}{'msg'}   = "Credentials provided by CLI.";
                 }
             }
 
@@ -1150,16 +1125,6 @@ sub dbcheck {
             foreach $line (<IN>) {
                 if ($line !~ /^\@/)         { next; }
                 if ($line !~ /^\@.+\=.+$/i) { nprint("\t+ ERROR: Invalid syntax: $line"); }
-                $ctr++;
-            }
-            nprint("\t$ctr entries");
-        }
-        elsif ($file eq 'db_realms') {
-            my $ctr = 0;
-            foreach $line (<IN>) {
-                if ((count_fields($line, 1) ne 4) && (count_fields($line) ne '')) {
-                    nprint("\t+ ERROR: Invalid syntax: $line");
-                }
                 $ctr++;
             }
             nprint("\t$ctr entries");
