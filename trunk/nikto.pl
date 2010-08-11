@@ -106,7 +106,7 @@ $request{'whisker'}->{'timeout'}                    = $CLI{'timeout'} || 10;
 if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'}; }
 $request{'User-Agent'} = $NIKTO{'useragent'};
 $request{'whisker'}->{'retry'} = 0;
-if (($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
+if ($CLI{'useproxy'} && ($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
    $request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
    $request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
    }

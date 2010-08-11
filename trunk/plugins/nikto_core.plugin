@@ -391,7 +391,7 @@ sub dump_target_info {
     if ((defined $CLI{'vhost'}) && ($CLI{'vhost'} ne $mark->{hostname})) {
         nprint("+ Virtual Host:   $CLI{'vhost'}", "", $mark);
     }
-    if (defined $request{'whisker'}->{'proxy_host'}) {
+    if ($request{'whisker'}->{'proxy_host'} ne '') {
         nprint(
             "+ Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"
             );
@@ -1720,7 +1720,7 @@ sub read_data {
 sub proxy_check {
     my ($mark) = @_;
 
-    if (defined $request{'whisker'}->{'proxy_host'} && $CLI{'useproxy'})    # proxy is set up
+    if (($request{'whisker'}->{'proxy_host'} ne '') && ($CLI{'useproxy'}))    # proxy is set up
     {
         LW2::http_close(\%request);    # force-close any old connections
         setup_hash(\%request, $mark, "Proxy Check");
@@ -1866,7 +1866,7 @@ sub setup_hash {
     $reqhash->{'whisker'}->{'ssl'}  = $mark->{'ssl'};
 
     # Proxy stuff
-    if (defined $NIKTOCONFIG{PROXYHOST} && defined $CLI{'useproxy'}) {
+    if (($NIKTOCONFIG{PROXYHOST} ne '')  && ($CLI{'useproxy'})) {
         $reqhash->{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{'PROXYHOST'};
         $reqhash->{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{'PROXYPORT'};
 	if ($NIKTOCONFIG{'PROXYUSER'} ne '') { 
