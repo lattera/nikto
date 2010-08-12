@@ -158,6 +158,16 @@ sub status_report {
     my $secleft =
       ((time() - $COUNTERS{'startsec'}) / $NIKTO{'totalrequests'}) *
       (($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) - $NIKTO{'totalrequests'});
+    my $timeleft;
+    if ($secleft > 60) {
+        my $minleft = $secleft / 60;
+        $timeleft = sprintf("%.1f minutes", $minleft);
+        if ($minleft > 60) {
+            my $hrsleft = $minleft / 60;
+            $timeleft = sprintf("%.1f hours", $hrsleft);
+        }
+    }
+    else { $timeleft = sprintf("%.0f seconds", $secleft); }
     my $perc_compl =
       ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) * 100);
     my $line;
@@ -169,7 +179,7 @@ sub status_report {
         if ($NIKTO{'total_targets'} > 1) {
             $line .= " (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})";
         }
-        $line .= sprintf(" (~%.0f%% complete, ~%d seconds left", $perc_compl, $secleft);
+        $line .= sprintf(" (~%.0f%% complete, $timeleft left", $perc_compl);
         if ($NIKTO{'current_plugin'} ne '') {
             $line .= ": currently in plugin '$NIKTO{'current_plugin'}'";
         }
@@ -1524,12 +1534,12 @@ sub check_updates {
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
         if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
-		if (($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
-    	    		$request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
-            		$request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
-			}
-	     proxy_check();
-             last;
+            if (($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
+                $request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
+                $request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
+            }
+            proxy_check();
+            last;
         }
     }
     ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
@@ -1551,8 +1561,7 @@ sub check_updates {
     }
 
     if ($RES ne 200) {
-        nprint(
-              "+ ERROR ($RES): Unable to get $mark{'hostname'}$serverdir/versions.txt");
+        nprint("+ ERROR ($RES): Unable to get $mark{'hostname'}$serverdir/versions.txt");
         exit;
     }
 
@@ -1866,13 +1875,14 @@ sub setup_hash {
     $reqhash->{'whisker'}->{'ssl'}  = $mark->{'ssl'};
 
     # Proxy stuff
-    if (($NIKTOCONFIG{PROXYHOST} ne '')  && ($CLI{'useproxy'})) {
+    if (($NIKTOCONFIG{PROXYHOST} ne '') && ($CLI{'useproxy'})) {
         $reqhash->{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{'PROXYHOST'};
         $reqhash->{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{'PROXYPORT'};
-	if ($NIKTOCONFIG{'PROXYUSER'} ne '') { 
-        	LW2::auth_set("proxy-basic", $reqhash, $NIKTOCONFIG{'PROXYUSER'},
-                      $NIKTOCONFIG{'PROXYPASS'});
-		}
+        if ($NIKTOCONFIG{'PROXYUSER'} ne '') {
+            LW2::auth_set("proxy-basic", $reqhash,
+                          $NIKTOCONFIG{'PROXYUSER'},
+                          $NIKTOCONFIG{'PROXYPASS'});
+        }
     }
 
     return $reqhash;
@@ -2318,6 +2328,7 @@ sub usage {
                                D     Debug output
                                E     Display all HTTP errors
                                P     Print progress to STDOUT
+                               S     Scrub output of IPs and hostnames
                                V     Verbose output
        -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
        -evasion+          IDS evasion technique:\n";
