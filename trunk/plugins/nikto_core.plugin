@@ -493,13 +493,13 @@ sub general_config {
                "port=s"           => \$CLI{'ports'},
                "findonly"         => \$CLI{'findonly'},
                "root=s"           => \$CLI{'root'},
-               "timeout=s"        => \$CLI{'timeout'},
-               "Pause=s"          => \$CLI{'pause'},
+               "timeout=i"        => \$CLI{'timeout'},
+               "Pause=i"          => \$CLI{'pause'},
                "ssl"              => \$CLI{'ssl'},
                "nocache"          => \$CLI{'nocache'},
                "nossl"            => \$CLI{'nossl'},
                "no404"            => \$CLI{'nofof'},
-               "useproxy"         => \$CLI{'useproxy'},
+               "useproxy:s"       => \$CLI{'useproxy'},
                "Help"             => \$CLI{'help'},
                "vhost=s"          => \$CLI{'vhost'},
                "host=s"           => \$CLI{'host'},
@@ -518,6 +518,16 @@ sub general_config {
     elsif ($CLI{'version'})      { version(); }
     elsif ($CLI{'Single'})       { single(); }
     elsif ($CLI{'list-plugins'}) { list_plugins(); }
+
+    # CLI proxy overrides nikto.conf
+    if ((defined($CLI{'useproxy'}))  && ($CLI{'useproxy'} ne '')) { 
+		my @prox = LW2::uri_split($CLI{'useproxy'});
+        	$NIKTOCONFIG{'PROXYHOST'} = $prox[2];
+ 		$NIKTOCONFIG{'PROXYPORT'} = $prox[3];
+	        $NIKTOCONFIG{'PROXYUSER'} = $prox[6];
+                $NIKTOCONFIG{'PROXYPASS'} = $prox[7];
+		}
+     elsif (defined($CLI{'useproxy'})) { $CLI{'useproxy'}=1; }
 
     # output file
     if (!defined $CLI{'format'}) {

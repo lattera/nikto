@@ -194,7 +194,6 @@ foreach my $mark (@MARKS) {
             $mark->{'banner'} = "(no identification possible)";
         }
 
-        #add_vulnerability($mark, "Web server banner: " . $mark->{'banner'}, 0);
         add_vulnerability($mark,
                    "Server: $protocol://$mark->{'display_name'}:$mark->{'port'}\t$mark->{'banner'}",
                    0);
