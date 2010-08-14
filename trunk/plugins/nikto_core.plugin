@@ -1900,15 +1900,15 @@ sub setup_hash {
 
 #######################################################################
 sub cache_add {
-    my $method        = shift;
-    my $code          = shift;
-    my $content       = shift;
-    my $uri           = shift;
-    my $postdata      = shift;
-    my $flags_nocache = shift;
-    my ($mark)        = @_;
-
     if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
+    	my $method        = shift;
+    	my $code          = shift;
+    	my $content       = shift;
+    	my $uri           = shift;
+    	my $postdata      = shift;
+    	my $flags_nocache = shift;
+    	my ($mark)        = @_;
+
         my $key =
           LW2::md4(  $mark->{'ip'}
           . $mark->{'hostname'}
@@ -1926,13 +1926,13 @@ sub cache_add {
 
 #######################################################################
 sub cache_fetch {
-    my $method        = shift;
-    my $uri           = shift;
-    my $postdata      = shift;
-    my $flags_nocache = shift;
-    my ($mark)        = @_;
-
     if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
+        my $method        = shift;
+        my $uri           = shift;
+        my $postdata      = shift;
+        my $flags_nocache = shift;
+        my ($mark)        = @_;
+
         my $key =
           LW2::md4(  $mark->{'ip'}
                    . $mark->{'hostname'}
