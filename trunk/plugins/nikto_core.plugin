@@ -2467,17 +2467,10 @@ sub add_vulnerability {
     $method = "GET" unless (defined $method);
     $osvdb  = "0"   unless (defined $osvdb);
 
-    my $result = "";
-    if (defined $_[7]) {
-        $result = $_[7]->{'whisker'}->{'data'};
-    }
-    my $outmessage = $message;
-    my $resulthash = {};
-
     # check to see if we've alerted already (can be from content search, etc.)
     foreach my $r (@RESULTS) {
-	if (($outmessage eq $r->{'message'}) && 
-		($uri eq $r->{'uri'}) && 
+	if (($uri eq $r->{'uri'}) && 
+		($message eq $r->{'message'}) && 
 		($method eq $r->{'method'}) && 
 		(${$r->{'mark'}}{'ident'} eq $mark->{'ident'}) && 
 		(${$r->{'mark'}}{'port'} eq $mark->{'port'})) { 
@@ -2485,12 +2478,12 @@ sub add_vulnerability {
 			}
 	}
     
-    unless ($osvdb eq "0") {
-        $outmessage = "OSVDB-$osvdb: $message";
+    my $result = "";
+    if (defined $_[7]) {
+        $result = $_[7]->{'whisker'}->{'data'};
     }
 
-    nprint("+ $outmessage");
-    %$resulthash = (mark     => $mark,
+    my %$resulthash = (mark     => $mark,
                     message  => $message,
                     nikto_id => $nikto_id,
                     osvdb    => $osvdb,
@@ -2498,9 +2491,13 @@ sub add_vulnerability {
                     uri      => $uri,
                     result   => $result,
                     );
-    $mark->{total_vulns}++;
     push(@RESULTS, $resulthash);
+    $mark->{total_vulns}++;
 
+    unless ($osvdb eq "0") {
+        $message = "OSVDB-$osvdb: $message";
+    }
+    nprint("+ $message");
 
     # Now report it
     report_item($mark, $resulthash);
