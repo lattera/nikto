@@ -2474,9 +2474,21 @@ sub add_vulnerability {
     my $outmessage = $message;
     my $resulthash = {};
 
+    # check to see if we've alerted already (can be from content search, etc.)
+    foreach my $r (@RESULTS) {
+	if (($outmessage eq $r->{'message'}) && 
+		($uri eq $r->{'uri'}) && 
+		($method eq $r->{'method'}) && 
+		(${$r->{'mark'}}{'ident'} eq $mark->{'ident'}) && 
+		(${$r->{'mark'}}{'port'} eq $mark->{'port'})) { 
+			return; 
+			}
+	}
+    
     unless ($osvdb eq "0") {
         $outmessage = "OSVDB-$osvdb: $message";
     }
+
     nprint("+ $outmessage");
     %$resulthash = (mark     => $mark,
                     message  => $message,
@@ -2488,6 +2500,7 @@ sub add_vulnerability {
                     );
     $mark->{total_vulns}++;
     push(@RESULTS, $resulthash);
+
 
     # Now report it
     report_item($mark, $resulthash);
