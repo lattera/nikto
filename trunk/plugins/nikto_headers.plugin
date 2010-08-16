@@ -138,7 +138,7 @@ sub nikto_headers {
         && ($result{'content-location'} !~ /$mark->{'ip'}/)) {
         add_vulnerability(
             $mark,
-            "IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".",
+            "IIS may reveal its internal IP or real IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".",
             999989,
             630
             );
@@ -162,7 +162,7 @@ sub nikto_headers {
         && ($result{'location'} !~ /$mark->{'ip'}/)) {
         add_vulnerability(
             $mark,
-            "IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",
+            "IIS may reveal its internal or real IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".",
             999988,
             630,
             "GET",
