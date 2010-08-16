@@ -2359,6 +2359,7 @@ sub usage {
 
         print "       -mutate-options    Provide information for mutates
        -nocache           Disables the URI cache
+       -nolookup          Disables DNS lookups
        -nossl             Disables using SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
