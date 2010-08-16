@@ -2483,7 +2483,8 @@ sub add_vulnerability {
         $result = $_[7]->{'whisker'}->{'data'};
     }
 
-    my %$resulthash = (mark     => $mark,
+    my $resulthash;
+    %$resulthash = (mark     => $mark,
                     message  => $message,
                     nikto_id => $nikto_id,
                     osvdb    => $osvdb,
