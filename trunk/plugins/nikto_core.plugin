@@ -1329,6 +1329,7 @@ sub load_plugins {
         # Check that the plugin is to be run
         # Perl doesn't allow us to use "in", pity
         foreach my $torun_plugin (@torun) {
+            next if ($torun_plugin eq "");
 
             # split up into parameters
             my $name = my $suffix = $torun_plugin;
