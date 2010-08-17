@@ -6178,7 +6178,7 @@
 "006180","5292","c","/zoomstats/libs/dbmax/mysql.php?GLOBALS['lib']['db']['path']=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "006181","0","3","/wp-content/plugins/akismet/readme.txt","GET","Tested up to","","","","","The WordPress Akismet plugin 'Tested up to' version usually matches the WordPress version","",""
 "006182","0","3","/wp-content/plugins/hello.php","GET","Call to undefined function add_action() in ","","","","","The WordPress hello.php plugin reveals a file system path","",""
-"006183","0","3","/readme.html","GET","Version ","","","","","This WordPress file reveals the installed version.","",""
+"006183","0","3","/readme.html","GET","Version ","","5-minute install","","","This WordPress file reveals the installed version.","",""
 "006184","0","3","/wp-links-opml.php","GET","generator=\"WordPress/","","","","","This WordPress script reveals the installed version.","",""
 "006184","3093","1","/includes/db.inc","GET","200","<?php","","","","Include files (.inc) should not be served in plain text.","",""
 "006185","3093","1","/includes/sendmail.inc","GET","200","<?php","","","","Include files (.inc) should not be served in plain text.","",""
