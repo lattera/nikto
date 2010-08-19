@@ -39,10 +39,10 @@ sub nikto_report_msf_init {
                     };
         }
     }
-    if (($CLI{'format'} eq 'msf') && ($id eq '')) { 
-	nprint("+ ERROR: Missing required module RPC::XML and/or RPC::XML::Client for MSF logging"); 
-	exit;
-	}
+    if (($CLI{'format'} eq 'msf') && ($id eq '')) {
+        nprint("+ ERROR: Missing required module RPC::XML and/or RPC::XML::Client for MSF logging");
+        exit;
+    }
 
     return $id;
 }
@@ -126,26 +126,54 @@ sub msf_host_end {
 sub msf_item {
     my ($handle, $mark, $item) = @_;
     msfLogin($handle);
+    my ($refs, $req, $resp, $xopts);
+    my $isVuln = 0;
+    $isVuln = 1 if ($item->{'osvdb'} ne "0");
 
-    my $refs;
-    $refs = RPC::XML::array->new("OSVDB-" . $item->{'osvdb'},) if ($item->{'osvdb'});
-    my $xopts = RPC::XML::struct->new('host'  => $mark->{'ip'},
-                                      'port'  => $mark->{'port'},
-                                      'proto' => 'tcp',
-                                      'name'  => 'nikto_tid_' . $item->{'nikto_id'},
-                                      'refs'  => $refs,
-                                      'info'  => "Message: "
-                                        . $item->{'message'}
-                                        . ", uri = "
-                                        . $item->{'uri'}
-                                        . ", method = "
-                                        . $item->{'method'}
-                                        . ", result = "
-                                        . $item->{'result'}
-                                        );
+    if ($isVuln) {
+        $refs = RPC::XML::array->new("OSVDB-" . $item->{'osvdb'},) if ($item->{'osvdb'});
 
-    my $req = RPC::XML::request->new("db.report_vuln", $TEMPLATES{'msftoken'}, $xopts);
-    my $resp = $cli->send_request($req);
+        $info =
+            "Message: "
+          . $item->{'message'}
+          . ", uri = "
+          . $item->{'uri'}
+          . ", method = "
+          . $item->{'method'}
+          . ", result = "
+          . $item->{'result'};
+
+        $xopts = RPC::XML::struct->new('host'  => $mark->{'ip'},
+                                       'port'  => $mark->{'port'},
+                                       'proto' => 'tcp',
+                                       'name'  => 'nikto.' . $item->{'nikto_id'},
+                                       'refs'  => $refs,
+                                       'info'  => $info
+                                       );
+
+        $req = RPC::XML::request->new("db.report_vuln", $TEMPLATES{'msftoken'}, $xopts);
+
+    }
+    else {
+
+        my $data = RPC::XML::struct->new('message' => $item->{'message'},
+                                         'uri'     => $item->{'uri'},
+                                         'method'  => $item->{'method'},
+                                         'result'  => $item->{'result'}
+                                         );
+
+        $xopts = RPC::XML::struct->new('host'  => $mark->{'ip'},
+                                       'port'  => $mark->{'port'},
+                                       'proto' => 'tcp',
+                                       'ntype' => 'nikto.' . $item->{'nikto_id'},
+                                       'data'  => $data
+                                       );
+
+        $req = RPC::XML::request->new("db.report_note", $TEMPLATES{'msftoken'}, $xopts);
+
+    }
+
+    $resp = $cli->send_request($req);
 
     return;
 }
@@ -174,3 +202,4 @@ sub msfLogin {
 }
 
 1;
+
