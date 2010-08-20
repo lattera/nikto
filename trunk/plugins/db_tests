@@ -697,7 +697,6 @@
 "000673","0","7","/.../.../.../.../.../.../.../.../.../boot.ini","GET","boot loader","","","","","Software allows files to be retrieved outside of the web root by using 'triple dot' notation. May be MiniPortal?","",""
 "000674","0","7","/................../etc/passwd","GET","root:","","","","","The web server allows the password file to be retrieved.","",""
 "000675","0","3","/%3f.jsp","GET","index of ","","","","","JRun 3.0 and 3.1 on NT/2000 running IIS4 or IIS5 allow directory listing by requesting %3f.jsp at the end of a URL.","",""
-"000676","0","3","/%3f.jsp","GET","Directory Listing","","","","","JRun 3.0 and 3.1 on NT/2000 running IIS4 or IIS5 allow directory listing by requesting %3f.jsp at the end of a URL.","",""
 "000677","0","7","/%2E%2E/%2E%2E/%2E%2E/%2E%2E/%2E%2E/windows/win.ini","GET","[windows]","","","","","Attackers can read any file on the system. Upgrade to Analogx 1.07 or higher.","",""
 "000678","0","7","/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd","GET","root:","","","","","Web server allows reading of files by sending encoded '../' requests. This server may be Boa (boa.org).","",""
 "000679","0","3","/%00","GET","File Name","","","","","Appending /%00 to a request to the web server may reveal a directory listing.","",""
