@@ -2210,6 +2210,14 @@ sub version {
     if ($@) {
         nprint("Module RPC::XML::Client missing. Logging to Metasploit is disabled.");
     }
+    my ($avail, $lib, $ver) = LW2::ssl_is_available();
+    if ($avail) { 
+	nprint("SSL: $lib $ver");
+	}
+    else {
+	nprint("SSL: support not available.");
+	}
+
     nprint($NIKTO{'DIV'});
 
     exit;
