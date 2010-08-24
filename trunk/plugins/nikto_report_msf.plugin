@@ -1,4 +1,5 @@
 #VERSION,1.00
+# $Id
 ###############################################################################
 #  Copyright (C) 2009 CIRT, Inc.
 #
@@ -155,7 +156,6 @@ sub msf_item {
 
     }
     else {
-
         my $data = RPC::XML::struct->new('message' => $item->{'message'},
                                          'uri'     => $item->{'uri'},
                                          'method'  => $item->{'method'},
