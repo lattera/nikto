@@ -108,7 +108,7 @@ Format is "id:password".</para>
       <listitem>
         <para>Will list all plugins that Nikto can run against targets and
 	    then will exit without performing a scan. These can be tuned for a
-	    session using the -plugins option.</para>
+	    session using the <parameter>-Plugins</parameter> option.</para>
 	    <para>The output format is:</para>
 	    <para>Plugin <varname>name</varname></para>
 	    <para>&nbsp;<varname>full name</varname> - <varname>description</varname>
@@ -180,14 +180,14 @@ type requests)</para>
       </listitem>
     </varlistentry>
 	<varlistentry>
-	  <term><option>-plugins</option></term>
+	  <term><option>-Plugins</option></term>
 	  <listitem>
 	    <para>Select which plugins will be run on the specified targets. A
-		comma separated list should be provided which lists the names of the
+		semi-colon separated list should be provided which lists the names of the
 		plugins. The names can be found by using -list-plugins.</para>
-		<para>There are two special entries: ALL, which specifies all plugins
-		shall be run and NONE, which specifies no plugins shall be run. The
-		default is ALL</para>
+		<para>There are two special entries: @@ALL, which specifies all plugins
+		shall be run and @@NONE, which specifies no plugins shall be run. The
+		default is @@DEFAULT</para>
 	  </listitem>
 	</varlistentry>
     <varlistentry>

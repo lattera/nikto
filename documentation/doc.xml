@@ -67,6 +67,12 @@
       match that hash value against future .txt tests. The latter is by far
       the slowest type of match, but in many cases will provide valid results
       for a particular file type.</para>
+      
+      <para>This feature is performed by making several requests for 
+      non-existent pages of various filetypes. This may add up to a thousand
+      requests to the remote server during the lifetime of the scan. This may
+      not be desireable over slow connection and can be disabled with the
+      <parameter>-no404</parameter> option.</para>
     </section>
 
     <section>
@@ -95,7 +101,9 @@
 
       <itemizedlist>
         <listitem>
-          <para>Windows (using ActiveState Perl)</para>
+          <para>Windows (using ActiveState Perl and Strawberry Perl). Some
+          POSIX features, such as interactive commands may not work under
+          Windows.</para>
         </listitem>
 
         <listitem>
@@ -178,14 +186,15 @@
 
       <para>The most basic Nikto scan requires simply a host to target, since
       port 80 is assumed if none is specified. The host can either be an IP or
-      a hostname of a machine, and is specified using the -h (-host) option.
+      a hostname of a machine, and is specified using the
+      <parameter>-h</parameter> (<parameter>-host</parameter>) option.
       This will scan the IP 192.168.0.1 on TCP port 80:</para>
 
       <screen>perl nikto.pl -h 192.168.0.1</screen>
 
-      <para>To check on a different port, specify the port number with the -p
-      (-port) option. This will scan the IP 192.168.0.1 on TCP port
-      443:</para>
+      <para>To check on a different port, specify the port number with the
+      <parameter>-p</parameter> (<parameter>-port</parameter>) option. This
+      will scan the IP 192.168.0.1 on TCP port 443:</para>
 
       <screen>perl nikto.pl -h 192.168.0.1 -p 443</screen>
 
@@ -196,15 +205,18 @@
 
       <para>There is no need to specify that port 443 may be SSL, as Nikto
       will first test regular HTTP and if that fails, HTTPS. If you are sure
-      it is an SSL server, specifying -s (-ssl) will speed up the test.</para>
+      it is an SSL server, specifying <parameter>-s</parameter>
+      (<parameter>-ssl</parameter>) will speed up the test.</para>
 
       <screen>perl nikto.pl -h 192.168.0.1 -p 443 -ssl</screen>
 
       <note>
-        <para><parameter>-mutate</parameter> 1 increases the number of tests
-        so that all filenames are tested against all databases inc
-        <filename>db_tests</filename>. This will produce over 2,000,000 extra
-        tests, which will use up a massive amount of resource.</para>
+        <para>The <parameter>-mutate</parameter> and
+        <parameter>-mutate-options</parameter> parameters have been deprecated
+        in nikto 2.1.2. Plugin selections, using the
+        <parameter>-Plugin</parameter> parameter, should be used instead.
+        Nikto will automagically turn a mutate option into the appropriate
+        selection string.</para>
       </note>
 
       <para>More complex tests can be performed using the
@@ -223,9 +235,10 @@
 
       <para>Nikto can scan multiple ports in the same scanning session. To
       test more than one port on the same host, specify the list of ports in
-      the -p (-port) option. Ports can be specified as a range (i.e., 80-90),
-      or as a comma-delimited list, (i.e., 80,88,90). This will scan the host
-      on ports 80, 88 and 443.</para>
+      the <parameter>-p</parameter> (<parameter>-port</parameter>) option.
+      Ports can be specified as a range (i.e., 80-90), or as a comma-delimited
+      list, (i.e., 80,88,90). This will scan the host on ports 80, 88 and
+      443.</para>
 
       <screen>perl nikto.pl -h 192.168.0.1 -p 80,88,443</screen>
     </section>
@@ -235,7 +248,8 @@
 
       <para>Nikto support scanning multiple hosts in the same session via a
       text file of host names or IPs. Instead of giving a host name or IP for
-      the -h (-host) option, a file name can be given. A file of hosts must be
+      the <parameter>-h</parameter> (<parameter>-host</parameter>) option, a
+      file name can be given. A file of hosts must be
       formatted as one host per line, with the port number(s) at the end of
       each line. Ports can be separated from the host and other ports via a
       colon or a comma. If no port is specified, port 80 is assumed.</para>
@@ -393,6 +407,15 @@ http://192.168.0.1:8080/
 
     <section>
       <title>Mutation Techniques</title>
+
+      <note>
+        <para>The <parameter>-mutate</parameter> and
+        <parameter>-mutate-options</parameter> parameters have been deprecated
+        in nikto 2.1.2. Plugin selections, using the
+        <parameter>-Plugin</parameter> parameter, should be used instead.
+        Nikto will automagically turn a mutate option into the appropriate
+        selection string.</para>
+      </note>
 
       <para>A mutation will cause Nikto to combine tests or attempt to guess
       values. These techniques may cause a tremendous amount of tests to be
@@ -725,6 +748,82 @@ http://192.168.0.1:8080/
 
 </screen>
     </section>
+
+    <section>
+      <title>Plugin selection</title>
+        <para>From Nikto 2.1.2 plugins can be selected on an individual basis and
+        may have parameters passed to them.</para>
+        
+        <para>A plugin selection string may be passed on the command line through the
+        <parameter>-Plugin</parameter> parameter. It consists of a semi-colon
+        separated list of plugin names with option parameters placed in brackets.
+        In simple form a plugin statement is like:</para>
+
+        <blockquote>
+           <para><parameter>plugin-name</parameter><optional>(<parameter>parameter
+           name</parameter><optional>:<parameter>parameter value</parameter>
+           </optional><optional>,<parameter>other parameters</parameter></optional>
+           )</optional></para>
+        </blockquote>
+
+        <para>For example we can do:</para>
+        <screen>tests(report:500,verbose)</screen>
+
+        <para>Which will set the parameters report to a value of 500 and verbose to
+        a value of 1. The parameters and plugin names can be found be running:</para>
+
+        <screen>./nikto.pl -list-plugins</screen>
+
+        <para>This also means that we deprecate the mutate options and replace them
+        with parameters passed to plugins, so the mutate options now internally
+        translate to:</para>
+
+        <orderedlist>
+          <listitem>
+            <para>tests(all)</para>
+          </listitem>
+          <listitem>
+            <para>tests(passfiles)</para>
+          </listitem>
+          <listitem>
+            <para>apacheusers(enumerate,home[,dictionary:dict.txt])</para>
+          </listitem>
+          <listitem>
+            <para>apacheusers(enumerate,cgiwrap[,dictionary:dict.txt])</para>
+          </listitem>
+          <listitem>
+            <para>subdomain</para>
+          </listitem>
+          <listitem>
+            <para>dictionary(dictionary:dict.txt)</para>
+          </listitem>
+        </orderedlist>
+
+        <para>Macros for commonly run plugin sets can also be defined in nikto.conf,
+        the default ones are:</para>
+
+        <screen>@@MUTATE=dictionary;subdomain
+@@DEFAULT=@@ALL;-@@MUTATE;tests(report:500)</screen>
+
+        <para>These are expanded by using -list-plugins and can be overridden through
+        -Plugins.</para>
+
+        <para>Altogether this can allow a customised set of plugins that may need to
+        be run for a specific circumstance. For example if a normal test bought up
+        that the server was vulnerable to the apache Expect header XSS attack and
+        we want to run a test just to see that it is vulnerable by adding debugging,
+        we can run:</para>
+
+        <screen>nikto.pl -host target.txt -Plugins "apache_expect_xss(verbose,debug)"</screen>
+
+        <para>And then manually check the output to see whether it was truly
+        vulnerable.</para>
+
+        <para>It should be noted that reports are also plugins, so if you need to
+        customize the plugin string and want an output, include the report plugin:</para>
+
+        <screen>nikto.pl -host targets.txt -Plugins "apacheusers(enumerate,dictionary:users.txt);report_xml" -output apacheusers.xml</screen>      
+    </section>
   </chapter>
 
   <chapter id="configuration">
@@ -1054,11 +1153,16 @@ DOCDIR=EXECDIR/docs</screen>
     <section>
       <title>Export Formats</title>
 
-      <para>Nikto saved output comes in four flavours: text, CSV, XML or HTML.
+      <para>Nikto allows output to be saved in a variety of formats, including
+      text, CSV, HTML, XML, NBE and exporting to metasploit.
       When using <parameter>-output</parameter>, an output format may be
-      specified with <parameter>-Format</parameter>. Text format is assumed if
-      nothing is specified with <parameter>-Format</parameter>. The DTD for
-      the Nikto XML format can be found in the 'docs' directory
+      specified with <parameter>-Format</parameter>.</para>
+
+      <para>If no <parameter>-Format</parameter> is specified, Nikto will try
+      to guess the format from the file extension. If Nikto cannot guess the
+      file format then output will only be sent to stdout.</para>
+      
+      <para>The DTD for the Nikto XML format can be found in the 'docs' directory
       (nikto.dtd).</para>
     </section>
 
@@ -1264,11 +1368,11 @@ DOCDIR=EXECDIR/docs</screen>
     <section>
       <title>Plugins</title>
 
-      <para>To allow a bit more flexibility, Nikto allows plugins so that
-      there is easy expansion of existing capabilities and some future
-      proofing.</para>
+      <para>Plugins allow other bits of code to hook into Nikto's processing
+      and perform extra checks that cannot be achieved through the standard
+      plugins.</para>
 
-      <para>Plugins are run in four different phases, these are:</para>
+      <para>Plugins can use several hooks, these are:</para>
 
       <blockquote>
         <variablelist>
@@ -1276,13 +1380,30 @@ DOCDIR=EXECDIR/docs</screen>
             <term>Initialization (mandatory)</term>
 
             <listitem>
-              <para>Plugin initialisation is performed before targets are
+              <para>Plugin initialization is performed before targets are
               assigned. During this phase, the plugin should tell Nikto about
               its existence and capabilities. It may optionally set up any
               later required variables.</para>
+              
+              <para>This is always called for every plugin, even if the plugin
+              will not be used in the scan. Any database loading or variable
+              setup should be deferred to the start hook.</para>
             </listitem>
           </varlistentry>
+          
+          <varlistentry>
+            <term>Start (optional)</term>
 
+            <listitem>
+              <para>The start hook is called after target enumeration, but
+              before target scanning occcurs, and will only be called on plugins
+              that are scheduled to be run. It will only execute once.</para>
+              
+              <para>This hook is normally used to load databases or to
+              initialize memory for the plugin.</para>
+            </listitem>
+          </varlistentry>
+          
           <varlistentry>
             <term>Reconnaisance (optional)</term>
 
@@ -1319,7 +1440,41 @@ DOCDIR=EXECDIR/docs</screen>
               detailed later</para>
             </listitem>
           </varlistentry>
-        </variablelist>
+
+          <varlistentry>
+            <term>Prefetch (optional)</term>
+
+            <listitem>
+              <para>The prefetch phase is called before every request to the
+              server. It is passed a copy of the request hash and can amend
+              it before it is sent to the server.</para>
+
+              <para>This is normally used where standard data is needed for
+              every request, for example, if authentication is needed.</para>
+              
+              <para>As this hook will be executed for every request made, for
+              efficiency, the hook sub should be kept optimal. It is strongly
+              advised that conditional execution (see below) is used to ensure
+              that it is only run when needed.</para>
+            </listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>Postfetch (optional)</term>
+
+            <listitem>
+              <para>The postfetch phase is called after every request to the
+              server. It is passed a copy of the response hash, so that it
+              can check for content or header specific risks.</para>
+
+              <para>As this hook will be executed for every request made, for
+              efficiency, the hook sub should be kept optimal. It is strongly
+              advised that conditional execution (see below) is used to ensure
+              that it is only run when needed.</para>
+            </listitem>
+          </varlistentry>
+          
+          </variablelist>
       </blockquote>
 
       <para>Plugins are written in standard perl in the current context. They
@@ -1333,6 +1488,7 @@ DOCDIR=EXECDIR/docs</screen>
       as a number between 1 and 100, where 1 is high priority and 100 is low
       priority. Plugins of equal weight will be executed in an undefined
       order.</para>
+      </section>
 
       <section>
         <title>Initialization Phase</title>
@@ -1398,65 +1554,56 @@ DOCDIR=EXECDIR/docs</screen>
           </varlistentry>
 
           <varlistentry>
-            <term><structfield>recon_method</structfield> (optional)</term>
+            <term><structfield>hooks</structfield> (optional)</term>
 
             <listitem>
-              <para>This should be a reference to a function used during the
-              reconnaisance phase of the plugin's execution. If this is left
-              undefined then the plugin will not execute during the
-              reconnaisance phase.</para>
+              <para>This should be a hash of hashes that contains information
+              about the hooks that the plugin can respond to.</para>
+              
+              <para>Each key of the hooks element should be the name of the
+              required hook with a hash value that details the information. The
+              components of the hash should be:</para>
+              
+              <variablelist>
+                <varlistentry>
+                  <term><structfield>method</structfield> (mandatory)</term>
+                  <listitem>
+                    <para>This should be a reference to a function called for the
+                    hook.</para>
+                  </listitem>
+                </varlistentry>
+                <varlistentry>
+                  <term><structfield>cond</structfield> (optional)</term>
+                  <listitem>
+                    <para>This is an expression to be evaluated before the plugin is
+                    executed; if true, the plugins is executed, if false, the plugin
+                    is skipped. This can be used to minimise plugin execution.</para>
+                  </listitem>
+                </varlistentry>
+                <varlistentry>
+                  <term><structfield>weight</structfield> (optional)</term>
+                  <listitem>
+                    <para>This is the weight used to schedule the running of the
+                    plugin during the reconnaisance phase. If this is left undefined
+                    it will default to 50.</para>
+                  </listitem>
+                </varlistentry>   
+              </variablelist>                
             </listitem>
           </varlistentry>
 
           <varlistentry>
-            <term><structfield>recon_cond</structfield> (optional)</term>
+            <term><structfield>options</structfield> (optional)</term>
 
             <listitem>
-              <para>This is an expression to be evaluated before the plugin is
-              executed; if true, the plugins is executed, if false, the plugin
-              is skipped. This can be used to minimise plugin
-              execution.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><structfield>recon_weight</structfield> (optional)</term>
-
-            <listitem>
-              <para>This is the weight used to schedule the running of the
-              plugin during the reconnaisance phase. If this is left undefined
-              it will default to 50.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><structfield>scan_method</structfield> (optional)</term>
-
-            <listitem>
-              <para>This should be a reference to a function used during the
-              scan phase of the plugin's execution. If this is left undefined
-              then the plugin will not execute during the scan phase.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><structfield>scan_cond</structfield> (optional)</term>
-
-            <listitem>
-              <para>This is an expression to be evaluated before the plugin is
-              executed; if true, the plugins is executed, if false, the plugin
-              is skipped. This can be used to minimise plugin
-              execution.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><structfield>scan_weight</structfield> (optional)</term>
-
-            <listitem>
-              <para>This is the weight used to schedule the running of the
-              plugin during the scan phase. If this is left undefined it will
-              default to 50.</para>
+              <para>This is a hash that contains help information about any
+              parameters that can be passed to the plugin. The information
+              will be shown if the <parameter>-list-plugins</parameter>
+              parameter is used.</para>
+              
+              <para>Each key of the options element should be the name of the
+              parameter, with a value of a string providing a brief description
+              of the parameter.</para>
             </listitem>
           </varlistentry>
 
@@ -1538,25 +1685,58 @@ DOCDIR=EXECDIR/docs</screen>
         <example>
           <title>Example initialisation function</title>
 
-          <programlisting> sub nikto_dictionary_attack_init
-{
-   my $id =
-   {
-      name         =&gt; "dictionary",
-      full_name    =&gt; "Dictionary attack",
-      author       =&gt; "Deity",
-      description  =&gt; "Attempts to dictionary attack commonly known directories/files",
-      recon_method =&gt; \&amp;nikto_dictionary_attack,
-      recon_cond   =&gt; '$CLI{mutate} =~ /6/',
-      recon_weight =&gt; 20,
-      copyright    =&gt; "2009 CIRT Inc"
-   };
+          <programlisting>sub nikto_auth_init {
+    my $id = { name             =&gt; 'auth',
+               full_name        =&gt; 'Guess authentication',
+               author           =&gt; 'Sullo/Deity',
+               description      =&gt; 'Attempt to guess authentication realms',
+               hooks            =&gt; {
+                                    start => {
+                                       method => \&amp;nikto_auth_load,
+                                       weight => 1,
+                                    },
+                                    postfetch => {
+                                       method => \&amp;nikto_auth,
+                                       weight => 19,
+                                       cond   => '$result-&gt;{whisker}-&gt;{code} eq 401',
+                                    },
+                                    prefetch => {
+                                       method => \&amp;nikto_auth_pre,
+                                       weight => 19,
+                                    },
+                                   },                   
+               copyright        =&gt; "2010 CIRT Inc"
+               };
 
-   return $id;
-}  </programlisting>
+    return $id;
+}</programlisting>
         </example>
       </section>
 
+      <section>
+        <title>Start hook</title>
+        
+        <para>The Start hook is called between target and enumeration and the
+        start of scanning. It will only ever be called once, no matter how many
+        targets Nikto is being run against. It will only be run against plugins
+        that will be executed later.</para>
+        
+        <para>This makes it the ideal place to set up any required variables,
+        assign variables or load databases for the plugin to be used in
+        response to later hooks.</para>
+        
+        <para>The start method is passed no parameters and should return
+        nothing.</para>
+        
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>void
+            <function><replaceable>start_method</replaceable></function></funcdef>
+
+            <paramdef><parameter>void</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>        
+        
       <section>
         <title>Reconnaisance Phase</title>
 
@@ -1572,6 +1752,7 @@ DOCDIR=EXECDIR/docs</screen>
             <function><replaceable>recon_method</replaceable></function></funcdef>
 
             <paramdef>hashref <parameter>mark</parameter></paramdef>
+            <paramdef>hashref <parameter>parameters</parameter></paramdef>
           </funcprototype>
         </funcsynopsis>
 
@@ -1599,10 +1780,57 @@ DOCDIR=EXECDIR/docs</screen>
             <function><replaceable>scan_method</replaceable></function></funcdef>
 
             <paramdef>hashref <parameter>mark</parameter></paramdef>
+            <paramdef>hashref <parameter>parameters</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+      </section>
+      
+      <section>
+        <title>Prefetch hook</title>
+
+        <para>The prefetch hook is executed before any request is made to
+        the target. It is designed to allow the plugin to alter the libwhisker
+        hash before the request.</para>
+
+        <para>In normal execution, the prefetch hook should not report
+        vulnerabilities.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>hashref request, hashref response
+            <function><replaceable>prefetch_method</replaceable></function></funcdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+            <paramdef>hashref <parameter>parameters</parameter></paramdef>
+            <paramdef>hashref <parameter>request</parameter></paramdef>
+            <paramdef>hashref <parameter>result</parameter></paramdef>
           </funcprototype>
         </funcsynopsis>
       </section>
 
+      <section>
+        <title>Postfetch hook</title>
+
+        <para>The postfetch hook is the executed after any request is made to
+        the target. It is designed to allow the plugin to check for issues with
+        the response, such as vulnerable headers or content.</para>
+
+        <para>In normal execution, the postfetch hook should report any
+        vulnerabilities that it finds.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>hashref request, hashref response
+            <function><replaceable>postfetch_method</replaceable></function></funcdef>
+
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+            <paramdef>hashref <parameter>parameters</parameter></paramdef>
+            <paramdef>hashref <parameter>request</parameter></paramdef>
+            <paramdef>hashref <parameter>result</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+      </section>
+      
       <section>
         <title>Reporting Phase</title>
 
@@ -1823,6 +2051,25 @@ DOCDIR=EXECDIR/docs</screen>
         </section>
 
         <section>
+          <title>Parameters</title>
+          
+          <para>The parameters hash contains all parameters that are passed
+          directly to a plugin through one of the hooks.</para>
+          
+          <para>The hash has a key of the parameter name and a value of the
+          passed parameter. Implementation and sanity checking of the values
+          is left up to the plugin.</para>
+          
+          <para>If a parameter has not been set, it will not be in the hash. If
+          it has been set to an undefined value, it will be set to the number 1
+          in the hash.</para>
+          
+          <para>Some parameters, such as <parameter>verbose</parameter> and
+          <parameter>debug</parameter> will be automatically handled by the Nikto,
+          though the parameters will still be included in the hash.</para>
+        </section>
+        
+        <section>
           <title>Vulnerability</title>
 
           <para>The vulnerability hash contains all information about a
@@ -1989,50 +2236,72 @@ DOCDIR=EXECDIR/docs</screen>
         <funcsynopsis>
           <funcprototype>
             <funcdef>string HTTPCode, string content
-            <function>fetch</function></funcdef>
-
-            <paramdef>string <parameter>uri</parameter></paramdef>
-
-            <paramdef>string <parameter>method</parameter></paramdef>
-
-            <paramdef>string <parameter>content</parameter></paramdef>
-
-            <paramdef>hashref <parameter>headers</parameter></paramdef>
-
-            <paramdef>boolean <parameter>noclean</parameter></paramdef>
-          </funcprototype>
-        </funcsynopsis>
-
-        <para><emphasis>Deprecated</emphasis></para>
-
-        <para>Performs a simple HTTP request to URI using the HTTP method,
-        <parameter>method</parameter>. <parameter>content</parameter> supplies
-        any data to pass in the HTTP body. <parameter>headers</parameter>
-        allows any custom headers to be placed in the request.
-        <parameter>noclean</parameter> is a flag specifying that the request
-        shouldn't be cleaned up before being sent (e.g. if the Host: header is
-        blank).</para>
-
-        <funcsynopsis>
-          <funcprototype>
-            <funcdef>string HTTPCode, string content
             <function>nfetch</function></funcdef>
-
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
             <paramdef>string <parameter>uri</parameter></paramdef>
-
             <paramdef>string <parameter>method</parameter></paramdef>
-
             <paramdef>string <parameter>content</parameter></paramdef>
-
             <paramdef>hashref <parameter>headers</parameter></paramdef>
-
-            <paramdef>boolean <parameter>noclean</parameter></paramdef>
+            <paramdef>hashref <parameter>flags</parameter></paramdef>
+            <paramdef>string <parameter>testid</parameter></paramdef>
           </funcprototype>
         </funcsynopsis>
 
-        <para>An updated version of fetch that uses a local, rather than a
-        global request/result structure. This should be used in preference to
-        fetch.</para>
+        <para>Makes a simple request through libwhisker with the passed
+        parameters. nfetch is hook aware and will cause all requests to
+        be passed through the prefetch and postfetch hooks.</para>
+        
+        <para>The <parameter>flags</parameter> hash is a selection of flags
+        that may modify the behaviour of the request. The current flags are
+        defined:</para>
+
+          <blockquote>
+            <table>
+              <title>Members of the <structname>flags</structname>
+              structure</title>
+
+              <tgroup cols="2">
+                <tbody>
+                  <row>
+                    <entry><structfield>noclean</structfield></entry>
+
+                    <entry>Tells nfetch not to perform sanity checks on the
+                    structure. Normally requests will be checked to ensure
+                    that a valid Host header is included and that the
+                    Content-Length header matches the size of any content,
+                    setting this flag prevents the checks</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>nocache</structfield></entry>
+
+                    <entry>Tells nfetch to ignore the cache for this request,
+                    the page will not be checked against the cache or placed
+                    into the cache.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>noprefetch</structfield></entry>
+
+                    <entry>Tells nfetch not to run the prefetch hook.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>nopostfetch</structfield></entry>
+
+                    <entry>Tells nfetch not to run the postfetch hook.</entry>
+                  </row>
+
+                  <row>
+                    <entry><structfield>noerror</structfield></entry>
+
+                    <entry>Tells nfetch not to report error responses from
+                    the request.</entry>
+                  </row>
+                </tbody>
+              </tgroup>
+            </table>
+          </blockquote>
 
         <funcsynopsis>
           <funcprototype>
@@ -2124,6 +2393,44 @@ array[0]-&gt;{description}</screen>
         <para>Prints <parameter>message</parameter> to standard out.
         <parameter>Display</parameter> specifies a filter for the message,
         currently this can be "v" for verbose and "d" for debug output.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>void <function>cache_add</function></funcdef>
+            <paramdef>string <parameter>method</parameter></paramdef>
+            <paramdef>string <parameter>response_code</parameter></paramdef>
+            <paramdef>string <parameter>content</parameter></paramdef>
+            <paramdef>string <parameter>uri</parameter></paramdef>
+            <paramdef>string <parameter>postdata</parameter></paramdef>
+            <paramdef>integer <parameter>nocache</parameter></paramdef>
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Adds the page to Nikto's cache, creating a key from a hash
+        of the passed data. This is normally handled by nfetch.</para>
+        
+        <para>The <parameter>nocache</parameter> is a mirror of the nocache
+        flag sent to the nfetch function.</para>
+
+        <funcsynopsis>
+          <funcprototype>
+            <funcdef>integer incache, string response_code, string content
+            <function>cache_fetch</function></funcdef>
+            <paramdef>string <parameter>method</parameter></paramdef>
+            <paramdef>string <parameter>uri</parameter></paramdef>
+            <paramdef>string <parameter>postdata</parameter></paramdef>
+            <paramdef>integer <parameter>nocache</parameter></paramdef>
+            <paramdef>hashref <parameter>mark</parameter></paramdef>
+          </funcprototype>
+        </funcsynopsis>
+
+        <para>Fetches the contents of the page from Nikto's cache, the page being
+        identified by the parameters. This is normally handled by nfetch.</para>
+        
+        <para>The <parameter>nocache</parameter> is a mirror of the nocache
+        flag sent to the nfetch function.</para>
+        
       </section>
 
       <section>
@@ -2206,14 +2513,6 @@ array[0]-&gt;{description}</screen>
             <listitem>
               <para>Hash which contains internal Nikto data, such as help for
               the command line parameters.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><varname>%REALMS</varname> (read)</term>
-
-            <listitem>
-              <para>Hash of data from db_realms.</para>
             </listitem>
           </varlistentry>
 
@@ -2352,48 +2651,8 @@ array[0]-&gt;{description}</screen>
 
             <listitem>
               <para>Containing the URI cache, should only be read/written
-              through <function>nfetch</function>. Members:</para>
-
-              <blockquote>
-                <table>
-                  <title>Members of the <structname>cache</structname>
-                  structure</title>
-
-                  <tgroup cols="2">
-                    <tbody>
-                      <row>
-                        <entry><structfield>{uri}</structfield></entry>
-
-                        <entry>URI for the cache</entry>
-                      </row>
-
-                      <row>
-                        <entry><structfield>{uri}{method}</structfield></entry>
-
-                        <entry>HTTP method used</entry>
-                      </row>
-
-                      <row>
-                        <entry><structfield>{uri}{res}</structfield></entry>
-
-                        <entry>HTTP result for URI</entry>
-                      </row>
-
-                      <row>
-                        <entry><structfield>{uri}{content}</structfield></entry>
-
-                        <entry>data for URI</entry>
-                      </row>
-
-                      <row>
-                        <entry><structfield>{uri}{mark}</structfield></entry>
-
-                        <entry>mark hashref for URI</entry>
-                      </row>
-                    </tbody>
-                  </tgroup>
-                </table>
-              </blockquote>
+              through <function>cache_add</function> and
+              <function>cache_fetch</function>.</para>
             </listitem>
           </varlistentry>
         </variablelist>
@@ -2633,9 +2892,22 @@ $TESTS{999999}{osvdb}=637;</screen>
         <listitem>
           <para>Ryan Dewhurst. Domain guessing code.</para>
         </listitem>
-      </itemizedlist>
 
-      <para>This document is © 2009 CIRT, Inc. and may not be reused without
+        <listitem>
+          <para>Frank Breedijk. NBE exporter code.</para>
+        </listitem>
+
+        <listitem>
+          <para>Sussurro. MSF exporter code.</para>
+        </listitem>
+
+        <listitem>
+          <para>Joe Hart, Gavin Jones, Ed Williams. Lots of suggestions and bug
+          finding.</para>
+        </listitem>        
+        </itemizedlist>
+
+      <para>This document is &copy; 2010 CIRT, Inc. and may not be reused without
       permission.</para>
     </section>
   </chapter>
