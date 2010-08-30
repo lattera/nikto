@@ -6437,3 +6437,6 @@
 "006445","0","3","/forum/faq.php?s=&do=search&q=database&match=all&titlesonly=0","GET","Database</span> Name:","","","","","vBulletin 3.6.8 contains a vulnerability which reveals the database credentials via an FAQ search. See http://www.vbulletin.com/forum/showthread.php?357818-Security-Patch-Release-3.8.6-PL1","",""
 "006446","0","3","/faq.php?s=&do=search&q=database&match=all&titlesonly=0","GET","Database</span> Name:","","","","","vBulletin 3.6.8 contains a vulnerability which reveals the database credentials via an FAQ search. See http://www.vbulletin.com/forum/showthread.php?357818-Security-Patch-Release-3.8.6-PL1","",""
 "006447","0","2b","/wconnect/admin.html","GET","e-SPS Web","","","","","American Software e-SPS admin section found.","",""
+"006448","0","18","/open.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
+"006449","0","18","/fx29id1.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
+"006450","0","18","/fx29id2.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
