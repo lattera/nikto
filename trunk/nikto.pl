@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use strict;
 
-#VERSION,2.1.2
+#VERSION,2.1.3
 # $Id$
 use Getopt::Long;
 Getopt::Long::Configure('no_ignore_case');
