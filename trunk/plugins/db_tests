@@ -6440,3 +6440,5 @@
 "006448","0","18","/open.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
 "006449","0","18","/fx29id1.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
 "006450","0","18","/fx29id2.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
+"006451","0","b","/gif/hp_invent_logo.gif","GET","200","","","","","This device may be an HP printer/scanner and allow retrieval of previously scanned images.","",""
+"006452","0","b","/gif/tricolor_ink_guage.gif","GET","200","","","","","This device may be an HP printer/scanner and allow retrieval of previously scanned images.","",""
