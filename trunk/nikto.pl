@@ -50,7 +50,7 @@ use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
 # setup
 $COUNTERS{'startsec'} = time();
 $NIKTO{'DIV'}         = "-" x 75;
-$NIKTO{'version'}     = "2.1.2";
+$NIKTO{'version'}     = "2.1.3";
 $NIKTO{'name'}        = "Nikto";
 $NIKTO{'configfile'}  = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
 
