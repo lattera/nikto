@@ -1,0 +1,243 @@
+#VERSION,2.03
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# General HTTP headers checks
+###############################################################################
+
+sub nikto_headers
+{
+    my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
+    # Standard headers, whisker is added to stop false positives
+    my @standard_headers = qw /accept accept-charset accept-encoding accept-language accept-ranges age allow authorization cache-control connection content-encoding content-language content-length content-location content-md5 content-range content-type date etag expect expires from host if-match if-modified-since if-none-match if-range if-unmodified-since last-modified location max-forwards pragma proxy-authenticate proxy-authorization range referer retry-after server te trailer transfer-encoding upgrade user-agent vary via warning www-authenticate whisker/;
+    # Host Pragma
+
+    #######################################################################
+    # look for a powered-by header...could require a valid file, maybe not
+    my %xpb;
+    foreach
+      my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk988.aspx/ )
+    {
+        (my $RES, $CONTENT) = fetch($f, "GET");
+        if ($result{'x-powered-by'} ne "") { $xpb{ $result{'x-powered-by'} } = 1; }
+    }
+
+    foreach my $x (sort keys %xpb)
+    {
+
+        # push version to BUILDITEMS so it can be evaluated later
+        push(@BUILDITEMS, $x);
+
+        if (exists($TESTS{999992}{message}))
+        {
+            $TESTS{999992}{message} =~ s/Retrieved X\-Powered\-By header\: //;
+            $TESTS{999992}{message} = "Retrieved X-Powered-By headers: $TESTS{999992}{message} and $x";
+        } else
+        {
+            $TESTS{999992}{message} = "Retrieved X-Powered-By header: $x";
+        }
+        $TESTS{999992}{osvdb} = 0;
+        nprint("+ OSVDB-$TESTS{999992}{osvdb}: $TESTS{999992}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999992} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    #######################################################################
+    # Servlet-Engine info
+    if ($result{'servlet-engine'} ne "")
+    {
+        my $x = $result{'servlet-engine'};
+        $x = ~s/\(.*$//;
+        $x =~ s/\s+//g;
+        push(@BUILDITEMS, $x);
+
+        $TESTS{999991}{message} = "Retrieved servlet-engine headers: $x";
+        $TESTS{999991}{osvdb}   = 0;
+        nprint("+ OSVDB-$TESTS{999991}{osvdb}: $TESTS{999991}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999991} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+
+        my @bits = split(/;/, $x);
+        foreach my $bit (@bits)
+        {
+
+            #    nprint("- Retrieved servlet-engine headers : $bit");
+            #    $TARGETS{$CURRENT_HOST_ID}{positives}{999998}=1;
+            #    $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+            push(@BUILDITEMS, $bit);
+        }
+    }
+    #######################################################################
+    # Content-Location header in IIS
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
+    my $wh = $request{'whisker'}{'Host'};
+    my $h  = $request{'Host'};
+    delete $request{'whisker'}{'Host'};
+    delete $request{'Host'};
+    $request{'whisker'}->{'uri'}    = "/";
+    $request{'whisker'}->{'method'} = "GET";
+    $request{'whisker'}{'version'}  = "1.0";
+
+    LW2::http_do_request_timeout(\%request, \%result);
+    if (   ($result{'content-location'} ne "")
+        && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
+        && ($result{'content-location'} !~ /$TARGETS{$CURRENT_HOST_ID}{ip}/))
+    {
+        $TESTS{999989}{message} =
+          "IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\".";
+        $TESTS{999989}{osvdb} = 630;
+        nprint("+ OSVDB-$TESTS{999989}{osvdb}: $TESTS{999989}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999989} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
+    $request{'whisker'}->{'uri'}    = "/images";
+    $request{'whisker'}->{'method'} = "GET";
+    $request{'whisker'}{'version'}  = "1.0";
+    delete $request{'whisker'}{'Host'};
+    delete $request{'Host'};
+    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+    LW2::http_do_request_timeout(\%request, \%result);
+
+    if (($result{'location'} ne "") && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) && ($result{'location'} !~ /$TARGETS{$CURRENT_HOST_ID}{ip}/))
+    {
+        $TESTS{999988}{message} =
+          "IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\".";
+        $TESTS{999988}{osvdb} = 630;
+        nprint("+ OSVDB-$TESTS{999988}{osvdb}: $TESTS{999988}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999988} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    $request{'whisker'}{'Host'} = $wh;
+    $request{'Host'} = $h;
+    #######################################################################
+    # Location header in WebLogic
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
+    $request{'whisker'}->{'uri'}    = ".";
+    $request{'whisker'}->{'method'} = "GET";
+    $request{'whisker'}{'version'}  = "1.0";
+    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+    LW2::http_do_request_timeout(\%request, \%result);
+
+    if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//))
+    {
+        $TESTS{999987}{message} = "WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".";
+        $TESTS{999987}{osvdb}   = 5737;
+        nprint("+ OSVDB-$TESTS{999987}{osvdb}: $TESTS{999987}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999987} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    #######################################################################
+    # All other interesting headers
+    foreach my $header (@interesting_headers)
+    {
+        if ($result{$header} ne '')
+        {
+            my $x = $result{$header};
+            $x =~ s/\s+.*$//;
+            push(@BUILDITEMS, $x);
+            $TESTS{999986}{message} = "Retrieved $header header: $result{$header}";
+            $TESTS{999986}{osvdb}   = 0;
+            nprint("+ OSVDB-$TESTS{999986}{osvdb}: $TESTS{999986}{message}");
+            $TARGETS{$CURRENT_HOST_ID}{positives}{999986} = 1;
+            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+        }
+    }
+
+    #######################################################################
+    # Look for any non-standard headers
+    foreach my $header (sort keys %result)
+    {
+       my $found = 0;
+       my $reportnum = 999100;
+       foreach my $st_header (@standard_headers)
+       {
+          if ($header eq $st_header)
+          {
+             $found=1;
+          }
+       }
+       if ($found == 0)
+       {
+          my $x = $result{$header};
+          $x =~s/\s+.*$//;
+          push(@BUILDITEMS, $x);
+          $TESTS{$reportnum}{message} = "Non-standard header $header returned by server, with contents: $result{$header}";
+          $TESTS{$reportnum}{osvdb}   = 0;
+          nprint("+ OSVDB-$TESTS{$reportnum}{osvdb}: $TESTS{$reportnum}{message}");
+          $TARGETS{$CURRENT_HOST_ID}{positives}{$reportnum} = 1;
+          $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+          $reportnum++;
+       }
+    }
+           
+    #######################################################################
+    # ETag header
+    
+    # Try to grab a standard file
+    foreach my $f (qw/\/index.html \/index.htm \/robots.txt/)
+    {
+       (my $RES, $CONTENT) = fetch($f, "GET");
+       if ($result{etag} ne '') { break; }
+    }
+
+    # Now we have a header, let's check ETag for inode
+    if ($result{etag} ne '')
+    {
+       my $etag=$result{etag};
+       $etag =~ s/"//g;
+       my @fields = split("-",$etag);
+       my $message = "ETag header found on server";
+       if ($#fields == 2)
+       {
+          my $inode="0x$fields[0]";
+          my $size="0x$fields[1]";
+          my $mtime="0x$fields[2]";
+          # for some reason $mtime is mangled
+          $message .= sprintf(", inode: %d, size: %d, mtime: %s", hex($inode), hex($size),  $mtime);
+       }
+       else
+       {
+          $message .= ", fields: ";
+          foreach my $field (@fields)
+          {
+             $message .= "0x$field ";
+          }
+       }
+       $TESTS{999984}{message} = $message;
+       $TESTS{999984}{osvdb}   = 0;
+       nprint("+ OSVDB-$TESTS{999984}{osvdb}: $TESTS{999984}{message}");
+       $TARGETS{$CURRENT_HOST_ID}{positives}{999984} = 1;
+       $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+}
+
+1;

@@ -1,0 +1,167 @@
+#VERSION,2.04
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2006 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Check for outdated items in banner
+###############################################################################
+
+sub nikto_outdated
+{
+    # Below is to use a local copy, as the old version caused duplicate entries
+    # when more than one host was scanned
+    my @BUILDITEMS;
+
+    # populate @BUILDITEMS with appropriate values
+    # if Apache, split on space...
+    if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /apache/i)
+    {
+        push(@BUILDITEMS, (split(/ /, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner})));
+    } elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /weblogic/i)    # strip all the date info...
+    {
+        my @T = split(/ /, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+        push(@BUILDITEMS, "$T[0]\/$T[1]");
+    } elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /sitescope/i)    # strip all the date info...
+    {
+        my @T = split(/ /, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+        push(@BUILDITEMS, "$T[0]");
+    } else
+    {
+        if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} !~ /\s/)             # has no spaces
+        {
+            $MATCHSTRING = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner};
+        } elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /\//)        # has spaces and / sepr
+        {
+            $MATCHSTRING = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner};
+            $MATCHSTRING =~ s/\s+//g;
+        } else                                                                            # must create  sepr
+        {
+
+            # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)
+            my $sepr = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner};
+            $sepr =~ s/[a-zA-Z0-9\.\(\)]//gi;
+            $sepr = substr($sepr, (length($sepr) - 1), 1);
+
+            # $sepr=~ s/\s+/ /g;
+            # break up ID string on $sepr
+            my @T = split(/$sepr/, $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+
+            # assume last is version...
+            for ($i = 0 ; $i < $#T ; $i++) { $MATCHSTRING .= "$T[$i] "; }
+        }
+        $MATCHSTRING =~ s/\s+$//;
+
+        #$MATCHSTRING =~ s/[\(\)]//g;
+        push(@BUILDITEMS, $MATCHSTRING);
+        nprint("Server Version String:$MATCHSTRING", "d");
+    }
+
+    my ($v, $V, $BI, $k) = "";
+
+    foreach $BI (@BUILDITEMS)
+    {
+        my $have_match = 0;
+        foreach $V (sort keys %OVERS)
+        {
+            if ($V eq "") { next; }
+            if ($BI =~ /^$V/i)    # software name matched
+            {
+                $have_match = 1;
+                foreach $k (keys %{ $OVERS{$V} })
+                {
+                    if ($k eq "")    { next; }
+                    if ($k eq "tid") { next; }
+                    $v = $k;
+                }
+                if (vereval($v, $BI, $V))    # version check
+                {
+                    my $msg = $OVERS{$V}{$v};
+                    $msg =~ s/\@RUNNING_VER/$BI/g;
+                    $msg =~ s/\@CURRENT_VER/$v/g;
+                    chomp($msg);
+                    nprint("+ $msg");
+                    $TESTS{ $OVERS{$V}{tid} }{message} = $msg;
+                    $TARGETS{$CURRENT_HOST_ID}{positives}{ $OVERS{$V}{tid} } = 1;
+                    $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+                }
+            }
+        }
+        if (!$have_match) { $UPDATES{$BI} = 1; }
+    }
+    return;
+}
+
+sub vereval
+{
+    # split both by last char of @_[0], as it is the name to version separator
+    my $sepr = substr($_[2], (length($sepr) - 1), 1);
+    nprint("nikto_outdated.plugin: verstring: $_[2], sepr:$sepr", "d");
+
+    $CURRENT = lc($_[0]);
+    $RUNNING = lc($_[1]);
+
+    nprint("nikto_outdated.plugin: \$CURRENT:$CURRENT:\$RUNNING:$RUNNING:", "d");
+
+    my @T = split(/$sepr/, $CURRENT);
+    my $CURRENT = $T[$#T];    # should be version...
+    @T = split(/$sepr/, $RUNNING);
+    my $RUNNING = $T[$#T];    # should be version...
+
+    # convert alphas to numerics so we can do a real comparison
+    $CURRENT =~ s/([^0-9\.]){1}/"." . ord($1) . "."/eg;
+    $RUNNING =~ s/([^0-9\.]){1}/"." . ord($1) . "."/eg;
+    $RUNNING =~ s/\.+/\./g;
+    $CURRENT =~ s/\.+/\./g;
+    $RUNNING =~ s/^\.//;
+    $CURRENT =~ s/^\.//;
+    $RUNNING =~ s/\.$//;
+    $CURRENT =~ s/\.$//;
+
+    nprint("nikto_outdated.plugin: \$CURRENT:$CURRENT:\$RUNNING:$RUNNING\: (after numberifcation)", "d");
+
+    if (($CUR_ORIG !~ /[a-zA-Z]/) && ($RUN_ORIG !~ /[a-zA-Z]/))
+    {
+        @CUR = split(/\./, $CURRENT);
+        @RUN = split(/\./, $RUNNING);
+    } else
+    {
+        @CUR = split(//, $CURRENT);
+        @RUN = split(//, $RUNNING);
+    }
+
+    # start with 0... eval each in turn...
+    for (my $i = 0 ; $i <= $#CUR ; $i++)
+    {
+        nprint("nikto_outdated.plugin: major compare: \$CUR[$i]:$CUR[$i]: \$RUN[$i]:$RUN[$i]:", "d");
+        if ($CUR[$i] > $RUN[$i]) { return 1; }    # running is older
+        if (($CUR[$i] ne "") && ($RUN[$i] eq "")) { return 1; }    # running is older
+        if ($CUR[$i] < $RUN[$i])                                   # running is newer
+        {
+            my $string = $_[1];
+            $string =~ s/\s/\%20/g;
+            $UPDATES{$string} = 1;
+            return 0;
+        }
+    }
+    return 0;                                                      # running is the same version if we make it here
+}
+
+1;

@@ -1,0 +1,95 @@
+#VERSION,2.02
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Enumeration of user svia the cgiwrap program
+###############################################################################
+# NOTES
+# This plugin tries to enumerate all the users
+# in the system (of course the bruteforce attack is limited to a given range).
+# The cgiwrap program allows you to determine user names based on the error responses.
+# this plugin is a hack of nikto_apacheusers.plugin, which was originally written by
+# Javier Fernandez-Sanguino Pe–a.
+###############################################################################
+
+sub nikto_user_enum_cgiwrap
+{
+    if ($CLI{mutate} !~ /4/) { return; }
+
+    my @CGIWRAPS;
+    my $valid = $ctr = 0;
+    my @CFGCGI = (split(/ /, $VARIABLES{"\@CGIDIRS"}));
+    my $msg;
+
+    # test for locations of cgiwrap files
+    foreach my $cgidir (@CFGCGI)
+    {
+        my $url = "$cgidir" . "cgiwrap";
+        (my $RES, $CONTENT) = fetch("$url", "GET");
+        if ($CONTENT =~ /check your URL/i)
+        {
+            push(@CGIWRAPS, "$url");
+            $valid++;
+        }
+    }
+
+    if ($valid eq 0) { return; }
+    nprint("- Enumerating users via cgiwrap (1 to 5 characters).", "d");
+
+    # Note1: This script only generates names with letters A-Z (no numbers)
+    #
+    # Note2: this script will generate SUM(26^n)(n=$min to $max)
+    # it's probably faster to write this to a file than to generate it
+    # on the fly BTW.
+    #
+    # Of course, it could be optimized to skip some "strange"
+    # combinations of usernames, but hey, then it wouldn't
+    # be 'brute force' would it? (jfs)
+
+    foreach $cgiwrap (@CGIWRAPS)
+    {
+        $start = "a";
+        while (length($start) <= 5)
+        {
+            if (($ctr % 500) eq 0) { nprint("\tUser enumeration guess $ctr ($cgiwrap/~$start)", "v"); }
+            (my $RES, $CONTENT) = fetch("$cgiwrap/~" . $start, "GET");
+            if ($CONTENT !~ /unable to find/i)    # this is a valid user
+            {
+                if (exists($TESTS{999993}{message}))
+                {
+                    $TESTS{999993}{message} .= ", $text";
+                } else
+                {
+                    $TESTS{999993}{message} =
+"Valid users were guessed via cgiwrap user enumeration. Recompile cgiwrap with the '--with-quiet-errors' to stop this. Users found are: $text";
+                }
+                $TESTS{999993}{osvdb} = 0;
+                $TARGETS{$CURRENT_HOST_ID}{positives}{999993} = 1;
+                $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+                $start++;
+                $ctr++;
+            }
+        }
+    }
+}
+
+1;

@@ -1,0 +1,164 @@
+#VERSION,2.03
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2006 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# HTTP options check
+###############################################################################
+
+# This just gets the HTTP options & checks 'em out.
+# See RFC 2626 for more info...
+
+sub nikto_httpoptions
+{
+    # test for both OPTIONS / and OPTIONS * as they may give different results
+    (my $RES, $CONTENT) = fetch("*", "OPTIONS");
+    my $aoptions = "$result{allow}, ";
+    my $poptions = "$result{public}, ";
+    my ($allow_methods, $public_methods, $txt);
+
+    ($RES, $CONTENT) = fetch("/", "OPTIONS");
+    $aoptions .= $result{allow};
+    $poptions .= $result{public};
+
+    foreach my $o (split(/,[ ]?/, $aoptions)) { $allow_methods .= ", $o" unless ($allow_methods =~ /\b$o\b/ || $o eq ''); }
+    $allow_methods =~ s/^[ ]?, //;
+    foreach my $o (split(/,[ ]?/, $poptions)) { $public_methods .= ", $o" unless ($public_methods =~ /\b$o\b/ || $o eq ''); }
+    $public_methods =~ s/^[ ]?, //;
+
+    # proxy can impose it's methods... should actually check this not just warn
+    if ($CLI{useproxy} ne "") { $txt = "(May be proxy's methods, not server's)"; }
+
+    if ($allow_methods ne "")
+    {
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999990} = 1;
+        $TESTS{999990}{message}                       = "Allowed HTTP Methods: $allow_methods $txt";
+        $TESTS{999990}{osvdb}                         = 0;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+        nprint("- $TESTS{999990}{message}");
+        foreach my $m (split /,? /, $allow_methods) { eval_methods($m, "Allow"); }
+    }
+
+    if ($public_methods ne "")
+    {
+        $TESTS{999985}{message}                       = "Public HTTP Methods: $public_methods $txt";
+        $TESTS{999985}{osvdb}                         = 0;
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999985} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+        nprint("- $TESTS{999985}{message}");
+        foreach my $m (split /,? /, $public_methods) { eval_methods($m, "Public"); }
+    }
+    return;
+}
+
+sub eval_methods
+{
+    my $method = $_[0] || return;
+    my $type = $_[1];
+    $method = uc($method);
+    my $prefix = "HTTP method ('$type' Header):";
+
+    if ($method eq "CONNECT")
+    {
+        $TESTS{999983}{message} = "$prefix 'CONNECT' may allow server to proxy client requests.";
+        $TESTS{999983}{osvdb}   = 0;
+        nprint("+ OSVDB-$TESTS{999983}{osvdb}: $TESTS{999983}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999983} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "MOVE")
+    {
+        $TESTS{999982}{message} = "$prefix 'MOVE' may allow clients to change file locations on the web server.";
+        $TESTS{999982}{osvdb}   = 5647;
+        nprint("+ OSVDB-$TESTS{999982}{osvdb}: $TESTS{999982}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999982} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "PROPFIND")
+    {
+        $TESTS{999981}{message} =
+"$prefix 'PROPFIND' may indicate DAV/WebDAV is installed. This may be used to get directory listings if indexing is allowed but a default page exists.";
+        $TESTS{999981}{osvdb} = 0;
+        nprint("+ OSVDB-$TESTS{999981}{osvdb}: $TESTS{999981}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999981} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "SEARCH")
+    {
+        $TESTS{999980}{message} = "$prefix 'SEARCH' indicates DAV/WebDAV is installed, and may be used to get directory listings if Index Server is running.";
+        $TESTS{999981}{osvdb}   = 425;
+        nprint("+ OSVDB-$TESTS{999980}{osvdb}: $TESTS{999980}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999980} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "PUT")
+    {
+        $TESTS{999978}{message} = "$prefix 'PUT' method could allow clients to save files on the web server.";
+        $TESTS{999978}{osvdb}   = 397;
+        nprint("+ OSVDB-$TESTS{999978}{osvdb}: $TESTS{999978}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999978} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "TRACE")
+    {
+        $TESTS{999979}{message} =
+          "$prefix 'TRACE' is typically only used for debugging and should be disabled. This message does not mean it is vulnerable to XST.";
+        $TESTS{999979}{osvdb} = 877;
+        nprint("+ OSVDB-$TESTS{999979}{osvdb}: $TESTS{999979}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999979} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "PROPPATCH")
+    {
+        $TESTS{999977}{message} = "$prefix 'PROPPATCH' indicates DAV/WebDAV is installed.";
+        $TESTS{999977}{osvdb}   = 0;
+        nprint("+ OSVDB-$TESTS{999977}{osvdb}: $TESTS{999977}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999977} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "DELETE")
+    {
+        $TESTS{999976}{message} = "$prefix 'DELETE' may allow clients to remove files on the web server.";
+        $TESTS{999976}{osvdb}   = 5646;
+        nprint("+ OSVDB-$TESTS{999976}{osvdb}: $TESTS{999976}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999976} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+
+    elsif ($method eq "TRACK")
+    {
+        $TESTS{999975}{message} =
+          " $prefix 'TRACK' ('TRACE' alias) is typically only used for debugging and should be disabled. This message does not mean it is vulnerable to XST.";
+        $TESTS{999975}{osvdb} = 5648;
+        nprint("+ OSVDB-$TESTS{999975}{osvdb}: $TESTS{999975}{message}");
+        $TARGETS{$CURRENT_HOST_ID}{positives}{999975} = 1;
+        $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+    }
+}
+
+1;

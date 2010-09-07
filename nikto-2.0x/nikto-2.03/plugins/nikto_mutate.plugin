@@ -1,0 +1,91 @@
+#VERSION,2.03
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Mutated file checks
+###############################################################################
+
+sub nikto_mutate
+{
+    if ($CLI{mutate} !~ /1/) { return; }
+    my ($c, %DIRS, %FS) = "";
+
+    # build a hash of all the unique directories
+    foreach $c (@CGIDIRS) { $DIRS{$c} = ""; }
+
+    nprint("-Loading root level files", "v");
+
+    foreach my $checkid (keys %TESTS)
+    {
+        my $dir  = LW2::uri_get_dir($TESTS{$checkid}{uri});
+        my $file = $TESTS{$checkid}{uri};
+        my $rdir = $dir;
+        $rdir =~ s/([^a-zA-Z0-9])/\\$1/g;
+        $file =~ s/$rdir//;
+        $DIRS{$dir} = "" unless $dir  eq "";
+        $FS{$file}  = "" unless $file eq "";
+    }
+
+    foreach my $c ((split(/ /, $VARIABLES{"\@MUTATEDIRS"})))  { $DIRS{$c} = ""; }
+    foreach my $c ((split(/ /, $VARIABLES{"\@MUTATEFILES"}))) { $FS{$c}   = ""; }
+
+    # add the directory/file combos to the request hashes
+    my $new_tests = 0;
+    my $m_test    = max_test_id();
+
+    foreach my $root (keys %DIRS)
+    {
+        foreach my $file (keys %FS)
+        {
+            # skip self referencing stuff
+            if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
+
+            # args with no file
+            if (($root eq "/") && ($file =~ /^\?/)) { next; }
+            if (($root eq "")  && ($file =~ /^\?/)) { next; }
+            $TARGETS{$CURRENT_HOST_ID}{total_checks}++;
+            $m_test++;
+            $new_tests++;
+
+            if (($new_tests % 100000) eq 0) { nprint("-Added test ($new_tests of many):$root$file:", "d"); }
+
+            $TESTS{$m_test}{uri}         = "$root$file";
+            $TESTS{$m_test}{message}     = "URL created via mutate option.";
+            $TESTS{$m_test}{match_1}     = 200;
+            $TESTS{$m_test}{match_1_and} = "";
+            $TESTS{$m_test}{match_1_or}  = "";
+            $TESTS{$m_test}{fail_1}      = "";
+            $TESTS{$m_test}{fail_2}      = "";
+            $TESTS{$m_test}{method}      = "GET";
+            $TESTS{$m_test}{data}        = "";
+            $TESTS{$m_test}{headers}     = "";
+            $TESTS{$m_test}{category}    = 1;
+            $TESTS{$m_test}{osvdb}       = 3092;
+            $TESTS{$m_test}{server}      = "generic";
+        }
+    }
+
+    nprint("- $new_tests mutate checks loaded", "v");
+    return;
+}
+
+1;

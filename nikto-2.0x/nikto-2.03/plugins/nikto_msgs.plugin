@@ -1,0 +1,50 @@
+#VERSION,2.02
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2006 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Various messages relating to the server banner
+###############################################################################
+# NOTES
+# versions are loaded from the "db_server_msgs" file, which should be in the
+# plugins directory this plugin checks the server version to see if there are
+# any version specific items in the4 db_server_msgs this differs from
+# nikto_outdated because that is ONLY checking to see if it is an old version,
+# whereas this checks to see if the versions match
+###############################################################################
+
+sub nikto_msgs
+{
+    foreach my $VER (keys %VERSIONS)
+    {
+        if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /($VER)\b/i)
+        {
+            my $msg = "$1 - $VERSIONS{$VER}";
+            nprint("+ $msg");
+            $TESTS{ $VERSIONS{$VER}{tid} }{message} = $msg;
+            $TARGETS{$CURRENT_HOST_ID}{positives}{ $VERSIONS{$VER}{tid} } = 1;
+            $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+        }
+    }
+    return;
+}
+
+1;

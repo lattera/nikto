@@ -1,0 +1,51 @@
+#########################################################################################################
+# CONFIG STUFF
+#########################################################################################################
+# default command line options, can't be an option that requires a value.  used for ALL runs.
+# CLIOPTS=-g -a
+
+# location of nmap to use with port scanning (rather than Nikto internals)
+# and any options to pass to it
+NMAP=/usr/local/bin/nmap
+NMAPOPTS=-P0
+
+# ports never to scan
+SKIPPORTS=21 111
+
+# if Nikto is having difficulty finding the 'plugins', set the full install path here
+# EXECDIR=/usr/local/nikto
+
+# the default HTTP version to try... can/will be changed as necessary
+DEFAULTHTTPVER=1.0
+
+# Nikto can submit updated version strings to CIRT.net. It won't do this w/o permission. You should
+# send updates because it makes the data better for everyone ;)  *NO* server specific information
+# such as IP or name is sent, just the relevant version information.
+# UPDATES=yes  #-- ask before each submission if it should send
+# UPDATES=no   #-- don't ask, don't send
+# UPDATES=auto #-- automatically attempt submission *without prompting*
+UPDATES=yes
+
+# Warning if MAX_WARN OK or MOVED responses are retrieved
+MAX_WARN=20
+
+# Prompt... if set to 'no' you'll never be asked for anything. Good for automation.
+#PROMPTS=no
+
+# cirt.net : set the IP so that updates will work without name resolution
+CIRT=209.172.49.178
+
+#########################################################################################################
+# PROXY STUFF
+#########################################################################################################
+#PROXYHOST=127.0.0.1
+#PROXYPORT=8080
+#PROXYUSER=proxyuserid
+#PROXYPASS=proxypassword
+
+#########################################################################################################
+# COOKIE STUFF
+#########################################################################################################
+# send a cookie with all requests, helpful if auth cookie is needed
+#STATIC-COOKIE=cookiename=cookievalue
+

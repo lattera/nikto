@@ -1,0 +1,78 @@
+#VERSION,2.01
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Enumeration of users and directories in system (as Apache's ~username)
+###############################################################################
+# NOTES
+# This plugin tries to enumerate all the users and directories
+# in the system (of course the bruteforce attack is limited to a given range).
+# In some Apache/UNIX systems this might give out many local users
+# (which could later on be used for a ssh brute-force attack).
+# This plugin was originally written by Javier Fernandez-Sanguino Pe–a
+###############################################################################
+
+sub nikto_user_enum_apache
+{
+    if ($CLI{mutate} !~ /3/) { return; }
+
+    nprint("- Enumerating Apache users (1 to 5 characters).", "d");
+
+    # Note1: This script only generates names with letters A-Z (no numbers)
+    #
+    # Note2: this script will generate SUM(26^n)(n=$min to $max)
+    # it's probably faster to write this to a file than to generate it
+    # on the fly BTW.
+    #
+    # Of course, it could be optimized to skip some "strange"
+    # combinations of usernames, but hey, then it wouldn't
+    # be 'brute force' would it? (jfs)
+
+    my $text = "a";
+    my $ctr  = 0;
+    while (length($text) <= 5)
+    {
+        if (($ctr % 500) eq 0) { nprint("\tUser enumeration guess $ctr ($text)", "v"); }
+        (my $RES, $CONTENT) = fetch("/~" . $text, "HEAD");
+        foreach $found (split(/ /,$VARIABLES{"\@HTTPFOUND"}))
+        {
+           if ($RES eq $found) # this is a valid user
+           {
+               if (exists($TESTS{999997}{message}))
+               {
+                   $TESTS{999997}{message} .= ", $text";
+               }
+               else
+               {
+                   $TESTS{999997}{message} = "Valid users found via Apache enumeration: $text";
+               }
+               $TESTS{999997}{osvdb} = 637;
+               $TARGETS{$CURRENT_HOST_ID}{positives}{999997} = 1;
+               $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+           }
+        }
+        $text++;
+        $ctr++;
+    }
+}
+
+1;

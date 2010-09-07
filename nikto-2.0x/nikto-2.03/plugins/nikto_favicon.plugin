@@ -1,0 +1,58 @@
+#VERSION,2.04
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Get a favicon.ico file & MD5 fingerprint
+###############################################################################
+
+sub nikto_favicon
+{
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_reset();
+    $request{'whisker'}->{'uri'} = "/favicon.ico";
+    LW2::http_fixup_request(\%request);
+    dump_var("Request Hash", \%request);
+    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+    LW2::http_do_request_timeout(\%request, \%result, 5);
+    dump_var("Result Hash", \%result);
+
+    if ($result{'whisker'}->{'data'} ne '')
+    {
+        $hash = LW2::md5($result{'whisker'}->{'data'});
+        $hash =~ s/^.*://;
+        nprint("Got favicon.ico hash:$hash", "d", "");
+
+        foreach my $match_hash (keys %FAVICONS)
+        {
+            if ($hash eq $match_hash)
+            {
+                nprint("+ OSVDB-39272: /favicon.ico file identifies this server as: $FAVICONS{$match_hash}");
+                $TARGETS{$CURRENT_HOST_ID}{positives}{ $FAVICONS{$hash}{tid} } = 1;
+                $TARGETS{$CURRENT_HOST_ID}{total_vulns}++;
+                $TESTS{ $FAVICONS{$hash}{tid} }{message} = "/favicon.ico file identifies this server as: $FAVICONS{$match_hash}";
+                $TESTS{ $FAVICONS{$hash}{tid} }{osvdb}   = 39272;
+            }
+        }
+    }
+}
+
+1;

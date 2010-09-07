@@ -1,0 +1,272 @@
+#VERSION,2.00
+#LASTMOD,11.10.2007
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Reporting
+###############################################################################
+
+sub open_output
+{
+    if ($CLI{file} eq "") { return; }
+
+    open(OUT, ">>$CLI{file}") || die print STDERR "+ ERROR: Unable to open '$CLI{file}' for write: $@\n";
+    select(OUT);
+    $|++;
+    select(STDERR);
+    $|++;
+    select(STDOUT);
+    $|++;
+
+    if ($CLI{format} =~ /^html?/i)
+     {
+        open_templates();
+        print OUT $TEMPLATES{htm_start};
+     } 
+    elsif ($CLI{format} =~ /^txt/i)
+     {
+        print OUT "- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}\n";
+     }
+    elsif ($CLI{format} =~ /^csv/i)
+     {
+        print OUT "\"$NIKTO{name} v$NIKTO{version}\",\"Core v$NIKTO{core_version}\"\n";
+     }
+    return;
+}
+###############################################################################
+sub close_output
+{
+    if ($CLI{format} =~ /^txt/i)
+    {
+        print OUT "\nTest Options: $CLI{all_options}\n";
+        print OUT "$DIV\n";
+    } elsif ($CLI{format} =~ /^csv/i)
+    {
+        print OUT "\n\"Test Options\",\"$CLI{all_options}\"\n";
+    }
+
+    close(OUT);
+    return;
+}
+###############################################################################
+sub write_kbase
+{
+    my $entry_id = $_[0];
+
+    my $kb_entry .= "\"$entry_id\",\"ip:$TARGETS{$CURRENT_HOST_ID}{ip}\",\"port:$CURRENT_PORT\",\"ssl:$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}\",";
+    $kb_entry    .= "\"name:$TARGETS{$CURRENT_HOST_ID}{hostname}\",\"start:$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_epoch}\",";
+    $kb_entry    .= "\"stop:$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_epoch}\",\"tests:$TARGETS{$CURRENT_HOST_ID}{total_checks}\",";
+    $kb_entry .=
+      "\"found:$TARGETS{$CURRENT_HOST_ID}{total_vulns}\",\"ver:$NIKTO{version}\",\"banner:$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}\",";
+    foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} }) { $kb_entry .= "\"p:$p\","; }
+    foreach my $m (@KB_MSGS) { $m =~ s/^\+ //; $kb_entry .= "\"m:$m\","; }
+    $kb_entry =~ s/\,$//;
+
+    open(KB, ">>$NIKTO{kbase}") or print "+ ERROR: Unable open '$NIKTO{kbase}' for write:$@\n";
+    print KB "$kb_entry\n";
+    close(KB);
+}
+###############################################################################
+sub next_kbase_id
+{
+    my $id = 0;
+    open(KB, "<$NIKTO{kbase}");
+    while (<KB>)
+    {
+        my @rec = parse_csv($_);
+        if ($rec[0] > $id) { $id = $rec[0]; }
+    }
+    close(KB);
+    $id++;
+    return $id;
+}
+###############################################################################
+sub open_templates
+{
+    my @ts         = dirlist($NIKTO{templatedir});
+    my $have_cirt  = 0;
+    foreach my $t (@ts)
+    {
+        open(T, "<$NIKTO{templatedir}/$t");
+        my @TEMPLATE = <T>;
+        close(T);
+        my $T = join("", @TEMPLATE);
+        $t =~ s/\..*$//;
+
+        # :-)
+        if ($T =~ /\s?20[0-9]{2}\s?CIRT, Inc/i)             { $have_cirt  = 1; }
+
+        $TEMPLATES{$t} = $T;
+    }
+
+    if (!$have_cirt)
+    {
+        print "\nIt looks like you may have removed the Nikto copyright from the reports. Please remember that this program is copyrighted, takes a lot of work to maintain, and is completely free for non-commercial use.\n\nIf this message has been a mistake, please notify sullo\@cirt.net.\n\n";
+    }
+
+    return;
+}
+###############################################################################
+sub proc_template
+{
+    my $template = $_[0] || return;
+    my %variables;
+    my $protocol = "http";
+    if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
+
+    $variables{"#TEMPL_HCTR"}               = $NIKTO{TEMPL_HCTR};
+    $variables{"#TEMPL_END"}                = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp};
+    $variables{"#TEMPL_HOSTNAME"}           = simple_enc($TARGETS{$CURRENT_HOST_ID}{hostname});
+    $variables{"#TEMPL_IP"}                 = simple_enc($TARGETS{$CURRENT_HOST_ID}{ip});
+    $variables{"#TEMPL_ITEMS_TESTED"}       = $TARGETS{$CURRENT_HOST_ID}{total_checks};
+    $variables{"#TEMPL_PORT"}               = $CURRENT_PORT;
+    $variables{"#TEMPL_START"}              = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp};
+    $variables{"#TEMPL_NIKTO_VER"}          = $NIKTO{version};
+    $variables{"#TEMPL_BANNER"}             = simple_enc($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+    $variables{"#TEMPL_NIKTO_CLI"}          = $CLI{all_options};
+    $variables{"#TEMPL_CTR"}                = $TARGETS{$CURRENT_HOST_ID}{total_checks};
+    $variables{"#TEMPL_NIKTO_HOSTS_TESTED"} = $COUNTERS{hosts_total};
+    $variables{"#TEMPL_ELAPSED"}            = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed};
+    $variables{"#TEMPL_LINK_NAME"}          = "$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT";
+    $variables{"#TEMPL_LINK_IP"} =
+      "<a href=\"$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT/\">$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT/</a>";
+    $variables{"#TEMPL_ITEMS_FOUND"} = $TARGETS{$CURRENT_HOST_ID}{total_vulns};
+
+    if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
+    {
+        $variables{"#TEMPL_LINK_NAME"} =
+          "<a href=\"$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT/\">$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT/</a>";
+    } else
+    {
+        $variables{"#TEMPL_LINK_NAME"} = "N/A";
+    }
+
+    foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
+
+    # Scanner Messages Handling
+    if ($template =~ /\#TEMPL_SMMSG/)
+    {
+        my $template_orig  = $template;
+        my $template_final = "";
+        foreach my $m (@KB_MSGS)
+        {
+            my $OSVDB = "";
+	    if ($m =~ /^OSVDB-([0-9]+):/) { $OSVDB = $1; } 
+            if ($OSVDB ne "") { $OSVDB = "<a href=\"http://osvdb.org/$OSVDB\">OSVDB-$OSVDB</a>"; }
+            $template =~ s/\#TEMPL_SMMSG/$m/;
+            $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
+            $template_final .= $template;
+            $template = $template_orig;
+        }
+        $template = "$template_final\n<br>";
+    }
+
+    # Positives Handling
+    if ($template =~ /\#TEMPL_MSG/)
+    {
+        my $template_orig  = $template;
+        my $template_final = "";
+        foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
+        {
+            $TESTS{$p}{uri}                  = simple_enc($TESTS{$p}{uri});
+            $variables{"#TEMPL_URI"}         = $TESTS{$p}{uri};
+            $variables{"#TEMPL_MSG"}         = $TESTS{$p}{message};
+            $variables{"#TEMPL_HTTP_METHOD"} = $TESTS{$p}{method};
+
+# this should be commented until the URI encoding is figured out... otherwise we're open to XSS in reports. doh.
+#     $ENC_URI=simple_enc($TESTS{$p}{uri});
+#     $variables{"#TEMPL_ITEM_IP_LINK"}="<a href=\"$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT$TESTS{$p}{uri}\">$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT$ENC_URI</a>";
+#     if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")  { $variables{"#TEMPL_ITEM_NAME_LINK"}="<a href=\"$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT$TESTS{$p}{uri}\">$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT$ENC_URI</a><br>"; }
+#     $variables{"#TEMPL_ITEM_IP_LINK"}="<a href=\"$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT$ENC_URI\">$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT$ENC_URI</a>";
+#     if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")  { $variables{"#TEMPL_ITEM_NAME_LINK"}="<a href=\"$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT$ENC_URI\">$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT$ENC_URI</a><br>"; }
+            $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$CURRENT_PORT$TESTS{$p}{uri}";
+            if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
+            {
+                $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$CURRENT_PORT$TESTS{$p}{uri}<br>";
+            } else
+            {
+                $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
+            }
+
+            $OSVDB = "";
+            foreach my $o (split(/ /, $TESTS{$p}{osvdb}))
+            {
+                $OSVDB .= "<a href=\"http://osvdb.org/$o\" title=\"More vuln information on OSVDB.org\">OSVDB-$o</a><br>\n";
+            }
+
+            $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
+            foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
+            $template_final .= $template;
+            $template = $template_orig;
+        }
+        $template = "$template_final\n<br>";
+    }
+
+    return $template;
+}
+###############################################################################
+sub simple_enc
+{
+    my $var = $_[0] || return;
+    $var =~ s/</&lt;/g;
+    $var =~ s/>/&gt;/g;
+    $var =~ s/"/&quot;/g;
+    return $var;
+}
+###############################################################################
+sub write_output
+{
+    my $htm;
+    if ($CLI{format} =~ /html?/i)
+    {
+        $NIKTO{TMPL_HCTR}++;
+
+        # htm_summary
+        if (!$NIKTO{TMPL_SUMMARY})
+        {
+            $htm = proc_template($TEMPLATES{htm_summary});
+            print OUT "$htm\n";
+            $NIKTO{TMPL_SUMMARY} = 1;
+        }
+
+        # htm_host_head
+        $htm = proc_template($TEMPLATES{htm_host_head});
+        print OUT "$htm\n";
+
+        # htm_host_sm
+        $htm = proc_template($TEMPLATES{htm_host_im});
+        print OUT "$htm\n";
+
+        # htm_host_item
+        $htm = proc_template($TEMPLATES{htm_host_item});
+        print OUT "$htm\n";
+
+        # htm_end
+        $htm = proc_template($TEMPLATES{htm_end});
+        print OUT "$htm\n";
+    }
+    return;
+}
+###############################################################################
+
+sub nikto_reports { }    # so core doesn't freak
+
+1;

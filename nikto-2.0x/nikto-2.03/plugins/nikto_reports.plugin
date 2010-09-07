@@ -1,0 +1,313 @@
+#VERSION,2.02
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Reporting
+###############################################################################
+
+sub open_output
+{
+    if ($CLI{file} eq "") { return; }
+
+    open(OUT, ">>$CLI{file}") || die print STDERR "+ ERROR: Unable to open '$CLI{file}' for write: $@\n";
+    select(OUT);
+    $|++;
+    select(STDERR);
+    $|++;
+    select(STDOUT);
+    $|++;
+
+    if ($CLI{format} =~ /^html?/i)
+    {
+        open_templates();
+        print OUT $TEMPLATES{htm_start};
+    } elsif ($CLI{format} =~ /^xml?/i)
+    {
+        open_templates();
+        my $xml = $TEMPLATES{xml_start};
+        $xml =~ s/\#NIKTODTD/$NIKTOCONFIG{NIKTODTD}/;
+        print OUT "$xml";
+    } elsif ($CLI{format} =~ /^txt/i)
+    {
+        print OUT "- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}\n";
+    } elsif ($CLI{format} =~ /^csv/i)
+    {
+        print OUT "\"$NIKTO{name} v$NIKTO{version}\",\"Core v$NIKTO{core_version}\"\n";
+    }
+    return;
+}
+###############################################################################
+sub close_output
+{
+    if ($CLI{format} =~ /^txt/i)
+    {
+        print OUT "\nTest Options: $CLI{all_options}\n";
+        print OUT "$DIV\n";
+    } elsif ($CLI{format} =~ /^csv/i)
+    {
+        print OUT "\n\"Test Options\",\"$CLI{all_options}\"\n";
+    } elsif ($CLI{format} =~ /^xml/i)
+    {
+        my $xml = proc_template($TEMPLATES{xml_close});
+        print OUT "$xml\n";
+    } elsif ($CLI{format} =~ /^html?/i)
+    {
+        my $htm = proc_template($TEMPLATES{htm_close});
+        print OUT "$htm\n";
+    }
+
+    close(OUT);
+    return;
+}
+###############################################################################
+sub open_templates
+{
+    my @ts        = dirlist($NIKTO{templatedir});
+    my $have_cirt = 0;
+    foreach my $t (@ts)
+    {
+        open(T, "<$NIKTO{templatedir}/$t");
+        my @TEMPLATE = <T>;
+        close(T);
+        my $T = join("", @TEMPLATE);
+        $t =~ s/\..*$//;
+
+        # :-)
+        if ($T =~ /\s?20[0-9]{2}\s?CIRT, Inc/i) { $have_cirt = 1; }
+
+        $TEMPLATES{$t} = $T;
+    }
+
+    if (!$have_cirt)
+    {
+        print
+"\nIt looks like you may have removed the Nikto copyright from the reports. Please remember that this program is copyrighted, takes a lot of work to maintain, and is completely free for non-commercial use.\n\nIf this message has been a mistake, please notify sullo\@cirt.net.\n\n";
+    }
+
+    return;
+}
+###############################################################################
+sub proc_template
+{
+    my $template = $_[0] || return;
+    my %variables;
+    my $protocol = "http";
+    if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
+
+    $variables{"#TEMPL_HCTR"}               = $NIKTO{TEMPL_HCTR};
+    $variables{"#TEMPL_END"}                = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{stop_time_disp};
+    $variables{"#TEMPL_HOSTNAME"}           = simple_enc($TARGETS{$CURRENT_HOST_ID}{hostname});
+    $variables{"#TEMPL_IP"}                 = simple_enc($TARGETS{$CURRENT_HOST_ID}{ip});
+    $variables{"#TEMPL_ITEMS_TESTED"}       = $TARGETS{$CURRENT_HOST_ID}{total_checks};
+    $variables{"#TEMPL_PORT"}               = $CURRENT_PORT;
+    $variables{"#TEMPL_START"}              = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time_disp};
+    $variables{"#TEMPL_NIKTO_VER"}          = $NIKTO{version};
+    $variables{"#TEMPL_BANNER"}             = simple_enc($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner});
+    $variables{"#TEMPL_NIKTO_CLI"}          = $CLI{all_options};
+    $variables{"#TEMPL_CTR"}                = $TARGETS{$CURRENT_HOST_ID}{total_checks};
+    $variables{"#TEMPL_NIKTO_HOSTS_TESTED"} = $COUNTERS{hosts_total};
+    $variables{"#TEMPL_ELAPSED"}            = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{elapsed};
+    $variables{"#TEMPL_LINK_NAME"}          = "$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT";
+    $variables{"#TEMPL_LINK_IP"}            = "$protocol://$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT/";
+    $variables{"#TEMPL_ITEMS_FOUND"}        = $TARGETS{$CURRENT_HOST_ID}{total_vulns};
+
+    if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
+    {
+        $variables{"#TEMPL_LINK_NAME"} = "$protocol://$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT/";
+    } else
+    {
+        $variables{"#TEMPL_LINK_NAME"} = "N/A";
+    }
+
+    foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
+
+    # Scanner Messages Handling
+    if ($template =~ /\#TEMPL_SMMSG/)
+    {
+        my $template_orig  = $template;
+        my $template_final = "";
+        foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
+        {
+            if ($TESTS{$p}{uri} ne '') { next; }
+            my $OSVDB = $TESTS{$p}{osvdb};
+            if (($OSVDB eq '') && ($TESTS{$p}{message} =~ /^OSVDB-([0-9]+):/)) { $OSVDB = $1; }
+            if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
+            $OSVDB_LINK = "http://osvdb.org/$OSVDB";
+            $template =~ s/\#TEMPL_SMMSG/$TESTS{$p}{message}/;
+            $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
+            $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
+            $template =~ s/\#ID/$p/;
+            $template_final .= $template;
+            $template = $template_orig;
+        }
+        $template = "$template_final\n";
+    }
+
+    # Positives Handling
+    if ($template =~ /\#TEMPL_MSG/)
+    {
+        my $template_orig  = $template;
+        my $template_final = "";
+        foreach my $p (keys %{ $TARGETS{$CURRENT_HOST_ID}{positives} })
+        {
+            if ($TESTS{$p}{uri} eq '') { next; }
+            foreach my $uri (split(' ',$TARGETS{$CURRENT_HOST_ID}{$p}{uri}))
+            {
+               $TESTS{$p}{uri}                  = simple_enc($TESTS{$p}{uri});
+               $variables{"#TEMPL_URI"}         = $uri;
+               $variables{"#TEMPL_MSG"}         = $TESTS{$p}{message};
+               $variables{"#TEMPL_HTTP_METHOD"} = $TESTS{$p}{method};
+   
+               $variables{"#TEMPL_ITEM_IP_LINK"} = "$protocol://$variables{\"#TEMPL_IP\"}:$CURRENT_PORT$variables{\"#TEMPL_URI\"}";
+               if ($TARGETS{$CURRENT_HOST_ID}{hostname} ne "")
+               {
+                   $variables{"#TEMPL_ITEM_NAME_LINK"} = "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$CURRENT_PORT$variables{\"#TEMPL_URI\"}";
+               }
+               else 
+               {
+                   $variables{"#TEMPL_ITEM_NAME_LINK"} = "";
+               }
+   
+               $OSVDB      = "";
+               $OSVDB_LINK = "";
+               foreach my $o (split(/ /, $TESTS{$p}{osvdb}))
+               {
+                   if ($o eq "")
+                   {
+                       $o = "0";
+                   }
+   
+                   $OSVDB      .= "$o";
+                   $OSVDB_LINK .= "http://osvdb.org/$o";
+               }
+   
+               $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
+               $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
+               $template =~ s/\#ID/$p/;
+   
+               foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
+               $template_final .= $template;
+               $template = $template_orig;
+           }
+        }
+        $template = "$template_final\n";
+    }
+    return $template;
+}
+###############################################################################
+sub simple_xml_enc
+{
+    my $var = $_[0] || return;
+    $var =~ s/&/%26/g;
+    return $var;
+}
+###############################################################################
+sub simple_enc
+{
+    my $var = $_[0] || return;
+    $var =~ s/</&lt;/g;
+    $var =~ s/>/&gt;/g;
+    $var =~ s/"/&quot;/g;
+    return $var;
+}
+##############################################################################
+sub write_html
+{
+    my $htm;
+    $NIKTO{TMPL_HCTR}++;
+
+    # htm_summary
+    if (!$NIKTO{TMPL_SUMMARY})
+    {
+        $htm = proc_template($TEMPLATES{htm_summary});
+        print OUT "$htm\n";
+        $NIKTO{TMPL_SUMMARY} = 1;
+    }
+
+    # htm_host_head
+    $htm = proc_template($TEMPLATES{htm_host_head});
+    print OUT "$htm\n";
+
+    # htm_host_sm
+    $htm = proc_template($TEMPLATES{htm_host_im});
+    print OUT "$htm\n";
+
+    # htm_host_item
+    $htm = proc_template($TEMPLATES{htm_host_item});
+    print OUT "$htm\n";
+
+    # htm_end
+    $htm = proc_template($TEMPLATES{htm_end});
+    print OUT "$htm\n";
+
+    return;
+}
+##############################################################################
+sub write_xml
+{
+    my $xml;
+    $NIKTO{TMPL_HCTR}++;
+
+    # xml_summary
+    if (!$NIKTO{TMPL_SUMMARY})
+    {
+        $xml = proc_template($TEMPLATES{xml_summary});
+        print OUT "$xml\n";
+        $NIKTO{TMPL_SUMMARY} = 1;
+    }
+
+    # xml_host_head
+    $xml = proc_template($TEMPLATES{xml_host_head});
+    print OUT "$xml\n";
+
+    # xml_host_im
+    $xml = proc_template($TEMPLATES{xml_host_im});
+    print OUT "$xml\n";
+
+    # xml_host_item
+    $xml = simple_xml_enc(proc_template($TEMPLATES{xml_host_item}));
+    print OUT "$xml\n";
+
+    # xml_end
+    $xml = proc_template($TEMPLATES{xml_end});
+    print OUT "$xml\n";
+
+    return;
+}
+###############################################################################
+sub write_output
+{
+    if ($CLI{format} =~ /html?/i)
+    {
+        write_html();
+    } elsif ($CLI{format} =~ /xml/i)
+    {
+        write_xml();
+    }
+
+    return;
+}
+###############################################################################
+
+sub nikto_reports { }    # so core doesn't freak
+
+1;

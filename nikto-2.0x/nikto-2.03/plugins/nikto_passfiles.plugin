@@ -1,0 +1,125 @@
+#VERSION,2.00
+# $Id$
+
+###############################################################################
+#  Copyright (C) 2004 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# Look for password file names
+###############################################################################
+
+sub nikto_passfiles
+{
+    if ($CLI{mutate} !~ /2/) { return; }
+
+    my @DIRS   = (split(/ /, $VARIABLES{"\@PASSWORDDIRS"}));
+    my @PFILES = (split(/ /, $VARIABLES{"\@PASSWORDFILES"}));
+    my @EXTS = qw(asp bak dat data dbc dbf exe htm html htx ini lst txt xml php php3 phtml);
+
+    my $mctr   = 0;
+    my $m_test = max_test_id();
+
+    foreach $dir (@DIRS)
+    {
+        foreach $f (@PFILES)
+        {
+            if ($f eq "") { next; }
+
+            # dir/file
+            $mctr++;
+            $m_test++;
+            $TESTS{$m_test}{uri}         = LW2::uri_normalize("$dir$f");
+            $TESTS{$m_test}{message}     = "URL created via password mutate option.";
+            $TESTS{$m_test}{match_1}     = 200;
+            $TESTS{$m_test}{match_1_and} = "";
+            $TESTS{$m_test}{match_1_or}  = "";
+            $TESTS{$m_test}{fail_1}      = "";
+            $TESTS{$m_test}{fail_2}      = "";
+            $TESTS{$m_test}{method}      = "GET";
+            $TESTS{$m_test}{data}        = "";
+            $TESTS{$m_test}{headers}     = "";
+            $TESTS{$m_test}{category}    = 1;
+            $TESTS{$m_test}{osvdb}       = 3092;
+            $TESTS{$m_test}{server}      = "generic";
+
+            foreach $ext (@EXTS)
+            {
+
+                # dir/file.ext
+                $mctr++;
+                $m_test++;
+                $TESTS{$m_test}{uri}         = LW2::uri_normalize("$dir$f.$ext");
+                $TESTS{$m_test}{message}     = "URL created via password mutate option.";
+                $TESTS{$m_test}{match_1}     = 200;
+                $TESTS{$m_test}{match_1_and} = "";
+                $TESTS{$m_test}{match_1_or}  = "";
+                $TESTS{$m_test}{fail_1}      = "";
+                $TESTS{$m_test}{fail_2}      = "";
+                $TESTS{$m_test}{method}      = "GET";
+                $TESTS{$m_test}{data}        = "";
+                $TESTS{$m_test}{headers}     = "";
+                $TESTS{$m_test}{category}    = 1;
+                $TESTS{$m_test}{osvdb}       = 3092;
+                $TESTS{$m_test}{server}      = "generic";
+
+                foreach my $cgi (@CGIDIRS)
+                {
+
+                    # dir/file.ext
+                    $mctr++;
+                    $m_test++;
+                    $TESTS{$m_test}{uri}         = LW2::uri_normalize("$cgi$dir$f.$ext");
+                    $TESTS{$m_test}{message}     = "URL created via password mutate option.";
+                    $TESTS{$m_test}{match_1}     = 200;
+                    $TESTS{$m_test}{match_1_and} = "";
+                    $TESTS{$m_test}{match_1_or}  = "";
+                    $TESTS{$m_test}{fail_1}      = "";
+                    $TESTS{$m_test}{fail_2}      = "";
+                    $TESTS{$m_test}{method}      = "GET";
+                    $TESTS{$m_test}{data}        = "";
+                    $TESTS{$m_test}{headers}     = "";
+                    $TESTS{$m_test}{category}    = 1;
+                    $TESTS{$m_test}{osvdb}       = 3092;
+                    $TESTS{$m_test}{server}      = "generic";
+
+                    # dir/file
+                    $mctr++;
+                    $m_test++;
+                    $TESTS{$m_test}{uri}         = LW2::uri_normalize("$cgi$dir$f");
+                    $TESTS{$m_test}{message}     = "URL created via password mutate option.";
+                    $TESTS{$m_test}{match_1}     = 200;
+                    $TESTS{$m_test}{match_1_and} = "";
+                    $TESTS{$m_test}{match_1_or}  = "";
+                    $TESTS{$m_test}{fail_1}      = "";
+                    $TESTS{$m_test}{fail_2}      = "";
+                    $TESTS{$m_test}{method}      = "GET";
+                    $TESTS{$m_test}{data}        = "";
+                    $TESTS{$m_test}{headers}     = "";
+                    $TESTS{$m_test}{category}    = 1;
+                    $TESTS{$m_test}{osvdb}       = 3092;
+                    $TESTS{$m_test}{server}      = "generic";
+                }
+            }
+        }
+    }
+
+    nprint("- $mctr password file checks loaded", "v");
+}
+
+1;

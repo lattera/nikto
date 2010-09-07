@@ -1,0 +1,129 @@
+#VERSION,2.00
+#LASTMOD,11.10.2007
+
+###############################################################################
+#  Copyright (C) 2007 CIRT, Inc.
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+
+###############################################################################
+# PURPOSE
+# General HTTP headers checks
+###############################################################################
+
+sub nikto_headers
+{
+    my @interesting_headers = qw /microsoftofficewebserver ms-author-via dasl dav daap-server/;
+
+    #######################################################################
+    # look for a powered-by header...could require a valid file, maybe not
+    my %xpb;
+    foreach my $f (qw/\/index.php \/junk999.php \/ \/index.php3 \/ \/junk999.php3 \/index.cfm \/junk999.cfm \/index.asp \/junk999.asp \/index.aspx \/junk999.aspx/)
+       {
+        (my $RES , $CONTENT) = fetch($f,"GET");
+        if ($result{'x-powered-by'} ne "") { $xpb{$result{'x-powered-by'}}=1; }
+       }
+
+    foreach my $x (sort keys %xpb)
+       {
+        # push version to BUILDITEMS so it can be evaluated later
+        push(@BUILDITEMS,$x);
+        nprint("- Retrieved X-Powered-By header: $x");
+       }
+
+    #######################################################################
+    # Servlet-Engine info
+    if ($result{'servlet-engine'} ne "")
+    {
+        my $x = $result{'servlet-engine'};
+        $x = ~s/\(.*$//;
+        $x =~ s/\s+//g;
+        nprint("- Retrieved servlet-engine headers:$x", "", "kb");
+        push(@BUILDITEMS, $x);
+
+        $x = $result{'servlet-engine'};
+        $x =~ s/^.*\(//;
+        $x =~ s/\).*$//;
+        my @bits = split(/;/, $x);
+        foreach my $bit (@bits)
+        {
+            nprint("- Retrieved servlet-engine headers : $bit", "", "kb");
+            push(@BUILDITEMS, $bit);
+        }
+    }
+    #######################################################################
+    # Content-Location header in IIS 4
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
+    $request{'whisker'}->{'uri'}    = "/";
+    $request{'whisker'}->{'method'} = "GET";
+    $request{'whisker'}{'version'}  = "1.0";
+
+    LW2::http_do_request_timeout(\%request,\%result);
+    if (   ($result{'content-location'} ne "")
+        && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
+        && ($result{'content-location'} !~ /$TARGETS{$CURRENT_HOST_ID}{ip}/))
+    {
+        nprint("+ OSVDB-630: IIS may reveal its internal IP in the Content-Location header via a request to the root file. The value is \"$result{'content-location'}\". CAN-2000-0649.", "", "kb");
+    }
+
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
+    $request{'whisker'}->{'uri'}    = "/images";
+    $request{'whisker'}->{'method'} = "GET";
+    $request{'whisker'}{'version'}  = "1.0";
+    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+    LW2::http_do_request_timeout(\%request, \%result);
+
+    if (($result{'location'} ne "") && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/) && ($result{'location'} !~ /$TARGETS{$CURRENT_HOST_ID}{ip}/))
+    {
+        nprint("+ OSVDB-630: IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\". CAN-2000-0649.", "", "kb");
+    }
+
+    #######################################################################
+    # Location header in WebLogic
+    LW2::http_close(\%request);    # force-close any old connections
+    LW2::http_fixup_request(\%request);
+    LW2::http_reset();
+    $request{'whisker'}->{'uri'}    = ".";
+    $request{'whisker'}->{'method'} = "GET";
+    $request{'whisker'}{'version'}  = "1.0";
+    if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+    LW2::http_do_request_timeout(\%request, \%result);
+
+    if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//))
+    {
+        nprint("+ OSVDB-5737: WebLogic may reveal its internal IP or hostname in the Location header. The value is \"$result{'location'}\".", "", "kb");
+    }
+
+    #######################################################################
+    # All other interesting headers
+    foreach my $header (@interesting_headers)
+    {
+ 	if ($result{$header} ne '') 
+	{
+        	my $x=$result{$header};
+        	$x=~s/\s+.*$//;
+        	nprint("- Retrieved $header header: $result{$header}");
+        	push(@BUILDITEMS,$x);
+	}
+    }
+
+}
+
+1;
