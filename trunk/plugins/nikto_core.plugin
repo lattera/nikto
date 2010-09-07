@@ -2399,7 +2399,7 @@ sub usage {
        -update            Update databases and plugins from cirt.net (cannot be abbreviated)
        -Version           Print plugin and database versions
        -vhost+            Virtual host (for Host header)
-   + requires a value
+   		+ requires a value
    ";
     }
     else {
@@ -2430,7 +2430,10 @@ sub usage {
        -update             Update databases and plugins from cirt.net (cannot be abbreviated)
        -Version            Print plugin and database versions
        -vhost+             Virtual host (for Host header)
-   + requires a value
+   		+ requires a value
+
+	Note: This is the short help output. Use -H for full help.
+
    ";
     }
     exit;
