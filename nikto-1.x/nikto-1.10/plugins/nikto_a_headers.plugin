@@ -1,0 +1,26 @@
+#VERSION,1.01
+#LASTMOD,05.16.2002
+# HTTP headers check
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this just gets the headers & finds any interesting ones
+
+sub nikto_a_headers
+{
+ 
+ # stuff to note...  
+ 
+ # look for a php header
+ (my $RES , $CONTENT) = fetch("/junk.php","GET");
+ if ($result{'x-powered-by'} ne "")
+   { 
+     fprint("- Retrieved X-Powered-By header: $result{'x-powered-by'}\n"); 
+     # push version to BUILDITEMS so it can be evaluated later
+     push(@BUILDITEMS,$result{'x-powered-by'});
+   }
+
+}
+
+1;

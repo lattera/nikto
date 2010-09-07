@@ -1,0 +1,80 @@
+#VERSION,1.00
+#LASTMOD,07.07.2002
+# HTTP Options check
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this searches google for terms listed in the config file for the given domain
+# and summarizes the findings in the output.
+
+# This code based upon the idea in 'mass-scan' by mjm, www.codito.de
+
+sub nikto_google
+{
+ if (!$NIKTO{google}) { return; }
+ my $googlerequest, $googleresult, $FOUND;
+ my $gothits=0;
+ my @f=split(/ /,$CONFIG{GOOGLERS});
+ my $s=$SERVER{hostname} || $SERVER{ip};
+ my $google="www.google.com";
+ my $googleip=gethostbyname($google);
+ 
+ if (($googleip eq "") && ($request{'whisker'}->{'proxy_host'} ne ""))
+  { fprint("+ Cannot resolve Google's IP, relying on proxy to resolve\n"); 
+    $googleip=$google;
+  }
+ elsif (($googleip eq "") && ($request{'whisker'}->{'proxy_host'} eq ""))
+  { print("+ ERROR: Cannot resolve $google to IP\n"); return; }
+ else
+   { $googleip=inet_ntoa($googleip); }
+   
+ LW::http_init_request(\%googlerequest);
+ $googlerequest{'whisker'}->{'host'}=$google;
+ $googlerequest{'whisker'}->{'port'}=80;
+ $googlerequest{'whisker'}->{'lowercase_incoming_headers'}=1;
+ $googlerequest{'whisker'}->{'http_ver'}="1.0";
+ $googlerequest{'whisker'}->{'timeout'}=$TIME || 10;
+ $googlerequest{'User-Agent'} = "Mozilla/4.0";
+ $googlerequest{'whisker'}->{'method'}="GET";
+ if ($SERVER{useproxy}) {
+    $googlerequest{'whisker'}->{'proxy_host'}=$CONFIG{PROXYHOST};
+    $googlerequest{'whisker'}->{'proxy_port'}=$CONFIG{PROXYPORT};
+   }
+
+ foreach my $word (@f)
+ {
+  &LW::http_reset;
+  $googlerequest{'whisker'}->{'uri'}="/search?num=100&hl=en&lr=&ie=ISO-8859-1&safe=off&as_qdr=all&q=$word&as_sitesearch=$s";
+
+  LW::http_fixup_request(\%googlerequest);
+  LW::http_do_request(\%googlerequest,\%googleresult);
+  vprint("- Checking Google for '$word' on '$s'\n");
+  
+  if ($googleresult{'whisker'}{'http_resp'} ne "200")
+   { fprint("- ERROR: Google search error ($googleresult{'whisker'}{'http_resp'})\n"); next; }
+   
+  my @result=split(/\n/,$googleresult{'whisker'}->{'data'});
+  
+  foreach my $l (@result) 
+  { 
+   if ($l =~ /a href\=http\:\/\/([^>]+)/ ) 
+   {
+    vprint("+ Google hit for '$word': http://$1\n"); 
+    $FOUND{$1} .= "'$word', ";
+    $gothits=1;
+   } # end if =~ href
+  } # end foreach $l
+ } # end foreach $word
+ 
+if (!$gothits) { vprint("- Google search revealed nothing.\n"); }
+else 
+ {
+  fprint("+ Google search for '$s' found these links which may contain interesting info:\n");
+  foreach my $link (sort keys %FOUND)
+     { fprint("    + $FOUND{$link} http://$link\n"); }
+ }
+
+} # end main sub
+
+1;

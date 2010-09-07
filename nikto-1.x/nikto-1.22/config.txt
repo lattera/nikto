@@ -1,0 +1,33 @@
+# CGI Directories - will attempt to figure out which are 'valid' unless told to check all
+# this must be defined or no CGI dirs will be tried
+CGIDIRS=/cgi-914/ /cgi-915/ /bin/ /cgi/ /mpcgi/ /cgi-bin/ /cgi-sys/ /cgi-local/ /htbin/ /cgibin/ /cgis/ /scripts/ /cgi-win/ /fcgi-bin/
+
+# default command line options, can't be an option that requires a value.  used for ALL runs.
+#CLIOPTS=-g -a
+
+# location of nmap to use with port scanning (rather than Nikto internals)
+#NMAP=/usr/bin/nmap
+
+# ports never to scan (21/111 tend to respond slowly... and USUALLY aren't web servers)
+SKIPPORTS=21 111
+
+# Proxy server setup 
+PROXYHOST=10.1.1.1
+PROXYPORT=8080
+PROXYUSER=proxyuserid
+PROXYPASS=proxypassword
+
+# the default HTTP version to try... can/will be changed as necessary
+DEFAULTHTTPVER=1.1
+
+# if Nikto is having difficulty finding 'plugins', set the full path here
+#PLUGINDIR=/usr/local/nikto/plugins
+
+# add directories/files which are ONLY used during mutate scans
+# each directory will be checked with each file (1200+ tries?), and each file
+# will be checked with all directories (500+?). The numbers add up fast.
+MUTATEDIRS=/....../ /members/ /porn/ /restricted/ /xxx/
+MUTATEFILES=xxx.htm xxx.html porn.htm porn.html
+
+# terms to search google for. these could be file names, too (i.e., CGI scripts...).
+GOOGLERS=password passwd login

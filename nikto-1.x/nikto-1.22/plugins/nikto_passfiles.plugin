@@ -1,0 +1,86 @@
+#VERSION,1.00
+#LASTMOD,06.16.2002
+# Password file checks
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this checks for random password files
+
+sub nikto_passfiles
+{
+ if ($NIKTO{mutate} !~ /2/) { return; }
+ 
+ my @DIRS=qw(/ /admin/ /clients/ /pass/ /password/ /passwords/ /store/ /users/ /access/ /members/ /private/ /ccbill/ /dmr/ /mastergate/ /dmr/ /epoch/ /netbilling/ /webcash/ /wwwjoin/ /etc/security/);
+ # if we got anything from the robots.txt check...
+ 
+ my @t=split(/ /,$CONFIG{PASSWORDDIRS}); 
+ foreach my $d (@t) 
+  { 
+   my $skip=0;
+   for (my $i=0;$i<=$#DIRS;$i++) { if ($DIRS[$i] eq $d) { $skip=1; last; } }  # already have it
+   if (!$skip) { push(@DIRS,$d); }
+  }  
+  
+ my @FILES=qw(admins clients pass password passwords passwd passwd.adjunct store users .htpasswd .passwd);
+ my @EXTS=qw(asp dat data dbc dbf exe htm html htx ini lst txt xml php php3 phtml);
+ 
+ my $FINAL=();
+ my $mctr=0;
+ 
+ foreach $dir ( @DIRS )
+ { 
+  foreach $file ( @FILES )
+  {
+   foreach $ext ( @EXTS )
+    {
+     my $f="$file\.$ext";
+     $f=LW::utils_normalize_uri($f);
+     $mctr++;
+     $ITEMCOUNT++;
+     $ROOTS{$ITEMCOUNT}=$dir;
+     $FILES{$ITEMCOUNT}=$f;
+     $INFOS{$ITEMCOUNT}="Found via password test mutate.";
+     $RESPS{$ITEMCOUNT}=200;
+     $METHD{$ITEMCOUNT}="GET";
+     
+     # w/o file extension:
+     my $f2="$file";
+     $f=LW::utils_normalize_uri($f);
+     $mctr++;
+     $ITEMCOUNT++;
+     $ROOTS{$ITEMCOUNT}=$dir;
+     $FILES{$ITEMCOUNT}=$f2;
+     $INFOS{$ITEMCOUNT}="Found via password test mutate.";
+     $RESPS{$ITEMCOUNT}=200;
+     $METHD{$ITEMCOUNT}="GET";
+
+     foreach my $cgi (@CGIDIRS) {
+      $mctr++;
+      $ITEMCOUNT++;
+      my $d="$cgi$dir";
+      $ROOTS{$ITEMCOUNT}=LW::utils_normalize_uri($d);
+      $FILES{$ITEMCOUNT}=$f;
+      $INFOS{$ITEMCOUNT}="Found via password test mutate.";
+      $RESPS{$ITEMCOUNT}=200;
+      $METHD{$ITEMCOUNT}="GET";
+
+      # w/o file extension
+      $mctr++;
+      $ITEMCOUNT++;
+      my $d="$cgi$dir";
+      $ROOTS{$ITEMCOUNT}=LW::utils_normalize_uri($d);
+      $FILES{$ITEMCOUNT}=$f2;
+      $INFOS{$ITEMCOUNT}="Found via password test mutate.";
+      $RESPS{$ITEMCOUNT}=200;
+      $METHD{$ITEMCOUNT}="GET";
+  
+     }
+    }
+  }
+ }
+
+vprint("- $mctr password file checks loaded\n");
+}
+
+1;

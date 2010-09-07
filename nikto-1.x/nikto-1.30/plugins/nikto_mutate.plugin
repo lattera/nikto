@@ -1,0 +1,62 @@
+#VERSION,1.05
+#LASTMOD,05.27.2003
+# mutated file checks
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+sub nikto_mutate
+{
+
+ if ($CLI{mutate} !~ /1/) { return; }
+ my $mctr=0;
+ 
+ my ($c, %DIRS, %FS) = "";
+
+ # build a hash of all the unique directories
+ foreach $c (@CGIDIRS) { $DIRS{$c}=""; }
+
+ foreach my $cn (keys %FILES)
+   {
+    my $dir=LW::utils_get_dir($FILES{$cn});
+    my $file=$FILES{$cn};
+    my $rdir=$dir;
+    $rdir=~s/([^a-zA-Z0-9])/\\$1/g;
+    $file =~ s/$rdir//;
+    $DIRS{$dir}="" unless $dir eq "";
+    $FS{$file}="" unless $file eq "";
+   }
+ 
+ # add anything from the config file
+ my @t=split(/ /,$CONFIG{"\@MUTATEDIRS"}); foreach $c (@t) { $DIRS{$c}=""; }
+ @t=split(/ /,$CONFIG{"\@MUTATEFILES"}); foreach $c (@t) { $FS{$c}=""; }
+
+ # add the -r(oot) option value
+ if ($CLI{root} ne "") { $DIRS{$CLI{root}}=""; }
+
+ # add the directory/file combos to the request hashes
+
+ foreach my $root (keys %DIRS)
+  {  
+   foreach my $file (keys %FS)
+    {
+     # skip self referencing stuff
+     if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
+     # args with no file
+     if (($root eq "/") && ($file =~ /^\?/)) { next; }
+     if (($root eq "") && ($file =~ /^\?/)) { next; }
+     $mctr++;
+     $ITEMCOUNT++;
+     $FILES{$ITEMCOUNT}="$CLI{root}$root$file";
+     $INFOS{$ITEMCOUNT}="URL created via mutate option.";
+     $RESPS{$ITEMCOUNT}=200;
+     $METHD{$ITEMCOUNT}="GET";
+    }
+  }
+
+ nprint("- $mctr mutate checks loaded","v");
+ return;
+
+}
+
+1;

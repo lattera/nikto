@@ -1,0 +1,52 @@
+#VERSION,1.00
+#LASTMOD,05.26.2002
+# mutated file checks
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+sub nikto_mutate
+{
+ if ($NIKTO{mutate} !~ /1/) { return; }
+ my $mctr=0;
+ 
+ my ($c, %DIRS, %FS) = "";
+
+ # build a hash of all the unique directories
+ foreach $c (@CGIDIRS) { $DIRS{$c}=""; }
+ foreach $c (keys %ROOTS) { if ($ROOTS{$c} ne "") { $DIRS{$ROOTS{$c}}=""; } }
+ 
+ # build hashes based on files
+ foreach $c (keys %FILES) { $FS{$FILES{$c}}=""; }
+ 
+ # add anything from the config file
+ my @t=split(/ /,$CONFIG{MUTATEDIRS}); foreach $c (@t) { $DIRS{$c}=""; }
+ @t=split(/ /,$CONFIG{MUTATEFILES}); foreach $c (@t) { $FS{$c}=""; }
+
+ # add the directory/file combos to the request hashes
+
+ foreach my $root (keys %DIRS)
+  {  
+   foreach my $file (keys %FS)
+    {
+     # skip self referencing stuff
+     if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
+     # args with no file
+     if (($root eq "/") && ($file =~ /^\?/)) { next; }
+     if (($root eq "") && ($file =~ /^\?/)) { next; }
+     $mctr++;
+     $ITEMCOUNT++;
+     $ROOTS{$ITEMCOUNT}=$root;
+     $FILES{$ITEMCOUNT}=$file;
+     $INFOS{$ITEMCOUNT}="Found via mutate.";
+     $RESPS{$ITEMCOUNT}=200;
+     $METHD{$ITEMCOUNT}="GET";
+    }
+  }
+
+ vprint("- $mctr mutate checks loaded\n");
+ return;
+
+}
+
+1;

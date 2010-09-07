@@ -1,0 +1,93 @@
+#VERSION,1.09
+#LASTMOD,11.07.2003
+# (c) 2001-2005 cirt.net, All Rights Reserved
+# HTTP headers check
+
+#######################################################################
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+# this just gets the headers & finds any interesting ones
+#######################################################################
+sub nikto_headers
+{
+ #######################################################################
+ # look for a php header...could require a valid file, maybe not
+ my @test_files=qw/\/index.php \/junk999.php \/ \/index.php3/;
+ my $done=0;
+ foreach my $f (@test_files)
+  {
+   (my $RES , $CONTENT) = fetch("$f","GET");
+   if ($result{'x-powered-by'} ne "")
+    { 
+     $done=1;
+     nprint("- Retrieved X-Powered-By header: $result{'x-powered-by'}"); 
+     # push version to BUILDITEMS so it can be evaluated later
+     push(@BUILDITEMS,$result{'x-powered-by'});
+    }
+  if ($done) { last; }
+  }
+ #######################################################################
+ # look for the Servlet-Engine info
+ if ($result{'servlet-engine'} ne "")
+   { 
+    my $x=$result{'servlet-engine'};
+    $x = ~s/\(.*$//;
+    $x=~s/\s+//g;
+    nprint("- Retrieved servlet-engine headers:$x");
+    push(@BUILDITEMS,$x);
+   
+    $x=$result{'servlet-engine'};
+    $x=~s/^.*\(//;
+    $x=~s/\).*$//;
+    my @bits=split(/;/,$x);
+    foreach my $bit (@bits) 
+      { 
+       nprint("- Retrieved servlet-engine headers : $bit"); 
+       push(@BUILDITEMS,$bit); 
+      }
+    }
+ #######################################################################
+ # Content-Location header in IIS 4
+ # Don't use fetch() just so we have some extra control
+ #######################################################################
+  my $Host_whisker_old=$request{'whisker'}{'Host'};
+  my $Host_old=$request{'Host'};
+  LW::http_fixup_request(\%request);
+  LW::http_reset();
+  delete $request{'whisker'}{'Host'};
+  delete $request{'Host'};
+  $request{'whisker'}->{'uri'}="/";
+  $request{'whisker'}->{'method'}="GET";
+  $request{'whisker'}{'http_ver'}="1.0";
+  LW::http_do_request(\%request,\%result);
+  if (($result{'content-location'} ne "") && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/))
+    { 
+     nprint("+ IIS may reveal its internal IP in the Content-Location header via a request to the root directory. The value is \"$result{'content-location'}\". CAN-2000-0649."); 
+    }
+
+  LW::http_fixup_request(\%request);
+  LW::http_reset();
+  delete $request{'whisker'}{'Host'};
+  delete $request{'Host'};
+  $request{'whisker'}->{'uri'}="/images";
+  $request{'whisker'}->{'method'}="GET";
+  $request{'whisker'}{'version'}="1.0";
+  LW::http_do_request(\%request,\%result);
+  if (($result{'location'} ne "") && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/))
+    { 
+     nprint("+ OSVDB-630: IIS may reveal its internal IP in the Location header via a request to the /images directory. The value is \"$result{'location'}\". CAN-2000-0649."); 
+    }
+  $request{'whisker'}{'Host'}=$Host_whisker_old;
+  $request{'Host'}=$Host_old;
+  
+#######################################################################
+# DAAP-Server, found on an Apple iTunes client/server
+ if ($result{'daap-server'} ne "")
+   {
+    my $x=$result{'daap-server'};
+    $x=~s/\s+.*$//;
+    nprint("- Retrieved DAAP-Server header: $result{'daap-server'}");
+    push(@BUILDITEMS,$x);
+   }
+}
+1;

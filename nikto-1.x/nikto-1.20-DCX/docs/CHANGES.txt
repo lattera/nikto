@@ -1,0 +1,110 @@
+1.20 		07.24.2002
+					Moved all mutate options to plugins
+					Added password file mutate plugin
+					Added better error messages if problems arise
+					Test for false-positives on all CGI directories
+					Added -useproxy CLI
+					Printing SSL certs the server accepts
+					Fixed port sorting if -f is used
+					Forked 1.20DCX edition for DefCon 10 CD: difference is only output
+					Fixed a bug where "findonly" was referenced as "findports" (thanks J DePriest)
+					Added properly wrapped text output in saved files
+
+1.100		05.25.2002
+					stopped nikto from dying if no config.txt file found	
+					added Apache user enumeration plugin
+					added robots.txt plugin
+					set false-positive message to display at end of run as well as during
+					
+1.10BETA_3	04.23.2002
+					fixed CAN/CVE links, added BID/CA/MS links (suggested by Jericho).
+					prints total number of 'issues' found (suggested by Jericho).
+					fixed proxy usage in the cirt.net update function.
+					updated to use LW 1.4, which fixes an SSL infinite loop problem.
+					fixed 401 auth suppression (broken in beta 2).
+					added robots plugin to examine robots.txt & add items found to the mutate check
+					
+1.10BETA_2	03.31.2002
+					fixed the config.txt DEFAULTHTTPVER variable setting so it really works
+					made proxy_check run only once per session
+					removed all reference to "nikto" in the scan_database.db
+					
+1.10BETA_1	03.23.2002	
+					renamed plugins from .pl to .plugin, just for clarity. but they're still perl files
+					allowed nikto.pl to update plugins the same as .db files
+					usage of LW 1.2
+					countless "under the hood" type things
+					lowercase-incoming-headers to more easily handle case sensitive nonsense
+					compartmentalized a LOT more code to make things easier to read
+					created config.txt file configuration w/o midifying nikto.pl itself
+					added user_scan_database.db so that it won't get ovwr-written if the user adds checks
+					enabled RFP's LibWhisker anti-ids options
+					change "check," to "c," in scan_database, just to save a little bandwidth on cirt.net :)
+					added plugin to check HTTP methods
+					created a 'mutate' mode for really brute force finding stuff on servers
+					added the ability to set default CLI options via config file
+					added PLUGINDIR config variable
+					added plugin to check other HTTP headers (just x-powered-by for now)
+					added ability for nikto to auto-determine ssl v non-ssl on a port
+					added port scanning ability (with or without nmap)
+					added ability to send message via the update script's versions.txt file. I don't know why, but it may  be handy to let folks know if a new beta is out, or something.
+					implemented the virtual host headers as patched by Pasi Eronen
+					
+1.018		01.17.2002	
+					Added /mpcgi/ to the @CGIDIRS array based on some suggestions.
+					Fixed a bug in the auth_check function (thanks RFP), and cleaned up error reporting on failed auths
+					
+1.017		01.12.2002	
+					Fixed a bug where the data portion of a request did not reset to null after some checks (thanks to Phil Brass for pointing me at it & letting me test against his server). 
+					
+1.016		01.10.2002	
+					Add dump_*hash functions
+					Added pause (-x) in scan loop
+					Fixed a bug which caused a major slowdown
+					Added load_conf for setup for configuration files (future)
+					Fixed http vs. https links in output files
+					
+1.015		01.08.2002	
+					Fixed a bug (?) in Libwhisker PR4 (will check v1 code...)
+                    Corrected an error which caused a few false-positives (404 really IS not found :)
+                    
+1.014		01.07.2002	
+					Removed comment filtering from lines in scan_database.db to accommodate SSI includes
+					Fixed quoting removal for data portions in checks (so " is valid).
+					
+1.013		01.06.2002	
+					Made major globabl variable changes, moved tons of them to hashes
+					Wrote some basic plugin writing documentation & added 'docs' directory
+					
+1.012		01.03.2002	
+					Added extended output for scan archival reasons (suggested by Steve Saady)
+					Changed host auth failure to a warning, not stoppage
+					Added "data" portion to scan_database.db
+					Added @IP and @HOSTNAME substitutions for scan_database.db checks (will be replaced by actual IP/hostname)
+					in case they are needed in the future.
+					Added JUNK() to scan_database.db checks to facilitate future buffer-overflows (non-DoS), and future DoS plugins
+					Added Proxy-agent as valid the same as Server result strings
+					Changed -l to -n ("nolookup") to be more accurate
+					
+1.011		01.02.2002	
+					Added proxy auth for db update requests (oops).
+					Started .xxx version numbering scheme to make life easier
+					Fixed href tags in HTM output (< and > encoding and target host/ip)
+					Added "caseless" WWW-Authenticate finding (for iPlanet Proxy)
+					
+1.01  		12.31.2001	
+					Added regex to remove comments from scan_database.db in case they ever exist
+					Fixed extra 'Host:' line being sent to server (duh).
+					Fixed non 'GET' request data posting (duh).
+					Added -timeout option
+					
+1.00		12.27.2001	
+					Finalized beta version for release
+
+
+TO DO:
+- update the plugin writing documentation--seriously out of date.
+- network scanning using nmap input, controlling nmap directly, or even the slow perl way
+- send a single request via the command line (useful for specific vul testing w/o a full scan, especially SSL)
+- continue to enahnce the proxy junk so a multi-user system can let each user have their own proxy id/password
+

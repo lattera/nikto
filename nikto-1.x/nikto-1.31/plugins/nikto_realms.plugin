@@ -1,0 +1,76 @@
+#VERSION,1.01
+#LASTMOD,05.27.2003  
+
+# this plugin checks auth realms for default ids/passwords
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+sub nikto_realms
+{
+ (my $RES, my $CONTENT) = fetch("/","GET","");
+ if ($result{'www-authenticate'} eq "") { return; }
+
+ my %REALMS=load_realms("$NIKTO{plugindir}/realms.db");
+
+ # check for ident only messages first
+ foreach my $REALM (keys %REALMS)
+  {
+   if (($REALMS{$REALM}{id} eq "") && ($REALMS{$REALM}{pw} eq "") && ($result{'www-authenticate'} =~ /$REALM/i))
+    { print "+ $REALM: $REALMS{$REALM}{msg}\n"; }
+  } 
+
+ # check for 'broken' web server, returns a blank www-auth header no matter what the id/pw sent
+ my $tid=LW::utils_randstr();
+ LW::auth_set_header("basic",\%request,$tid,$tid);
+ LW::http_fixup_request(\%request);
+ LW::http_do_request(\%request,\%result); # test auth
+ if ($result{'www-authenticate'} eq "")  { return; }
+
+ foreach my $REALM (keys %REALMS)
+  {
+   if (($result{'www-authenticate'} =~ /$REALM/i) || ($REALM eq "\@ANY"))
+    { 
+     my $realm_temp=$result{'www-authenticate'}; # grab name
+     LW::auth_set_header("basic",\%request,$REALMS{$REALM}{id},$REALMS{$REALM}{pw});   # set auth
+     LW::http_fixup_request(\%request);
+     LW::http_do_request(\%request,\%result); # test auth
+     if ($result{'www-authenticate'} eq "")
+      { nprint("+ Default account found for '$REALM'(ID '$REALMS{$REALM}{id}', PW '$REALMS{$REALM}{pw}). $REALMS{$REALM}{msg}'"); 
+        #set auth stuff & run auth_check again
+        $NIKTO{hostid}=$REALMS{$REALM}{id};
+        $NIKTO{hostpw}=$REALMS{$REALM}{pw};
+        $result{'www-authenticate'}=$realm_temp; # set it back so auth_check properly ids it
+        &auth_check;
+      }
+    } 
+  }
+ return;
+}
+
+sub load_realms
+{
+ my %AUTHREALMS;
+ my $AFILE=$_[0]; 
+ open(IN,"<$AFILE") || die nprint("Can't open $AFILE:$!");
+ my @file=<IN>;
+ close(IN);
+ foreach my $line (@file)
+ {
+  chomp($line);
+  if ($line =~ /^\#/) { next; } # comment
+  if ($line =~ /\#/) { $line=~s/\#.*$//; $line=~s/\s+$//; }
+  if ($line eq "") { next; }
+  my @t=parse_csv($line);
+  $AUTHREALMS{$t[0]}{realm}=$t[0];
+  $AUTHREALMS{$t[0]}{id}=$t[1];
+  $AUTHREALMS{$t[0]}{pw}=$t[2];
+  $AUTHREALMS{$t[0]}{msg}=$t[3];
+  
+  nprint("Loaded:$t[0] -- $t[1], $t[2], $t[3]","d");
+ }
+return %AUTHREALMS;
+
+}
+
+1;

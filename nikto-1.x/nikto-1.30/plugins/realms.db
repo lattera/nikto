@@ -1,0 +1,25 @@
+#VERSION,1.001
+#LASTMOD,04.01.2003  
+# http://www.cirt.net
+
+########################################################################
+# format: realm,id,password,message
+# @ANY = match any realm name (generic)
+# If ID and PW fields are blank, realm match is used for message only
+########################################################################
+
+"@ANY","admin","admin","Generic account discovered."
+"@ANY","administrator","administrator","Generic account discovered."
+"@ANY","guest","guest","Generic account discovered."
+"@ANY","test","test","Generic account discovered."
+"ConfigToolPassword",,,"Realm matches a Nokia Checkpoint Firewall-1"
+"EIC","root","ncr","Enterprise Intranet Configurator - NCR Teradata server"
+"hp print server appliance","admin","admin","HP Print Server"
+"InterScanVirusWall","admin","admin","Trend Micro's InterScan Virus Wall"
+"Monitor or Admin","admin","","StorageTek's StorageNet, ID 'admin' with no password"
+"Monitor or Admin","monitor","","StorageTek's StorageNet, ID monitor' with no password"
+"Netscape Administration","admin","admin","Netscape server administration"
+"Netscape Mission Control","admin","admin","Netscape server administration"
+"Topaz Prism Site","admin","admin","Topaz Prism monitoring from Mercurity Interactive"
+"Topaz Site Realm","admin","admin","Mercury Interactive Topaz administrator"
+"UpgradeAdministrator","admin","ncr","NCR's Terradata server, Parallel Upgrade Tool (PUT)"

@@ -1,0 +1,15 @@
+#VERSION,1.04
+#LASTMOD,05.27.2003
+# run the plugins in the following order
+
+#nikto_realms
+nikto_headers
+nikto_robots
+nikto_httpoptions
+nikto_outdated
+nikto_msgs
+nikto_apacheusers
+nikto_mutate
+nikto_passfiles
+nikto_user_enum_apache
+nikto_user_enum_cgiwrap

@@ -1,0 +1,14 @@
+#VERSION,1.00
+#LASTMOD,09.20.2002
+# run the plugins in the following order
+
+nikto_headers
+nikto_robots
+nikto_httpoptions
+nikto_outdated
+nikto_msgs
+nikto_apacheusers
+nikto_frontpage
+nikto_google
+nikto_mutate
+nikto_passfiles

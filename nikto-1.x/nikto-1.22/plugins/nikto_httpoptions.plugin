@@ -1,0 +1,39 @@
+#VERSION,1.02
+#LASTMOD,07.07.2002
+# HTTP Options check
+# see RFC 2626 for info...
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this just gets the options & checks 'em out.
+
+sub nikto_httpoptions
+{
+ (my $RES , $CONTENT) = fetch("/","OPTIONS");
+
+ $NIKTO{methods}=$result{allow};
+ 
+ # proxy can impose it's methods... need to actually check this not just warn
+ my $TXT="";
+ if ($SERVER{useproxy} ne "") { $TXT="(May be proxy's methods, not server's)"; }
+
+ if ($NIKTO{methods} ne "")
+    { fprint("+ Allowed HTTP Methods: $NIKTO{methods} $TXT\n"); }
+
+ # now the warnings...
+ if ($NIKTO{methods} =~ /put/i) 
+    { fprint("+ Server allows PUT method, may be able to store files.\n"); }
+
+ if ($NIKTO{methods} =~ /connect/i) 
+    { fprint("+ CONNECT method is enabled, server may act as a proxy or relays.\n"); }
+
+ if ($NIKTO{methods} =~ /delete/i) 
+    { fprint("+ Server allows DELETE method, may be able to remove files.\n"); }
+
+ if ($NIKTO{methods} =~ /propfind|proppatch/i) 
+    { fprint("+ Server allows PROPFIND or PROPPATCH methods, which indicates DAV/WebDAV is installed. Both allow remote admin and have had security problems.\n"); }
+ 
+}
+
+1;

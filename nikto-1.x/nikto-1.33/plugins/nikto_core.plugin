@@ -1,0 +1,1812 @@
+#VERSION,1.25
+#LASTMOD,04.25.2003
+
+# Nikto "core" functions
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# --------------------------------------------------------------------#
+#                             Functions                               #
+# --------------------------------------------------------------------#
+
+sub test_target
+{
+ dump_result_hash();
+
+ # this is the actual the looped code for all the checks
+ for (my $CHECKID=1;$CHECKID<=$ITEMCOUNT;$CHECKID++)
+  { 
+   (my $RES, $CONTENT) = fetch($FILES{$CHECKID},$METHD{$CHECKID},$DATAS{$CHECKID});
+   nprint("- $RES for $METHD{$CHECKID}:\t$request{whisker}{uri}","v");
+
+   # this is a kluge unti the DB is restructured for more conditional tests
+   my @rcodes = split(/\!/,$RESPS{$CHECKID});
+   $RESPS{$CHECKID} = $rcodes[0];
+
+   # this will also have to change once we allow regex's in the DB
+   $RESPS{$CHECKID} =~ s/([^a-zA-Z0-9\s])/\\$1/g;
+
+   # do auth/redir first, independent of test pass/fail
+   if (($RES eq 401) && !($NIKTO{suppressauth}))
+    {
+     my $R=$result{'www-authenticate'};
+     $R =~ s/^basic //i;
+     $R =~ s/realm=//i;
+     nprint("+ $FILES{$CHECKID} - Needs Auth: (realm $R)");
+    }
+   elsif ($RES eq 302)
+    {
+     nprint("+ $FILES{$CHECKID} - Redirects to " . $result{'location'} ." , $INFOS{$CHECKID}") unless !$OKTRAP;
+     $NIKTO{totalmoved}++;
+    }
+
+   if ($RESPS{$CHECKID} =~ /[^0-9]/)   # response has text to match
+     {
+      if ($CONTENT =~ /$RESPS{$CHECKID}/)  # test passed
+        { 
+          if (($rcodes[1] eq "") || ($CONTENT !~ /$rcodes[1]/))  # conditional passed or is blank
+           {
+            $VULS++;
+            nprint("+ $request{whisker}{uri} - $INFOS{$CHECKID} ($METHD{$CHECKID})");
+            $NIKTO{totalokay}++; 
+           }
+        }
+     }
+     
+elsif (($RES eq $RESPS{$CHECKID}) || 
+       ((($RES eq $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found}) || ($RES eq 200)) &&
+       ($RES !~ /$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}/i))
+      )
+ {
+  if (($rcodes[1] eq "") || ($CONTENT !~ /$rcodes[1]/))  # conditional passed or is blank
+       {
+        $VULS++;
+        nprint("+ $request{whisker}{uri} - $INFOS{$CHECKID} ($METHD{$CHECKID})");
+        $NIKTO{totalokay}++;
+       }
+ }
+    
+ # verify we're not getting bogus 200/302 messages
+ bogus_responses();
+ 
+ # end check loop
+ if ($CLI{pause} > 0) { sleep $CLI{pause}; }
+ }
+
+# print any cookies found
+if ($CLI{cookies})
+{
+ foreach my $cookie (@COOKIES)
+ {
+  $cookie =~ s/\n/ /g;
+  my @C=split(/--=--/,$cookie);
+  nprint("+ Got Cookie on file '$C[0]' - value '$C[1]'");
+ }
+}
+
+ # do this again, at the end so it's obvious. reset OKTRAP.
+ $OKTRAP=1;
+ bogus_responses();
+
+ nprint("+ $ITEMCOUNT items checked - $VULS item(s) found on remote host(s)");
+
+ $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{end_time} = time();
+ my $diff = $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{end_time} - $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time};
+ my $end  = localtime($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{end_time});
+ nprint("+ End Time:        $end ($diff seconds)");
+ nprint($DIV);
+
+ return;
+}
+#################################################################################
+sub bogus_responses
+{
+ if ($OKTRAP) 
+  {
+   if ($NIKTO{totalokay} > $CONFIG{MAX_WARN})
+    { 
+     $OKTRAP=0;
+     nprint("\n+ Over 30 \"OK\" messages, this may be a by-product of the
+            +     server answering all requests with a \"200 OK\" message. You should
+            +     manually verify your results.");
+    }
+   elsif ($NIKTO{totalmoved} > $CONFIG{MAX_WARN})
+    {
+     $OKTRAP=0;
+     nprint("\n+ Over 30 \"Moved\" messages, this may be a by-product of the
+            +     server answering all requests with a \"302\" Moved message. You should
+            +     manually verify your results.");
+    }
+  }
+}
+#################################################################################
+sub dump_target_info
+{
+ # print out initial connection junk
+ my $SSLPRINT="";
+ $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time}=time();
+ my $start=localtime($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{start_time});
+
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) 
+   { 
+    my $SSLCIPHERS=$result{whisker}{ssl_cipher}      || "Enabled"; 
+    my $SSLISSUERS=$result{whisker}{ssl_cert_issuer} || "Unknown";
+    my $SSLINFO=$result{whisker}{ssl_cert_subject}   || "Unknown";
+    $SSLPRINT="$DIV\n";
+    $SSLPRINT.="+ SSL Info:        Ciphers: $SSLCIPHERS\n                   Info:    $SSLISSUERS\n                   Subject: $SSLINFO";
+   }
+  
+ if ($TARGETS{$CURRENT_HOST_ID}{ip} =~ /[a-z]/i) { nprint("+ Target IP:       (proxied)"); }
+     else { nprint("+ Target IP:       $TARGETS{$CURRENT_HOST_ID}{ip}"); }
+ nprint("+ Target Hostname: $TARGETS{$CURRENT_HOST_ID}{hostname}"); 
+ nprint("+ Target Port:     $CURRENT_PORT");
+ if (($CLI{vhost} ne $TARGETS{$CURRENT_HOST_ID}{hostname}) && ($CLI{vhost} ne ""))
+     { nprint("+ Virtual Host: $CLI{vhost}"); }
+ if ($request{'whisker'}->{'proxy_host'} ne "") 
+     { nprint("- Proxy:           $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"); }
+ if ($NIKTO{hostid} ne "") { nprint("- Host Auth:       ID: $NIKTO{hostid}, PW: $NIKTO{hostpw}, Realm: $NIKTO{hostdomain}","v"); }
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { nprint($SSLPRINT); }
+ for (my $i=1;$i<=9;$i++) { if ($CLI{evasion} =~ /$i/) { nprint("+ Using IDS Evasion:\t$NIKTO{anti_ids}{$i}"); }}
+ nprint("+ Start Time:      $start");
+ nprint($DIV);
+ 
+ if (!($CLI{forcegen})) { nprint("- Scan is dependent on \"Server\" string which can be faked, use -g to override"); }
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} ne "") { nprint("+ Server: $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}"); }
+    else { nprint("+ Server ID string not sent"); }
+    
+ return;
+}
+#################################################################################
+sub general_config
+{
+ ## gotta set these first
+ $|=1;
+ $NIKTO{anti_ids}{1}="Random URI encoding (non-UTF8)";
+ $NIKTO{anti_ids}{2}="Directory self-reference (/./)";
+ $NIKTO{anti_ids}{3}="Premature URL ending";
+ $NIKTO{anti_ids}{4}="Prepend long random string";
+ $NIKTO{anti_ids}{5}="Fake parameter";
+ $NIKTO{anti_ids}{6}="TAB as request spacer";
+ $NIKTO{anti_ids}{7}="Random case sensitivity";
+ $NIKTO{anti_ids}{8}="Use Windows directory separator (\\)";
+ $NIKTO{anti_ids}{9}="Session splicing";
+
+ $NIKTO{mutate_opts}{1}="Test all files with all root directories";
+ $NIKTO{mutate_opts}{2}="Guess for password file names";
+ $NIKTO{mutate_opts}{3}="Enumerate user names via Apache (/~user type requests)";
+ $NIKTO{mutate_opts}{4}="Enumerate user names via cgiwrap (/cgi-bin/cgiwrap/~user type requests)";
+
+ $NIKTO{options}="
+   Options:
+       -Cgidirs       	    Scan these CGI dirs: 'none', 'all', or a value like '/cgi/'
+       -cookies       		print cookies found
+       -evasion+        	ids evasion technique (1-9, see below)
+       -findonly      		find http(s) ports only, don't perform a full scan
+       -Format      		save file (-o) Format: htm, csv or txt (assumed)
+       -generic       		force full (generic) scan
+       -host+       		target host
+       -id+          		host authentication to use, format is userid:password
+       -mutate+           	mutate checks (see below)
+       -nolookup       		skip name lookup
+       -output+       		write output to this file
+       -port+       		port to use (default 80)
+       -root+       		prepend root value to all requests, format is /directory
+       -ssl 	     		force ssl mode on port
+       -timeout	     		timeout (default 10 seconds)
+       -useproxy         	use the proxy defined in config.txt
+       -Version       		print plugin and database versions
+       -vhost+       		virtual host (for Host header)
+   + requires a value
+   
+   These options cannot be abbreviated:
+       -debug            	debug mode
+       -dbcheck            	syntax check scan_database.db and user_scan_database.db
+       -update      		update databases and plugins from cirt.net
+       -verbose      		verbose mode
+   
+   IDS Evasion Techniques:
+   ";
+
+ for (my $i=0;$i<=9;$i++) { if ($NIKTO{anti_ids}{$i} eq "") { next; } 
+                            $NIKTO{options} .= "\t$i\t$NIKTO{anti_ids}{$i}\n"; }
+ $NIKTO{options} .= "\n   Mutation Techniques:\n";
+ for (my $i=0;$i<=9;$i++) { if ($NIKTO{mutate_opts}{$i} eq "") { next; } 
+                            $NIKTO{options} .= "\t$i\t$NIKTO{mutate_opts}{$i}\n"; }
+
+ ### CLI STUFF
+ $CLI{pause}=$NIKTO{suppressauth}=$CLI{html}=$OUTPUT{verbose}=$CLI{skiplookup}=$NIKTO{totalmoved}=$NIKTO{totalokay}=$NIKTO{totalrequests}=$ITEMCOUNT=0;
+ @OPTS=@ARGV;
+ 
+ # preprocess CLI options which cannot be abbreviated
+ for (my $i=0;$i<=$#ARGV;$i++)
+  {
+   if    ($ARGV[$i] =~ /\-dbcheck/)  { dbcheck(); }   
+   elsif ($ARGV[$i] =~ /\-verbose/)  { $OUTPUT{verbose}=1; $ARGV[$i]=""; }
+   elsif ($ARGV[$i] =~ /\-debug/)    { $OUTPUT{debug}=1;   $ARGV[$i]=""; }
+   elsif ($ARGV[$i] =~ /\-update/)   { check_updates(); }
+  }
+
+ GetOptions(
+           "nolookup" => \$CLI{skiplookup},
+           "generic"  => \$CLI{forcegen},
+           "Cgidirs=s"=> \$CLI{forcecgi},
+           "mutate=s" => \$CLI{mutate},
+           "id=s"     => \$CLI{hostauth},
+           "evasion=s"=> \$CLI{evasion},
+           "port=s"   => \$CLI{ports},
+           "findonly" => \$CLI{findonly},
+           "root=s"   => \$CLI{root},
+           "timeout=s"=> \$CLI{timeout},
+           "x=s"      => \$CLI{pause},
+           "ssl"      => \$CLI{ssl},
+           "useproxy" => \$CLI{useproxy},
+           "vhost=s"  => \$CLI{vhost},
+           "host=s"   => \$CLI{host},
+           "cookies"  => \$CLI{cookies},
+           "output=s" => \$CLI{file},
+           "Format=s" => \$CLI{format},
+           "Verbose"  => \$CLI{verbose}
+           );
+
+ if ($CLI{verbose}) { version(); }
+ if (($CLI{format} eq "") || ($CLI{format} eq "text"))  { $CLI{format}="txt"; }
+ if ($CLI{format} eq "html") { $CLI{format}="htm"; }
+ $CLI{format}=lc($CLI{format});
+ 
+ # port(s)
+ $CLI{ports}=~s/^\s+//;
+ $CLI{ports}=~s/\s+$//;
+ if ($CLI{ports} eq "") { $CLI{ports}=80; }
+ if ($CLI{ports} =~ /[^0-9\-\, ]/) { nprint("+ ERROR: Invalid port option '$CLI{ports}'"); exit; }
+
+ ### VARIABLES (STUFF)
+ if (length($CONFIG{"\@CGIDIRS"}) < 1) { $CONFIG{"\@CGIDIRS"}="/cgi-bin/"; }
+ # populate %VARIABLES
+ foreach my $key (keys %CONFIG)
+  { if ($key =~ /^\@/) { $VARIABLES{$key}=$CONFIG{"$key"}; }  }
+
+ $OKTRAP=1;
+ if ($CLI{hostauth} ne "")
+ {
+  my @x=split(/:/,$CLI{hostauth});
+  if (($#x ne 1) || ($x[0] eq ""))
+   { nprint("+ ERROR: '$CLI{hostauth}' (-i option) syntax is 'user:password' or 'user:password:domain' for host authentication.")  }
+  $NIKTO{hostid}     = $x[0];
+  $NIKTO{hostpw}     = $x[1];
+  $NIKTO{hostdomain} = $x[2];
+ } 
+ $CLI{evasion}=~s/[^0-9]//g;
+
+ $NIKTO{useragent}="Mozilla/4.75 ($NIKTO{name}/$NIKTO{version} $request{'User-Agent'})";
+ 
+ # here's the fingerprint -- this should always be something which will NOT be found on the server!
+ $NIKTO{fingerprint}="$NIKTO{name}-$NIKTO{version}-" . LW::utils_randstr() . ".htm";
+
+ if ($CLI{evasion} ne "")  # remove all refs to Nikto/LW
+ {
+  $NIKTO{useragent}="Mozilla/4.75";
+  $NIKTO{fingerprint}=LW::utils_randstr() . ".htm";
+ }
+
+# SSL Test
+if (!$LW::LW_HAS_SSL) 
+ { nprint("-***** SSL support not available (see docs for SSL install instructions) *****"); }
+
+# get core version
+open(FI,"<$NIKTO{plugindir}/nikto_core.plugin");
+my @F=<FI>;
+close(FI);
+my @VERS=grep(/^#VERSION/,@F);
+$NIKTO{core_version}=$VERS[0];
+$NIKTO{core_version}=~s/\#VERSION,//;
+chomp($NIKTO{core_version});
+
+$COUNTERS{hosts_total}=$COUNTERS{hosts_completed}=0;
+
+return;
+}
+#################################################################################
+sub resolve
+{
+ my $ident=$_[0] || return;
+
+ my ($name, $ip, $dn)="";
+ 
+ # ident is name, lookup IP
+ if ($ident =~ /[^0-9\.]/)   # not an IP, assume name
+   {
+    if ($CLI{skiplookup}) { nprint("+ ERROR: -skiplookup set, but given name\n"); exit; }
+    $ip=gethostbyname($ident);
+    if (($ip eq "") && ($request{'whisker'}->{'proxy_host'} ne ""))    # can't resolve name to IP, but using proxy
+     { $name=$ident; $ip=$name; }
+    elsif (($ip eq "") && ($request{'whisker'}->{'proxy_host'} eq "")) # can't resolve name to IP, no proxy set
+     { 
+       nprint("+ ERROR: Cannot resolve hostname '$ident'\n"); 
+       delete $TARGETS{$CURRENT_HOST_ID};
+       return;
+     }
+    else
+     { 
+      use IO::Socket;
+      $ip=inet_ntoa($ip); 
+      if (($ip !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/) && ($ip ne "")) # trap for proxy...
+       {
+        nprint("+ ERROR: Invalid IP '$ip'\n\n");
+        delete $TARGETS{$CURRENT_HOST_ID};
+        return;
+       }
+      $name=$ident;
+     }
+   }
+  else   # ident is IP, lookup name
+   {
+    if (($ident !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/) && ($ident ne "")) # trap for proxy...
+     { 
+      nprint("+ ERROR: Invalid IP '$ident'\n\n");
+      delete $TARGETS{$CURRENT_HOST_ID};
+      return;
+     }
+
+    $ip=$ident;
+    if (!$CLI{skiplookup}) 
+     {
+      use IO::Socket;
+      my $temp_ip=inet_aton($ip);
+      $name=gethostbyaddr($temp_ip,AF_INET); 
+      # check reverse dns to avoid an inet_aton error
+      my $rdnsip=gethostbyname($name);
+      if ($rdnsip ne "")
+       {
+        $rdnsip=inet_ntoa($rdnsip);
+        if ($ip ne $rdnsip) { $name=$ip; }  # Reverse DNS does not match
+       }
+      else { $name = $ip; }  # Reverse DNS does not exist
+     }
+   if ($name eq "") { $name=$ip; }
+   }
+   
+ # set displayname -- name takes precedence
+ if ($name ne "") { $dn=$name; }
+ else             { $dn=$ip;   }
+ 
+ # set this 'host'
+ $request{'whisker'}{'host'} = $name;
+
+ return $name,$ip,$dn;
+}
+#################################################################################
+sub set_targets
+{
+ if ($CLI{host} eq "") { usage(); }
+ my $host_ctr=1;
+
+ # if -p is not set, see if each line hast its own ports. if not push 80 to ports_in
+ if (-e $CLI{host})
+   {
+    nprint("Reading from file '$CLI{host}'","v");
+    open(IN,"<$CLI{host}") || die print "Cannot open '$CLI{host}':$@\n";
+    while(<IN>)
+     {
+      chomp;
+      s/\#.*$//;
+      if ($_ eq "") { next; }
+      s/\s+//g;
+      $COUNTERS{hosts_total}++;
+      if (/(\:|\,)/) # at least one port is set for host
+       {
+        my @h=split(/\:|\,/);
+        $TARGETS{$host_ctr}{ident}=$h[0];
+        # preppend anything from CLI -- careful not to duplcate port 80 (default)
+        my $p=""; 
+        my $has_eighty=0;
+        for (my $i=1;$i<=$#h;$i++) { $p.="$h[$i],"; if ($h[$i] eq 80) { $has_eighty=1;} }
+        if (($has_eighty eq 0) || ($CLI{ports} ne 80)) { $p = "$CLI{ports},$p"; }
+        $p=~s/\,$//;
+        $TARGETS{$host_ctr}{ports_in}=$p;
+       }
+      else 
+       { 
+        $TARGETS{$host_ctr}{ports_in} = $CLI{ports};
+        if ($TARGETS{$host_ctr}{ports_in} eq "") { $TARGETS{$host_ctr}{ports_in} = 80; }
+        $TARGETS{$host_ctr}{ident} = $_;
+       }
+     nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:","d");
+     $host_ctr++;
+     }
+  close(IN);
+  }
+
+ # if it's not a file, set it as the ident & set the ports. resolve() will figure out if its name or IP  
+ # if -p is not set, push 80 to ports_in
+ else
+   { 
+    $COUNTERS{hosts_total}++;
+    $TARGETS{$host_ctr}{ident}=$CLI{host};
+    if ($CLI{ports} eq "") { $TARGETS{$host_ctr}{ports_in}=80;}
+    else { $TARGETS{$host_ctr}{ports_in}=$CLI{ports}; }
+    nprint("- Target id:$host_ctr:ident:$TARGETS{$host_ctr}{ident}:ports_in:$TARGETS{$host_ctr}{ports_in}:","d");
+   }
+ return;
+}
+#################################################################################
+sub host_config
+{
+ ($TARGETS{$CURRENT_HOST_ID}{hostname}, $TARGETS{$CURRENT_HOST_ID}{ip}, $TARGETS{$CURRENT_HOST_ID}{display_name}) = resolve($TARGETS{$CURRENT_HOST_ID}{ident});
+ if ($TARGETS{$CURRENT_HOST_ID}{ident} eq "") { return; }
+ 
+ port_scan($TARGETS{$CURRENT_HOST_ID}{ports_in});
+ 
+ # make sure we have open ports on this target
+ if (keys(%{$TARGETS{$CURRENT_HOST_ID}{ports}}) eq 0)
+   { nprint("+ No HTTP(s) ports found on $TARGETS{$CURRENT_HOST_ID}{ident} / $TARGETS{$CURRENT_HOST_ID}{ports_in}"); }
+
+ return;
+}
+#################################################################################
+# perform a port scan
+#################################################################################
+sub port_scan
+{
+ my $portopts=$_[0] || return;
+ my (@t) = ();
+ my %portlist;
+ 
+ # if we're using nmap, skip this & let nmap handle port ranges... unless proxied
+ if (!(-X $CONFIG{NMAP}) || $CLI{useproxy})
+ {
+  # break out , items
+  if ($portopts =~ /,/)  { foreach (split(/\,/,$portopts)) { push(@t,$_); } }
+  else { push(@t,$portopts); }
+ 
+  # ranges
+  for (@t)
+   {
+    s/^\s+//;
+    s/\s+$//;
+    if ($_ !~ /-/) { $portlist{$_}=0; }
+    else 
+     {
+      my @x=split(/\-/,$_);
+      for (my $i=$x[0];$i<=$x[1];$i++) { $portlist{$i}=0; } 
+     }
+   }
+   
+  # last check for only null lists (i.e., user put in 4-1 as a range)
+  my $invalid= my $have_valid = 0;
+  foreach my $p (keys %portlist) 
+   {
+    if (($p =~/[^0-9]/)||($p eq "")) { $invalid=1; last; }  
+    $have_valid++;
+   }
+  if ($invalid|!$have_valid) { nprint("+ ERROR: Invalid port option '$CLI{ports}'"); exit; }
+  }  # end if not NMAP
+
+ # if NMAP is defined & no proxy, use that... if not, we do it the hard way
+ if ((-X $CONFIG{NMAP}) && !$CLI{useproxy})
+  {
+   nprint("- Calling nmap:$CONFIG{NMAP} -oG - -p $portopts $TARGETS{$CURRENT_HOST_ID}{ip}","v");
+   foreach my $line (split(/\n/,`$CONFIG{NMAP} -oG - -p $portopts $TARGETS{$CURRENT_HOST_ID}{ip}`))
+    {
+     if ($line !~ /^Host/) { next; }
+     $line =~ s/^.*Ports: //;
+     $line =~ s/Ignored.*$//;
+     $line =~ s/^\s+//;
+     $line =~ s/\s+$//;
+     foreach my $PORTSTRING (parse_csv($line)) { $portlist{(split(/\//,$PORTSTRING))[0]}=0; }
+    } 
+  }
+
+ # test each port...
+ nprint("- Testing open ports for web servers","v");
+ foreach $p (sort keys %portlist) 
+  { 
+   if ($p !~ /[0-9]/) { next; }
+   $p =~ s/\s+$//;
+   $p =~ s/^\s+//;
+   foreach my $skip (split(/ /,$CONFIG{SKIPPORTS})) { if ($skip eq $p) { $p=""; last; } }
+   if ($p eq "") { next; }
+   port_check($p); 
+  }
+  
+ return;
+}
+#################################################################################
+sub get_banner
+{
+ (my $RES, $CONTENT) = fetch("/","HEAD");
+ $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}=$result{'server'};
+ return;
+}
+#################################################################################
+sub port_check
+{
+ my $port=$_[0] || return 0;
+ $port=~s/(^\s+|\s+$)//g;
+ my $oldhost=$request{'whisker'}->{'host'};
+ $request{'whisker'}->{'uri'}="/";
+ $request{'whisker'}->{'method'}="HEAD";
+ 
+ # test for proxy
+ proxy_check() unless $PROXYCHECKED;
+ 
+ # try http
+ nprint("- Checking for HTTP on port $TARGETS{$CURRENT_HOST_ID}{ip}:$port","v");
+ if (!$CLI{ssl})
+ {
+  $request{'whisker'}->{'ssl'}=0;
+  $request{'whisker'}->{'port'}= $port;
+  LW::http_fixup_request(\%request);
+  dump_request_hash();
+  if (!LW::http_do_request(\%request,\%result)) 
+    { 
+      # this will fix for some Apaches that are smart enough to answer non ssl reqs on an ssl server
+      if ($result{'whisker'}->{'data'} !~ /speaking plain HTTP to an SSL/) 
+      {
+       $TARGETS{$CURRENT_HOST_ID}{ports}{$port}{ssl}=0;
+       nprint("- Server found: $TARGETS{$CURRENT_HOST_ID}{ip}:$port \t$result{'server'}","d"); 
+       $request{'whisker'}->{'host'}=$oldhost; 
+       dump_result_hash();
+       return; 
+      }
+    }
+  else { dump_result_hash(); }
+  }
+
+ # try https
+ nprint("- Checking for HTTPS on port $TARGETS{$CURRENT_HOST_ID}{ip}:$port","v");
+ $request{'whisker'}->{'ssl'}=1;
+ $request{whisker}->{save_ssl_info}=1;
+ $request{'whisker'}->{'port'}= $port;
+ LW::http_fixup_request(\%request);
+ dump_request_hash();
+ if (!LW::http_do_request(\%request,\%result)) 
+    { $TARGETS{$CURRENT_HOST_ID}{ports}{$port}{ssl}=1;
+      $request{'whisker'}->{'host'}=$oldhost; 
+      nprint("- Server found: $TARGETS{$CURRENT_HOST_ID}{ip}:$port \t$result{'server'}","d"); 
+      dump_result_hash();
+      return; 
+    }
+  else { dump_result_hash(); } 
+ return;
+}
+#################################################################################
+sub open_output
+{
+ if ($CLI{file} eq "") { return; }
+
+ open(OUT,">>$CLI{file}") || die print "+ ERROR: Unable to open '$CLI{file}' for write: $@\n";
+ select(OUT);    $|++;
+ select(STDERR); $|++;
+ select(STDOUT); $|++;
+
+ if ($CLI{format} =~ /^htm/) 
+  { 
+   print OUT "<html>\n<body bgcolor=white>\n"; 
+   print OUT "<title>$NIKTO{name} Results</title>\n";
+   print OUT "<!-- generated by $NIKTO{name} v$NIKTO{version} c$NIKTO{core_version}\n     http://www.cirt.net/ -->\n";
+   print OUT "<center><a href=\"http://www.cirt.net/code/nikto.shtml\"><font size=+1>$NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}</font></a><br>\n";
+   print OUT "<a href=\"http://www.cirt.net/\"><font size=-1>CIRT.net</font></a></center>\n";
+  }
+ elsif ($CLI{format} =~ /^txt/) 
+  {
+   print OUT "- $NIKTO{name} v$NIKTO{version}/$NIKTO{core_version}\n";
+  }
+ elsif ($CLI{format} =~ /^csv/) 
+  {
+   print OUT "\"$NIKTO{name} v$NIKTO{version}\",\"Core v$NIKTO{core_version}\"\n";
+  }
+   
+ return;
+}
+#################################################################################
+sub close_output
+{
+ my $t=join(" ",@OPTS);
+
+ if ($CLI{format} =~ /^htm/)
+  {
+   print OUT "Test Options: $t<br>\n";   
+   print OUT "<hr>\n</html>\n";
+  }
+ elsif ($CLI{format} =~ /^txt/) 
+  {
+   print OUT "\nTest Options: $t\n";
+   print OUT "$DIV\n";
+  }
+ elsif ($CLI{format} =~ /^csv/) 
+  {
+   print OUT "\n\"Test Options\",\"$t\"\n";
+  }
+
+ close(OUT);
+ return;
+}
+#################################################################################
+# print the output & write to the save file
+#################################################################################
+sub nprint
+{
+ my $line=$_[0];
+ chomp($line);
+
+ # don't print debug & verbose to output file...
+ if ($_[1] eq "d" && $OUTPUT{debug})   { print "D: $line\n"; return; }  # debug
+ if ($_[1] eq "v" && $OUTPUT{verbose}) { print "V: $line\n"; return; }  # verbose
+ if ($_[1] eq "v" || $_[1] eq "d")     { return; }
+ 
+ # print to STDOUT
+ print "$line\n";
+ 
+ # if no file saving, return
+ if ($CLI{file} eq "") { return; }
+ 
+ if ($CLI{format} eq "txt")    # plaintext output
+  {
+   $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
+   $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
+   $line =~ s/BID\-([0-9]{4})/http:\/\/www.securityfocus.com\/bid\/$1/g;
+   $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
+   $line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
+   print OUT "$line\n";
+  }
+ elsif ($CLI{format} =~ /csv/)                           # if csv output
+  {
+   chomp($line);
+   if ($line =~ /-------------/) { $line="\"$DIV\",\"$DIV\""; }
+   $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1/g;
+   $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/http:\/\/www.cert.org\/advisories\/$1.html/g;
+   $line =~ s/BID\-([0-9]{4})/http\:\/\/www.securityfocus.com\/bid\/$1/g;
+   $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/http:\/\/www.cert.org\/incident_notes\/$1.html/gi;
+   $line =~ s/(MS[0-9]{2}\-[0-9]{3})/http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp/gi;
+
+   if ($line =~ /^\+/) { $line =~ s/^\+ (.*) - (.*)/"$1","$2"/; }
+   $line =~ s/Target IP:       (.*)/"Target IP","$1"/;
+   $line =~ s/Target Hostname: (.*)/"Target Hostname","$1"/;
+   $line =~ s/Target Port:     (.*)/"Target Port","$1"/;
+   $line =~ s/Start Time:      (.*)/"Start Time","$1"/;
+   $line =~ s/End Time:        (.*)/"End Time","$1"/;
+   $line =~ s/ERROR: (.*)/"ERROR","$1"/;
+  
+   chomp($line);
+   $line =~ s/\t/     /g;
+   $line =~ s/Server: ([^ ]*)(.*$)/"Server","$1","$2"/;
+   $line =~ s/Test Options: (.*)/"Test Options","$1\n"/;
+   $line =~ s/Allowed HTTP Methods: (.*)/"Allowed HTTP Methods","$1"/;
+   $line =~ s/^\+//;
+   $line =~ s/^\- //;
+   $line =~ s/^\s+//;
+   if ($line !~ /^\"/) { $line = "\"\",\"$line\""; }
+   $line =~ s/\n\r//g;
+   $line =~ s/\"\"/\"/g;
+   print OUT "-- $line--\n";
+  }
+ elsif ($CLI{format} =~ /^htm/)                          # if htm(l) output
+  {
+   $protocol="http";
+   if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{ssl}) { $protocol .= "s"; }
+
+   if ($line =~ /------------/) { print OUT "<hr>\n"; return; }
+
+   elsif ($line =~ /^\+ Target IP/)  
+      { $line =~ s/$TARGETS{$CURRENT_HOST_ID}{ip}/<a href=\"$protocol\:\/\/$TARGETS{$CURRENT_HOST_ID}{ip}:$CURRENT_PORT\/\">$TARGETS{$CURRENT_HOST_ID}{ip}<\/a>/; }
+
+   elsif ($line =~ /^\+ Target Host/)  
+      { $line =~ s/$TARGETS{$CURRENT_HOST_ID}{hostname}/<a href=\"$protocol\:\/\/$TARGETS{$CURRENT_HOST_ID}{hostname}:$CURRENT_PORT\/\">$TARGETS{$CURRENT_HOST_ID}{hostname}<\/a>/; }
+
+   elsif ($line =~ /^\+ Target Port/)  
+      { $line =~ s/$CURRENT_PORT/<a href=\"http\:\/\/www\.cirt\.net\/cgi\-bin\/ports\.pl\?port\=$CURRENT_PORT\">$CURRENT_PORT<\/a>/; }
+
+   elsif ($line =~ /^\+ \//) # item
+      {
+       if ($line =~ /\((GET|TRACE|TRACK|Needs Auth)\)/) 
+        {
+         my @TEMP=split(/ /,$line);
+         my $r=$TEMP[1];
+         my $disp=$r;
+         $disp =~ s/\</\&lt\;/g;
+         $disp =~ s/\>/\&gt\;/g;
+         $TEMP[1] =~ s/([^a-zA-Z0-9\s])/\\$1/g;
+         $line =~ s/$TEMP[1]/<a href=\"$protocol\:\/\/$TARGETS{$CURRENT_HOST_ID}{display_name}:$CURRENT_PORT$r\">$disp<\/a>/;
+        }
+       
+      $line =~ s/[^\"]http(s)?\:\/\/[\w\.\!\@\~\#\$\%\^\&\*\(\)\_\-\=\+\'\.\,\/\?\\\{\}\;\:]+/<a href\=\"$&\">$&<\/a>/ig;  
+      $line =~ s/to<a href=\" /to <a href=\"/g; # ugly kluge
+
+      # make a link for CVE/CAN/CA/IN/BID/MS identifiers
+      $line =~ s/((CVE|CAN)\-[0-9]{4}-[0-9]{4})/<a href=\"http:\/\/cve.mitre.org\/cgi-bin\/cvename.cgi?name\=$1\">$1<\/a>/g;
+      $line =~ s/(CA\-[0-9]{4}-[0-9]{2})/<a href=\"http:\/\/www.cert.org\/advisories\/$1.html\">$1<\/a>/g;
+      $line =~ s/BID\-([0-9]{4})/<a href=\"http:\/\/www.securityfocus.com\/bid\/$1\">$1<\/a>/g;
+      $line =~ s/(IN\-[0-9]{4}\-[0-9]{2})/<a href=\"http:\/\/www.cert.org\/incident_notes\/$1.html\">$1<\/a>/gi;
+      $line =~ s/(MS[0-9]{2}\-[0-9]{3})/<a href=\"http:\/\/www.microsoft.com\/technet\/security\/bulletin\/$1.asp\">$1<\/a>/gi;
+     }
+
+   $line =~ s/^\- /<li>/;
+   $line =~ s/^\+ /<li>/;
+   print OUT "$line<br>\n";
+  }
+ return;
+}
+#################################################################################
+# run_plugins
+# load plugins & run them
+# this ugly, and potentially dangerous if untrusted plugins are present
+#################################################################################
+sub run_plugins
+{
+ open(ORDERFILE,"<$NIKTO{plugindir}/nikto_plugin_order.txt");
+ my @ORDER=<ORDERFILE>;
+ close(ORDERFILE);
+ 
+ foreach my $pluginf (@ORDER)
+ {
+  if ($pluginf =~ /^\#/) { next; }
+  chomp($pluginf);
+  $pluginf =~ s/\s+//;
+  if ($pluginf eq "") { next; }
+  require "$NIKTO{plugindir}/$pluginf\.plugin";
+  nprint("- Calling plugin:$pluginf\.plugin","d");
+  # just call it...hope it works...taint doesn't like this very much for obvious reasons
+  &$pluginf;
+ }
+return;
+}
+#################################################################################
+# check_updates
+#################################################################################
+sub check_updates
+{
+ LW::http_init_request(\%request);
+ my (%REMOTE, %LOCAL, @DBTOGET) = ();
+ my ($pluginmsg, $remotemsg) = "";
+ my $code_updates=0;
+ my $serverdir="/nikto/UPDATES/$NIKTO{version}";
+ 
+ my $server="www.cirt.net";
+ $request{'whisker'}->{'http_ver'}="1.1";
+ $request{'whisker'}->{'port'}=80;
+ $request{'whisker'}->{'anti_ids'}="";
+ $request{'User-Agent'}="Nikto Update Agent";
+ $request{'whisker'}->{'host'}="www.cirt.net";
+ 
+ for (my $i=0;$i<=$#ARGV;$i++) 
+ { if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { $CLI{useproxy}=1; last; } }
+ 
+ if (($CONFIG{PROXYHOST} ne "") && ($CLI{useproxy}))
+  {
+   $request{'whisker'}->{'proxy_host'}=$CONFIG{PROXYHOST};
+   $request{'whisker'}->{'proxy_port'}=$CONFIG{PROXYPORT};
+  }
+
+ my  $ip=gethostbyname($server);
+ if ($ip ne "") { $request{'whisker'}->{'host'}= inet_ntoa($ip); }
+ else { $request{'whisker'}->{'host'}=$server; }
+
+ # retrieve versions file
+ LW::http_fixup_request(\%request);
+ (my $RES, $CONTENT) = fetch("$serverdir/versions.txt","GET");
+ if ($RES eq 407) # requires Auth
+  {
+   if ($CONFIG{PROXYUSER} eq "")  
+      {
+      $CONFIG{PROXYUSER}=read_data("Proxy ID: ","");
+      $CONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
+     }
+   LW::auth_set_header("proxy-basic",\%request,$CONFIG{PROXYUSER},$CONFIG{PROXYPASS});
+
+   # and try again
+   LW::http_fixup_request(\%request);
+   ($RES, $CONTENT) = fetch("$serverdir/versions.txt","GET");
+  }
+
+ if ($RES ne 200) 
+  { print "+ ERROR ($RES): Unable to get $request{'whisker'}->{'host'}$serverdir/versions.txt\n"; 
+    exit; }
+
+ # make hash
+ for (split(/\n/,$CONTENT))
+ { 
+  my @l=parse_csv($_);
+  if ($_ =~ /^msg/) { $remotemsg="$l[1]"; next; }
+  $REMOTE{$l[0]}=$l[1]; 
+ }
+ 
+ # get local versions of plugins/dbs
+ my @FILES=dirlist($NIKTO{plugindir},"(^nikto|\.db\$)");
+
+ foreach my $file (@FILES)
+ {
+  my $v="";
+  open(LOCAL,"<$NIKTO{plugindir}/$file") || print "+ ERROR: Unable to open '$NIKTO{plugindir}/$file' for read: $@\n";
+  my @l=<LOCAL>;
+  close(LOCAL);
+  
+  my @VERS=grep(/^#VERSION/,@l);
+  chomp(@VERS[0]);
+  $LOCAL{$file}=(parse_csv(@VERS[0]))[1];
+ }
+
+ # check main nikto versions
+ foreach my $remotefile (keys %REMOTE)
+ {
+  if ($remotefile eq "nikto") # main program version
+   { 
+    if ($REMOTE{$remotefile} > $NIKTO{version}) 
+     { 
+      print "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{version}\n";
+      print "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n"; 
+      if ($remotemsg ne "") {  print "+ $server message: $remotemsg\n"; }
+      exit; 
+     }
+    next;
+   }
+
+  if (($LOCAL{$remotefile} eq "") || ($REMOTE{$remotefile} > $LOCAL{$remotefile}))
+   { 
+    push(@DBTOGET,$remotefile); 
+    if ($remotefile !~ /\.db$/) { $code_updates=1; }
+   }
+  elsif ($REMOTE{$remotefile} < $LOCAL{$remotefile})  # local is newer (!)
+   { print "+ Local '$remotefile' (ver $LOCAL{$remotefile}) is NEWER than remote (ver $REMOTE{$remotefile}).\n";  } 
+ }
+
+ # replace local files if updated
+ foreach my $toget (@DBTOGET)
+ {
+  print "+ Retrieving '$toget'\n";
+  (my $RES, $CONTENT) = fetch("$serverdir/$toget","GET");
+  if ($RES ne 200) { print "+ ERROR: Unable to get $server$serverdir/$toget\n"; exit; }
+  if ($CONTENT ne "") {
+   open(OUT,">$NIKTO{plugindir}/$toget") || die print "+ ERROR: Unable to open '$NIKTO{plugindir}/$toget' for write: $@\n";
+   print OUT $CONTENT;
+   close(OUT); 
+  }
+ }
+
+# CHANGES file
+if ($code_updates)
+ {
+  print "+ Retrieving 'CHANGES.txt'\n";
+  (my $RES, $CONTENT) = fetch("$serverdir/CHANGES.txt","GET");
+  if (($CONTENT ne "") && ($RES eq 200)) {
+   open(OUT,">$NIKTO{plugindir}/../docs/CHANGES.txt") || die print "+ ERROR: Unable to open '$NIKTO{plugindir}/../CHANGES.txt' for write: $@\n";
+   print OUT $CONTENT;
+   close(OUT); 
+  }
+ }
+
+if ($#DBTOGET < 0 )   { print "+ No updates required.\n"; }
+if ($remotemsg ne "") { print "+ $server message: $remotemsg\n"; }
+exit;
+}
+#################################################################################
+# auth_check
+# if the server requires authentication & we have it...
+#################################################################################
+sub auth_check
+{
+ my $REALM=$result{'www-authenticate'};
+ $REALM =~ s/^Basic //i;
+ $REALM =~ s/realm=//i;
+ if ($REALM eq "") { $REALM="unnamed"; }
+ 
+if (($result{'www-authenticate'} !~ /basic|ntlm/i)  && ($result{'www-authenticate'} ne ""))# doh, not basic!
+ {
+  my $AUTHTYPE=$result{'www-authenticate'};
+  $AUTHTYPE =~ s/ .*$//;
+  nprint("+ ERROR: Host uses '$AUTHTYPE'");
+  nprint("+ Continuing scan without authentication , but suppressing 401 messages.");
+  $NIKTO{suppressauth}=1;
+ }
+elsif ($NIKTO{hostid} eq "")
+ {
+  nprint("+ ERROR: No auth credentials for $REALM, please set.");
+  nprint("+ Continuing scan without authentication, but suppressing 401 messages.");
+  $NIKTO{suppressauth}=1;
+  return;
+ }
+else
+ {
+ nprint("- Attempting authorization to $REALM realm.","v");
+
+ # check for 'broken' web server, returns a blank www-auth header no matter what the id/pw sent
+ my $tid=LW::utils_randstr();
+ LW::auth_set_header("basic",\%request,$tid,$tid,$NIKTO{hostdomain});   # set auth
+ LW::http_fixup_request(\%request);
+ LW::http_do_request(\%request,\%result); # test auth
+
+ if ($result{'www-authenticate'} eq "") # broken
+ { nprint("+ ERROR: Unable to verify authentication to $REALM works (server doesn't respond properly). Nikto is using it blindly."); }
+ else # test
+ {
+  LW::auth_set_header("basic",\%request,$NIKTO{hostid},$NIKTO{hostpw},$NIKTO{hostdomain});   # set auth
+  LW::http_fixup_request(\%request);
+  LW::http_do_request(\%request,\%result); # test auth
+  if ($result{'www-authenticate'} ne "")
+   {
+    nprint("+ ERROR: Unable to authenticate to $REALM");
+    nprint("+ Continuing scan without authentication, but suppressing 401 messages.");
+    $NIKTO{suppressauth}=1;
+   }
+  else { nprint("- Successfully authenticated to realm $REALM."); }
+ }
+ }
+ 
+return;
+}
+#################################################################################
+# read_data ( prompt, mode )
+# read STDIN data from the user
+# portions of this (POSIX code) were taken from the 
+# Term::ReadPassword module by Tom Phoenix <rootbeer@redcat.com> (many thanks).
+# it has been modified to not require Term::ReadLine, but still requires
+# POSIX::Termios of it's a POSIX machine
+#################################################################################
+sub read_data
+{
+ if ($CONFIG{PROMPTS} =~ /no/i) { return; }
+ my($prompt, $mode, $POSIX) = @_;
+ my $input = "";
+
+ if ($^O =~ /Win32/)  { $POSIX=0; }
+ else                 { $POSIX=1; }
+
+ my %SPECIAL = (
+    "\x03"      => 'INT',       # Control-C, Interrupt
+    "\x08"      => 'DEL',       # Backspace
+    "\x7f"      => 'DEL',       # Delete
+    "\x0d"      => 'ENT',       # CR, Enter
+    "\x0a"      => 'ENT',       # LF, Enter
+  );
+
+ # if we're on a non-POSIX machine we can't not-echo the
+ # characters, so just use getc to avoid the dependency on
+ # POSIX::Termios. We would be best to get rid of this 
+ # entirely and use another way...
+
+ if ($POSIX)
+  {
+   local(*TTY, *TTYOUT);
+   open TTY, "<&STDIN" or return;
+   open TTYOUT, ">>&STDOUT" or return;
+
+   # Don't buffer it!
+   select( (select(TTYOUT), $|=1)[0] );
+   print TTYOUT $prompt;
+
+   # Remember where everything was
+   my $fd_tty = fileno(TTY);
+   my $term = POSIX::Termios->new();
+   $term->getattr($fd_tty);
+   my $original_flags = $term->getlflag();
+
+   if ($mode eq "noecho") 
+     { 
+      my $new_flags = $original_flags & ~(ISIG | ECHO | ICANON); 
+      $term->setlflag($new_flags);
+     }
+   $term->setattr($fd_tty, TCSAFLUSH);
+KEYSTROKE:
+   while (1) {
+        my $new_keys = '';
+        my $count = sysread(TTY, $new_keys, 99);
+        if ($count) {
+            for my $new_key (split //, $new_keys) {
+                if (my $meaning = $SPECIAL{$new_key}) {
+                    if ($meaning eq 'ENT')    { last KEYSTROKE; }
+                    elsif ($meaning eq 'DEL') { chop $input; }
+                    elsif ($meaning eq 'INT') { last KEYSTROKE; }
+                    else { $input .= $new_key; }
+                } 
+                else { $input .= $new_key; }
+            }
+        } 
+        else { last KEYSTROKE; }
+    }
+    # Done with waiting for input. Let's not leave the cursor sitting
+    # there, after the prompt.
+    print TTY "\n";
+    print "\n";
+
+    # Let's put everything back where we found it.
+    $term->setlflag($original_flags);
+    $term->setattr($fd_tty, TCSAFLUSH);
+    close(TTY);
+    close(TTYOUT);
+    return $input;
+  }
+ else # non-POSIX
+  {
+   print $prompt;
+   $input=<STDIN>;
+   chomp($input);
+   return $input;
+  }
+
+return;
+}
+#################################################################################
+# proxy_setuup
+# Setup the required proxy stuff
+#################################################################################
+sub proxy_setup
+{
+ if (!$CLI{useproxy}) { return; }
+ 
+ # HTTP proxy
+ $request{'whisker'}->{'proxy_host'}=$CONFIG{PROXYHOST};
+ $request{'whisker'}->{'proxy_port'}=$CONFIG{PROXYPORT};
+
+ # SOCKS
+  
+ return; 
+}
+#################################################################################
+# proxy_check
+# test whether proxy requires authentication, and if we can use it
+#################################################################################
+sub proxy_check
+{
+ $request{'whisker'}->{'method'}="HEAD";
+ $request{'whisker'}->{'uri'}="/";
+
+ if ($request{'whisker'}->{'proxy_host'} ne "")  # proxy is set up
+ {
+  LW::http_fixup_request(\%request);
+  LW::http_do_request(\%request,\%result);
+
+  if ($result{'whisker'}{'http_resp'} eq "407")       # proxy requires auth
+  { 
+   # have id/pw?
+   if ($CONFIG{PROXYUSER} eq "") 
+     { 
+      $CONFIG{PROXYUSER}=read_data("Proxy ID: ","");
+      $CONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
+     }
+   if ($result{'proxy-authenticate'} !~ /Basic/i)
+    {
+     my @x=split(/ /,$result{'proxy-authenticate'});
+     nprint("+ Proxy server uses '$x[0]' rather than 'Basic' authentication. $NIKTO{name} $NIKTO{version} can't do that.");
+     exit;
+    }
+   
+   # test it...
+   LW::auth_set_header("proxy-basic",\%request,$CONFIG{PROXYUSER},$CONFIG{PROXYPASS});   # set auth
+   LW::http_fixup_request(\%request);
+   LW::http_do_request(\%request,\%result);
+   if ($result{'proxy-authenticate'} ne "") 
+    { 
+     my @pauthinfo=split(/ /,$result{'proxy-authenticate'});
+     my @pauthinfo2=split(/=/,$result{'proxy-authenticate'});
+     $pauthinfo2[1]=~s/^\"//; $pauthinfo2[1]=~s/\"$//;
+     nprint("+ Proxy requires authentication for '$pauthinfo[0]' realm '$pauthinfo2[1]', unable to authenticate.");
+     exit; 
+    }
+   else { nprint("- Successfully authenticated to proxy.","v"); }
+  }
+ }
+ 
+ $PROXYCHECKED=1;
+ return;
+}
+#################################################################################
+# directory listing
+# 'pattern' is an optional regex to match the file names against
+# written by Thomas Reucker for the SETI-Web project (GPL)
+#################################################################################
+sub dirlist
+{
+ my $DIR=$_[0] || return;
+ my $PATTERN=$_[1] || "";
+ my @FILES = ();
+
+ # some basic security checks... REALLY basic
+ # this should be better
+ if ($DIR =~ /etc/) { return; }
+ 
+ opendir(DIRECTORY,$DIR) || die print "+ ERROR: Can't open directory '$DIR': $@";
+ foreach my $file (readdir(DIRECTORY))
+  {
+   if ($file =~ /^\./)    { next; } # skip hidden files, '.' and '..'
+   if ($PATTERN ne "") { if ($file =~ /$PATTERN/) { push (@FILES,$file); } }
+   else { push (@FILES,$file); }
+   }
+closedir(DIRECTORY);
+ 
+return @FILES;
+}
+#######################################################################
+# dbcheck
+# checks the standard databases for duplicate entries
+#######################################################################
+sub dbcheck {
+ my (@L, @ENTRIES, %ENTRIES)=();
+ my ($line, $entry) ="";
+ my $ctr=0;
+ 
+ #### scan_database.db
+ print "-->\tDB Syntax ($FILES{dbfile})\n";
+ open(IN,"<$FILES{dbfile}") || die print "\tERROR: Unable to open '$FILES{dbfile}' for read: $@\n"; 
+ @ENTRIES=<IN>; close(IN);
+
+ foreach $line (@ENTRIES)
+ {
+  if ($line !~ /^\"/)  { next; }
+  @L=parse_csv($line);
+  if (($#L < 5) || ($#L > 6)) { print "\tERROR: Invalid syntax ($#L): $line"; next; }
+  if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) { print "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+  if (($L[1] =~ /^\@CGI/) && ($L[1] !~ /^\@CGIDIRS/)) { print "\tERROR: Possible \@CGIDIRS misspelling:$line"; }
+  if ($line =~ /[^\\]\"\"/) { print "\tERROR: Possible double-quote syntax error:$line"; }
+  # build entry based on all except output message
+  $ENTRIES{"$L[0],$L[1],$L[2],$L[3],$L[5]"}++;
+ }
+
+ foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
+ $ctr=keys(%ENTRIES);
+ print "\t$ctr entries\n";
+
+ #### user_scan_database.db
+ if (-e $FILES{userdbfile}) {
+ print "--> DB Syntax ($FILES{userdbfile})\n";
+ %ENTRIES=();
+ open(IN,"<$FILES{userdbfile}") || die print "\tERROR: Unable to open '$FILES{userdbfile}' for read: $@\n"; 
+ @ENTRIES=<IN>; close(IN);
+ 
+ $ctr=0;
+ foreach $line (@ENTRIES)
+ {
+  if ($line !~ /^\"/)  { next; }
+  @L=parse_csv($line);
+  if (($#L < 5) || ($#L > 6)) { print "\tERROR: User DB: Invalid syntax ($#L): $line"; next; }
+  if ($line !~ /^\".*\",\".*\",\".*\",\".*\",\".*\"/) { print "\tERROR: User DB: Invalid syntax ($#L): $line\n"; next; }
+  if (($L[1] =~ /^\@CGI/) && ($L[1] !~ /^\@CGIDIRS/)) { print "\tERROR: User DB: Possible \@CGIDIRS misspelling:$line"; }
+  if ($line =~ /[^\\]\"\"/) { print "\tERROR: User DB: Possible double-quote syntax error:$line"; }
+  # build entry based on all except output message
+  $ENTRIES{"$L[0],$L[1],$L[2],$L[3],$L[5]"}++;
+ }
+ foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
+ $ctr=keys(%ENTRIES);
+ print "\t$ctr entries\n";
+ }
+
+ #### outdated.db
+ $ctr=0;
+ print "-->\tDB Syntax ($NIKTO{plugindir}/outdated.db)\n";
+ %ENTRIES=();
+ open(IN,"<$NIKTO{plugindir}/outdated.db") || die print "\tERROR: Unable to open '$NIKTO{plugindir}/outdated.db' for read: $@\n"; 
+ @ENTRIES=<IN>; close(IN);
+
+ foreach $line (@ENTRIES)
+ {
+  $line =~ s/^\s+//;
+  if ($line =~ /^\#/) { next; }
+  chomp($line);
+  if ($line eq "") { next; }
+  @L=parse_csv($line);
+  if ($line !~ /^\".*\"\,\".*\"\,\".*\"$/) { print "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+  if ($#L ne 2) { print "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+  $ENTRIES{"$L[0]"}++;
+ }
+
+ foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
+ $ctr=keys(%ENTRIES);
+ print "\t$ctr entries\n";
+
+ #### server_msgs.db
+ $ctr=0;
+ print "-->\tDB Syntax ($NIKTO{plugindir}/server_messages.db)\n";
+ %ENTRIES=();
+ open(IN,"<$NIKTO{plugindir}/server_msgs.db") || die print "\tERROR: Unable to open '$NIKTO{plugindir}/server_msgs.db' for read: $@\n"; 
+ @ENTRIES=<IN>; close(IN);
+
+ foreach $line (@ENTRIES)
+ {
+  $line =~ s/^\s+//;
+  if ($line =~ /^\#/) { next; }
+  chomp($line);
+  if ($line eq "") { next; }
+  @L=parse_csv($line);
+  if ($line !~ /^\".*\"\,\".*\"$/) { print "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+  if ($#L ne 1) { print "\tERROR: Invalid syntax ($#L): $line\n"; next; }
+  
+  # test regex
+  "test" =~ /$L[0]/;
+
+  $ENTRIES{"$L[0]"}++;
+ }
+
+ foreach $entry (keys %ENTRIES) { if ($ENTRIES{$entry} > 1) { print "\tERROR: Duplicate ($ENTRIES{$entry}): $entry\n"; } }
+ $ctr=keys(%ENTRIES);
+ print "\t$ctr entries\n";
+
+ #### check that all plugins are in nikto_plugin_order.txt
+ print "-->\tPlugin order ($NIKTO{plugindir}/nikto_plugin_order.txt)\n";
+
+ my @FILES=dirlist($NIKTO{plugindir},"(\.plugin\$)");
+ my %PLUGS;
+
+ foreach my $pluginf (@FILES)
+ {
+  chomp($pluginf);
+  if ($pluginf =~ /\#/)         { next; }
+  $pluginf =~ s/\s+//;
+  if ($pluginf eq "")           { next; }
+  $pluginf =~ s/\..*$//;
+  if ($pluginf eq "nikto_core") { next; }
+  $PLUGS{$pluginf}=0;
+ }
+
+ open(ORDERFILE,"<$NIKTO{plugindir}/nikto_plugin_order.txt") || die print "\tERROR: Unable to open '$NIKTO{plugindir}/nikto_plugin_order.txt' for read: $@\n"; 
+ foreach my $line (<ORDERFILE>) 
+  {
+   chomp($line); 
+   if ($line =~ /^\#/) { next; }
+   if ($line eq "")    { next; }
+   $PLUGS{$line}=1; 
+  }
+ close(ORDERFILE);
+
+ my $bad=0;
+ foreach my $p (sort keys %PLUGS) 
+  {
+   if ($PLUGS{$p} eq 0) 
+     { $bad=1; print "\tERROR: plugin '$p' not in nikto_plugin_order.txt\n"; }
+  }
+  if (!$bad) { print "\tOrder file okay\n"; }
+
+ #### check that all plugins are named properly
+ print "-->\tPlugin conventions ($NIKTO{plugindir}/*.plugin)\n";
+ my $bad=0;
+ foreach my $pluginf (@FILES)
+ {
+  chomp($pluginf);
+  if ($pluginf =~ /\#/)         { next; }
+  $pluginf =~ s/\s+//;
+  if ($pluginf eq "")           { next; }
+  if ($pluginf eq "nikto_core") { next; }
+  open(IN,"<$NIKTO{plugindir}/$pluginf.plugin")  || die print "\tERROR: Unable to open '$NIKTO{plugindir}/$pluginf.plugin' for read: $@\n"; 
+  my @F=<IN>;
+  close(IN);
+  my $CT=grep(/sub $pluginf/,@F);
+  if ($CT < 1) 
+   {
+    print "\tERROR: file '$pluginf\.plugin' does not have 'sub $pluginf' defined.\n";
+    $bad++;
+   } 
+ }
+ if (!$bad) { print "\tPlugin syntax okay\n"; }
+
+ exit;
+}
+#######################################################################
+# spit out all the details
+#######################################################################
+sub dump_result_hash
+{
+ if (!$OUTPUT{debug}) { return; } # quick return
+ 
+ nprint("- Result Hash:","d");
+ foreach my $item (sort keys %result) 
+  {
+   if ($item eq "whisker")  { next; } 
+   nprint("- $item \t\t$result{$item}","d"); 
+  }
+ foreach my $item (sort keys %{$result{'whisker'}}) 
+  { 
+   nprint("- \$whisker-\>$item \t$result{'whisker'}->{$item}","d"); 
+  }
+ return;
+}
+#######################################################################
+# spit out all the details
+#######################################################################
+sub dump_request_hash
+{
+ if (!$OUTPUT{debug}) { return; } # quick return
+
+ nprint("- Request Hash:","d");
+ foreach my $item (sort keys %request) 
+  { 
+   if ($item eq "whisker") { next; } 
+   nprint("- $item: $request{$item}","d"); 
+  }
+ foreach my $item (sort keys %{$request{'whisker'}}) 
+  { 
+   if ($item eq "http_eol") { next; } 
+   nprint("- \$whisker-\>$item: $request{'whisker'}->{$item}","d"); 
+  }
+ return;
+}
+#######################################################################
+# check_responses
+# check what the 200/404 messages are...
+#######################################################################
+sub check_responses
+{
+ # get NOT FOUND response (404)
+ # check for compliant 404 message
+ # check for common strings to use as 'not found' matches from content
+
+ ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}, $CONTENT)=fetch("/$CLI{root}$NIKTO{fingerprint}","GET");
+
+ if (($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} eq "400") || ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} eq "")) # may need to use HTTP/1.?
+  {
+   my $old=$request{'whisker'}->{'http_ver'};
+   if ($request{'whisker'}->{'http_ver'} eq "1.1") { $request{'whisker'}->{'http_ver'}="1.0"; }
+   else { $request{'whisker'}->{'http_ver'}="1.1"; }
+   nprint("- Server did not understand HTTP $old, switching to HTTP $request{'whisker'}->{'http_ver'}");
+   ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}, $CONTENT)=fetch("/$CLI{root}$NIKTO{fingerprint}","GET");
+  }
+
+ if (($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} ne "404") && ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} ne "401"))
+ {
+  nprint("+ Server does not respond with '404' for error messages (uses '$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}').");
+  nprint("+     This may increase false-positives.");
+  if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} eq "302") { nprint("+ Not found files redirect to: $result{'location'}"); }
+  if ($CONTENT =~ /not found/i) { $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}="not found"; }  # shorten it, content has "not found" in it
+  elsif ($CONTENT =~ /404/i) { $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}="404"; }        # shorten it, content has "404" in it
+  else { $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} = $CONTENT; }
+ }
+
+ # get OK response (200)
+ ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found}, $CONTENT)=fetch("/$CLI{root}","GET");
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found} eq 404)  # assume server does not actually have a / & set it to 200
+ {
+  $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found}=200;
+  nprint("+ No root document found, assuming 200 is OK response.","v");
+ }
+ elsif ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found} != 200) 
+ {
+  if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found} eq "302") 
+   { 
+    nprint("+ The root file (/) redirects to: $result{'location'}"); 
+    # try to get redirected location to see if 200 is actually the valid response
+    ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found}, $CONTENT)=fetch($result{'location'},"GET");
+    if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found} ne 200) # still no good... just a 302, stop going in circles
+     {  $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found}=302; } 
+    }
+ }
+
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found} eq "401") { auth_check(); }
+  
+ # if they're the same, something is amiss... just pick a 404/200 scheme, nothing better to do
+ # except 403... which will cut down false positives
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} eq $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found})
+ { 
+  if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} ne "401") {
+    nprint("+ The found & not found messages appear to be the same, be skeptical of positives.");
+   }
+  $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound}=404 unless $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{notfound} eq 403;
+  $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{found}=200; 
+ }
+
+return;
+}
+#######################################################################
+# figure out CGI directories
+# check_cgi
+#######################################################################
+sub check_cgi
+{
+ my ($gotvalid,$gotinvalid)=0;
+ my @POSSIBLECGI=();
+ my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));
+ my ($res, $possiblecgidir) ="";
+
+ #force all possible CGI directories to be "true" 
+ if ($CLI{forcecgi} eq "all") { $VARIABLES{"\@CGIDIRS"} = join(" ",@CFGCGI); }
+ # scan no CGI directories
+ elsif ($CLI{forcecgi} eq "none") { $VARIABLES{"\@CGIDIRS"} = ""; }
+ # scan a specific directory 
+ elsif ($CLI{forcecgi} =~ /[a-zA-Z0-9]/) { $VARIABLES{"\@CGIDIRS"} = $CLI{forcecgi}; }
+ # or normal testing of each dir
+ else
+ {
+  foreach $possiblecgidir (@CFGCGI)
+   {
+    ($res, $CONTENT)=fetch($possiblecgidir,"GET");
+    nprint("Checked for CGI dir\t$possiblecgidir\tgot:$res","d");
+    if (($res eq 302) || ($res eq 200) || ($res eq 403)) 
+     { 
+      push(@POSSIBLECGI,$possiblecgidir); 
+      $gotvalid++; 
+     }
+  }
+
+ if ($gotvalid eq 0) 
+  { 
+   nprint("+ No CGI Directories found (use '-C all' to force check all possible dirs)"); 
+   $VARIABLES{"\@CGIDIRS"} = "";
+  }
+ elsif ($#CFGCGI eq $#POSSIBLECGI)
+  {
+   nprint("+ All CGI directories 'found', use '-C none' to test none"); 
+   $VARIABLES{"\@CGIDIRS"} = @CFGCGI;
+  }
+ else 
+  { $VARIABLES{"\@CGIDIRS"} = join(" ",@POSSIBLECGI); }
+
+ } # end !$CLI{forcecgi}
+
+ nprint("- Checking for CGI in: $VARIABLES{\"\@CGIDIRS\"}","v");
+ return;
+}
+#######################################################################
+# get a page
+# fetch URI, METHOD
+#######################################################################
+sub fetch
+{
+ $request{'whisker'}->{'uri'}    = $_[0] || return;
+ $request{'whisker'}->{'method'} = $_[1];
+ LW::http_reset();
+ $request{'whisker'}->{'data'}="";
+ 
+ if ($_[2] ne "" && $_[2] ne " ")
+  { 
+    $request{'whisker'}->{'data'} =  $_[2]; 
+    $request{'whisker'}->{'data'} =~ s/\\\"/\"/g; 
+  }
+  else { delete $request{'whisker'}->{'Content-Length'}; }
+  
+ $NIKTO{totalrequests}++;
+ LW::http_fixup_request(\%request);
+
+ dump_request_hash();
+
+ LW::http_do_request(\%request,\%result);
+ dump_result_hash();
+ if (exists($result{'set-cookie'})) { push(@COOKIES,"/--=--$result{'set-cookie'}"); }
+ return $result{'whisker'}->{'http_resp'}, $result{'whisker'}->{'data'};
+}
+#######################################################################
+# return $_[0] 'x' characters
+#######################################################################
+sub junk
+{
+ return "x" x $_[0];
+}
+#######################################################################
+# load the scan database
+#######################################################################
+sub load_scan_items
+{
+ open(IN,"<$FILES{dbfile}") || die print "+ ERROR: Unable to open '$FILES{dbfile}' for read: $@\n";
+ @DBFILE=<IN>;
+ close(IN); 
+
+ open(IN,"<$FILES{serverdbfile}") || die print "+ ERROR: Unable to open '$FILES{serverdbfile}' for read: $@\n";
+ @SERVERFILE=<IN>;
+ close(IN); 
+
+ # load a user database if it exists...
+ if (-e $FILES{userdbfile})
+  {
+   open(IN,"<$FILES{userdbfile}") || die print "+ ERROR: Unable to open '$FILES{userdbfile}' for read: $@\n";
+   my @DBFILE_USER=<IN>;
+   close(IN); 
+   # join them...
+   foreach $line (@DBFILE_USER) { push(@DBFILE,$line); }
+  }
+ return;
+}
+#######################################################################
+# get server categories
+#######################################################################
+sub set_server_cats
+{
+ # first figure out server type
+
+ foreach $line (@SERVERFILE)
+ {
+  if ($line =~ /^\"/)
+   {
+    if ($line =~ /\#/) { $line=~s/\#.*$//; $line=~s/\s+$//; }
+    chomp($line);
+    @scat=parse_csv($line);
+    nprint("servercat compare: '$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner}' to '$scat[1]'","d");
+    if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} =~ /$scat[1]/i) 
+      { 
+        $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{category}=$scat[0]; 
+        nprint("servercat match:$scat[0]","d"); 
+        last; 
+      }
+   }
+ }
+ if ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{category} eq "") { $TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{category}="generic"; }
+return;
+}
+#######################################################################
+# set up the scan database
+#######################################################################
+sub set_scan_items
+{
+ set_server_cats();
+ my $shname=$TARGETS{$CURRENT_HOST_ID}{hostname} || $TARGETS{$CURRENT_HOST_ID}{ip};
+ my ($line, $stype) = "";
+ my (@item, @scat, $FILES, $RESPS, $METHD, $INFOS, $DATAS) = ();
+ $ITEMCOUNT=0;
+  
+ # now load checks
+ foreach $line (@DBFILE)
+ {
+  if ($line =~ /^\"/)  # check
+  {
+   chomp($line);
+   
+   @item=parse_csv($line);
+   # if the right category or cat is generic...
+   
+   if (($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{category} =~ /$item[0]/i) 
+       || ($item[0] =~ /generic/i) 
+       || ($TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{banner} eq "") 
+       || ($CLI{forcegen}))
+   {
+    # substitute for @IP, @HOSTNAME in check
+    $line =~ s/\@IP/$TARGETS{$CURRENT_HOST_ID}{ip}/g;
+    $line =~ s/\@HOSTNAME/$shname/g;
+
+    for (my $i=1;$i<=$#item;$i++)
+     {
+      chomp($item[$i]);
+      if ($i eq 3) { next; }  # skip method
+      if ($item[$i] =~ /(JUNK\([0-9]+\))/)  # junk text
+       {
+        my $j= my $m=$1;
+        $j=~ s/^JUNK\(//;
+        $j=~ s/\)//;
+        $j=junk($j);
+        $m=~s/([^a-zA-Z0-9])/\\$1/g;
+        $item[$i] =~ s/$m/$j/;
+       }
+     }
+    
+    if ($item[1] eq "") { $item[2]="/"; }
+    if (($#item < 4) || ($#item > 6)) { nprint("Invalid check syntax:@item:","d"); }
+
+    # Build the check items. First check for any @ values to replace
+    # this nasty set of loops allows for multiple values per line
+    if ($item[1] =~ /^\@/)  # multiple checks in one
+     {
+      my @clones=();
+      my $todelete="";
+      push(@clones,$item[1]);
+      foreach my $varname (keys %VARIABLES)
+       {
+        for (my $i=0;$i<=$#clones;$i++)
+         {
+          if ($clones[$i] =~ /$varname/)
+           {
+            my @values=split(/ /,$VARIABLES{$varname});
+            foreach my $val (@values) 
+             {
+              my $temp=$clones[$i];
+              $temp =~ s/$varname/$val/g;
+              push(@clones,$temp);
+              $todelete=$i;
+             }
+           splice(@clones,$todelete,1);
+           $i--; # step back in the @clones 'cause we deleted one. more work, but it guarantees it's complete
+           }
+         }
+       }
+      # now actually populate the checks 
+      for (my $i=0;$i<=$#clones;$i++)
+      {
+       $ITEMCOUNT++;
+       $FILES{$ITEMCOUNT}="$CLI{root}$clones[$i]";
+       $RESPS{$ITEMCOUNT}=$item[2];
+       $METHD{$ITEMCOUNT}=$item[3];
+       $INFOS{$ITEMCOUNT}=$item[4];
+       $DATAS{$ITEMCOUNT}=$item[5];
+      }
+     }
+    else # normal, single check
+     {
+      $ITEMCOUNT++;
+      $FILES{$ITEMCOUNT}="$CLI{root}$item[1]";
+      $RESPS{$ITEMCOUNT}=$item[2];
+      $METHD{$ITEMCOUNT}=$item[3];
+      $INFOS{$ITEMCOUNT}=$item[4];
+      $DATAS{$ITEMCOUNT}=$item[5];
+
+     }
+   }
+  }
+ }
+
+nprint("- Server category identified as '$TARGETS{$CURRENT_HOST_ID}{ports}{$CURRENT_PORT}{category}', if this is not correct please use -g to force a generic scan.","v");
+nprint("- $ITEMCOUNT server checks loaded","v");
+if ($ITEMCOUNT eq 0) { nprint("+ Unable to load valid checks!"); exit; }
+if ($CLI{forcegen}  eq 0) { nprint("+ Forcing full DB scan","v"); }
+
+return;
+}
+#######################################################################
+# escape all non standard chars in a string (for regex's really)
+# char_escape 'string'
+#######################################################################
+sub char_escape
+{
+ my $text=$_[0]||return;
+ $text =~ s/([^a-zA-Z0-9 ])/\\$1/g;
+ return $text;
+}
+#######################################################################
+# turn CSV data to an array
+# parse_csv 'string'
+#######################################################################
+sub parse_csv
+{
+ my $text = $_[0];
+ my @new = ();
+ push(@new, $+) while $text =~ m{
+ "([^\"\\]*(?:\\.[^\"\\]*)*)",?
+    |  ([^,]+),?
+    | ,
+  }gx;
+  push(@new, undef) if substr($text, -1,1) eq ',';
+  return @new;
+}
+#######################################################################
+# print version info
+#######################################################################
+sub version
+{
+ my @FILES=dirlist($NIKTO{plugindir},"(^nikto|\.db\$)");
+
+ print "$DIV\n$NIKTO{name} Versions\n$DIV\n";
+ print "File                               Version      Last Mod\n";
+ print "-----------------------------      --------     ----------\n";
+ print "Nikto main                         $NIKTO{version}\n";
+ print "LibWhisker                         $LW::VERSION\n";
+
+ my $col1=35;
+ my $col2=13;
+
+ foreach my $FILE (@FILES)
+  {
+   open(FI,"<$NIKTO{plugindir}/$FILE") || die print "- ERROR: Unable to open '$NIKTO{plugindir}/$FILE': $!\n";;;
+   my @F=<FI>;
+   close(FI);
+   my @VERS=grep(/^#VERSION/,@F);
+   my @MODS=grep(/^#LASTMOD/,@F);
+   chomp($VERS[0]);
+   chomp($MODS[0]);
+   $VERS[0] =~ s/^#VERSION,//;
+   $MODS[0] =~ s/^#LASTMOD,//;
+   my $ws1=($col1-length($FILE));
+   my $ws2=($col2-length($VERS[0]));
+   print "$FILE", " " x $ws1 , "$VERS[0]", " " x $ws2, "$MODS[0]\n";
+  }
+ print "$DIV\n";
+
+ exit;
+}
+#######################################################################
+# send version update info to CIRT.net, if desired
+#######################################################################
+sub send_updates
+{
+ if ($CONFIG{UPDATES} !~ /yes|auto/i) { return; }
+ my $have_updates=0;
+ my ($updated_version, $answer, $RES);
+ foreach my $ver (keys %UPDATES) 
+  { 
+   if ($UPDATES{$ver} eq 1) 
+    { 
+     if ($ver !~ /[0-9]/)   { next; }        # no version info...useless
+     if ($ver eq "Win32") { next; }          # also no use
+     if ($ver eq "Linux-Mandrake") { next; } # just... usually garbage
+     $have_updates=1; 
+     $updated_version .= "$ver ";
+    } 
+  }
+  
+ if (!$have_updates) { return; }
+ if ($updated_version eq "") { return; }
+ 
+ # make sure the outdated.db isn't *too* old
+ open(OD,"<$NIKTO{plugindir}/outdated.db") || die print "- ERROR: Unable to open '$NIKTO{plugindir}/outdated.db': $!\n";;
+ @F=<OD>;
+ close(OD);
+ 
+ my @LASTUPDATED=grep(/^#LASTMOD/,@F);
+ chomp($LASTUPDATED[0]);
+ $LASTUPDATED[0]=~s/^.*,//;
+ my @lu=split(/\./,$LASTUPDATED[0]);
+ my $lm="$lu[2]$lu[0]";
+ my @NOW=localtime(time);
+ $NOW[5]+=1900;
+ $NOW[4]++;
+ if ($NOW[4] < 10) { $NOW[4]="0$NOW[4]"; }
+ my $now="$NOW[5]$NOW[4]";
+ if (($now - $lm) > 4) { return; }  # DB is 4 months old... ignore the updates!
+ 
+ $updated_version =~ s/\s+$//; 
+ $updated_version =~ s/^\s+//; 
+ 
+ if ($CONFIG{UPDATES} eq "auto") { $answer = "y"; }
+ else
+  {
+   $answer=read_data("\n
+   ***** Portions of the server's ident string ($updated_version)
+   are not in the Nikto database or is newer than the known string.
+   Would you like to submit this information (*no server specific data*)
+   to CIRT.net for a Nikto update (or you may email to sullo\@cirt.net)
+   (y/n)? ","");
+  }
+
+ if ($answer !~ /y/i) { return; }
+ 
+ LW::http_init_request(\%request);
+ my $server="www.cirt.net";
+ $request{'whisker'}->{'http_ver'}="1.1";
+ $request{'whisker'}->{'port'}=80;
+ $request{'whisker'}->{'anti_ids'}="";
+ $request{'User-Agent'}="Nikto Update Agent";
+ $request{'Host'}="www.cirt.net";
+ 
+ for (my $i=0;$i<=$#ARGV;$i++) 
+ { if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) { $CLI{useproxy}=1; last; } }
+ 
+ my  $ip=gethostbyname($server);
+ if ($ip ne "") { $request{'whisker'}->{'host'}= inet_ntoa($ip); }
+ else { $request{'whisker'}->{'host'}=$server; }
+ if (($CONFIG{PROXYHOST} ne "") && ($CLI{useproxy}))
+
+  {
+   $request{'whisker'}->{'proxy_host'}=$CONFIG{PROXYHOST};
+   $request{'whisker'}->{'proxy_port'}=$CONFIG{PROXYPORT};
+  }
+
+ # send data
+ LW::http_fixup_request(\%request);
+ ($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
+
+ # if res is blank... maybe only proxy to get to net?
+ if (($RES eq "") && ($CONFIG{PROXYHOST} ne ""))
+  {
+   $request{'whisker'}->{'proxy_host'}=$CONFIG{PROXYHOST};
+   $request{'whisker'}->{'proxy_port'}=$CONFIG{PROXYPORT};
+   ($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
+  }
+
+ if ($RES eq 407) # requires Auth
+  {
+   if ($CONFIG{PROXYUSER} eq "")  
+      {
+      $CONFIG{PROXYUSER}=read_data("Proxy ID: ","");
+      $CONFIG{PROXYPASS}=read_data("Proxy Pass: ","noecho");
+     }
+   LW::auth_set_header("proxy-basic",\%request,$CONFIG{PROXYUSER},$CONFIG{PROXYPASS});
+
+   # and try again
+   LW::http_fixup_request(\%request);
+  ($RES, $CONTENT) = fetch("/cgi-bin/versions?DATA=$updated_version","GET");
+  }
+
+ if ($CONTENT !~ /SUCCESS/) 
+  { 
+   print "- ERROR ($RES, $CONTENT): Unable to send updated version string(s) to CIRT.net\n"; 
+  }
+ else
+  {
+   print "- Sent updated version string(s) to CIRT.net\n"; 
+  }
+
+return;
+}
+#######################################################################
+# print usage info
+#######################################################################
+sub usage
+{
+ nprint($NIKTO{options});
+ exit;
+}
+#######################################################################
+sub nikto_core { return; } # trap for this plugin being called to run
+#######################################################################
+
+1;

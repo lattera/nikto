@@ -1,0 +1,65 @@
+#VERSION,1.05
+#LASTMOD,05.27.2003
+# HTTP headers check
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this checks out the robots.txt file
+
+sub nikto_robots
+{
+ (my $RES , $CONTENT) = fetch("/robots.txt","GET");
+
+ if ($RES eq 200)  # got one!
+  { 
+   my ($DIRS, $RFILES) = "";
+   my $DISCTR=0;
+   my @DOC=split(/\n/,$CONTENT);
+   foreach my $line (@DOC)
+    {
+     $line = char_escape($line);
+     if ($line =~ /disallow/i)  # hmmm...
+      {
+       chomp($line);
+       $line =~ s/\#.*$//;
+       $line =~ s/(^\s+|\s+$)//g;
+       $line =~ s/\s+/ /g;
+       $line =~ s/\\t/ /g;
+       $line =~ s/disallow(:)?( )?//i;
+       $line =~ s/\*//g;
+       $line =~ s/\/+/\//g;
+
+       if ($line eq "") { next; }
+       # try to figure out file vs dir... just guess...
+       if (($line !~ /\./) && ($line !~ /\/$/)) { $line .= "/"; }
+
+       $line=LW::utils_normalize_uri($line);
+
+       # figure out dirs/files...
+       my $realdir=LW::utils_get_dir($line);
+       my $realfile=$line;
+       $realfile =~ s/^$realdir//;
+       
+       nprint("- robots.txt entry dir:$realdir -- file:$realfile","d");
+       if (($realdir ne "") && ($realdir ne "/")) { $DIRS{$realdir}++; }
+       if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
+       $DISCTR++;
+      } # end if $line =~ disallow
+    } # end foreach my $line (@DOC)_
+    
+  # add them  to mutate dir/file
+  foreach my $d (sort keys %DIRS) { $CONFIG{MUTATEDIRS} .= " $d"; $CONFIG{PASSWORDDIRS} .= " $d"; }
+  foreach my $f (sort keys %RFILES) { $CONFIG{MUTATEFILES} .= " $f"; }
+
+  if ($DISCTR eq 1) 
+     { nprint("+ /robots.txt - contains $DISCTR 'disallow' entry which should be manually viewed (added to mutation file lists) (GET)."); }
+  elsif ($DISCTR > 1) 
+     { nprint("+ /robots.txt - contains $DISCTR 'disallow' entries which should be manually viewed (added to mutation file lists) (GET)."); }
+  else 
+     { nprint("- /robots.txt - retrieved but it does not contain any 'disallow' entries, which is odd. This should be checked manually.(GET)"); }
+  $VULS++;
+  } # end if $RES eq 200
+}
+
+1;

@@ -1,0 +1,57 @@
+#########################################################################################################
+# CONFIG STUFF
+#########################################################################################################
+# default command line options, can't be an option that requires a value.  used for ALL runs.
+# CLIOPTS=-g -a
+
+# location of nmap to use with port scanning (rather than Nikto internals)
+NMAP=/usr/bin/nmap
+
+# ports never to scan (21/111 tend to respond slowly... and USUALLY aren't web servers)
+SKIPPORTS=21 111
+
+# if Nikto is having difficulty finding 'plugins', set the full path here
+# PLUGINDIR=/usr/local/nikto/plugins
+
+# the default HTTP version to try... can/will be changed as necessary
+DEFAULTHTTPVER=1.1
+
+#########################################################################################################
+# PROXY STUFF
+#########################################################################################################
+# PROXYHOST=10.10.10.10
+# PROXYPORT=8080
+# PROXYUSER=proxyuserid
+# PROXYPASS=proxypassword
+
+
+#########################################################################################################
+# COOKIE STUFF
+#########################################################################################################
+# send a cookie with all requests, helpful if auth cookie is needed
+#STATIC-COOKIE=cookiename=cookievalue
+
+#########################################################################################################
+# VARIABLE'S STUFF
+#########################################################################################################
+# User defined values may be added here, which will be used as replacements for values in
+# the scan_database.db and user_scan_database.db files. They work the same as @CGIDIRS do.
+# Any values to be replaced must start with the @ character, such as: @CGIDIRS. An example
+# line would look like (minus the #):
+# @ADMINDIRS=/admin/ /administrator/ /adm/
+# and the corresponding DB entry would look like (minus the #):
+# "generic","@ADMINDIRS/passwords.txt","200","GET","Got admin?"
+# @IP and @HOSTNAME are done automagically
+# Variables currently only work for the requested file portion of a check 
+#########################################################################################################
+# this must be defined or just /cgi-bin/ will be tried
+@CGIDIRS=/cgi.cgi/ /webcgi/ /cgi-914/ /cgi-915/ /bin/ /cgi/ /mpcgi/ /cgi-bin/ /cgi-sys/ /cgi-local/ /htbin/ /cgibin/ /cgis/ /scripts/ /cgi-win/ /fcgi-bin/
+
+# These are for nikto_mutate.plugin. Each will be substituted with *every* file and path!
+# This can make for an insane number of checks.
+@MUTATEDIRS=/....../ /members/ /porn/ /restricted/ /xxx/
+@MUTATEFILES=xxx.htm xxx.html porn.htm porn.html
+
+# Other variables that can be used in the scan DB
+@ADMINDIRS=/admin/ /adm/
+@USERS=adm bin daemon ftp guest listen lp mysql noaccess nobody nobody4 nuucp operator root smmsp smtp sshd sys test unknown uucp web www

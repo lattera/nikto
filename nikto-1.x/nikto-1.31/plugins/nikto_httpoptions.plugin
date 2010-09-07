@@ -1,0 +1,50 @@
+#VERSION,1.05
+#LASTMOD,07.22.2003
+# HTTP Options check
+# see RFC 2626 for info...
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this just gets the options & checks 'em out.
+
+sub nikto_httpoptions
+{
+ (my $RES , $CONTENT) = fetch("/","OPTIONS");
+ $NIKTO{methods}=$result{allow};
+ 
+ # proxy can impose it's methods... need to actually check this not just warn
+ my $TXT="";
+ if ($CLI{useproxy} ne "") { $TXT="(May be proxy's methods, not server's)"; }
+
+ if ($NIKTO{methods} ne "")
+    { nprint("+ Allowed HTTP Methods: $NIKTO{methods} $TXT"); }
+
+ # now the warnings...
+ if ($NIKTO{methods} =~ /put/i) 
+    { nprint("+ HTTP method 'PUT' method may allow clients to save files on the web server."); }
+
+ if ($NIKTO{methods} =~ /connect/i) 
+    { nprint("+ HTTP method 'CONNECT' may allow server to proxy client requests."); }
+
+ if ($NIKTO{methods} =~ /delete/i) 
+    { nprint("+ HTTP method 'DELETE' may allow clients to remove files on the web server."); }
+
+ if ($NIKTO{methods} =~ /propfind/i) 
+    { nprint("+ HTTP method 'PROPFIND' may indicate DAV/WebDAV is installed. This may be used to get directory listings if indexing is allowed but a default page exists."); }
+
+ if ($NIKTO{methods} =~ /search/i) 
+    { nprint("+ HTTP method 'SEARCH' may be used to get directory listings if Index Server is running."); }
+
+ if ($NIKTO{methods} =~ /proppatch/i) 
+    { nprint("+ HTTP method 'PROPPATCH' may indicate DAV/WebDAV is installed."); }
+    
+ if ($NIKTO{methods} =~ /trace/i) 
+    { nprint("+ HTTP method 'TRACE' is typically only used for debugging. It should be disabled."); }
+ 
+ if ($NIKTO{methods} =~ /track/i) 
+    { nprint("+ HTTP method 'TRACK' ('TRACE' alias) is typically only used for debugging. It should be disabled."); }
+
+}
+
+1;

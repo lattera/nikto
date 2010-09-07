@@ -1,0 +1,75 @@
+#VERSION,1.01
+#LASTMOD,06.17.2003
+# (c) 2001-2005 cirt.net, All Rights Reserved
+
+# Enumeration of users via the cgiwrap program 
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# This plugin tries to enumerate all the users 
+# in the system (of course the bruteforce attack is limited to a given range).
+# The cgiwrap program allows you to determine user names based on the error responses.
+
+# this plugin is a hack of nikto_apacheusers.plugin which was written by Javier Fernandez-Sanguino Pe–a
+
+sub nikto_user_enum_cgiwrap {
+ if ($CLI{mutate} !~ /4/) { return; }
+
+ my @CGIWRAPS;
+ my $valid=$ctr=0;
+ my @CFGCGI=(split(/ /,$VARIABLES{"\@CGIDIRS"}));
+ my $msg;
+
+# test for locations of cgiwrap files
+ foreach my $cgidir (@CFGCGI)
+  {
+   my $url = "$cgidir" . "cgiwrap";
+   (my $RES , $CONTENT) = fetch("$url","GET");
+   if ( $CONTENT =~ /check your URL/i ) 
+     {
+      push(@CGIWRAPS,"$url"); 
+      $valid++; 
+     }
+  }
+
+if ($valid eq 0) { return; }
+nprint("- Enumerating users via cgiwrap (1 to 5 characters).","d");
+
+# Note1: This script only generates names with letters A-Z (no numbers)
+#
+# Note2: this script will generate SUM(26^n)(n=$min to $max) 
+# it's probably faster to write this to a file than to generate it
+# on the fly BTW.
+# 
+# Of course, it could be optimized to skip some "strange"
+# combinations of usernames, but hey, then it wouldn't
+# be 'brute force' would it? (jfs)
+
+foreach $cgiwrap (@CGIWRAPS)
+ {
+  $start="a";
+  while (length($start) <= 5) 
+      {
+       if (($ctr % 500) eq 0) { nprint("\tUser enumeration guess $ctr ($cgiwrap/~$start)","d"); }
+       (my $RES , $CONTENT) = fetch("$cgiwrap/~".$start,"GET");
+       if ( $CONTENT !~ /unable to find/i ) # this is a valid user
+         { 
+          $VULS++;
+          if ($CONTENT =~ /less than configured minimum/)
+           {  
+            $msg = "is a valid user on the system and may have a UID below 100. Recompile cgiwrap with the '--with-quiet-errors' option to stop user enumeration.";
+           }
+          else
+           {
+            $msg = "is a valid user on the system. Recompile cgiwrap with the '--with-quiet-errors' option to stop user enumeration.";
+           }
+          nprint("+ $cgiwrap/~".$start." - '$start' $msg.");
+         $start++;
+         $ctr++;
+         }
+       }
+  }
+}
+
+1;

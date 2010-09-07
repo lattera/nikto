@@ -1,0 +1,256 @@
+#VERSION,1.02
+#LASTMOD,03.10.2002
+# FrontPage Add-On for Nikto
+# this could all be done in the regular scan_database.db, but it couldn't key off the frontpage install
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# changes:
+# 1.01 -- added some better error messages
+# 1.02 -- added patches from Pasi Eronen which fix some bugs in the code
+
+sub nikto_frontpage
+{
+ # test for the file, if it exists, push stuff to the scan arrays for testing later
+ # this could probably be done easier
+ (my $RES , $CONTENT) = fetch("/_vti_inf.html","GET");
+ if ($RES ne 200)  { ($RES , $CONTENT) = fetch("/_vti_bin/shtml.exe/_vti_rpc","GET"); }
+
+ my $STARTITEM="";
+ if ($RES eq "200")  # got it
+ {
+   # we can cheat and add the 200 & GET at the end, also "/" for directory if that's all
+    $STARTITEM=$ITEMCOUNT;
+
+    $ITEMCOUNT++;
+    $FILES{$ITEMCOUNT}="_private/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $FILES{$ITEMCOUNT}="_vti_pvt/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $FILES{$ITEMCOUNT}="_vti_bin/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $FILES{$ITEMCOUNT}="_vti_log/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $FILES{$ITEMCOUNT}="_vti_txt/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_private/";
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/";
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_log/";
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_txt/";
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_cnf/";
+    $FILES{$ITEMCOUNT}="_vti_cnf/";
+    $INFOS{$ITEMCOUNT}="FrontPage Directory Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/";
+    $FILES{$ITEMCOUNT}="shtml.dll";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/";
+    $FILES{$ITEMCOUNT}="shtml.exe";
+    $INFOS{$ITEMCOUNT}="Attackers may be able to crash FrontPage by requesting a DOS device, like shtml.exe/aux.htm -- a DoS was not attempted.";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/cgi-dos/";
+    $FILES{$ITEMCOUNT}="args.bat";
+    $INFOS{$ITEMCOUNT}="FrontPage CGI Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/scripts/tools/";
+    $FILES{$ITEMCOUNT}="newdsn.exe";
+    $INFOS{$ITEMCOUNT}="FrontPage CGI Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/admcgi/";
+    $FILES{$ITEMCOUNT}="contents.htm";
+    $INFOS{$ITEMCOUNT}="FrontPage CGI Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/scripts/iisadmin/";
+    $FILES{$ITEMCOUNT}="bdir.htr";
+    $INFOS{$ITEMCOUNT}="FrontPage CGI Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/admcgi/";
+    $FILES{$ITEMCOUNT}="scripts/Fpadmcgi.exe";
+    $INFOS{$ITEMCOUNT}="FrontPage CGI Found";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/admisapi/";
+    $FILES{$ITEMCOUNT}="fpadmin.htm";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="access.cnf";
+    $INFOS{$ITEMCOUNT}="Contains HTTP server-specific access control information, remove or ACL if FrontPage is not being used.";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="service.cnf";
+    $INFOS{$ITEMCOUNT}="Contains meta-information about the web server, remove or ACL if FrontPage is not being used.";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="services.cnf";
+    $INFOS{$ITEMCOUNT}="Contains the list of subwebs, remove or ACL if FrontPage is not being used.";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="writeto.cnf";
+    $INFOS{$ITEMCOUNT}="Contains information about form handler result files, remove or ACL if FrontPage is not being used.";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="service.pwd";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="users.pwd";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="authors.pwd";
+    $INFOS{$ITEMCOUNT}="This file contains FrontPage passwords.";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="administrators.pwd";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/scripts/";
+    $FILES{$ITEMCOUNT}="fpcount.exe";
+
+    $ITEMCOUNT++;
+    $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+    $FILES{$ITEMCOUNT}="svcacl.cnf";
+    $INFOS{$ITEMCOUNT}="File used to store whether subwebs have unique permissions settings and any IP address restrictions.  Can be used to discover information about subwebs, remove or ACL if FrontPage is not being used.";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="POST";
+    $ROOTS{$ITEMCOUNT}="/vti_bin/";
+    $FILES{$ITEMCOUNT}="shtml.dll/_vti_rpc?method=server+version%3a4%2e0%2e2%2e2611";
+    $INFOS{$ITEMCOUNT}="Gives info about server settings.";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="POST";
+    $ROOTS{$ITEMCOUNT}="/vti_bin/";
+    $FILES{$ITEMCOUNT}="shtml.exe/_vti_rpc?method=server+version%3a4%2e0%2e2%2e2611";
+    $INFOS{$ITEMCOUNT}="Gives info about server settings.";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="POST";
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/_vti_aut/";
+    $FILES{$ITEMCOUNT}="author.dll?method=list+documents%3a3%2e0%2e2%2e1706&service%5fname=&listHiddenDocs=true&listExplorerDocs=true&listRecurse=false&listFiles=true&listFolders=true&listLinkInfo=true&listIncludeParent=true&listDerivedT=false&listBorders=false";
+    $INFOS{$ITEMCOUNT}="We seem to have authoring access to the FrontPage web";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="POST";
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/_vti_aut/";
+    $FILES{$ITEMCOUNT}="author.exe?method=list+documents%3a3%2e0%2e2%2e1706&service%5fname=&listHiddenDocs=true&listExplorerDocs=true&listRecurse=false&listFiles=true&listFolders=true&listLinkInfo=true&listIncludeParent=true&listDerivedT=false&listBorders=false";
+    $INFOS{$ITEMCOUNT}="We seem to have authoring access to the FrontPage web";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="GET";
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/_vti_aut/";
+    $FILES{$ITEMCOUNT}="dvwssr.dll";
+    $RESPS{$ITEMCOUNT}=401;
+    $INFOS{$ITEMCOUNT}="This dll allows anyone with authoring privs to change other users file, and may contain a buffer overflow for unauthenticated users. See also : http://www.wiretrip.net/rfp/p/doc.asp?id=45&iface=1";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="GET";
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/_vti_aut/";
+    $FILES{$ITEMCOUNT}="dvwssr.dll";
+    $RESPS{$ITEMCOUNT}=200;
+    $INFOS{$ITEMCOUNT}="This dll allows anyone with authoring privs to change other users file, and may contain a buffer overflow for unauthenticated users. See also : http://www.wiretrip.net/rfp/p/doc.asp?id=45&iface=1";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="GET";
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/_vti_aut/";
+    $FILES{$ITEMCOUNT}="fp30reg.dll?xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    $RESPS{$ITEMCOUNT}="The remote procedure call failed";
+    $INFOS{$ITEMCOUNT}="This dll is vulnerable to a remote overflow which can allow attackers to execute remote commands.";
+
+    $ITEMCOUNT++;
+    $METHD{$ITEMCOUNT}="GET";
+    $ROOTS{$ITEMCOUNT}="/_vti_bin/shtml.exe/";
+    $FILES{$ITEMCOUNT}="nikto_nonexistant.exe";
+    $RESPS{$ITEMCOUNT}=":\\";
+    $INFOS{$ITEMCOUNT}="This exe shows the full web path when a non-existent file is requested.";
+
+    my @FILES = qw(registrations.txt register.txt orders.txt form_results.txt registrations.htm register.htm orders.htm form_results.htm);
+    foreach my $f (@FILES)
+     { 
+      $ITEMCOUNT++;
+      $ROOTS{$ITEMCOUNT}="/_private/";
+      $FILES{$ITEMCOUNT}="$f";
+     } 
+
+    @FILES = qw(writeto.cnf svcacl.cnf services.cnf access.cnf);
+    foreach my $f (@FILES)
+     { 
+      $ITEMCOUNT++;
+      $ROOTS{$ITEMCOUNT}="/_vti_pvt/";
+      $FILES{$ITEMCOUNT}="$f";  
+     }
+
+    my @DIRS  = qw(_vti_bin cgi-bin bin scripts);
+    @FILES = qw(fpsrvadm.exe fpremadm.exe CGImail.exe admin.pl cfgwiz.exe contents.htm fpadmin.htm);
+    foreach my $d (@DIRS) { 
+    foreach my $f (@FILES)
+     {
+      $ITEMCOUNT++;
+      $ROOTS{$ITEMCOUNT}="/$d/";
+      $FILES{$ITEMCOUNT}="$f";
+     }
+     }
+
+
+ }
+
+for (my $i=$STARTITEM;$i<=$ITEMCOUNT;$i++)
+ {
+  if ($ROOTS{$i} eq "") { $ROOTS{$i}="/"; }
+  if ($RESPS{$i} eq "") { $RESPS{$i}="200"; }
+  if ($METHD{$i} eq "") { $METHD{$i}="GET"; }
+  if ($INFOS{$i} eq "") { $INFOS{$i}="FrontPage File Found."; }
+ }
+
+}
+
+1;

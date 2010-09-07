@@ -1,0 +1,75 @@
+#VERSION,1.06
+#LASTMOD,08.22.2003
+# mutated file checks
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+sub nikto_mutate
+{
+
+ if ($CLI{mutate} !~ /1/) { return; }
+ my $mctr=0;
+ 
+ my ($c, %DIRS, %FS) = "";
+
+ # build a hash of all the unique directories
+ foreach $c (@CGIDIRS) { $DIRS{$c}=""; }
+
+ nprint("-Loading root level files","v");
+
+ foreach my $cn (keys %FILES)
+   {
+   print "cn:$cn\n";
+    my $dir=LW::utils_get_dir($FILES{$cn});
+    my $file=$FILES{$cn};
+    my $rdir=$dir;
+    $rdir=~s/([^a-zA-Z0-9])/\\$1/g;
+    $file =~ s/$rdir//;
+    print "prev:$dir\n";
+    if ($dir =~ /sullo/) { print "yup:$dir\n"; exit; }
+    $DIRS{$dir}="" unless $dir eq "";
+    $FS{$file}="" unless $file eq "";
+   }
+ 
+ nprint("-Loading config.txt items","v");
+ # add anything from the config file
+ my @t=split(/ /,$CONFIG{"\@MUTATEDIRS"}); foreach $c (@t) { $DIRS{$c}=""; }
+ @t=split(/ /,$CONFIG{"\@MUTATEFILES"}); foreach $c (@t) { $FS{$c}=""; }
+
+ # add the -r(oot) option value
+ if ($CLI{root} ne "") { $DIRS{$CLI{root}}=""; }
+
+ # add the directory/file combos to the request hashes
+
+ $total_tests=0;
+ foreach my $root (keys %DIRS)
+  {  
+    if ($root =~ /sullo/) { print "hrm.:\n"; exit; }
+   foreach my $file (keys %FS)
+    {
+    if ($file =~ /sullo/) { print "uhh\n"; exit; }
+     # skip self referencing stuff
+     if (($root !~ /[^\.\/]/) && ($file !~ /[^\.\/]/)) { next; }
+     # args with no file
+     if (($root eq "/") && ($file =~ /^\?/)) { next; }
+     if (($root eq "") && ($file =~ /^\?/)) { next; }
+     $mctr++;
+     $total_tests++;
+     $ITEMCOUNT++;
+
+     if (($total_tests % 100000) eq 0) { nprint("-Added test ($total_tests of many):$CLI{root}$root$file:","d"); }
+
+     $FILES{$ITEMCOUNT}="$CLI{root}$root$file";
+     $INFOS{$ITEMCOUNT}="URL created via mutate option.";
+     $RESPS{$ITEMCOUNT}=200;
+     $METHD{$ITEMCOUNT}="GET";
+    }
+  }
+
+ nprint("- $mctr mutate checks loaded","v");
+ return;
+
+}
+
+1;

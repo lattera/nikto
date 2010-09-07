@@ -1,0 +1,260 @@
+NAME
+	Nikto  - Web Server and CGI Scanner
+	
+	
+SYNOPSIS
+	nikto [-h target] [options]
+	
+	
+WARNING
+	Nikto is a tool for finding default web files and examing web server and CGI security.
+	It makes a lot of reqeusts to the remote server, which in some cases may cause the server
+	to crash.  It may also be illegal to use this software against servers you do not have 
+	permission to do test.
+
+
+DESCRIPTION
+	Nikto is designed to examine web servers and look for items in multiple categories:
+		- misconfigurations
+		- default files and scripts
+		- insecure files and scripts
+		- outdated software
+	
+	It uses Rain Forest Puppy's LibWhisker (wiretrip.net) for HTTP functionality, and can perform checks in 
+	HTTP or HTTPS.  It also supports basic port scanning and will determine if a web server
+	is running on any open ports.
+	
+	Server checks and plugins can be automatically udpated from the main distribution server by
+	using the 'update' option (see below) to ensure Nikto is checking the most recent vulnerabilities.
+	
+	Nikto will also load user defined checks at startup if they are placed in a file named "user_scan_database.db" in
+	the plugins directory.  Unlike scan_database.db, this file will not be over-written if the -update option is used. This
+	should always be used if you add your own checks (and you should send those checks to sullo@cirt.net so the product
+	gets better for everyone!).
+	
+	Nikto leaves a footprint on a server it scans--both in an invalid 404 check and in the User-Agent header. This can
+	be changed by forcing the $NIKTO{fingerprint} and $NIKTO{useragent} to new values in the source code, OR, if any
+	IDS evasion (-e) option is used.  Note that it's pretty obvious when Nikto is scanning a server anyway--the large
+	number of invalid requests sticks out a lot in the server logs, although with an IDS evasion technique it might not
+	be extremely obvious that it was Nikto.
+
+	Why the name Nikto? See the movies The Day the Earth Stood Still" and, of course "Army of Darkness" for the answer. For
+	a full list of pop-culture references to this, see http://www.blather.net/archives2/issue2no21.html which has a lot of
+	good information.
+	
+OPTIONS
+	The options listed below are all optional except the -h target specification.  They can all be abbreviated
+	to the first letter (i.e., -m for -mutate), with the exception of -verbose and -debug.
+	
+       -allcgi       		
+       		Force scan of all possible CGI directories defined in the config.txt value CGIDIRS, regardless
+       		of whether they might exist or not.
+
+       -mutate 
+           	Mutate checks. This causes Nikto put all files with all directories from the .db files and 
+       		can the host. You might find some oddities this way. Note that it generates a lot of checks.
+
+       -evasion <evasion method>
+            IDS evasion techniques.  This enables the intrusion detection evasion in LibWhisker.  Multiple options
+            can be used by stringing the numbers together, i.e. to enable methods 1 and 5, use "-e 15".  The valid
+            options are (use the number preceeding each description):
+	   		 1	Random URI encoding (non-UTF8)
+	   		 2	Add directory self-reference /./
+	   		 3	Premature URL ending
+	   		 4	Prepend long random string to request
+	   		 5	Fake parameters to files
+	   		 6	TAB as request spacer instead of spaces
+	   		 7	Random case sensitivity
+	   		 8	Use Windows directory separator \ instead of /
+	   		 9	Session splicing
+	   		See the LibWhisker source for more information, or http://www.wiretrip.net/
+
+       -findports
+       		Use port scan to find valid HTTP and HTTPS ports only, but do not perform checks against them.
+
+       -generic 
+       		Force full scan rather than trusting the "Server:" identification string, as many servers allow this
+       		to be changed.
+
+       -google 
+       		Perform a Google seach, restricted to the current target, for the words defined in GOOGLERS in the config file.
+       		By default these words are: password passwd login
+
+       -host <ip or hostname>
+            Target host to check against. This can be an IP address or hostname.  This is the only required option.
+
+       -id <user:password>
+       		HTTP Authentication use, format is userid:password for authorizing Nikto a web server realm.
+
+       -nolookup
+       		Don't perform a host name lookup.
+
+       -output <filename>
+       		Write output to this file when complete.  Format is text unless -w is also used.
+
+       -port <port number>
+       		Port number to scan, defaults to port 80 if missing.  This can also be a range or list of ports, which
+       		Nikto will check for web servers.  If a web server is found, it will perform a full scan unless the
+       		-f option is used.
+
+       -ssl 
+      		Force SSL mode on port(s) listed.  Note that Nikto attempts to determine if a port is HTTP or HTTPS 
+      		automatically, but this can be slow if the server fails to respond or is slow to respond to the 
+      		incorrect one.
+
+       -timeout	
+       		Timeout for each request, default is 10 seconds
+       		
+       -useproxy
+       		Use the proxy defined in config.txt for all requests
+
+       -vhost <ip or hostname>
+       		Virtual host to use for the "Host:" header, in case it is different from the target.
+
+       -web
+       		Write to the -o output file in HTML (web) format.
+   
+   These options cannot be abbreviated to the first letter:
+       -verbose 
+       		Print out a lot of extra data during a run. This can be useful if a scan or server is failing, or to see
+       		exactly how a server responds to each request.
+
+       -debug
+       		Print a huge amount of detail out. In most cases this is going to be more information than you need, so
+       		try -verbose first.
+       	
+		-update
+			This will connect to cirt.net and download updated scan_database.db and plugin files. Use this with
+			caution as you are downloading files--perhaps including code--from an "untrusted" source. This option
+			cannot be combined with any other, but required variables (like the PROXY settings) will be loaded
+			from the config.txt file.
+		
+		-dbcheck
+			This option will check the syntax of the checks in the scan_database.db and user_scan_database.db files. This
+			is really only useful if you are adding checks or are having problems.
+
+
+CONFIG FILE
+	The 'config.txt' file provides a means to set variables without modifying the Nikto source itself at run-time. The
+	options below can be set in the file. Options that accept multiple values (CGIDIRS, SKIPPORTS, etc.) should just use
+	a space to distinguish multiple values.  None of these are required unless you need them.
+	
+	CGIDIRS - CGI directories to look for, valid ones (or all) will be used for CGI checks against the remote host.
+	CLIOPTS - Add any option here to be added to every Nikto execution, whether specified at the command line or not.
+	NMAP - Path to nmap. If defined, Nikto will use nmap to port scan a host rather than PERL code, and so should be faster.
+	SKIPPORTS - Port number never to scan (so you don't crash services, perhaps?).
+	PROXYHOST - Server to use as a proxy, either IP or hostname, no 'http://' needed.
+	PROXYPORT - Port number that PROXYHOST uses as a proxy.
+	PROXYUSER - If the PROXYHOST requires authentication, use this ID.
+	PROXYPASS - If the PROXYHOST requires a password for PROXYUSER, use this password.
+	DEFAULTHTTPVER - First try this HTTP method. If this fails, Nikto will attempt to find a valid one. Useful if you want try something non-standard.
+	PLUGINDIR - If Nikto can't find it's plugin directory for some reason, enter the full path and the problem is solved.
+	MUTATEDIRS - Additional directories to use when operating under the Mutate mode besides ones already defined the .db files.
+	MUTATEFILES - Additional files to use when operating under the Mutate mode besides ones already defined the .db files.
+
+
+EXAMPLES
+	A basic scan of a web server on port 80. The -h option is the only option that is required for a basic scan of a web
+	server on the standard HTTP port.
+	
+	nikto.pl -h 10.100.100.10
+	
+	A basic scan of a web server on port 443, forcing SSL encryption and ignoring the Server header.  Note that Nikto does
+	not assume port 443 to be SSL, but if HTTP fails it will try HTTPS.
+	
+	nikto.pl -h 10.100.100.10 -p 443 -s -g
+	
+	Scanning multiple ports on the server, letting Nikto determine if they are HTTP and SSL encrypted.
+	
+	nikto.pl -h 10.100.100.10 -p 80-90 
+	
+	Scanning specific ports on the system.
+
+	nikto.pl -h 10.100.100.10 -p 80,443,8000,8080
+
+	You may combine IDS evasion techniques as desired.
+	
+	nikto.pl -h 10.100.100.10 -p 80 -e 167
+
+
+FILES
+	config.txt  - run-time configuration options, see the CONFIG FILE section
+	LW.pm - The stand-alone LibWhisker file. It is probably better to install the LibWhisker module directly than to use this.
+	user_scan_database.db - If it exists in the plugins directory, it will load these checks as well. Same syntax as scan_database.db
+
+
+ADDITIONAL SOFTWARE
+	LibWhisker is required for proper execution of Nikto. The LW.pm library is included with Nikto, but it is recommended
+	that you download and install the full LibWhisker module from http://www.wiretrip.net/. If you are not using an installed
+	Libwhisker, you will need to change Nikto.pl so that it includes the proper LW.pm file.  Edit Nikto.pl and comment line 4:
+		use LW;
+	and uncomment the line below it (line 5):
+		require "./plugins/LW.pm";
+	
+	nmap can be used to speed up port scans. This should be faster than relying on PERL code to perform port scans. Nmap can
+	be obtained from http://www.nmap.org/, it is not included with Nikto.
+	
+	SSL software is required to test using HTTPS.  For Windows systems, the SSL software and libraries can be obtained from
+	http://www.activestate.com/.  For unix systems, OpenSSL from http://www.openssl.org/ and the Net::SSLeay module from
+	http://www.cpan.org/ are required.
+
+CHECKS
+	Checks, both information and actual security problems, are derived from a number of sources. These include the mailing lists
+	BugTraq, NTBugTraq, WebAppSec (WWW-Mobile-Code), and others. The web sites www.securitytracker.com, www.securiteam.com, 
+	www.packetstormsecurity.com and www.securityfocus.com.  Additionally, I monitor updates to Nessus as well, and so often
+	see new web security checks in plugins written by people for that awesome project (http://www.nessus.org/).
+
+WARNINGS
+	Nikto can cause harm to your local system, the remote system and/or the network.  Some options can generate over 70,000 
+	HTTP requests to a target. Do not run Nikto againsts hosts you are not authorized to perform testing against. Cirt.net
+	takes no responsibility for anything done with this software, any problems it may cause or problems it may find.
+	
+	Plugins are standard PERL.  They are included and executed when Nikto is run. If you run the -update option, new and
+	updated plugins will be downloaded from cirt.net. This means you are downloading code, and potentially running it, 
+	without viewing it yourself.  Please consider the implications.  Do not assume code distributed from Cirt.net is not
+	harmful, as accidents happen and a malicious third party may have inserted a dangerous plugin. Cirt.net assumes no 
+	responsibility if any malicious code is delivered via the -update option.
+	
+
+DISTRIBUTION
+	Nikto and updated databases and plugins is distributed from http://www.cirt.net/
+	
+	
+SEE ALSO
+	LibWhisker - http://www.wiretrip.net/
+	Nmap - http://www.nmap.org/
+	OpenSSL - http://www.openssl.org/
+	CPAN - http://www.cpan.org/
+	ActiveState - http://www.activestate.com/
+	
+	
+LICENSE
+	This copyright applies to all code included in this distribution, but does not include the LibWhisker software, which is
+	distributed under its own license.
+
+	Copyright (C) 2001, 2002 Sullo/CIRT.net
+
+	This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2  of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+
+	You should have received a copy of the GNU General Public License along with this program; if not, write to the 
+	Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+	
+	Contact Information: See the AUTHOR section.
+
+
+AUTHOR
+	Sullo, sullo@cirt.net
+	http://www.cirt.net/
+	
+	Suggestions/fixes/support from: Jericho/attrition.org, rfp/wiretrip.net, Zel/firewallmonkeys.com, Zeno/cgisecurity.com, 
+	Darby/cirt.net, Valdez/cirt.net, S Saady, P Eronen/nixu.com, M Arboi, T Seyrat, J DePriest
+	
+	Tests contributed/suggested by: M Richardson, Jericho/attrition.org, Prickley Paw, M Arboi, H Heimann
+	
+	And Xiola.net for succeeding where everyone else has failed.
+	

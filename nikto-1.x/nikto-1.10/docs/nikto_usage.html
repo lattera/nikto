@@ -1,0 +1,251 @@
+<b>NAME</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto  - Web Server and CGI Scanner<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<b>SYNOPSIS</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nikto [-h target] [options]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<b>WARNING</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto is a tool for finding default web files and examing web server and CGI security.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It makes a lot of reqeusts to the remote server, which in some cases may cause the server<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to crash.  It may also be illegal to use this software against servers you do not have <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;permission to do test.<br>
+<br>
+<br>
+<b>DESCRIPTION</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto is designed to examine web servers and look for items in multiple categories:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- misconfigurations<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- default files and scripts<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- insecure files and scripts<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- outdated software<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It uses Rain Forest Puppy's LibWhisker (wiretrip.net) for HTTP functionality, and can perform checks in <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HTTP or HTTPS.  It also supports basic port scanning and will determine if a web server<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is running on any open ports.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Server checks and plugins can be automatically udpated from the main distribution server by<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;using the 'update' option (see below) to ensure Nikto is checking the most recent vulnerabilities.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto will also load user defined checks at startup if they are placed in a file named "user_scan_database.db" in<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;the plugins directory.  Unlike scan_database.db, this file will not be over-written if the -update option is used. This<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;should always be used if you add your own checks (and you should send those checks to sq@cirt.net so the product<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;gets better for everyone!).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto leaves a footprint on a server it scans--both in an invalid 404 check and in the User-Agent header. This can<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be changed by forcing the $NIKTO{fingerprint} and $NIKTO{useragent} to new values in the source code, OR, if any<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IDS evasion (-e) option is used.  Note that it's pretty obvious when Nikto is scanning a server anyway--the large<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of invalid requests sticks out a lot in the server logs, although with an IDS evasion technique it might not<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be extremely obvious that it was Nikto.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Why the name Nikto? See the movies The Day the Earth Stood Still" and, of course "Army of Darkness" for the answer. For<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a full list of pop-culture references to this, see http://www.blather.net/archives2/issue2no21.html which has a lot of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;good information.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<b>OPTIONS</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The options listed below are all optional except the -h target specification.  They can all be abbreviated<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to the first letter (i.e., -m for -mutate), with the exception of -verbose and -debug.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -allcgi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Force scan of all possible CGI directories defined in the config.txt value CGIDIRS, regardless<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;of whether they might exist or not.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -mutate <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mutate checks. This causes Nikto put all files with all directories from the .db files and <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;can the host. You might find some oddities this way. Note that it generates a lot of checks.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -evasion <evasion method><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  IDS evasion techniques.  This enables the intrusion detection evasion in LibWhisker.  Multiple options<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  can be used by stringing the numbers together, i.e. to enable methods 1 and 5, use "-e 15".  The valid<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options are (use the number preceeding each description):<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Random URI encoding (non-UTF8)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Add directory self-reference /./<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Premature URL ending<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prepend long random string to request<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fake parameters to files<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TAB as request spacer instead of spaces<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Random case sensitivity<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use Windows directory separator \ instead of /<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Session splicing<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;See the LibWhisker source for more information, or http://www.wiretrip.net/<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -findports<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use port scan to find valid HTTP and HTTPS ports only, but do not perform checks against them.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -generic <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Force full scan rather than trusting the "Server:" identification string, as many servers allow this<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;to be changed.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -host <ip or hostname><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Target host to check against. This can be an IP address or hostname.  This is the only required option.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -id <user:password><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HTTP Authentication use, format is userid:password for authorizing Nikto a web server realm.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -nolookup<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Don't perform a host name lookup.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -output <filename><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write output to this file when complete.  Format is text unless -w is also used.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -port <port number><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Port number to scan, defaults to port 80 if missing.  This can also be a range or list of ports, which<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto will check for web servers.  If a web server is found, it will perform a full scan unless the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-f option is used.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -ssl <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Force SSL mode on port(s) listed.  Note that Nikto attempts to determine if a port is HTTP or HTTPS <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;automatically, but this can be slow if the server fails to respond or is slow to respond to the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;incorrect one.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -timeout&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Timeout for each request, default is 10 seconds<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -vhost <ip or hostname><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Virtual host to use for the "Host:" header, in case it is different from the target.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -web<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Write to the -o output file in HTML (web) format.<br>
+   <br>
+   These options cannot be abbreviated to the first letter:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -verbose <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print out a lot of extra data during a run. This can be useful if a scan or server is failing, or to see<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exactly how a server responds to each request.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  -debug<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Print a huge amount of detail out. In most cases this is going to be more information than you need, so<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;try -verbose first.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-update<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This will connect to cirt.net and download updated scan_database.db and plugin files. Use this with<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;caution as you are downloading files--perhaps including code--from an "untrusted" source. This option<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cannot be combined with any other, but required variables (like the PROXY settings) will be loaded<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;from the config.txt file.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-dbcheck<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This option will check the syntax of the checks in the scan_database.db and user_scan_database.db files. This<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is really only useful if you are adding checks or are having problems.<br>
+<br>
+<br>
+<b>CONFIG FILE</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The 'config.txt' file provides a means to set variables without modifying the Nikto source itself at run-time. The<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;options below can be set in the file. Options that accept multiple values (CGIDIRS, SKIPPORTS, etc.) should just use<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a space to distinguish multiple values.  None of these are required unless you need them.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CGIDIRS - CGI directories to look for, valid ones (or all) will be used for CGI checks against the remote host.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLIOPTS - Add any option here to be added to every Nikto execution, whether specified at the command line or not.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;NMAP - Path to nmap. If defined, Nikto will use nmap to port scan a host rather than PERL code, and so should be faster.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SKIPPORTS - Port number never to scan (so you don't crash services, perhaps?).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROXYHOST - Server to use as a proxy, either IP or hostname, no 'http://' needed.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROXYPORT - Port number that PROXYHOST uses as a proxy.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROXYUSER - If the PROXYHOST requires authentication, use this ID.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PROXYPASS - If the PROXYHOST requires a password for PROXYUSER, use this password.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DEFAULTHTTPVER - First try this HTTP method. If this fails, Nikto will attempt to find a valid one. Useful if you want try something non-standard.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PLUGINDIR - If Nikto can't find it's plugin directory for some reason, enter the full path and the problem is solved.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MUTATEDIRS - Additional directories to use when operating under the Mutate mode besides ones already defined the .db files.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MUTATEFILES - Additional files to use when operating under the Mutate mode besides ones already defined the .db files.<br>
+<br>
+<br>
+<b>EXAMPLES</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A basic scan of a web server on port 80. The -h option is the only option that is required for a basic scan of a web<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;server on the standard HTTP port.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nikto.pl -h 10.100.100.10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A basic scan of a web server on port 443, forcing SSL encryption and ignoring the Server header.  Note that Nikto does<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;not assume port 443 to be SSL, but if HTTP fails it will try HTTPS.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nikto.pl -h 10.100.100.10 -p 443 -s -g<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scanning multiple ports on the server, letting Nikto determine if they are HTTP and SSL encrypted.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nikto.pl -h 10.100.100.10 -p 80-90 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Scanning specific ports on the system.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nikto.pl -h 10.100.100.10 -p 80,443,8000,8080<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You may combine IDS evasion techniques as desired.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nikto.pl -h 10.100.100.10 -p 80 -e 167<br>
+<br>
+<br>
+<b>FILES</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;config.txt  - run-time configuration options, see the CONFIG FILE section<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LW.pm - The stand-alone LibWhisker file. It is probably better to install the LibWhisker module directly than to use this.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;user_scan_database.db - If it exists in the plugins directory, it will load these checks as well. Same syntax as scan_database.db<br>
+<br>
+<br>
+<b>ADDITIONAL SOFTWARE</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LibWhisker is required for proper execution of Nikto. The LW.pm library is included with Nikto, but it is recommended<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;that you download and install the full LibWhisker module from http://www.wiretrip.net/. If you are not using an installed<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Libwhisker, you will need to change Nikto.pl so that it includes the proper LW.pm file.  Edit Nikto.pl and comment line 4:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;use LW;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;and uncomment the line below it (line 5):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;require "./plugins/LW.pm";<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nmap can be used to speed up port scans. This should be faster than relying on PERL code to perform port scans. Nmap can<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;be obtained from http://www.nmap.org/, it is not included with Nikto.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SSL software is required to test using HTTPS.  For Windows systems, the SSL software and libraries can be obtained from<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.activestate.com/.  For unix systems, OpenSSL from http://www.openssl.org/ and the Net::SSLeay module from<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.cpan.org/ are required.<br>
+<br>
+<b>CHECKS</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Checks, both information and actual security problems, are derived from a number of sources. These include the mailing lists<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BugTraq, NTBugTraq, WebAppSec (WWW-Mobile-Code), and others. The web sites www.securitytracker.com, www.securiteam.com, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;www.packetstormsecurity.com and www.securityfocus.com.  Additionally, I monitor updates to Nessus as well, and so often<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;see new web security checks in plugins written by people for that awesome project (http://www.nessus.org/).<br>
+<br>
+<b>WARNINGS</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto can cause harm to your local system, the remote system and/or the network.  Some options can generate over 70,000 <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;HTTP requests to a target. Do not run Nikto againsts hosts you are not authorized to perform testing against. Cirt.net<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;takes no responsibility for anything done with this software, any problems it may cause or problems it may find.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Plugins are standard PERL.  They are included and executed when Nikto is run. If you run the -update option, new and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;updated plugins will be downloaded from cirt.net. This means you are downloading code, and potentially running it, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;without viewing it yourself.  Please consider the implications.  Do not assume code distributed from Cirt.net is not<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;harmful, as accidents happen and a malicious third party may have inserted a dangerous plugin. Cirt.net assumes no <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;responsibility if any malicious code is delivered via the -update option.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<br>
+<b>DISTRIBUTION</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nikto and updated databases and plugins is distributed from http://www.cirt.net/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<b>SEE ALSO</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;LibWhisker - http://www.wiretrip.net/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nmap - http://www.nmap.org/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;OpenSSL - http://www.openssl.org/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CPAN - http://www.cpan.org/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ActiveState - http://www.activestate.com/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+<b>LICENSE</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This copyright applies to all code included in this distribution, but does not include the LibWhisker software, which is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;distributed under its own license.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copyright (C) 2001, 2002 Chris Sullo/CIRT.net<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;as published by the Free Software Foundation; either version 2  of the License, or (at your option) any later version.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You should have received a copy of the GNU General Public License along with this program; if not, write to the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Contact Information: See the AUTHOR section.<br>
+<br>
+<br>
+<b>AUTHOR</b><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Chris Sullo, sq@cirt.net<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;http://www.cirt.net/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Thanks to: Rain Forest Puppy for finding bugs and LibWhisker, Paul Darby/Stephen Valdez/Stephen Saady for testing, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Prickley Paw/Jericho for large amounts of checks and ideas, Pasi Eronen for a number of bug fixes, Michel Arboi for writing the <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nessus Nikto-wrapper, and Thomas Seyrat for working to get Nikto into the Debian Linux distribution.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>

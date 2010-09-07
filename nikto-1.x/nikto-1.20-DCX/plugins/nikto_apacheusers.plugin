@@ -1,0 +1,31 @@
+#VERSION,1.00
+#LASTMOD,05.25.2002
+# Apache user enumeration
+
+# This software is distributed under the terms of the GPL, which should have been received
+# with a copy of this software in the "LICENSE.txt" file.
+
+# this checks Apache user enumeration. Do this is a plugin so we can do a test of a bogus
+# user to see if we're getting bad data or not. Thanks to Jericho for pointing out the FPs
+
+# The original Nikto check looked like:
+# check,apache,/,~root,"Forbidden",GET,"Enumeration of users is possible by requesting ~username (responds with Forbidden for real users, not found for non-existent users)."
+
+sub nikto_apacheusers
+{
+ (my $RES , $CONTENT) = fetch("/~root","GET");
+
+ if ($CONTENT =~ /forbidden/i) # good on "root"
+  {
+   (my $RES , $CONTENT) = fetch("/~abcdef993454","GET");
+
+   if ($CONTENT !~ /forbidden/i) # Good, it gave an error instead of forbidden
+    {
+     $VULS++;
+     fprint("+ /~root - Enumeration of users is possible by requesting ~username (responds with Forbidden for real users, not found for non-existent users).\n");
+    }
+  }
+
+}
+
+1;
