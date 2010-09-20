@@ -6442,3 +6442,5 @@
 "006450","0","18","/fx29id2.txt","GET","Fx29ID","","","","","Payload for Fx29ID RFI exploit. The server may have been compromised to act as repository for this file.","",""
 "006451","0","b","/gif/hp_invent_logo.gif","GET","200","","","","","This device may be an HP printer/scanner and allow retrieval of previously scanned images.","",""
 "006452","0","b","/gif/tricolor_ink_guage.gif","GET","200","","","","","This device may be an HP printer/scanner and allow retrieval of previously scanned images.","",""
+"006453","0","3","/_vti_cnf/WS_FTP.LOG","GET","vti_timelastmodified","-->","","","","A WS_FTP.LOG file was found.","",""
+"006454","0","3","/_vti_pvt/WS_FTP.LOG","GET","access.cnf","-->","","","","A WS_FTP.LOG file was found.","",""
