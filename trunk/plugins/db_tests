@@ -6444,3 +6444,5 @@
 "006452","0","b","/gif/tricolor_ink_guage.gif","GET","200","","","","","This device may be an HP printer/scanner and allow retrieval of previously scanned images.","",""
 "006453","0","3","/_vti_cnf/WS_FTP.LOG","GET","vti_timelastmodified","-->","","","","A WS_FTP.LOG file was found.","",""
 "006454","0","3","/_vti_pvt/WS_FTP.LOG","GET","access.cnf","-->","","","","A WS_FTP.LOG file was found.","",""
+"006455","0","23","/services","GET","And now... Some Services","","","","","Axis web services reveals information about all installed web services. See http://ws.apache.org/axis/java/security.html to secure Axis.","",""
+"006456","0","23","/happyaxis.jsp","GET","Examining webapp configuration","","","","","Axis file reveals sensitive information about the Axis installation components. See http://ws.apache.org/axis/java/security.html to secure Axis.","",""
