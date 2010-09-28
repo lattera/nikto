@@ -2023,7 +2023,7 @@ sub nfetch {
                     && $mark->{'banner'} ne $result{'server'}
                     && !exists $mark->{'bannerchanged'}) {
                     nprint(
-                        "+ Server banner has changed from $mark->{banner} to $result{server}, this may suggest a WAF is in place"
+                        "+ Server banner has changed from $mark->{banner} to $result{server}, this may suggest a WAF or load balancer is in place"
                         );
                     $mark->{'bannerchanged'} = 1;
                 }
