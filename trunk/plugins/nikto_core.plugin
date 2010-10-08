@@ -1868,6 +1868,7 @@ sub setup_hash {
 
     # Do the standard set up for the hash
     LW2::http_init_request($reqhash);
+    #$reqhash->{'whisker'}->{'keep-alive'}              = 1;
     $reqhash->{'whisker'}->{'ssl_save_info'}              = 1;
     $reqhash->{'whisker'}->{'keep-alive'}              = 1;
     $reqhash->{'whisker'}->{'lowercase_incoming_headers'} = 1;
@@ -2001,6 +2002,13 @@ sub nfetch {
     if (!$incache) {
         LW2::http_do_request_timeout(\%request, \%result);
         $NIKTO{'totalrequests'}++;
+
+	# If we got an error, do 1 retry. This should be much more intelligent and configurable!
+	if (defined $result{'whisker'}->{'error'} || $result{'whisker'}{'code'} eq '') {
+        	LW2::http_do_request_timeout(\%request, \%result);
+        	$NIKTO{'totalrequests'}++;
+		}
+
         cache_add($request{'whisker'}->{'method'},
                   $result{'whisker'}->{'code'},
                   $result{'whisker'}->{'data'},
@@ -2040,7 +2048,8 @@ sub nfetch {
     nprint("- $result{'whisker'}{'code'} for $method:\t$request{'whisker'}->{'uri'}", "v");
 
     # Check for errors to reduce false positives
-    if (defined $result{'whisker'}->{'error'} && !exists $flags->{'noerror'}) {
+    if ((defined $result{'whisker'}->{'error'} || $result{'whisker'}{'code'} eq '') 
+	&& !exists $flags->{'noerror'}) {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $request{'whisker'}->{'uri'} returned an error: $result{'whisker'}{'error'}\n", "e");
         if (($result{'whisker'}->{'code'} eq 502) && ($CLI{'useproxy'})) {

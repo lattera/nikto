@@ -246,7 +246,7 @@ sub allchecks {
 sub testfile {
     my ($mark, $uri, $name, $tid) = @_;
     my ($res, $content, $error) = nfetch($mark, "$uri", "GET", "", "", "", "Tests: $name");
-    nprint("- $res for $uri", "v");
+    nprint("- $res for $uri (error: $error)", "v");
     if ($error) {
         $mark->{'total_errors'}++;
         nprint("+ ERROR: $uri returned an error: $error", "e");

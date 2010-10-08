@@ -1,4 +1,4 @@
-#VERSION,2.002
+#VERSION,2.003
 # $Id$
 #######################################################################
 # Source: http://cirt.net
@@ -39,3 +39,4 @@ Unable to complete your request
 unable to open
 Web access denied
 Hack Attempts
+does not exist 						 # SAP NetWeaver
