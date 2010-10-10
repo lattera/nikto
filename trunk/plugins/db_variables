@@ -23,5 +23,5 @@
 @USERS=adm bin daemon ftp guest listen lp mysql noaccess nobody nobody4 nuucp operator root smmsp smtp sshd sys test unknown uucp web www
 @PASSWORDDIRS=/ /admin/ /clients/ /pass/ /password/ /passwords/ /store/ /users/ /access/ /members/ /private/ /ccbill/ /dmr/ /mastergate/ /dmr/ /epoch/ /netbilling/ /webcash/ /wwwjoin/ /etc/security/
 @PASSWORDFILES=admins clients pass password passwords passwd passwd.adjunct store users .htpasswd .passwd
-@PHPMYADMIN=/ /3rdparty/phpMyAdmin/ /phpMyAdmin/
+@PHPMYADMIN=/ /3rdparty/phpMyAdmin/ /phpMyAdmin/ /3rdparty/phpmyadmin/ /phpmyadmin /pma
 @HTTPFOUND=200 301 302 403
