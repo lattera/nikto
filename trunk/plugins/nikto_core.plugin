@@ -74,14 +74,15 @@ sub is_404 {
         if (LW2::md4($content) eq $FoF{$ext}{'match'}) {
             return 1;
         }
-    }
-    else {
-        foreach my $string (keys %ERRSTRINGS) {
-            if ($content =~ /$string/i) {
-                return 1;
+
+        else {
+            foreach my $string (keys %ERRSTRINGS) {
+                if ($content =~ /$string/i) {
+                     return 1;
+                     }
+                }
             }
-        }
-    }
+         }
 
     return 0;
 }
@@ -294,11 +295,13 @@ sub map_codes {
         # if we've got an OK/OTHER response, look at content first
         # blank content, or hash...
         if (length($content) == 0) {
+	    nprint("- OK/OTHER type settled on: BLANK\n","v");
             $FoF{$ext}{'type'}  = "BLANK";
             $FoF{$ext}{'match'} = "";
         }
         else {
-            my $cooked = rm_active_content($content);
+	    nprint("- OK/OTHER type settled on: HASH\n","v");
+            my $cooked = rm_active_content($content, $file);
             $FoF{$ext}{'type'}  = "HASH";
             $FoF{$ext}{'match'} = LW2::md4($cooked);
         }
@@ -308,7 +311,7 @@ sub map_codes {
     %headers = ();
     ($res, $content, $error) = nfetch($mark, "/index.php?", "GET", "", \%headers, "", "map_codes");
 
-    my $cooked = rm_active_content($content);
+    my $cooked = rm_active_content($content, "/index.php");
     $FoF{'index.php'}{'match'} = LW2::md4($cooked);
     $FoF{'index.php'}{'type'}  = "HASH";
 

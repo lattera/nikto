@@ -1033,3 +1033,4 @@
 "601019","nginx/","0.8.45","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "601020","sw-cp-server/","1.0.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "601021","Oracle-iPlanet-Web-Server/","7.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"601022","CVOS/","3.9.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
