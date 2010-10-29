@@ -1532,7 +1532,7 @@
 "001520","3092","1","/cgi-sys/countedit","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
 "001521","3092","1","/cgi-sys/domainredirect.cgi","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
 "001522","3092","1","/cgi-sys/entropybanner.cgi","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
-"001523","3092","1","/cgi-sys/entropysearch.cgi","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
+"001523","3092","1","/cgi-sys/entropysearch.cgi","GET","200","","","","","Default CGI, often with a hosting manager. CGI may allow username enumeration in the user parameter.","",""
 "001524","3092","1","/cgi-sys/FormMail-clone.cgi","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
 "001525","3092","1","/cgi-sys/helpdesk.cgi","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
 "001526","3092","1","/cgi-sys/mchat.cgi","GET","200","","","","","Default CGI, often with a hosting manager. No known problems, but host managers allow sys admin via web","",""
