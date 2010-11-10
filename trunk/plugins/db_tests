@@ -6461,3 +6461,4 @@
 "006470","3093","1","@FCKEDITORfckconfig.js","GET","FCKConfig","","","","","FCKeditor JavaScript file found.","",""
 "006471","3093","23","@FCKEDITOR_whatsnew.html","GET","CreateFCKeditor","","","","","FCKeditor changes file found.","",""
 "006472","3093","0","@FCKEDITOReditor/filemanager/browser/default/browser.html","GET","Resources Browser","","","","","FCKeditor could allow files to be updated or edited by remote attackers.","",""
+"006473","","1b","/reportserver/","GET","Microsoft SQL Server Reporting Services","","","","","Microsoft SQL Server Reporting Services","",""
