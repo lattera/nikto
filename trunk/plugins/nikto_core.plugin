@@ -2093,6 +2093,7 @@ sub set_scan_items {
 
     # load the tests
     %TESTS = ();
+    $NIKTO{total_checks}=0;
     my @SKIPLIST = ();
     if (defined $NIKTOCONFIG{SKIPIDS}) {
         @SKIPLIST = split(/ /, $NIKTOCONFIG{SKIPIDS});
