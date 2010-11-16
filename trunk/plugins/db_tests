@@ -6464,3 +6464,4 @@
 "006473","0","1b","/reportserver/","GET","Microsoft SQL Server Reporting Services","","","","","Microsoft SQL Server Reporting Services","",""
 "006474","0","2","/j2ee/examples/servlets/","GET","This is a collection","","","","","Oracle j2ee example servlets.","",""
 "006475","0","2","/j2ee/examples/jsp/","GET","This is a collection","","","","","Oracle j2ee example JSP pages.","",""
+"006476","3092","1","/messages/","GET","200","","","","","This might be interesting...","",""
