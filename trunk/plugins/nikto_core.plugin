@@ -387,9 +387,9 @@ sub dump_target_info {
     if ($mark->{ssl}) {
         $sslprint = "$NIKTO{'DIV'}\n";
         $sslprint .=
-            "+ SSL Info:        Ciphers: $mark->{'ssl_cipher'}\n"
-          . "                   Info:    $mark->{'ssl_cert_issuer'}\n"
-          . "                   Subject: $mark->{'ssl_cert_subject'}";
+            "+ SSL Info:        Subject: $mark->{'ssl_cert_subject'}\n"
+          . "                   Ciphers: $mark->{'ssl_cipher'}\n"
+          . "                   Issuer:  $mark->{'ssl_cert_issuer'}";
     }
 
     if ($mark->{ip} =~ /[a-z]/i) {
