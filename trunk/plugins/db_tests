@@ -6465,3 +6465,4 @@
 "006474","0","2","/j2ee/examples/servlets/","GET","This is a collection","","","","","Oracle j2ee example servlets.","",""
 "006475","0","2","/j2ee/examples/jsp/","GET","This is a collection","","","","","Oracle j2ee example JSP pages.","",""
 "006476","3092","1","/messages/","GET","200","","","","","This might be interesting...","",""
+"006477","0","23","@CRYSTALREPORTSviewrpt.cwr?id=1&wid=1&apstoken=127.0.0.2:0@111","GET","Server 127.0.0.2:0 not found","","","","","Crystal Reports can be used to scan internal hosts. See http://tinyurl.com/2f4r2o9","",""
