@@ -25,7 +25,7 @@ sub nikto_headers_init {
                     name        => "headers",
                     full_name   => "HTTP Headers",
                     author      => "Sullo",
-                    description => "Performs various checks against the headers returned from a HTTP request.",
+                    description => "Performs various checks against the headers returned from an HTTP request.",
                     hooks       => {
                                         scan =>  {
                                             method => \&nikto_headers,

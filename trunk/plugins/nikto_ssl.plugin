@@ -25,7 +25,7 @@ sub nikto_ssl_init {
                full_name   => "SSL and cert checks",
                author      => "Sullo",
                description => "Perform checks on SSL/Certificates",
-               hooks       => { scan => { method => \&nikto_ssl, }, },
+               hooks       => { scan => { method => \&nikto_ssl, } },
                copyright   => "2010 CIRT Inc."
                };
     return $id;
