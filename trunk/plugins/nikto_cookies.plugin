@@ -59,7 +59,7 @@ sub nikto_cookies_postfetch {
             if ($ip ne $mark->{'ip'}) {
                 my $msg   = "";
                 my $osvdb = 0;
-                $c =~ /^([^:]+)/;
+                $c =~ /^([^=]+)/;
                 my $cname = $1;
                 if ($cname eq 'ARPT') {
                     $msg =
