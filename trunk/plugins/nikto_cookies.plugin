@@ -45,7 +45,7 @@ sub nikto_cookies_postfetch {
 
     # if we need to limit to once per cookie...
     #my $key =
-    #  LW2::md5(  $mark->{'ip'}
+    #  LW2::md4(  $mark->{'ip'}
     #           . $mark->{'hostname'}
     #           . $mark->{'port'}
     #           . $mark->{'ssl'}

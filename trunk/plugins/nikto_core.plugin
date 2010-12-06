@@ -1914,6 +1914,7 @@ sub cache_add {
     	my $postdata      = shift;
     	my $flags_nocache = shift;
     	my ($mark)        = @_;
+	return if flags_nocache;
 
         my $key =
           LW2::md4(  $mark->{'ip'}
@@ -1938,6 +1939,7 @@ sub cache_fetch {
         my $postdata      = shift;
         my $flags_nocache = shift;
         my ($mark)        = @_;
+	return if flags_nocache;
 
         my $key =
           LW2::md4(  $mark->{'ip'}
