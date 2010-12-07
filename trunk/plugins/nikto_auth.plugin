@@ -20,7 +20,6 @@
 # PURPOSE:
 # Search content for known bad strings
 ###############################################################################
-use vars qw/$REALMS %REALMSMATCHED/;
 
 sub nikto_auth_init {
     my $id = { name             => 'auth',
@@ -45,15 +44,16 @@ sub nikto_auth_init {
                copyright        => "2010 CIRT Inc"
                };
 
+    use vars qw/$REALMS %REALMSCHECKED/;
+
     return $id;
 }
 
 sub nikto_auth_load {
 
     # Load up the database as soon as we can
-
     $REALMS        = init_db("db_realms");
-    %REALMSMATCHED = ();
+    %REALMSCHECKED = ();
         
     if (defined $CLI{'hostauth'}) {
         my @x = split(/:/, $CLI{'hostauth'});
@@ -72,19 +72,15 @@ sub nikto_auth_load {
 sub nikto_auth_pre {
     my ($mark, $parameters, $request, $result) = @_;
 
-    # If we know the realm then don't bother guessing it
-    # See whether we've already guessed it
+    # If we tried the realm then don't bother guessing it
 
-    my ($uridir) = $request->{'whisker'}->{'uri'};
-    $uridir =~ s#/[^/]*$#/#g;
-
-    if (exists $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}) {
+    if ($REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'status'} == 1) {
 
         # Just set up the auth and return the valid result
-        LW2::auth_set($REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'authtype'},
+        LW2::auth_set($REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'authtype'},
                       $request,
-                      $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'id'},
-                      $REALMSMATCHED{ $mark->{'hostname'} }{$uridir}{'password'}
+                      $REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'id'},
+                      $REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'password'}
                       );
 
         # Patch to fix short reads
@@ -107,29 +103,36 @@ sub nikto_auth {
         return $request, $result;
     }
 
+    # Split up www-authenticate to realm and method
+    my @authenticate = split(/=/, $result->{'www-authenticate'});
+    if ($authenticate[0] =~ /^ntlm/i) { 
+	$realm=$authtype='NTLM'; 
+	}
+    else {
+	$realm=$authenticate[1];
+	$realm =~ s/^\"//;
+	$realm =~ s/\".*$//;
+    	if ($authenticate[0] =~ /^basic/i) {
+        	$authtype='basic';
+        	}
+    	elsif ($authenticate[0] =~ /^digest/i) {
+        	$authtype='digest';
+        	}
+	}
+
+    # did we already test this realm?
+    if (exists $REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'status'}) {
+	return $request, $result;
+	}
+
     # Save to revert
     $save_auth = $result{'www-authenticate'};
-
-    # Split up www-authenticate to realm and method
-    my @authenticate = split(/ /, $result->{'www-authenticate'});
-    if ($#authenticate == 0) {    # Only one parameter: realm
-        $realm = $authenticate[0];
-        if ($realm =~ /^ntlm/i) {
-            $realm    = "";
-            $authtype = $authenticate[0];
-        }
-    }
-    else {
-        $authtype = $authenticate[0];
-        $realm    = $authenticate[1];
-        $realm =~ s/^realm=//;
-    }
 
     nprint("+ $uri - Requires Authentication for realm '$realm'") if $OUTPUT{'show_auth'};
 
     # Now we have this we can try guessing the password
     foreach my $entry (@{$REALMS}) {
-        unless ($realm =~ /$entry->{'realm'}/i || $entry->{realm} eq '@ANY') { next; }
+        unless ($realm =~ /$entry->{'realm'}/i || $entry->{'realm'} eq '@ANY') { next; }
 
         if ($result->{'www-authenticate'} =~ /^ntlm/i) {
             $authtype = 'ntlm';
@@ -150,6 +153,11 @@ sub nikto_auth {
         dump_var("Auth Request",  $request);
         dump_var("Auth Response", $result);
 
+        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'status'}   = 0;
+        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'id'}       = $entry->{'id'};
+        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'password'} = $entry->{'password'};
+        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'authtype'} = $authtype;
+
         if ($result{'www-authenticate'} =~ /^ntlm/i) {
 
             # Deal with ntlm
@@ -159,19 +167,17 @@ sub nikto_auth {
                 $NIKTO{'totalrequests'}++;
             }
         }
-        my $uridir = $request->{'whisker'}->{'uri'};
-        $uridir =~ s#/[^/]*$#/#g;
 
         if ($result->{'www-authenticate'} eq ''
             && !defined $result->{'whisker'}->{'error'}) {
             my $message =
-              "Default account found for '$realm' at $uridir ($request->{'whisker'}->{'uri'}) (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
+              "Default account found for '$realm' at $request->{'whisker'}->{'uri'} (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
             if ($entry->{'id'} eq '' && $entry->{'password'} eq '') {
                 $message =
-                  "Blank credentials found at $uridir ($request{whisker}->{uri}), $entry->{'realm'}: $entry->{'msg'}";
+                  "Blank credentials found at $request{whisker}->{uri}, $entry->{'realm'}: $entry->{'msg'}";
             }
             unless ($entry->{'checked'} == 1) {
-                add_vulnerability($mark, $message, $entry->{tid}, 0, "GET", $uridir, $result);
+                add_vulnerability($mark, $message, $entry->{tid}, 0, "GET", $request{whisker}->{uri}, $result);
                 $entry->{checked} = 1;
             }
 
@@ -179,14 +185,8 @@ sub nikto_auth {
             LW2::http_do_request_timeout($request, $result);    # test auth
             $NIKTO{'totalrequests'}++;
 
-            # Set up so we don't have to repeat in future
-            # / isn't a valid entry in a hash  - more stupid perl
-
-            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'id'}       = $entry->{'id'};
-            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'password'} = $entry->{'password'};
-            $REALMSMATCHED{ $mark->{hostname} }{$uridir}{'authtype'} = $authtype;
-
-            # and leave
+            # Mark it successful
+            $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'status'}   = 1;
             last;
         }
         else {

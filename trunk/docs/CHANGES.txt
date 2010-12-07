@@ -1,9 +1,11 @@
 2010-12-06
+	- Ticket 194: Look for internal IPs in cookies
+	- Ticket 82: Auth is now checked per realm, not per resource
+	- Move -root option to %mark so it works on a per-host level if passed via URI
         - Added nikto_ssl.plugin to check cert's CN vs hostname
 	- Add basic retry on error in nfetch()
 	- Change how db_404_strings are used by moving where they ae checked--should reduce FP
 	- Fix missing url sent to rm_active_content during error mapping--shoudl prevent many FPs
-	- Ticket 194: Look for internal IPs in cookies
 	- Actually check for code-based nocache flag in cache_add and cache_fetch
 	- Make nikto_multiple_index.plugin only look at 200 responses
 2010-09-06 Nikto 2.1.3 release

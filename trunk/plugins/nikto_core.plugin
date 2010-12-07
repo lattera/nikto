@@ -909,6 +909,7 @@ sub set_targets {
         my $defport;
         $host =~ s/\s+//g;
         if (!defined $host) { next; }
+        my $markhash = {};
 
         # is it a URL?
         if ($host =~ /^https?:\/\//) {
@@ -917,9 +918,13 @@ sub set_targets {
             $defhost = $hostdata[2];
             $defport = $hostdata[3];
 
-            if ((!defined $root) && (defined $hostdata[0])) {
-                $root = $hostdata[0];
-                nprint("- Added -root value of '$root'", "d");
+            if ($root ne '') { 
+		$markhash->{'root'} = $root;
+                nprint("- Added -root value of '$root' from CLI", "v");
+		}
+            elsif ($hostdata[0] ne '') {
+		$markhash->{'root'} = $hostdata[0];
+                nprint("- Added -root value of '$hostdata[0]' from URI", "v");
             }
         }
         else {
@@ -933,10 +938,9 @@ sub set_targets {
         if ($defport eq "" && scalar(@ports) > 0) {
 
             foreach $port (@ports) {
-                my $markhash = {};
-                $markhash->{ident} = $defhost;
-                $markhash->{port}  = $port;
-                nprint("- Target:$markhash->{ident} port:$markhash->{port}", "v", $markhash);
+                $markhash->{'ident'} = $defhost;
+                $markhash->{'port'}  = $port;
+                nprint("- Target:$markhash->{'ident'} port:$markhash->{'port'}", "v", $markhash);
                 push(@marks, $markhash);
             }
         }
@@ -944,11 +948,10 @@ sub set_targets {
             if ($defport eq "") {
                 $defport = $defaultport;
             }
-            my $markhash = {};
-            $markhash->{ident} = $defhost;
-            $markhash->{port}  = $defport;
+            $markhash->{'ident'} = $defhost;
+            $markhash->{'port'}  = $defport;
 
-            nprint("- Target:$markhash->{ident} port:$markhash->{port}", "v", $markhash);
+            nprint("- Target:$markhash->{'ident'} port:$markhash->{'port'}", "v", $markhash);
             push(@marks, $markhash);
         }
     }
@@ -1972,7 +1975,7 @@ sub nfetch {
         check_input();
     }
 
-    $request{'whisker'}->{'uri'} = $CLI{'root'} . $uri;    # prepend -root option's value if set
+    $request{'whisker'}->{'uri'} = $mark->{'root'} . $uri;    # prepend -root option's value if set
     $request{'whisker'}->{'method'} = $method;
 
     if ($data ne "") {
