@@ -101,7 +101,7 @@ sub single {
           || $request{'whisker'}{$key};
     }
 
-    $request{'whisker'}->{'encode_anti_ids'} = ask("Enable Anti-IDS (0)");
+    $request{'whisker'}->{'encode_anti_ids'} = ask("Enable Encoding (0)");
     if ($request{'whisker'}->{'encode_anti_ids'} eq 1) {
         print "
 \t1 Random URI encoding (non-UTF8)
@@ -113,7 +113,7 @@ sub single {
 \t7 Random case sensitivity
 \t8 Use Windows directory separator (\\)\n";
 
-        $request{'whisker'}{'encode_anti_ids'} = ask("Anti-IDS Methods");
+        $request{'whisker'}{'encode_anti_ids'} = ask("Encoding Methods");
         if ($request{'whisker'}{'encode_anti_ids'} eq "") {
             delete($request{'whisker'}->{'encode_anti_ids'});
         }

@@ -46,9 +46,10 @@ letter to specify the type. Multiple may be used:</para>
     <varlistentry>
       <term><option>-evasion</option></term>
       <listitem>
-        <para>Specify the LibWhisker IDS evasion technique to use (see the
-LibWhisker docs for detailed information on these). Use the
-reference number to specify the type, multiple may be used:</para>
+        <para>Specify the LibWhisker encoding/evasion technique to use (see the
+LibWhisker docs for detailed information on these). Note that these are not 
+likely to actually bypass a modern IDS system, but may be useful for other 
+purposes. Use the reference number to specify the type, multiple may be used:</para>
         <para>1 - Random URI encoding (non-UTF8)</para>
         <para>2 - Directory self-reference (/./)</para>
         <para>3 - Premature URL ending</para>

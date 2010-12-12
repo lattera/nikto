@@ -422,7 +422,7 @@ sub dump_target_info {
     if (defined $NIKTO{'anti_ids'} && defined $CLI{'evasion'}) {
         for (my $i = 1 ; $i <= (keys %{ $NIKTO{'anti_ids'} }) ; $i++) {
             if ($CLI{'evasion'} =~ /$i/) {
-                nprint("+ Using IDS Evasion:  $NIKTO{'anti_ids'}{$i}");
+                nprint("+ Using Encoding:  $NIKTO{'anti_ids'}{$i}");
             }
         }
     }
@@ -2361,7 +2361,7 @@ sub usage {
                                S     Scrub output of IPs and hostnames
                                V     Verbose output
        -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
-       -evasion+          IDS evasion technique:\n";
+       -evasion+          Encoding technique:\n";
 
         foreach my $k (sort keys %{ $NIKTO{'anti_ids'} }) {
             print "                               $k     $NIKTO{'anti_ids'}{$k}\n";

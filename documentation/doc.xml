@@ -685,7 +685,7 @@ http://192.168.0.1:8080/
                               uri_postfix ():
                                uri_prefix ():
                                  uri_user ():
-                         Enable Anti-IDS (0):
+                         Enable Encoding  (0):
 --------------------------------------------  Done with questions
         Host Name: localhost
         Host IP: 127.0.0.1
