@@ -497,7 +497,7 @@ sub general_config {
                "findonly"         => \$CLI{'findonly'},
                "root=s"           => \$CLI{'root'},
                "timeout=i"        => \$CLI{'timeout'},
-               "Pause=i"          => \$CLI{'pause'},
+               "Pause=f"          => \$CLI{'pause'},
                "ssl"              => \$CLI{'ssl'},
                "nocache"          => \$CLI{'nocache'},
                "nossl"            => \$CLI{'nossl'},
@@ -662,13 +662,6 @@ sub general_config {
         nprint("- ***** SSL support not available (see docs for SSL install) *****");
     }
 
-    # Notices
-    my $notice = "";
-    if (defined $CLI{'root'}) { $notice .= "Prepending \'$CLI{'root'}\' to requests"; }
-    if ($CLI{'pause'} > 0)    { $notice .= ", Pausing $CLI{'pause'} seconds per request"; }
-    $notice =~ s/^, //;
-    if ($notice ne '') { nprint("-***** $notice *****"); }
-
     # get core version
     open(FI, "<$NIKTOCONFIG{PLUGINDIR}/nikto_core.plugin");
     my @F = <FI>;
@@ -684,6 +677,7 @@ sub general_config {
     $NIKTO{'POSIX'}{'support'} = 0;
     eval "use POSIX qw(:termios_h)";
     if (!$@) {
+        $NIKTO{'SUPPORT'}{'POSIX'} = 1;
         eval "use Time::HiRes qw(ualarm)";
         if (!$@) {
             $NIKTO{'POSIX'}{'support'}  = 1;
@@ -695,8 +689,33 @@ sub general_config {
             $NIKTO{'POSIX'}{'noecho'} = $oterm & ~$echo;
         }
     }
-    return;
+
+    # Notices
+    my $notice = "";
+    if (defined $CLI{'root'}) { $notice .= "Prepending \'$CLI{'root'}\' to requests"; }
+
+    # see if we have Time::HiRes sleep support
+    eval "use Time::HiRes qw(sleep)";
+    if ($@ && ($CLI{'pause'} =~ /\./)) {
+    	my $integer = int($CLI{'pause'});
+        $CLI{'pause'} =~ /\.(\d+)/;
+        if ($1 >= 5) { $integer++; }
+        $CLI{'pause'}=$integer;
+        $notice .= ", Pausing $CLI{'pause'} second(s) per request (rounded, as Time::HiRes is not available)";
+        }
+
+     if ($CLI{'pause'} ne '') { $notice .= ", Pausing $CLI{'pause'} second(s) per request"; }
+     $notice =~ s/^, //;
+     if ($notice ne '') { nprint("-***** $notice *****"); }
+
+     return;
 }
+
+###############################################################################
+sub sleeper {
+	if ($CLI{'pause'} <= 0) { return; }
+	sleep($CLI{'pause'});
+	}
 
 ###############################################################################
 sub reset_term {
@@ -1755,7 +1774,7 @@ sub proxy_check {
 
         LW2::http_fixup_request(\%request);
 
-        if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
+	sleeper();
         LW2::http_do_request_timeout(\%request, \%result);
         $NIKTO{'totalrequests'}++;
         dump_var("Request Hash", \%request);
@@ -1791,7 +1810,7 @@ sub proxy_check {
             LW2::auth_set("proxy-basic", \%request, $NIKTOCONFIG{PROXYUSER},
                           $NIKTOCONFIG{PROXYPASS});    # set auth
             LW2::http_fixup_request(\%request);
-            if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
+            sleeper();
             LW2::http_do_request_timeout(\%request, \%result);
             $NIKTO{'totalrequests'}++;
             dump_var("Request Hash", \%request);
@@ -1966,7 +1985,7 @@ sub cache_fetch {
 #######################################################################
 sub nfetch {
     my ($mark, $uri, $method, $data, $headers, $flags, $testid) = @_;
-    if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
+    sleeper();
     my (%request, %result);
     setup_hash(\%request, $mark, $testid);
 
@@ -2393,7 +2412,7 @@ sub usage {
        -output+           Write output to this file
        -Plugins+          List of plugins to run (default: ALL)
        -port+             Port to use (default 80)
-       -Pause+            Pause between tests (seconds)
+       -Pause+            Pause between tests (seconds, integer or float)
        -root+             Prepend root value to all requests, format is /directory
        -ssl               Force ssl mode on port
        -Single            Single request mode

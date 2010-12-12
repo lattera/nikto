@@ -203,7 +203,7 @@ be specified as a range (i.e., 80-90), or as a comma-delimited list,
     <varlistentry>
       <term><option>-Pause</option></term>
       <listitem>
-        <para>Seconds to delay between each test.</para>
+        <para>Seconds (integer or floating point) to delay between each test.</para>
       </listitem>
     </varlistentry>
     <varlistentry>

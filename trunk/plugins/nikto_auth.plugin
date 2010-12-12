@@ -146,7 +146,7 @@ sub nikto_auth {
         LW2::http_fixup_request($request);
 
         # pause if needed
-        if ($CLI{'pause'} > 0) { sleep $CLI{'pause'}; }
+	sleeper();
 
         LW2::http_do_request_timeout($request, $result);    # test auth
         $NIKTO{'totalrequests'}++;
