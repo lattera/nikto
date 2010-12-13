@@ -701,6 +701,7 @@ sub general_config {
         $CLI{'pause'} =~ /\.(\d+)/;
         if ($1 >= 5) { $integer++; }
         $CLI{'pause'}=$integer;
+	if ($CLI{'pause'} <= 0 ) { $CLI{'pause'} = 1; } # don't sleep for 0!
         $notice .= ", Pausing $CLI{'pause'} second(s) per request (rounded, as Time::HiRes is not available)";
         }
 
