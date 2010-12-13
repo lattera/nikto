@@ -695,17 +695,21 @@ sub general_config {
     if (defined $CLI{'root'}) { $notice .= "Prepending \'$CLI{'root'}\' to requests"; }
 
     # see if we have Time::HiRes sleep support
-    eval "use Time::HiRes qw(sleep)";
-    if ($@ && ($CLI{'pause'} =~ /\./)) {
-    	my $integer = int($CLI{'pause'});
-        $CLI{'pause'} =~ /\.(\d+)/;
-        if ($1 >= 5) { $integer++; }
-        $CLI{'pause'}=$integer;
-	if ($CLI{'pause'} <= 0 ) { $CLI{'pause'} = 1; } # don't sleep for 0!
-        $notice .= ", Pausing $CLI{'pause'} second(s) per request (rounded, as Time::HiRes is not available)";
-        }
+    if ($CLI{'pause'} > 0) { 
+    	eval "use Time::HiRes qw(sleep)";
+    	if ($@ && ($CLI{'pause'} =~ /\./)) {
+    		my $integer = int($CLI{'pause'});
+        	$CLI{'pause'} =~ /\.(\d+)/;
+        	if ($1 >= 5) { $integer++; }
+        	$CLI{'pause'}=$integer;
+		if ($CLI{'pause'} <= 0 ) { $CLI{'pause'} = 1; } # don't sleep for 0!
+        	$notice .= ", Pausing $CLI{'pause'} second(s) per request (rounded, as Time::HiRes is not available)";
+        	}
+        else { 
+		$notice .= ", Pausing $CLI{'pause'} second(s) per request"; 
+		}
+	}
 
-     if ($CLI{'pause'} ne '') { $notice .= ", Pausing $CLI{'pause'} second(s) per request"; }
      $notice =~ s/^, //;
      if ($notice ne '') { nprint("-***** $notice *****"); }
 
