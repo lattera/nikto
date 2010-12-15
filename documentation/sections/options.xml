@@ -268,7 +268,8 @@ specified)</para>
     <varlistentry>
       <term><option>-useproxy</option></term>
       <listitem>
-        <para>Use the HTTP proxy defined in the configuration file.</para>
+        <para>Use the HTTP proxy defined in the configuration file. The proxy
+        may also be directly set as an argument.</para>
       </listitem>
     </varlistentry>
     <varlistentry>

@@ -285,12 +285,21 @@ http://192.168.0.1:8080/
 
       <para>If the machine running Nikto only has access to the target host
       (or update server) via an HTTP proxy, the test can still be performed.
-      Set the <varname>PROXY*</varname> variables (as described in section 4),
-      then execute Nikto with the -u (-useproxy) command. All connections will
-      be relayed through the HTTP proxy specified in the configuration
-      file.</para>
+      There are two ways to use a proxy with Nikto, via the nikto.conf file or
+      directly on the command line.</para>
 
-      <screen>perl nikto.pl -h 192.168.0.1 -p 80 -u</screen>
+      <para>To use the nikto.conf file, set the <varname>PROXY*</varname> variables 
+      (as described in section 4), and then execute Nikto with the -useproxy option.
+      All connections will be relayed through the HTTP proxy specified in the 
+      configuration file.</para>
+
+      <screen>perl nikto.pl -h localhost -p 80 -useproxy</screen>
+
+      <para>To set the proxy on the command line, use the -useproxy option with 
+      the proxy set as the argument, for example:</para>
+
+      <screen>./nikto.pl -h localhost -useproxy http://localhost:8080/</screen>
+
     </section>
 
     <section>

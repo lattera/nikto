@@ -3,6 +3,7 @@
 	- Ticket 192: Relable IDS evasion as 'encoding techniques'
 	- Ticket 186: Enable sleep for fractions of seconds
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
+	- TIcket 179: Update docs for -useproxy
 	- Ticket 82: Auth is now checked per realm, not per resource
 	- Move -root option to %mark so it works on a per-host level if passed via URI
         - Added nikto_ssl.plugin to check cert's CN vs hostname
