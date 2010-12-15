@@ -1088,11 +1088,11 @@ PROXYPASS=</screen>
           <term><varname>STATIC-COOKIE</varname></term>
 
           <listitem>
-            <para>Adds the supplied cookie to all requests made via Nikto,
-            this is generally useful is an authentication cookie is required
-            for a website. For example:</para>
+            <para>Adds the supplied cookie(s) to all requests made via Nikto.
+            This is generally useful is an authentication cookie is required
+            for a website. Separate cookies with a semi-colon, for example:</para>
 
-            <screen>STATIC-COOKIE=userid=0</screen>
+            <screen>STATIC-COOKIE="cookie1"="cookie value";"cookie2"="cookie val"</screen>
 
             <para>Default Setting</para>
 

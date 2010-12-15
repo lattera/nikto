@@ -146,6 +146,7 @@ foreach my $mark (@MARKS) {
         $NIKTO{'total_targets'}++;
     }
     $mark->{'ssl'} = $open - 1;
+
 }
 
 # Open reporting
@@ -171,9 +172,21 @@ foreach my $mark (@MARKS) {
     $request{'whisker'}->{'port'}    = $mark->{'port'};
     $request{'whisker'}->{'ssl'}     = $mark->{'ssl'};
     $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
+
+    # Cookies
     if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) {
-        $request{'Cookie'} = $NIKTOCONFIG{'STATIC-COOKIE'};
+        $mark->{'cookiejar'} = LW2::cookie_new_jar();
+	# parse conf line into name/value pairs
+	foreach my $p (split(/;/, $NIKTOCONFIG{'STATIC-COOKIE'})) {
+		$p =~ s/(?:^\s+|\s+$)//;
+		$p =~ s/"(?:[ ]+)?=(?:[ ]+)?"/","/g;
+		my @cv = parse_csv($p);
+
+		# Set into the jar
+		LW2::cookie_set(\%{$mark->{'cookiejar'}}, $cv[0], $cv[1]);
+		}
     }
+
     $mark->{'total_vulns'}  = 0;
     $mark->{'total_checks'} = 0;
     $mark->{'total_errors'} = 0;

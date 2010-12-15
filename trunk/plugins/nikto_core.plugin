@@ -2015,6 +2015,11 @@ sub nfetch {
         }
     }
 
+    # set cookies
+    if (defined($mark->{'cookiejar'})) { 
+	LW2::cookie_write($mark->{'cookiejar'}, \%request, 1);
+	}
+
     LW2::http_fixup_request(\%request) unless ($flags->{'noclean'});
 
     # Run pre hooks
