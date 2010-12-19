@@ -6467,3 +6467,4 @@
 "006476","3092","1","/messages/","GET","200","","","","","This might be interesting...","",""
 "006477","0","23","@CRYSTALREPORTSviewrpt.cwr?id=1&wid=1&apstoken=127.0.0.2:0@111","GET","Server 127.0.0.2:0 not found","","","","","Crystal Reports can be used to scan internal hosts. See http://tinyurl.com/2f4r2o9","",""
 "006478","0","b","/console-selfservice/","GET","console header","","","","","RSA Self-Service Console found","",""
+"006479","68662","8","/axis2/axis2-web/HappyAxis.jsp","GET","Axis2 Happiness Page","","","","","SAP BusinessObjects dswsbobje.war deploys Axis2 with a static admin password. See http://www.rapid7.com/security-center/advisories/R7-0037.jsp","",""
