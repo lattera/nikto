@@ -51,11 +51,12 @@ sub nikto_embedded {
         (my $res, $content) =
           nfetch($mark, $item->{'uri'}, "GET", "", "", "", "embedded detection");
         if ($res eq "200") {
+            $item->{'match'} = validate_and_fix_regex($item->{'match'});
             my @lines = split(/\n/, $content);
             foreach my $line (@lines) {
 
                 # Check for the matches and pull out information
-                if ($line =~ $item->{'match'}) {
+                if ($line =~ /$item->{'match'}/) {
 
                     # Now pull out the make
                     my $model = $line;

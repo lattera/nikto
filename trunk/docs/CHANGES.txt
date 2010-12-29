@@ -1,10 +1,13 @@
 2010-12-06
 	- Ticket 194: Look for internal IPs in cookies
-	- Ticket 192: Relable IDS evasion as 'encoding techniques'
+	- Ticket 192: Relabel IDS evasion as 'encoding techniques'
 	- Ticket 186: Enable sleep for fractions of seconds
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
-	- TIcket 179: Update docs for -useproxy
+	- Ticket 179: Update docs for -useproxy
+	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 82: Auth is now checked per realm, not per resource
+	- Automatically escape invalid regexes in databases at run-time, so no dying
+	- Validate regex field syntax on -dbcheck
 	- Move -root option to %mark so it works on a per-host level if passed via URI
         - Added nikto_ssl.plugin to check cert's CN vs hostname
 	- Add basic retry on error in nfetch()

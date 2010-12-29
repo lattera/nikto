@@ -49,6 +49,7 @@ sub nikto_msgs {
     $dbarray = init_db("db_server_msgs");
 
     foreach my $item (@$dbarray) {
+	$item->{'server'} = validate_and_fix_regex($item->{'server'});
         if ($mark->{'banner'} =~ /($item->{'server'})\b/i) {
             add_vulnerability($mark, "$1 - $item->{'message'}",
                               $item->{'nikto_id'}, $item->{'osvdb'});

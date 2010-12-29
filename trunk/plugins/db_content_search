@@ -15,7 +15,7 @@
 # regular expressions as possible, and limited to only critical findings.
 #######################################################################
 "nikto_id","osvdb","matchstring","message"
-"750000","3268","[iI]ndex of \/","Directory indexing found."
+"750000","3268","[iI]ndex [oO]f \/","Directory indexing found."
 "750001","0","Warning(?:<\/b>)?:\s+(?:include|require)(?:_once)?\(","PHP include error may indicate local or remote file inclusion is possible."
 "750002","0","failed to open stream: No such file or directory in (?:<b>)?(?:[a-zA-Z]:\\|\/)","PHP include error reveals the full path to the web root."
 "750003","0","mysql_p?connect\(","Potential PHP MySQL database connection string found."

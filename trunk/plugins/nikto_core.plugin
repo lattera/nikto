@@ -482,7 +482,7 @@ sub general_config {
 
     # preprocess CLI options which cannot be abbreviated
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
-        if    ($ARGV[$i] eq '-dbcheck') { dbcheck(); }
+        if    ($ARGV[$i] eq '-dbcheck') { check_dbs(); }
         elsif ($ARGV[$i] eq '-update')  { check_updates(); }
     }
 
@@ -1076,6 +1076,7 @@ sub load_databases {
             # db_404_strings
             elsif ($file eq 'db_404_strings') {
                 foreach my $l (@file) {
+		    $l = validate_and_fix_regex($l);
                     $ERRSTRINGS{$l} = 1;
                 }
             }
@@ -1085,7 +1086,7 @@ sub load_databases {
                 foreach my $l (@file) {
                     my @T = parse_csv($l);
                     $CONTENTSEARCH{ $T[0] }{'osvdb'}   = $T[1];
-                    $CONTENTSEARCH{ $T[0] }{'string'}  = $T[2];
+                    $CONTENTSEARCH{ $T[0] }{'string'}  = validate_and_fix_regex($T[2]);
                     $CONTENTSEARCH{ $T[0] }{'message'} = $T[3];
                 }
             }
@@ -1094,6 +1095,8 @@ sub load_databases {
             elsif ($file eq 'db_outdated') {
                 foreach my $l (@file) {
                     my @T = parse_csv($l);
+		    next if $T[1] eq '';
+		    $T[1] = validate_and_fix_regex($T[1]);
                     $OVERS{ $T[1] }{ $T[2] } = $T[3];
                     $OVERS{ $T[1] }{'tid'} = $T[0];
                 }
@@ -1107,7 +1110,7 @@ sub load_databases {
 }
 
 ###############################################################################
-sub dbcheck {
+sub check_dbs {
     my @dbs =
       qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
     my $prefix = $_[0];
@@ -1142,7 +1145,7 @@ sub dbcheck {
             foreach my $line (<IN>) {
                 if ($line !~ /^\"/) { next; }
                 my @L = parse_csv($line);
-                if ($L[4] !~ /(GET|POST|TRACE|TRACK|OPTIONS|SEARCH|INDEX)/i) {
+                if (($L[4] !~ /(GET|POST|TRACE|TRACK|OPTIONS|SEARCH|INDEX)/i) && ($L[0] ne '006433')) {
                     nprint("\t+ ERROR: Possibly invalid method: $L[4] on ($line)");
                 }
                 if ($L[5] eq "") { nprint("\t+ ERROR: blank conditional: $line"); next; }
@@ -1162,6 +1165,10 @@ sub dbcheck {
                 if ((count_fields($line, 1) ne 12) && (count_fields($line) ne '')) {
                     nprint("\t+ ERROR: Invalid syntax: $line");
                 }
+		for (my $i=5;$i<=9;$i++) { 
+			my ($result, $bad) = validate_and_fix_regex($L[$i]);
+			if ($bad) { nprint("\t+ ERROR: Invalid regex in field $i: \"$L[$i]\""); }
+			}
             }
             foreach $entry (keys %ENTRIES) {
                 if ($ENTRIES{$entry} > 1) {
@@ -1180,12 +1187,16 @@ sub dbcheck {
             nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_404_strings') {
-            my $ctr = 0;
+            my $ctr = 1;
             foreach $line (<IN>) {
-
-                # not really any syntax to check
+		chomp($line);
+		$line =~ s/\#.*$//;
+		next if $line eq '';
+                my ($result, $bad) = validate_and_fix_regex($line);
+                if ($bad) { nprint("\t+ ERROR: Invalid regex on line $ctr: \"$line\""); }
                 $ctr++;
             }
+	    $ctr--;
             nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_headers') {
@@ -1211,22 +1222,37 @@ sub dbcheck {
         else {
 
             # It's a file of standard DB type, we can do this intelligently
-            my @headers;
+            my (@headers, @regex_fields);
             my $ctr = 0, $fields = 0;
             foreach $line (<IN>) {
-
                 # first, grab the headers
                 if ($fields == 0) {
                     $line =~ s/\#.*//;
                     next if ($line eq "");
                     @headers = parse_csv($line);
                     $fields  = $#headers;
+                    # check regex fields for syntax
+		    for (my $i=0; $i<=$#headers; $i++) { 
+			if (($headers[$i] eq 'match') || ($headers[$i] eq 'matchstring') || ($headers[$i] eq 'server')) {
+				push(@regex_fields, $i);
+				}
+			}
                     next;
                 }
+
+                if ($regex_fields[0] ne '') { 
+			my @entry=parse_csv($line);
+			foreach my $f (@regex_fields) { 
+                		my ($result, $bad) = validate_and_fix_regex($entry[$f]);
+                		if ($bad) { nprint("\t+ ERROR: Invalid regex in field $f on line $ctr: \"$line\""); }
+				}
+			}
+
                 if (   (count_fields($line, 1) != $fields - 1)
                     && (count_fields($line) ne '')) {
                     nprint("\t+ ERROR: Invalid syntax: $line");
                 }
+                
                 $ctr++;
             }
             nprint("\t$ctr entries");
@@ -1235,7 +1261,7 @@ sub dbcheck {
         close(IN);
     }
 
-    if ($_[0] eq "") { dbcheck('u'); }    # do this once
+    if ($_[0] eq "") { check_dbs('u'); }    # do this once
 
     nprint("\n");
     exit;
@@ -2175,8 +2201,12 @@ sub set_scan_items {
                 my $ext = get_ext($item[3]);
                 $db_extensions{$ext} = 1;
 
-              # Escape chars in the conditionals.  This must change if regexs are allowed in the db.
-                for (my $y = 5 ; $y <= 9 ; $y++) { $item[$y] = quotemeta($item[$y]); }
+		# validate...
+                for (my $y = 5 ; $y <= 9 ; $y++) { 
+			next if $item[$y] eq '';
+			$item[$y] =~ s/\\"/"/g;  # quotes are only escaped for csv parsing
+			$item[$y]=validate_and_fix_regex($item[$y]);
+			}
 
                 $NIKTO{total_checks}++;
                 $TESTS{ $item[0] }{'uri'}         = $item[3];
@@ -2722,8 +2752,25 @@ sub expand_pluginlist {
 
     return $output;
 }
-#######################################################################
+###############################################################################
+sub validate_and_fix_regex { 
+	my $fixed=0;
+	my $regex=$_[0] || return "", $fixed;
+	eval { qr/$regex/ };
+        if ($@) {
+		$fixed=1;
+        	$regex = rquote($regex);
+                }
+	return $regex, $fixed;
+}
+###############################################################################
+sub rquote { 
+	my $string = $_[0] || return;
+	$string =~ s/([^A-Za-z_0-9 "'\\])/\\$1/g;
+	return $string;
+}
+###############################################################################
 sub nikto_core { return; }    # trap for this plugin being called to run. lame.
-#######################################################################
+###############################################################################
 
 1;

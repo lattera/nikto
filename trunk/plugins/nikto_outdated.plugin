@@ -94,7 +94,7 @@ sub nikto_outdated {
     foreach $BI (@BUILDITEMS) {
         my $have_match = 0;
         foreach $V (sort keys %OVERS) {
-            if ($V eq "") { next; }
+	    next if $V eq '';
             if ($BI =~ /^$V/i)    # software name matched
             {
                 $have_match = 1;

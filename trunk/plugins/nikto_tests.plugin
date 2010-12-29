@@ -194,7 +194,6 @@ sub passchecks {
                 testfile($mark, "$dir$file.$ext", "passfiles", "299998");
 
                 foreach my $cgi (@CGIDIRS) {
-
                     # dir/file.ext
                     testfile($mark, "$cgi$dir$file.$ext", "passfiles", "299998");
 
