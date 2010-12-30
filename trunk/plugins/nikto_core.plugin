@@ -401,20 +401,26 @@ sub dump_target_info {
 
     nprint("+ Target Hostname:    $mark->{hostname}", "", $mark);
     nprint("+ Target Port:        $mark->{port}");
+    if (defined $CLI{'root'}) { nprint("+ Target Path:        $CLI{'root'}"); 
+	}
+
     if ((defined $CLI{'vhost'}) && ($CLI{'vhost'} ne $mark->{hostname})) {
         nprint("+ Virtual Host:   $CLI{'vhost'}", "", $mark);
     }
+
     if ($request{'whisker'}->{'proxy_host'} ne '') {
         nprint(
             "+ Proxy:              $request{'whisker'}->{'proxy_host'}:$request{'whisker'}->{'proxy_port'}"
             );
     }
+
     if (defined $NIKTO{'hostid'}) {
         nprint(
             "+ Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}",
             "v"
             );
     }
+
     if ($mark->{ssl}) {
         nprint($sslprint);
     }
@@ -690,12 +696,9 @@ sub general_config {
         }
     }
 
-    # Notices
-    my $notice = "";
-    if (defined $CLI{'root'}) { $notice .= "Prepending \'$CLI{'root'}\' to requests"; }
-
     # see if we have Time::HiRes sleep support
     if ($CLI{'pause'} > 0) { 
+    	my $notice = "";
     	eval "use Time::HiRes qw(sleep)";
     	if ($@ && ($CLI{'pause'} =~ /\./)) {
     		my $integer = int($CLI{'pause'});
@@ -703,15 +706,12 @@ sub general_config {
         	if ($1 >= 5) { $integer++; }
         	$CLI{'pause'}=$integer;
 		if ($CLI{'pause'} <= 0 ) { $CLI{'pause'} = 1; } # don't sleep for 0!
-        	$notice .= ", Pausing $CLI{'pause'} second(s) per request (rounded, as Time::HiRes is not available)";
+        	nprint("-***** Pausing $CLI{'pause'} second(s) per request (rounded, as Time::HiRes is not available) *****");
         	}
         else { 
-		$notice .= ", Pausing $CLI{'pause'} second(s) per request"; 
+		nprint("-***** Pausing $CLI{'pause'} second(s) per request *****"); 
 		}
 	}
-
-     $notice =~ s/^, //;
-     if ($notice ne '') { nprint("-***** $notice *****"); }
 
      return;
 }
@@ -1166,7 +1166,7 @@ sub check_dbs {
                     nprint("\t+ ERROR: Invalid syntax: $line");
                 }
 		for (my $i=5;$i<=9;$i++) { 
-			my ($result, $bad) = validate_and_fix_regex($L[$i]);
+			my ($result, $bad) = validate_and_fix_regex($L[$i], 1);
 			if ($bad) { nprint("\t+ ERROR: Invalid regex in field $i: \"$L[$i]\""); }
 			}
             }
@@ -1192,7 +1192,7 @@ sub check_dbs {
 		chomp($line);
 		$line =~ s/\#.*$//;
 		next if $line eq '';
-                my ($result, $bad) = validate_and_fix_regex($line);
+                my ($result, $bad) = validate_and_fix_regex($line, 1);
                 if ($bad) { nprint("\t+ ERROR: Invalid regex on line $ctr: \"$line\""); }
                 $ctr++;
             }
@@ -1243,7 +1243,7 @@ sub check_dbs {
                 if ($regex_fields[0] ne '') { 
 			my @entry=parse_csv($line);
 			foreach my $f (@regex_fields) { 
-                		my ($result, $bad) = validate_and_fix_regex($entry[$f]);
+                		my ($result, $bad) = validate_and_fix_regex($entry[$f], 1);
                 		if ($bad) { nprint("\t+ ERROR: Invalid regex in field $f on line $ctr: \"$line\""); }
 				}
 			}
@@ -2753,15 +2753,19 @@ sub expand_pluginlist {
     return $output;
 }
 ###############################################################################
+# Check a regex for validation & fix. If mode=1, return a flag which indicates
+# whether the regex was changed
 sub validate_and_fix_regex { 
+	my $regex = $_[0];
+	my $mode = $_[1] || 0;
 	my $fixed=0;
-	my $regex=$_[0] || return "", $fixed;
 	eval { qr/$regex/ };
         if ($@) {
 		$fixed=1;
         	$regex = rquote($regex);
                 }
-	return $regex, $fixed;
+	if ($mode) { return $regex, $fixed; }
+	return $regex;
 }
 ###############################################################################
 sub rquote { 

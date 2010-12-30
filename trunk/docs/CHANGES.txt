@@ -6,6 +6,7 @@
 	- Ticket 179: Update docs for -useproxy
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 82: Auth is now checked per realm, not per resource
+	- Move message on -root from notices to target host info (suggestion from YGN)
 	- Automatically escape invalid regexes in databases at run-time, so no dying
 	- Validate regex field syntax on -dbcheck
 	- Move -root option to %mark so it works on a per-host level if passed via URI
