@@ -2426,7 +2426,7 @@ sub usage {
                                P     Print progress to STDOUT
                                S     Scrub output of IPs and hostnames
                                V     Verbose output
-       -dbcheck           Check database and other key files for syntax errors (cannot be abbreviated)
+       -dbcheck           Check database and other key files for syntax errors
        -evasion+          Encoding technique:\n";
 
         foreach my $k (sort keys %{ $NIKTO{'anti_ids'} }) {
@@ -2481,7 +2481,7 @@ sub usage {
                                c     Remote Source Inclusion
                                x     Reverse Tuning Options (i.e., include all except specified)
        -useproxy          Use the proxy defined in nikto.conf
-       -update            Update databases and plugins from cirt.net (cannot be abbreviated)
+       -update            Update databases and plugins from cirt.net
        -Version           Print plugin and database versions
        -vhost+            Virtual host (for Host header)
    		+ requires a value
@@ -2491,7 +2491,7 @@ sub usage {
         print "
        -config+            Use this config file
        -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
-       -dbcheck            check database and other key files for syntax errors (cannot be abbreviated)
+       -dbcheck            check database and other key files for syntax errors
        -evasion+           ids evasion technique
        -Format+            save file (-o) format
        -host+              target host
@@ -2512,7 +2512,7 @@ sub usage {
        -Single             Single request mode
        -timeout+           Timeout (default 2 seconds)
        -Tuning+            Scan tuning
-       -update             Update databases and plugins from cirt.net (cannot be abbreviated)
+       -update             Update databases and plugins from cirt.net
        -Version            Print plugin and database versions
        -vhost+             Virtual host (for Host header)
    		+ requires a value
