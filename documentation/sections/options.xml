@@ -4,7 +4,15 @@ brief version of this text is available by running Nikto with the -h
 (-help) option.</para>
   <variablelist>
     <varlistentry>
+      <term><option>-ask</option></term>
+      <listitem>
+        <para>Whether to ask about submitting updates: yes (ask about each--
+the default), no (don't ask, just send), auto (don't ask, just send).
+       </para>
+      </listitem>
+    </varlistentry>
       <term><option>-Cgidirs</option></term>
+    <varlistentry>
       <listitem>
         <para>Scan these CGI directories. Special words "none" or "all" may
 be used to scan all CGI directories or none, (respectively). A
@@ -150,6 +158,18 @@ type requests)</para>
       <term><option>-nolookup</option></term>
       <listitem>
         <para>Do not perform name lookups on IP addresses.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-nocache</option></term>
+      <listitem>
+        <para>Disable response cache</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-nointeractive</option></term>
+      <listitem>
+        <para>Disable interactive features</para>
       </listitem>
     </varlistentry>
     <varlistentry>

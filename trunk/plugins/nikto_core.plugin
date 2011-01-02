@@ -498,7 +498,7 @@ sub general_config {
                "mutate=s"         => \$CLI{'mutate'},
                "mutate-options=s" => \$CLI{'mutate-options'},
                "id=s"             => \$CLI{'hostauth'},
-               "Interactive-off"  => \$CLI{'interactiveoff'},
+               "nointeractive"    => \$CLI{'nointeractive'},
                "evasion=s"        => \$CLI{'evasion'},
                "port=s"           => \$CLI{'ports'},
                "findonly"         => \$CLI{'findonly'},
@@ -682,7 +682,7 @@ sub general_config {
 
     # POSIX support for status?
     $NIKTO{'POSIX'}{'support'} = 0;
-    if (!$CLI{'interactiveoff'}) { 
+    if (!$CLI{'nointeractive'}) { 
     eval "use POSIX qw(:termios_h)";
     if (!$@) {
         $NIKTO{'SUPPORT'}{'POSIX'} = 1;
@@ -2440,7 +2440,6 @@ sub usage {
        -host+             Target host
        -Help              Extended help information
        -id+               Host authentication to use, format is userid:password
-       -Interactive-off   Disable interactive features
        -list-plugins      List all available plugins, perform no testing
        -mutate+           Guess additional file names:\n";
 
@@ -2449,9 +2448,10 @@ sub usage {
         }
 
         print "       -mutate-options    Provide information for mutates
-       -nocache           Disables the URI cache
+       -nocache           Disables the response cache
+       -nointeractive     Disables interactive features
        -nolookup          Disables DNS lookups
-       -nossl             Disables using SSL
+       -nossl             Disables the use of SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
        -Plugins+          List of plugins to run (default: ALL)
