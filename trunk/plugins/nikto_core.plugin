@@ -486,14 +486,10 @@ sub general_config {
       $NIKTO{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'} = $OUTPUT{'errors'} = 0;
     $CLI{'all_options'} = join(" ", @ARGV);
 
-    # preprocess CLI options which cannot be abbreviated
-    for (my $i = 0 ; $i <= $#ARGV ; $i++) {
-        if    ($ARGV[$i] eq '-dbcheck') { check_dbs(); }
-        elsif ($ARGV[$i] eq '-update')  { check_updates(); }
-    }
-
     GetOptions("nolookup"         => \$CLI{'skiplookup'},
                "config=s"         => \$CLI{'config'},
+               "update"           => \&check_updates,
+               "dbcheck"          => \&check_dbs,
                "Cgidirs=s"        => \$CLI{'forcecgi'},
                "mutate=s"         => \$CLI{'mutate'},
                "mutate-options=s" => \$CLI{'mutate-options'},
@@ -1117,12 +1113,20 @@ sub check_dbs {
     my @dbs =
       qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
     my $prefix = $_[0];
-    if ($prefix eq "")  { nprint("\n-->\tNikto Databases"); }
-    if ($prefix eq "u") { nprint("\n-->\tUser Databases"); }
+    if (($prefix eq "") || ($prefix eq "dbcheck"))  { 
+	$prefix=""; # for options from Get::Opt
+	nprint("\n-->\tNikto Databases"); 
+	}
+    elsif ($prefix eq "u") { 
+	nprint("\n-->\tUser Databases"); 
+	}
 
     for my $file (@dbs) {
         my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
-        if (!-r $filename) { next; }
+        if (!-r $filename) { 
+		nprint("+ ERROR: Unable to read \"$filename\"");
+		next; 
+		}
         open(IN, "<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
         nprint("Syntax Check: $filename");
 
