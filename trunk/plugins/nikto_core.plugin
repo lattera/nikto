@@ -487,9 +487,8 @@ sub general_config {
     $CLI{'all_options'} = join(" ", @ARGV);
 
     GetOptions("nolookup"         => \$CLI{'skiplookup'},
+               "ask=s"            => \$CLI{'ask'},
                "config=s"         => \$CLI{'config'},
-               "update"           => \&check_updates,
-               "dbcheck"          => \&check_dbs,
                "Cgidirs=s"        => \$CLI{'forcecgi'},
                "mutate=s"         => \$CLI{'mutate'},
                "mutate-options=s" => \$CLI{'mutate-options'},
@@ -506,24 +505,20 @@ sub general_config {
                "nossl"            => \$CLI{'nossl'},
                "no404"            => \$CLI{'nofof'},
                "useproxy:s"       => \$CLI{'useproxy'},
-               "Help"             => \$CLI{'help'},
                "vhost=s"          => \$CLI{'vhost'},
                "host=s"           => \$CLI{'host'},
                "output=s"         => \$CLI{'file'},
                "Format=s"         => \$CLI{'format'},
                "Display=s"        => \$CLI{'display'},
-               "Single"           => \$CLI{'Single'},
                "Tuning=s"         => \$CLI{'tuning'},
-               "Version"          => \$CLI{'version'},
                "Plugins=s"        => \$CLI{'plugins'},
-               "list-plugins"     => \$CLI{'list-plugins'},
-               "ask=s"            => \$CLI{'ask'}
-               ) or usage(0);
-
-    if    ($CLI{'help'})         { usage(2); }
-    elsif ($CLI{'version'})      { version(); }
-    elsif ($CLI{'Single'})       { single(); }
-    elsif ($CLI{'list-plugins'}) { list_plugins(); }
+               "Help"             => \&usage,
+               "Single"           => \&single,
+               "list-plugins"     => \&list_plugins,
+               "Version"          => \&version,
+               "update"           => \&check_updates,
+               "dbcheck"          => \&check_dbs,
+               ) or usage();
 
     # CLI proxy overrides nikto.conf
     if ((defined($CLI{'useproxy'}))  && ($CLI{'useproxy'} ne '')) { 
@@ -2407,7 +2402,7 @@ sub send_updates {
 
 #######################################################################
 sub usage {
-    if ($_[0] eq 2) {
+    if ($_[0] eq "Help") {
         print "
    Options:
        -ask+               Whether to ask about submitting updates
