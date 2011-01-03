@@ -41,6 +41,7 @@ sub nikto_multiple_index {
     my $dbarray = init_db("db_multiple_index");
     my ($found, $hashes);
     foreach my $item (@$dbarray) {
+	return if $mark->{'terminate'};
 
         # Use nfetch to minimise extra code
         # First we need to mangle the host.

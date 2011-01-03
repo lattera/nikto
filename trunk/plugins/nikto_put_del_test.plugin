@@ -37,6 +37,7 @@ sub nikto_put_del_test_init {
 }
 
 sub nikto_put_del_test {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my $msg;
 

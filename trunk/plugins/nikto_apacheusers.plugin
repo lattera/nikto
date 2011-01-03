@@ -45,6 +45,7 @@ sub nikto_apacheusers_init {
 }
 
 sub nikto_apacheusers {
+    return if $mark->{'terminate'};
     my ($mark, $parameters) = @_;
     my $apacheusers = 0;
 
@@ -155,6 +156,7 @@ sub nikto_user_enum_apache_brute {
     my ($result, $content);
     my @foundusers = ();
     while (length($text) <= $size) {
+	return if $mark->{'terminate'};
         if (($ctr % 500) eq 0) { nprint("- User enumeration guess $ctr ($text)", "v"); }
         ($result, $content) =
           nfetch($mark, $url . $text, "HEAD", "", "", "", "user_enum_apache: enumeration");
@@ -185,6 +187,7 @@ sub nikto_user_enum_apache_dictionary {
 
     # Now attempt on each entry
     while (<IN>) {
+	return if $mark->{'terminate'};
         chomp;
         s/\#.*$//;
 

@@ -41,6 +41,7 @@ sub nikto_httpoptions_init {
 # See RFC 2626 for more info...
 
 sub nikto_httpoptions {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my %headers;
 
@@ -99,7 +100,7 @@ sub nikto_httpoptions {
 
     # Check for other weirdness
     # IIS Debug
-
+    return if $mark->{'terminate'};
     ($res, $content) = nfetch($mark, "/", "DEBUG", "", "", "", "httpoptions: DEBUG");
     if ($res == 200) {
         add_vulnerability(
@@ -112,6 +113,7 @@ sub nikto_httpoptions {
     }
 
     # IIS PROPFIND HEADER
+    return if $mark->{'terminate'};
     %headers = ("Host"           => "",
                 "Content-Length" => "0",);
     ($res, $content) =
@@ -133,6 +135,7 @@ sub nikto_httpoptions {
 
         # Check for all flavours of HTTP
         foreach my $version (split(/ /, "1.0 1.1")) {
+            return if $mark->{'terminate'};
             $request{'whisker'}{'version'} = $version;
             ($res, $content) =
               nfetch($mark, "/", $method, "", \%headers, "", "httpoptions: $method");

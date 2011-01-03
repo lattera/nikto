@@ -41,16 +41,19 @@ sub nikto_tests_init {
 }
 
 sub nikto_tests {
+    return if $mark->{'terminate'};
     my ($mark, $parameters) = @_;
 
     # this is the actual the looped code for all the checks
     foreach my $checkid (sort keys %TESTS) {
+	return if $mark->{'terminate'};
         if ($checkid >= 500000) { next; }    # skip TESTS added manually during run (for reports)
                                              # replace variables in the uri
         my @urilist = change_variables($TESTS{$checkid}{'uri'});
 
         # Now repeat for each uri
         foreach my $uri (@urilist) {
+            return if $mark->{'terminate'};
             my %headers;
             (my $res, $content, $error) =
               nfetch($mark, $uri,
@@ -182,6 +185,7 @@ sub passchecks {
     nprint("- Performing passfiles mutation", "v");
 
     foreach my $dir (@DIRS) {
+    return if $mark->{'terminate'};
         foreach my $file (@PFILES) {
             next if ($file eq "");
 
@@ -189,6 +193,7 @@ sub passchecks {
             testfile($mark, "$dir$file", "passfiles", "299998");
 
             foreach my $ext (@EXTS) {
+		return if $mark->{'terminate'};
 
                 # dir/file.ext
                 testfile($mark, "$dir$file.$ext", "passfiles", "299998");
@@ -237,12 +242,14 @@ sub allchecks {
     # Now do a check for each item - just check the return status, nothing else
     foreach my $dir (keys %DIRS) {
         foreach my $file (keys %FILES) {
+	    return if $mark->{'terminate'};
             testfile($mark, "$dir$file", "all checks", 299999);
         }
     }
 }
 
 sub testfile {
+    return if $mark->{'terminate'};
     my ($mark, $uri, $name, $tid) = @_;
     my ($res, $content, $error) = nfetch($mark, "$uri", "GET", "", "", "", "Tests: $name");
     nprint("- $res for $uri (error: $error)", "v");

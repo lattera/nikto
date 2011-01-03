@@ -36,6 +36,7 @@ sub nikto_outdated_init {
 }
 
 sub nikto_outdated {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
 
     # Below is to use a local copy, as the old version caused duplicate entries
@@ -69,7 +70,6 @@ sub nikto_outdated {
         }
         else                                     # must create  sepr
         {
-
             # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)
             my $sepr = $mark->{'banner'};
             $sepr =~ s/[a-zA-Z0-9\.\(\)]//gi;
@@ -119,7 +119,6 @@ sub nikto_outdated {
 }
 
 sub vereval {
-
     # split both by last char of @_[0], as it is the name to version separator
     my $sepr = substr($_[2], (length($_[2]) - 1), 1);
     nprint("nikto_outdated.plugin: verstring: $_[2], sepr:$sepr", "d");

@@ -218,9 +218,12 @@ foreach my $mark (@MARKS) {
     my $time    = date_disp($mark->{'end_time'});
     my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
     if (!$CLI{'findonly'}) {
-        nprint(
-            "+ $NIKTO{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
-            );
+	if (!$mark->{'terminate'}) { 
+        	nprint("+ $NIKTO{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
+		}
+	else { 
+		nprint("+ Scan terminated:  $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
+		}
         nprint("+ End Time:           $time ($elapsed seconds)");
     }
     nprint($NIKTO{'DIV'});

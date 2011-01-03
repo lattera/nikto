@@ -132,6 +132,7 @@ sub nikto_auth {
 
     # Now we have this we can try guessing the password
     foreach my $entry (@{$REALMS}) {
+	return if $mark->{'terminate'};
         unless ($realm =~ /$entry->{'realm'}/i || $entry->{'realm'} eq '@ANY') { next; }
 
         if ($result->{'www-authenticate'} =~ /^ntlm/i) {

@@ -38,6 +38,7 @@ sub nikto_dictionary_attack_init {
 }
 
 sub nikto_dictionary_attack {
+    return if $mark->{'terminate'};
     my ($mark, $parameters) = @_;
 
     my $dictfile = "";
@@ -69,6 +70,7 @@ sub nikto_dictionary_attack {
 
     # Now attempt on each entry
     while (<IN>) {
+	return if $mark->{'terminate'};
         chomp;
         s/\#.*$//;
         next if ($_ eq "");

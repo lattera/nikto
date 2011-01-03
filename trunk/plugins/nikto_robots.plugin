@@ -39,6 +39,7 @@ sub nikto_robots_init {
 }
 
 sub nikto_robots {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my %headers;
     (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", \%headers, "", "robots");

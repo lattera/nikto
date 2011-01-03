@@ -44,6 +44,7 @@ sub nikto_msgs_init {
 }
 
 sub nikto_msgs {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my $dbarray;
     $dbarray = init_db("db_server_msgs");
@@ -65,6 +66,7 @@ sub nikto_msgs {
         next unless ($RES == 200);
 
         # Computer name
+	return if $mark->{'terminate'};
         my $name = $CONTENT;
         $name =~ s#(^.*<ComputerName>)([a-zA-Z0-9]*)(</ComputerName>.*$)#$2#;
         my $eposerver = $CONTENT;
@@ -82,6 +84,7 @@ sub nikto_msgs {
         my ($RES, $CONTENT) =
           nfetch($mark, "/cpqlogin.htm", "GET", "", "", "", "msgs: CompaqHTTPServer");
         next unless ($RES == 200);
+	return if $mark->{'terminate'};
         my $ipaddrs = "";
         my $name;
         foreach my $line (split(/\n/, $CONTENT)) {

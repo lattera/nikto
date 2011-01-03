@@ -36,6 +36,7 @@ sub nikto_favicon_init {
 }
 
 sub nikto_favicon {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my ($RES, $CONTENT) = nfetch($mark, "/favicon.ico", "GET", "", "", "", "favicon");
     my $dbarray = init_db("db_favicon");

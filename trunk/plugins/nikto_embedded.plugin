@@ -43,11 +43,13 @@ sub nikto_embedded_init {
 }
 
 sub nikto_embedded {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my $dbarray;
     $dbarray = init_db("db_embedded");
 
     foreach my $item (@$dbarray) {
+	return if $mark->{'terminate'};
         (my $res, $content) =
           nfetch($mark, $item->{'uri'}, "GET", "", "", "", "embedded detection");
         if ($res eq "200") {

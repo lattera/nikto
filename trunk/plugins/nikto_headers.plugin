@@ -44,6 +44,7 @@ sub nikto_headers_init {
 }
 
 sub nikto_headers_postfetch {
+    return if $mark->{'terminate'};
     my ($mark, $parameters, $request, $result) = @_;
 
     if (exists $result->{'whisker'}->{'error'}) {
@@ -62,6 +63,7 @@ sub nikto_headers_postfetch {
 }
 
 sub nikto_headers_check {
+    return if $mark->{'terminate'};
     my ($mark, $result, $header, $message, $tid) = @_;
 
     if (exists $result->{$header}) {
@@ -86,6 +88,7 @@ sub nikto_headers_check {
 }
 
 sub nikto_headers {
+    return if $mark->{'terminate'};
     my ($mark) = @_;
     my $dbarray = init_db("db_headers");
     my %headers;
@@ -95,6 +98,7 @@ sub nikto_headers {
     my %transheaders;
     foreach
       my $f (qw/\/index.asp \/junk999.asp \/index.aspx \/junk988.aspx \/login.asp \/login.aspx/) {
+	return if $mark->{'terminate'};
         (my $res, $content) =
           nfetch($mark, $f, "GET", "", \%transheaders, "", "headers: Translate-f #1");
         if ($res eq "200") {
@@ -226,6 +230,7 @@ sub nikto_headers {
 
     # Try to grab a standard file
     foreach my $f (qw/\/index.html \/index.htm \/robots.txt/) {
+	return if $mark->{'terminate'};
         (my $res, $content) = nfetch($mark, $f, "GET", "", \%headers, "", "headers: etag");
         last if (defined $headers{'etag'});
     }
