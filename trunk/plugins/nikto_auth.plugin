@@ -150,7 +150,7 @@ sub nikto_auth {
 	sleeper();
 
         LW2::http_do_request_timeout($request, $result);    # test auth
-        $NIKTO{'totalrequests'}++;
+        $COUNTERS{'totalrequests'}++;
         dump_var("Auth Request",  $request);
         dump_var("Auth Response", $result);
 
@@ -165,7 +165,7 @@ sub nikto_auth {
             my @ntlm_x = split(/ /, $result{'www-authenticate'});
             if ($#ntlm_x == 1) {
                 LW2::http_do_request_timeout(\%request, \%result);
-                $NIKTO{'totalrequests'}++;
+                $COUNTERS{'totalrequests'}++;
             }
         }
 
@@ -184,7 +184,7 @@ sub nikto_auth {
 
             # Finally repeat the check
             LW2::http_do_request_timeout($request, $result);    # test auth
-            $NIKTO{'totalrequests'}++;
+            $COUNTERS{'totalrequests'}++;
 
             # Mark it successful
             $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'status'}   = 1;

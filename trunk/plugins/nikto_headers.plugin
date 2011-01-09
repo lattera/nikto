@@ -136,7 +136,7 @@ sub nikto_headers {
     $request{'whisker'}{'version'}  = "1.0";
 
     LW2::http_do_request_timeout(\%request, \%result);
-    $NIKTO{'totalrequests'}++;
+    $COUNTERS{'totalrequests'}++;
     if (   ($result{'content-location'} ne "")
         && ($result{'content-location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
         && ($result{'content-location'} !~ /$mark->{'ip'}/)) {
@@ -159,7 +159,7 @@ sub nikto_headers {
     delete $request{'Host'};
     sleeper();
     LW2::http_do_request_timeout(\%request, \%result);
-    $NIKTO{'totalrequests'}++;
+    $COUNTERS{'totalrequests'}++;
 
     if (   ($result{'location'} ne "")
         && ($result{'location'} =~ /[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/)
@@ -188,7 +188,7 @@ sub nikto_headers {
     $request{'whisker'}{'version'}  = "1.0";
     sleeper();
     LW2::http_do_request_timeout(\%request, \%result);
-    $NIKTO{'totalrequests'}++;
+    $COUNTERS{'totalrequests'}++;
 
     if (($result{'location'} ne "") && ($result{'location'} =~ /http:\/\//)) {
         add_vulnerability(
@@ -206,9 +206,9 @@ sub nikto_headers {
 
     #######################################################################
     # Look for any uncommon headers
+    my $reportnum = 999100;
     foreach my $header (sort keys %headers) {
-        my $found     = 0;
-        my $reportnum = 999100;
+    	my $found     = 0;
         foreach my $st_header (@$dbarray) {
             if ($header eq $st_header->{'header'}) {
                 $found = 1;
@@ -217,7 +217,7 @@ sub nikto_headers {
         if ($found == 0) {
             my $x = $headers{$header};
             $x =~ s/\s+.*$//;
-            push(@BUILDITEMS, $x);
+            $mark->{'components'}->{$x}=1;
             add_vulnerability($mark,
                               "Uncommon header '$header' found, with contents: $headers{$header}",
                               $reportnum, 0);

@@ -39,10 +39,9 @@ Getopt::Long::Configure('no_ignore_case');
 #######################################################################
 
 # global var/definitions
-use vars qw/$TEMPLATES %ERRSTRINGS %CLI %VARIABLES %TESTS $CONTENT/;
-use vars qw/%NIKTO %NIKTOCONFIG %request %result %COUNTERS/;
-use vars qw/%db_extensions %FoF %UPDATES @DBFILE @BUILDITEMS/;
-use vars qw/@RESULTS @PLUGINS @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
+use vars qw/$TEMPLATES %CLI %VARIABLES %TESTS/;
+use vars qw/%NIKTO %NIKTOCONFIG %request %result %COUNTERS %UPDATES %db_extensions/;
+use vars qw/@RESULTS @PLUGINS @DBFILE @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
 $COUNTERS{'startsec'} = time();
@@ -116,7 +115,7 @@ if ($CLI{'host'} eq "") {
     usage();
 }
 
-$NIKTO{'total_targets'} = $COUNTERS{'hosts_completed'} = 0;
+$COUNTERS{'total_targets'} = $COUNTERS{'hosts_completed'} = 0;
 load_plugins();
 
 # Parse the supplied list of targets
@@ -143,7 +142,7 @@ foreach my $mark (@MARKS) {
         next;
     }
     else {
-        $NIKTO{'total_targets'}++;
+        $COUNTERS{'total_targets'}++;
     }
     $mark->{'ssl'} = $open - 1;
 
@@ -188,10 +187,9 @@ foreach my $mark (@MARKS) {
     }
 
     $mark->{'total_vulns'}  = 0;
-    $mark->{'total_checks'} = 0;
     $mark->{'total_errors'} = 0;
 
-    %FoF = ();
+    my %FoF = ();
 
     nfetch($mark, "/", "GET", "", "", { nocache => 1, noprefetch => 1, nopostfetch => 1 },
            "getinfo");
@@ -219,7 +217,7 @@ foreach my $mark (@MARKS) {
     my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
     if (!$CLI{'findonly'}) {
 	if (!$mark->{'terminate'}) { 
-        	nprint("+ $NIKTO{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
+        	nprint("+ $COUNTERS{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
 		}
 	else { 
 		nprint("+ Scan terminated:  $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
@@ -234,14 +232,12 @@ foreach my $mark (@MARKS) {
 report_close();
 
 nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
-nprint( "+ $NIKTO{'totalrequests'} requests made in " .(time()-$COUNTERS{'startsec'}) . " seconds","v");
+nprint( "+ $COUNTERS{'totalrequests'} requests made in " .(time()-$COUNTERS{'startsec'}) . " seconds","v");
 send_updates();
 nprint("T:" . localtime() . ": Ending", "d");
 
 exit;
 
-#################################################################################
-####                Most code is now in nikto_core.plugin                    ####
 #################################################################################
 # load config file
 # error=load_config(FILENAME)

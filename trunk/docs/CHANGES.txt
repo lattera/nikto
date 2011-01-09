@@ -2,11 +2,15 @@
 	- Ticket 194: Look for internal IPs in cookies
 	- Ticket 192: Relabel IDS evasion as 'encoding techniques'
 	- Ticket 186: Enable sleep for fractions of seconds
+	- Ticket 184: Fix -root option
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
 	- Ticket 179: Update docs for -useproxy
 	- Ticket 178: Add -Interactive-off to disable interactivity
+	- Ticket 173: Skip current host
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 82: Auth is now checked per realm, not per resource
+	- Created $mark->{'components'} to store server build items
+	- Variable consolidation & memory usage cleanup
 	- Move message on -root from notices to target host info (suggestion from YGN)
 	- Automatically escape invalid regexes in databases at run-time, so no dying
 	- Validate regex field syntax on -dbcheck

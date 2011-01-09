@@ -42,7 +42,7 @@ sub nikto_robots {
     return if $mark->{'terminate'};
     my ($mark) = @_;
     my %headers;
-    (my $RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", \%headers, "", "robots");
+    my ($RES, $CONTENT) = nfetch($mark, "/robots.txt", "GET", "", \%headers, "", "robots");
 
     if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'})) {
         if (is_404("robots.txt", $CONTENT, $RES, $headers{'location'})) { return; }

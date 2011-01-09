@@ -72,17 +72,15 @@ sub is_404 {
     elsif ($FoF{$ext}{'type'} eq "HASH") {
         my $content = rm_active_content($content, $uri);
         if (LW2::md4($content) eq $FoF{$ext}{'match'}) {
-            return 1;
-        }
+            	return 1;
+        	}
+	}
 
-        else {
-            foreach my $string (keys %ERRSTRINGS) {
-                if ($content =~ /$string/i) {
-                     return 1;
-                     }
-                }
-            }
-         }
+    foreach my $string (keys %{$VARIABLES->{'ERRSTRINGS'}}) {
+    	if ($content =~ /$string/i) {
+        	return 1;
+               	}
+        }
 
     return 0;
 }
@@ -157,8 +155,8 @@ sub get_ext {
 ###############################################################################
 sub status_report {
     my $secleft =
-      ((time() - $COUNTERS{'startsec'}) / $NIKTO{'totalrequests'}) *
-      (($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) - $NIKTO{'totalrequests'});
+      ((time() - $COUNTERS{'startsec'}) / $COUNTERS{'totalrequests'}) *
+      (($COUNTERS{'total_checks'} * $COUNTERS{'total_targets'}) - $COUNTERS{'totalrequests'});
     my $timeleft;
     if ($secleft > 60) {
         my $minleft = $secleft / 60;
@@ -170,15 +168,15 @@ sub status_report {
     }
     else { $timeleft = sprintf("%.0f seconds", $secleft); }
     my $perc_compl =
-      ($NIKTO{'totalrequests'} / ($NIKTO{'total_checks'} * $NIKTO{'total_targets'}) * 100);
+      ($COUNTERS{'totalrequests'} / ($COUNTERS{'total_checks'} * $COUNTERS{'total_targets'}) * 100);
     my $line;
 
     # This 'if' is because I am a lazy, bad programmer.
     # And also because total_checks only takes into account db_tests, not other stuff. I swear.
     if (($perc_compl < 100) && ($secleft > 0)) {
-        $line = "- STATUS: Completed $NIKTO{'totalrequests'} tests";
-        if ($NIKTO{'total_targets'} > 1) {
-            $line .= " (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$NIKTO{'total_targets'})";
+        $line = "- STATUS: Completed $COUNTERS{'totalrequests'} tests";
+        if ($COUNTERS{'total_targets'} > 1) {
+            $line .= " (target " . ($COUNTERS{'hosts_completed'} + 1) . "/$COUNTERS{'total_targets'})";
         }
         $line .= sprintf(" (~%.0f%% complete, $timeleft left", $perc_compl);
         if ($NIKTO{'current_plugin'} ne '') {
@@ -246,12 +244,14 @@ sub map_codes {
     }
 
     # these are some used in mutate that may not be in the db_tests
-    $db_extensions{'bak'}  = 1;
-    $db_extensions{'data'} = 1;
-    $db_extensions{'dbc'}  = 1;
-    $db_extensions{'dbf'}  = 1;
-    $db_extensions{'lst'}  = 1;
-    $db_extensions{'htx'}  = 1;
+    if (defined $CLI{'mutate'}) { 
+    	$db_extensions{'bak'}  = 1;
+    	$db_extensions{'data'} = 1;
+    	$db_extensions{'dbc'}  = 1;
+    	$db_extensions{'dbf'}  = 1;
+    	$db_extensions{'lst'}  = 1;
+    	$db_extensions{'htx'}  = 1;
+	}
 
     foreach my $ext (keys %db_extensions) {
         if (   $ext ne "DIRECTORY"
@@ -260,6 +260,7 @@ sub map_codes {
             $REQS{"/$rs.$ext"} = $ext;
         }
     }
+    undef $db_extensions;
 
     # add those generic type holders back as real files
     $REQS{"/$rs/"} = "DIRECTORY";
@@ -429,7 +430,7 @@ sub dump_target_info {
     if (defined $NIKTO{'anti_ids'} && defined $CLI{'evasion'}) {
         for (my $i = 1 ; $i <= (keys %{ $NIKTO{'anti_ids'} }) ; $i++) {
             if ($CLI{'evasion'} =~ /$i/) {
-                nprint("+ Using Encoding:  $NIKTO{'anti_ids'}{$i}");
+                nprint("+ Using Encoding:     $NIKTO{'anti_ids'}{$i}");
             }
         }
     }
@@ -484,7 +485,7 @@ sub general_config {
 
     ### CLI STUFF
     $CLI{'pause'} = $CLI{'html'} = $OUTPUT{'verbose'} = $CLI{'skiplookup'} =
-      $NIKTO{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'} = $OUTPUT{'errors'} = 0;
+      $COUNTERS{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'} = $OUTPUT{'errors'} = 0;
     $CLI{'all_options'} = join(" ", @ARGV);
 
     GetOptions("nolookup"         => \$CLI{'skiplookup'},
@@ -604,6 +605,9 @@ sub general_config {
     if (defined $CLI{'evasion'}) {
         $CLI{'evasion'} =~ s/[^1-8AB]//g;
     }
+    else { 
+	undef $NIKTO{'anti_ids'}; # we don't need this any more
+	}
 
     if (!defined $CLI{'plugins'} || $CLI{'plugins'} eq "") {
         $CLI{'plugins'} = '@@DEFAULT';
@@ -633,6 +637,9 @@ sub general_config {
             $CLI{'plugins'} .= ';dictionary(dictionary:' . $CLI{'mutate-opts'} . ')';
         }
     }
+    else { 
+	undef $NIKTO{'mutate_opts'}; # we don't need this any more
+	}
 
     # Asking questions?
     if ($CLI{'ask'} =~ /^(?:auto|yes|no)$/) {
@@ -640,7 +647,7 @@ sub general_config {
         undef($CLI{'ask'});
     }
 
-    $NIKTO{'timeout'} = $CLI{'timeout'} || 10;
+    $CLI{'timeout'} || 10;
 
     # Set up User-Agent
     $NIKTO{'useragent'} = $NIKTOCONFIG{'USERAGENT'};
@@ -784,7 +791,7 @@ sub check_input {
     }
     elsif ($key eq 'N') {
 	nprint("- Terminating host scan.");
-	return 'term'; #$mark->{'terminate'}=1;
+	return 'term';
 	}
     return;
 }
@@ -933,6 +940,11 @@ sub set_targets {
         if (!defined $host) { next; }
         my $markhash = {};
 
+        if ($root ne '') { 
+	    $markhash->{'root'} = $root;
+            nprint("- Added -root value of '$root' from CLI", "v");
+	    }
+
         # is it a URL?
         if ($host =~ /^https?:\/\//) {
             my @hostdata = LW2::uri_split($host);
@@ -940,11 +952,7 @@ sub set_targets {
             $defhost = $hostdata[2];
             $defport = $hostdata[3];
 
-            if ($root ne '') { 
-		$markhash->{'root'} = $root;
-                nprint("- Added -root value of '$root' from CLI", "v");
-		}
-            elsif ($hostdata[0] ne '') {
+           if (($hostdata[0] ne '') && ($root eq '')) {
 		$markhash->{'root'} = $hostdata[0];
                 nprint("- Added -root value of '$hostdata[0]' from URI", "v");
             }
@@ -1075,7 +1083,7 @@ sub load_databases {
             elsif ($file eq 'db_404_strings') {
                 foreach my $l (@file) {
 		    $l = validate_and_fix_regex($l);
-                    $ERRSTRINGS{$l} = 1;
+                    $VARIABLES->{'ERRSTRINGS'}->{$l} = 1;
                 }
             }
 
@@ -1620,7 +1628,7 @@ sub check_updates {
     ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
 
     # retrieve versions file
-    (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
+    my ($RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
     if ($RES eq 407) {
         if ($NIKTOCONFIG{'PROXYUSER'} eq "") {
             $NIKTOCONFIG{'PROXYUSER'} = read_data("Proxy ID: ",   "");
@@ -1692,7 +1700,7 @@ sub check_updates {
     # replace local files if updated
     foreach my $toget (@DBTOGET) {
         nprint("+ Retrieving '$toget'");
-        (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/$toget", "GET");
+        my ($RES, $CONTENT) = nfetch(\%mark, "$serverdir/$toget", "GET");
         if ($RES ne 200) {
             nprint("+ ERROR: Unable to get $server$serverdir/$toget");
             exit;
@@ -1709,7 +1717,7 @@ sub check_updates {
     # CHANGES file
     if ($code_updates) {
         nprint("+ Retrieving 'CHANGES.txt'");
-        (my $RES, $CONTENT) = nfetch(\%mark, "$serverdir/CHANGES.txt", "GET");
+        my ($RES, $CONTENT) = nfetch(\%mark, "$serverdir/CHANGES.txt", "GET");
         if (($CONTENT ne "") && ($RES eq 200)) {
             open(OUT, ">$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt")
               || die print STDERR
@@ -1815,7 +1823,7 @@ sub proxy_check {
 
 	sleeper();
         LW2::http_do_request_timeout(\%request, \%result);
-        $NIKTO{'totalrequests'}++;
+        $COUNTERS{'totalrequests'}++;
         dump_var("Request Hash", \%request);
         dump_var("Result Hash",  \%result);
 
@@ -1851,7 +1859,7 @@ sub proxy_check {
             LW2::http_fixup_request(\%request);
             sleeper();
             LW2::http_do_request_timeout(\%request, \%result);
-            $NIKTO{'totalrequests'}++;
+            $COUNTERS{'totalrequests'}++;
             dump_var("Request Hash", \%request);
             dump_var("Result Hash",  \%result);
 
@@ -1936,7 +1944,7 @@ sub setup_hash {
     $reqhash->{'whisker'}->{'ssl_save_info'}              = 1;
     $reqhash->{'whisker'}->{'keep-alive'}              = 1;
     $reqhash->{'whisker'}->{'lowercase_incoming_headers'} = 1;
-    $reqhash->{'whisker'}->{'timeout'}                    = $NIKTO{'timeout'};
+    $reqhash->{'whisker'}->{'timeout'}                    = $CLI{'timeout'};
     if (defined $CLI{'evasion'}) {
         $reqhash->{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'};
     }
@@ -2029,7 +2037,7 @@ sub nfetch {
     setup_hash(\%request, $mark, $testid);
 
     # check for keyboard input
-    if (($NIKTO{'totalrequests'} % 10) == 0) {
+    if (($COUNTERS{'totalrequests'} % 10) == 0) {
         if (check_input() eq 'term') { $mark->{'terminate'}=1; }
     }
 
@@ -2072,12 +2080,12 @@ sub nfetch {
 
     if (!$incache) {
         LW2::http_do_request_timeout(\%request, \%result);
-        $NIKTO{'totalrequests'}++;
+        $COUNTERS{'totalrequests'}++;
 
 	# If we got an error, do 1 retry. This should be much more intelligent and configurable!
 	if (defined $result{'whisker'}->{'error'} || $result{'whisker'}{'code'} eq '') {
         	LW2::http_do_request_timeout(\%request, \%result);
-        	$NIKTO{'totalrequests'}++;
+        	$COUNTERS{'totalrequests'}++;
 		}
 
         cache_add($request{'whisker'}->{'method'},
@@ -2161,7 +2169,7 @@ sub set_scan_items {
 
     # load the tests
     %TESTS = ();
-    $NIKTO{total_checks}=0;
+    $COUNTERS{total_checks}=0;
     my @SKIPLIST = ();
     if (defined $NIKTOCONFIG{SKIPIDS}) {
         @SKIPLIST = split(/ /, $NIKTOCONFIG{SKIPIDS});
@@ -2216,7 +2224,7 @@ sub set_scan_items {
 			$item[$y]=validate_and_fix_regex($item[$y]);
 			}
 
-                $NIKTO{total_checks}++;
+                $COUNTERS{total_checks}++;
                 $TESTS{ $item[0] }{'uri'}         = $item[3];
                 $TESTS{ $item[0] }{'osvdb'}       = $item[1];
                 $TESTS{ $item[0] }{'method'}      = $item[4];
@@ -2233,8 +2241,8 @@ sub set_scan_items {
     }
 
     undef @DBFILE;    # this memory hog is no longer needed!
-    nprint("- $NIKTO{'total_checks'} server checks loaded", "v");
-    if ($NIKTO{'total_checks'} eq 0 && !defined $CLI{'tuning'}) {
+    nprint("- $COUNTERS{'total_checks'} server checks loaded", "v");
+    if ($COUNTERS{'total_checks'} eq 0 && !defined $CLI{'tuning'}) {
         nprint("+ Unable to load valid checks!");
         exit;
     }
@@ -2316,7 +2324,6 @@ sub send_updates {
     my $have_updates = 0;
     my ($updated_version, $answer, $RES);
     foreach my $ver (keys %UPDATES) {
-
         # ignore useless ones...
         if ($ver !~ /[0-9]/) { next; }
         elsif ($ver eq "Win32")          { next; }

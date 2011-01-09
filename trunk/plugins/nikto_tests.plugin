@@ -159,7 +159,7 @@ sub nikto_tests {
 
         # Percentages
         if (($OUTPUT{'progress'}) && ($parameters->{'report'})) {
-            if (($NIKTO{'totalrequests'} % $parameters->{'report'}) == 0) {
+            if (($COUNTERS{'totalrequests'} % $parameters->{'report'}) == 0) {
                 status_report();
             }
         }
