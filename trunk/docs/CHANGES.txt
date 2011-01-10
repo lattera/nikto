@@ -1,6 +1,7 @@
 2010-12-06
 	- Ticket 194: Look for internal IPs in cookies
 	- Ticket 192: Relabel IDS evasion as 'encoding techniques'
+	- Ticket 188: Remove 'cyhpers' from DTD
 	- Ticket 186: Enable sleep for fractions of seconds
 	- Ticket 184: Fix -root option
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
