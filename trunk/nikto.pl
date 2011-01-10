@@ -195,7 +195,7 @@ foreach my $mark (@MARKS) {
            "getinfo");
 
     report_host_start($mark);
-    if ($CLI{'findonly'}) {
+    if ($CLI{'plugins'} eq '@@NONE') { 
         my $protocol = "http";
         if ($mark->{'ssl'}) { $protocol .= "s"; }
         if ($mark->{'banner'} eq "") {
@@ -208,14 +208,15 @@ foreach my $mark (@MARKS) {
     }
     else {
         dump_target_info($mark);
-        unless (defined $CLI{'nofof'}) { map_codes($mark) }
+        unless ((defined $CLI{'nofof'}) || ($CLI{'plugins'} eq '@@NONE'))
+ 		{ map_codes($mark) }
         run_hooks($mark, "recon");
         run_hooks($mark, "scan");
     }
     $mark->{'end_time'} = time();
     my $time    = date_disp($mark->{'end_time'});
     my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
-    if (!$CLI{'findonly'}) {
+    if ($CLI{'plugins'} ne '@@NONE') {
 	if (!$mark->{'terminate'}) { 
         	nprint("+ $COUNTERS{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
 		}
@@ -231,10 +232,12 @@ foreach my $mark (@MARKS) {
 }
 report_close();
 
+ if ($CLI{'plugins'} ne '@@NONE') {
 nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
 nprint( "+ $COUNTERS{'totalrequests'} requests made in " .(time()-$COUNTERS{'startsec'}) . " seconds","v");
 
 send_updates(@MARKS);
+}
 nprint("T:" . localtime() . ": Ending", "d");
 
 exit;

@@ -394,6 +394,7 @@ sub dump_target_info {
           . "                   Issuer:  $mark->{'ssl_cert_issuer'}";
     }
 
+    if ($CLI{'plugins'} ne '@@NONE') {
     if ($mark->{ip} =~ /[a-z]/i) {
         nprint("+ Target IP:          (proxied)", "", $mark);
     }
@@ -444,6 +445,7 @@ sub dump_target_info {
     my $time = date_disp($mark->{start_time});
     nprint("+ Start Time:         $time");
     nprint($NIKTO{'DIV'});
+}
 
     if ($mark->{banner} ne "") {
         nprint("+ Server: $mark->{banner}");
@@ -521,6 +523,11 @@ sub general_config {
                "update"           => \&check_updates,
                "dbcheck"          => \&check_dbs,
                ) or usage();
+
+    # deprecated -findonly overrides -Plugins
+    if ($CLI{'findonly'}) { 
+	$CLI{'plugins'} = "\@\@NONE";
+	}
 
     # CLI proxy overrides nikto.conf
     if ((defined($CLI{'useproxy'}))  && ($CLI{'useproxy'} ne '')) { 
@@ -2428,6 +2435,7 @@ sub usage {
                                auto  Don't ask, just send
        -config+            Use this config file
        -Cgidirs+           Scan these CGI dirs: \"none\", \"all\", or values like \"/cgi/ /cgi-a/\"
+       -dbcheck           Check database and other key files for syntax errors
        -Display+           Turn on/off display outputs:
                                1     Show redirects
                                2     Show cookies received
@@ -2438,15 +2446,13 @@ sub usage {
                                P     Print progress to STDOUT
                                S     Scrub output of IPs and hostnames
                                V     Verbose output
-       -dbcheck           Check database and other key files for syntax errors
        -evasion+          Encoding technique:\n";
 
         foreach my $k (sort keys %{ $NIKTO{'anti_ids'} }) {
             print "                               $k     $NIKTO{'anti_ids'}{$k}\n";
         }
 
-        print "       -findonly          Find http(s) ports only, don't perform a full scan
-       -Format+           Save file (-o) format:
+       print "        -Format+           Save file (-o) format:
                                csv   Comma-separated-value
                                htm   HTML Format
                                msf+  Log to Metasploit
@@ -2470,9 +2476,9 @@ sub usage {
        -nossl             Disables the use of SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
-       -Plugins+          List of plugins to run (default: ALL)
        -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds, integer or float)
+       -Plugins+          List of plugins to run (default: ALL)
        -root+             Prepend root value to all requests, format is /directory
        -ssl               Force ssl mode on port
        -Single            Single request mode
@@ -2494,8 +2500,8 @@ sub usage {
                                x     Reverse Tuning Options (i.e., include all except specified)
        -useproxy          Use the proxy defined in nikto.conf
        -update            Update databases and plugins from cirt.net
-       -Version           Print plugin and database versions
        -vhost+            Virtual host (for Host header)
+       -Version           Print plugin and database versions
    		+ requires a value
    ";
     }
@@ -2504,6 +2510,7 @@ sub usage {
        -config+            Use this config file
        -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -dbcheck            check database and other key files for syntax errors
+       -Display+           Turn on/off display outputs
        -evasion+           ids evasion technique
        -Format+            save file (-o) format
        -host+              target host
@@ -2516,17 +2523,16 @@ sub usage {
        -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
-       -Plugins+           List of plugins to run (default: ALL)
        -port+              Port to use (default 80)
+       -Plugins+           List of plugins to run (default: ALL)
        -root+              Prepend root value to all requests, format is /directory 
-       -Display+           Turn on/off display outputs
        -ssl                Force ssl mode on port
        -Single             Single request mode
        -timeout+           Timeout (default 2 seconds)
        -Tuning+            Scan tuning
        -update             Update databases and plugins from cirt.net
-       -Version            Print plugin and database versions
        -vhost+             Virtual host (for Host header)
+       -Version            Print plugin and database versions
    		+ requires a value
 
 	Note: This is the short help output. Use -H for full help.

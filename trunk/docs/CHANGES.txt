@@ -9,6 +9,7 @@
 	- Ticket 178: Add -Interactive-off to disable interactivity
 	- Ticket 173: Skip current host
 	- Ticket 169: Allow regular expressions in db_tests
+	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
 	- Ticket 82: Auth is now checked per realm, not per resource
 	- Created $mark->{'components'} to store server build items
 	- Variable consolidation & memory usage cleanup

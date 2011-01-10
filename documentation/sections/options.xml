@@ -75,7 +75,9 @@ purposes. Use the reference number to specify the type, multiple may be used:</p
       <listitem>
         <para>Only discover the HTTP(S) ports, do not perform a security scan.
 This will attempt to connect with HTTP or HTTPS, and report the
-Server header.</para>
+Server header. Note that as of version 2.1.4, -findonly has been deprecated and
+simply sets '-Plugins "@@NONE"' which will override any command line or config file
+settings for -Plugins.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
