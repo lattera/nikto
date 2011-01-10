@@ -40,8 +40,8 @@ Getopt::Long::Configure('no_ignore_case');
 
 # global var/definitions
 use vars qw/$TEMPLATES %CLI %VARIABLES %TESTS/;
-use vars qw/%NIKTO %NIKTOCONFIG %request %result %COUNTERS %UPDATES %db_extensions/;
-use vars qw/@RESULTS @PLUGINS @DBFILE @MARKS @REPORTS %CACHE %CONTENTSEARCH/;
+use vars qw/%NIKTO %CONFIGFILE %request %result %COUNTERS %db_extensions/;
+use vars qw/@RESULTS @PLUGINS @DBFILE @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
 $COUNTERS{'startsec'} = time();
@@ -82,10 +82,10 @@ if ($config_exists == 0) {
 }
 
 setup_dirs();
-require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_core.plugin";
+require "$CONFIGFILE{'PLUGINDIR'}/nikto_core.plugin";
 nprint("T:" . localtime($COUNTERS{'startsec'}) . ": Starting", "d");
-require "$NIKTOCONFIG{'PLUGINDIR'}/nikto_single.plugin";
-require "$NIKTOCONFIG{'PLUGINDIR'}/LW2.pm";
+require "$CONFIGFILE{'PLUGINDIR'}/nikto_single.plugin";
+require "$CONFIGFILE{'PLUGINDIR'}/LW2.pm";
 
 my ($a, $b) = split(/\./, $LW2::VERSION);
 die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
@@ -102,9 +102,9 @@ $request{'whisker'}->{'timeout'}                    = $CLI{'timeout'} || 10;
 if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'}; }
 $request{'User-Agent'} = $NIKTO{'useragent'};
 $request{'whisker'}->{'retry'} = 0;
-if ($CLI{'useproxy'} && ($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
-   $request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
-   $request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
+if ($CLI{'useproxy'} && ($CONFIGFILE{PROXYPORT} ne '') && ($CONFIGFILE{PROXYHOST} ne '')) {
+   $request{'whisker'}->{'proxy_host'} = $CONFIGFILE{PROXYHOST};
+   $request{'whisker'}->{'proxy_port'} = $CONFIGFILE{PROXYPORT};
    }
 
 nprint($NIKTO{'DIV'});
@@ -170,13 +170,13 @@ foreach my $mark (@MARKS) {
     }
     $request{'whisker'}->{'port'}    = $mark->{'port'};
     $request{'whisker'}->{'ssl'}     = $mark->{'ssl'};
-    $request{'whisker'}->{'version'} = $NIKTOCONFIG{'DEFAULTHTTPVER'};
+    $request{'whisker'}->{'version'} = $CONFIGFILE{'DEFAULTHTTPVER'};
 
     # Cookies
-    if (defined $NIKTOCONFIG{'STATIC-COOKIE'}) {
+    if (defined $CONFIGFILE{'STATIC-COOKIE'}) {
         $mark->{'cookiejar'} = LW2::cookie_new_jar();
 	# parse conf line into name/value pairs
-	foreach my $p (split(/;/, $NIKTOCONFIG{'STATIC-COOKIE'})) {
+	foreach my $p (split(/;/, $CONFIGFILE{'STATIC-COOKIE'})) {
 		$p =~ s/(?:^\s+|\s+$)//;
 		$p =~ s/"(?:[ ]+)?=(?:[ ]+)?"/","/g;
 		my @cv = parse_csv($p);
@@ -233,7 +233,8 @@ report_close();
 
 nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
 nprint( "+ $COUNTERS{'totalrequests'} requests made in " .(time()-$COUNTERS{'startsec'}) . " seconds","v");
-send_updates();
+
+send_updates(@MARKS);
 nprint("T:" . localtime() . ": Ending", "d");
 
 exit;
@@ -255,12 +256,12 @@ sub load_config {
         $line =~ s/^\s+//;
         next if ($line eq "");
         my @temp = split(/=/, $line, 2);
-        if ($temp[0] ne "") { $NIKTOCONFIG{ $temp[0] } = $temp[1]; }
+        if ($temp[0] ne "") { $CONFIGFILE{ $temp[0] } = $temp[1]; }
     }
 
     # add CONFIG{'CLIOPTS'} to ARGV if defined...
-    if (defined $NIKTOCONFIG{'CLIOPTS'}) {
-        my @t = split(/ /, $NIKTOCONFIG{'CLIOPTS'});
+    if (defined $CONFIGFILE{'CLIOPTS'}) {
+        my @t = split(/ /, $CONFIGFILE{'CLIOPTS'});
         foreach my $c (@t) { push(@ARGV, $c); }
     }
 
@@ -278,30 +279,30 @@ sub setup_dirs {
     chomp($CURRENTDIR);
     $CURRENTDIR =~ s#[\\/]nikto.pl$##;
 
-    # First assume we get it from NIKTOCONFIG
-    unless (defined $NIKTOCONFIG{'EXECDIR'}) {
+    # First assume we get it from CONFIGFILE
+    unless (defined $CONFIGFILE{'EXECDIR'}) {
         if (-d "$ENV{'PWD'}/plugins") {
-            $NIKTOCONFIG{'EXECDIR'} = $ENV{'PWD'};
+            $CONFIGFILE{'EXECDIR'} = $ENV{'PWD'};
         }
         elsif (-d "$CURRENTDIR/plugins") {
-            $NIKTOCONFIG{'EXECDIR'} = $CURRENTDIR;
+            $CONFIGFILE{'EXECDIR'} = $CURRENTDIR;
         }
         elsif (-d "./plugins") {
-            $NIKTOCONFIG{'EXECDIR'} = $CURRENTDIR;
+            $CONFIGFILE{'EXECDIR'} = $CURRENTDIR;
         }
         else {
             print STDERR "Could not work out the nikto EXECDIR, try setting it in nikto.conf\n";
             exit;
         }
     }
-    unless (defined $NIKTOCONFIG{'PLUGINDIR'}) {
-        $NIKTOCONFIG{'PLUGINDIR'} = "$NIKTOCONFIG{'EXECDIR'}/plugins";
+    unless (defined $CONFIGFILE{'PLUGINDIR'}) {
+        $CONFIGFILE{'PLUGINDIR'} = "$CONFIGFILE{'EXECDIR'}/plugins";
     }
-    unless (defined $NIKTOCONFIG{'TEMPLATEDIR'}) {
-        $NIKTOCONFIG{'TEMPLATEDIR'} = "$NIKTOCONFIG{'EXECDIR'}/templates";
+    unless (defined $CONFIGFILE{'TEMPLATEDIR'}) {
+        $CONFIGFILE{'TEMPLATEDIR'} = "$CONFIGFILE{'EXECDIR'}/templates";
     }
-    unless (defined $NIKTOCONFIG{'DOCUMENTDIR'}) {
-        $NIKTOCONFIG{'DOCUMENTDIR'} = "$NIKTOCONFIG{'EXECDIR'}/docs";
+    unless (defined $CONFIGFILE{'DOCUMENTDIR'}) {
+        $CONFIGFILE{'DOCUMENTDIR'} = "$CONFIGFILE{'EXECDIR'}/docs";
     }
     return;
 }
@@ -313,9 +314,9 @@ sub check_config_defined {
     my $item    = $_[0];
     my $default = $_[1];
 
-    if (!defined $NIKTOCONFIG{$item}) {
+    if (!defined $CONFIGFILE{$item}) {
         print STDERR
           "- Warning: $item is not defined in Nikto configuration, setting to \"$default\"\n";
-        $NIKTOCONFIG{$item} = $default;
+        $CONFIGFILE{$item} = $default;
     }
 }

@@ -46,7 +46,7 @@ sub xml_head {
     open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
 
     my $xml = xml_change_vars($TEMPLATES{xml_start});
-    $xml =~ s/\#NIKTODTD/$NIKTOCONFIG{NIKTODTD}/;
+    $xml =~ s/\#NIKTODTD/$CONFIGFILE{NIKTODTD}/;
     print OUT "$xml";
 
     return OUT;
@@ -86,8 +86,8 @@ sub xml_item {
 }
 ###############################################################################
 sub xml_open_templates {
-    foreach my $t (dirlist($NIKTOCONFIG{TEMPLATEDIR}, "xml.*")) {
-        open(T, "<$NIKTOCONFIG{TEMPLATEDIR}/$t");
+    foreach my $t (dirlist($CONFIGFILE{TEMPLATEDIR}, "xml.*")) {
+        open(T, "<$CONFIGFILE{TEMPLATEDIR}/$t");
         my @TEMPLATE = <T>;
         close(T);
         my $T = join("", @TEMPLATE);

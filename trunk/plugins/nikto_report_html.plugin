@@ -46,7 +46,7 @@ sub html_head {
     open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
 
     my $html = html_change_vars($TEMPLATES{'htm_start'});
-    $html =~ s/\#NIKTODTD/$NIKTOCONFIG{'NIKTODTD'}/;
+    $html =~ s/\#NIKTODTD/$CONFIGFILE{'NIKTODTD'}/;
     print OUT "$html";
 
     return OUT;
@@ -86,8 +86,8 @@ sub html_item {
 }
 ###############################################################################
 sub html_open_templates {
-    foreach my $t (dirlist($NIKTOCONFIG{'TEMPLATEDIR'}, "htm.*")) {
-        open(T, "<$NIKTOCONFIG{'TEMPLATEDIR'}/$t");
+    foreach my $t (dirlist($CONFIGFILE{'TEMPLATEDIR'}, "htm.*")) {
+        open(T, "<$CONFIGFILE{'TEMPLATEDIR'}/$t");
         my @TEMPLATE = <T>;
         close(T);
         my $T = join("", @TEMPLATE);

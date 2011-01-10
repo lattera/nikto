@@ -110,7 +110,7 @@ sub nikto_outdated {
                 }
             }
         }
-        if (!$have_match) { $UPDATES{$BI} = 1; }
+        if (!$have_match) { $mark->{'components'}->{'$BI'}=2; }
     }
     return;
 }
@@ -176,7 +176,7 @@ sub vereval {
         {
             my $string = $_[1];
             $string =~ s/\s/\%20/g;
-            $UPDATES{$string} = 1;
+            $mark->{'components'}->{$string}=2;
             return 0;
         }
     }

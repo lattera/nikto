@@ -525,10 +525,10 @@ sub general_config {
     # CLI proxy overrides nikto.conf
     if ((defined($CLI{'useproxy'}))  && ($CLI{'useproxy'} ne '')) { 
 		my @prox = LW2::uri_split($CLI{'useproxy'});
-        	$NIKTOCONFIG{'PROXYHOST'} = $prox[2];
- 		$NIKTOCONFIG{'PROXYPORT'} = $prox[3];
-	        $NIKTOCONFIG{'PROXYUSER'} = $prox[6];
-                $NIKTOCONFIG{'PROXYPASS'} = $prox[7];
+        	$CONFIGFILE{'PROXYHOST'} = $prox[2];
+ 		$CONFIGFILE{'PROXYPORT'} = $prox[3];
+	        $CONFIGFILE{'PROXYUSER'} = $prox[6];
+                $CONFIGFILE{'PROXYPASS'} = $prox[7];
 		}
      elsif (defined($CLI{'useproxy'})) { $CLI{'useproxy'}=1; }
 
@@ -558,7 +558,7 @@ sub general_config {
     }
 
     # verify readable dtd
-    if ($CLI{'format'} eq 'xml' && !-r $NIKTOCONFIG{'NIKTODTD'}) {
+    if ($CLI{'format'} eq 'xml' && !-r $CONFIGFILE{'NIKTODTD'}) {
         nprint("+ ERROR: reading DTD");
         exit;
     }
@@ -643,21 +643,21 @@ sub general_config {
 
     # Asking questions?
     if ($CLI{'ask'} =~ /^(?:auto|yes|no)$/) {
-        $NIKTOCONFIG{'UPDATES'} = $CLI{'ask'};    # override nikto.conf setting
+        $CONFIGFILE{'UPDATES'} = $CLI{'ask'};    # override nikto.conf setting
         undef($CLI{'ask'});
     }
 
     $CLI{'timeout'} || 10;
 
     # Set up User-Agent
-    $NIKTO{'useragent'} = $NIKTOCONFIG{'USERAGENT'};
+    $NIKTO{'useragent'} = $CONFIGFILE{'USERAGENT'};
     $NIKTO{'useragent'} =~ s/\@VERSION/$NIKTO{'version'}/g;
     my $ev = $CLI{'evasion'} || "None";
     $NIKTO{'useragent'} =~ s/\@EVASIONS/$ev/g;
 
     # RFI URL -- push it to VARIABLES
-    if (defined $NIKTOCONFIG{'RFIURL'}) {
-        $VARIABLES{'@RFIURL'} = $NIKTOCONFIG{'RFIURL'};
+    if (defined $CONFIGFILE{'RFIURL'}) {
+        $VARIABLES{'@RFIURL'} = $CONFIGFILE{'RFIURL'};
     }
     else {
         nprint("- ***** RFIURL is not defined in nikto.conf--no RFI tests will run *****");
@@ -669,15 +669,15 @@ sub general_config {
     }
 
     # get core version
-    open(FI, "<$NIKTOCONFIG{PLUGINDIR}/nikto_core.plugin");
+    open(FI, "<$CONFIGFILE{PLUGINDIR}/nikto_core.plugin");
     my @F = <FI>;
     close(FI);
     my @VERS = grep(/^#VERSION/, @F);
     $NIKTO{'core_version'} = $VERS[0];
     $NIKTO{'core_version'} =~ s/\#VERSION,//;
     chomp($NIKTO{'core_version'});
-    $NIKTO{'TMPL_HCTR'}    = 0;
-    $NIKTO{'TMPL_SUMMARY'} = 0;
+    $NIKTO{'TEMPL_HCTR'}    = 0;
+    $NIKTO{'TEMPL_SUMMARY'} = 0;
 
     # POSIX support for status?
     $NIKTO{'POSIX'}{'support'} = 0;
@@ -1043,13 +1043,13 @@ sub load_databases {
 
     # verify required files
     for my $file (@dbs) {
-        if (!-r "$NIKTOCONFIG{PLUGINDIR}/$file") {
-            die nprint("+ ERROR: Can't find/read required file \"$NIKTOCONFIG{PLUGINDIR}/$file\"");
+        if (!-r "$CONFIGFILE{PLUGINDIR}/$file") {
+            die nprint("+ ERROR: Can't find/read required file \"$CONFIGFILE{PLUGINDIR}/$file\"");
         }
     }
 
     for my $file (@dbs) {
-        my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
+        my $filename = $CONFIGFILE{PLUGINDIR} . "/" . $prefix . $file;
         if (!-r $filename) { next; }
         open(IN, "<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
 
@@ -1129,7 +1129,7 @@ sub check_dbs {
 	}
 
     for my $file (@dbs) {
-        my $filename = $NIKTOCONFIG{PLUGINDIR} . "/" . $prefix . $file;
+        my $filename = $CONFIGFILE{PLUGINDIR} . "/" . $prefix . $file;
         if (!-r $filename) { 
 		nprint("+ ERROR: Unable to read \"$filename\"");
 		next; 
@@ -1301,7 +1301,7 @@ sub port_check {
     my $m = {};
 
     # Check SKIPPORTS
-    if ($NIKTOCONFIG{'SKIPPORTS'} =~ /\b$port\b/) {
+    if ($CONFIGFILE{'SKIPPORTS'} =~ /\b$port\b/) {
         nprint("+ ERROR: SKIPPORTS (nikto.conf) contains $port -- not checking");
         return 0;
     }
@@ -1315,7 +1315,7 @@ sub port_check {
     if ($CLI{'ssl'})   { shift(@checktypes); }
     if ($CLI{'nossl'}) { pop(@checktypes); }
 
-    foreach my $method (split(/ /, $NIKTOCONFIG{'CHECKMETHODS'})) {
+    foreach my $method (split(/ /, $CONFIGFILE{'CHECKMETHODS'})) {
         $request{'whisker'}->{'method'} = $method;
         foreach my $checkssl (@checktypes) {
             nprint("- Checking for $checkssl on port " . ($hostname||$ip) . ":$port, using $method", "v", $m);
@@ -1348,11 +1348,11 @@ sub port_check {
 
 ###############################################################################
 sub load_plugins {
-    my @pluginlist = dirlist("$NIKTOCONFIG{PLUGINDIR}", '\.plugin$');
+    my @pluginlist = dirlist("$CONFIGFILE{PLUGINDIR}", '\.plugin$');
     my @all_names;
 
     # populate plugin macros
-    $NIKTOCONFIG{'@@NONE'} = "";
+    $CONFIGFILE{'@@NONE'} = "";
 
     # Check if running plugins is NONE - if so, don't bother initalising
     # plugins
@@ -1364,7 +1364,7 @@ sub load_plugins {
         my $plugin_name = $plugin;
         $plugin_name =~ s/\.plugin$//;
         my $plugin_init = $plugin_name . "_init";
-        eval { require "$NIKTOCONFIG{PLUGINDIR}/$plugin"; };
+        eval { require "$CONFIGFILE{PLUGINDIR}/$plugin"; };
         if ($@) {
             nprint("- Could not load or parse plugin: $plugin_name\n Error: ");
             warn $@;
@@ -1390,7 +1390,7 @@ sub load_plugins {
             }
         }
     }
-    $NIKTOCONFIG{'@@ALL'} = join(';', @all_names);
+    $CONFIGFILE{'@@ALL'} = join(';', @all_names);
     my @torun = split(/;/, expand_pluginlist($CLI{'plugins'}, 0));
 
     # Second pass to ensure that @@ALL is configured
@@ -1617,9 +1617,9 @@ sub check_updates {
     for (my $i = 0 ; $i <= $#ARGV ; $i++) {
         if (($ARGV[$i] eq "-u") || ($ARGV[$i] eq "-useproxy")) {
             $CLI{'useproxy'} = 1;
-            if (($NIKTOCONFIG{PROXYPORT} ne '') && ($NIKTOCONFIG{PROXYHOST} ne '')) {
-                $request{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{PROXYHOST};
-                $request{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{PROXYPORT};
+            if (($CONFIGFILE{PROXYPORT} ne '') && ($CONFIGFILE{PROXYHOST} ne '')) {
+                $request{'whisker'}->{'proxy_host'} = $CONFIGFILE{PROXYHOST};
+                $request{'whisker'}->{'proxy_port'} = $CONFIGFILE{PROXYPORT};
             }
             proxy_check();
             last;
@@ -1630,9 +1630,9 @@ sub check_updates {
     # retrieve versions file
     my ($RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
     if ($RES eq 407) {
-        if ($NIKTOCONFIG{'PROXYUSER'} eq "") {
-            $NIKTOCONFIG{'PROXYUSER'} = read_data("Proxy ID: ",   "");
-            $NIKTOCONFIG{'PROXYPASS'} = read_data("Proxy Pass: ", "noecho");
+        if ($CONFIGFILE{'PROXYUSER'} eq "") {
+            $CONFIGFILE{'PROXYUSER'} = read_data("Proxy ID: ",   "");
+            $CONFIGFILE{'PROXYPASS'} = read_data("Proxy Pass: ", "noecho");
         }
 
         # and try again
@@ -1659,12 +1659,12 @@ sub check_updates {
     }
 
     # get local versions of plugins/dbs
-    my @NIKTOFILES = dirlist($NIKTOCONFIG{PLUGINDIR}, "");
+    my @NIKTOFILES = dirlist($CONFIGFILE{PLUGINDIR}, "");
 
     foreach my $file (@NIKTOFILES) {
         my $v = "";
-        open(LOCAL, "<$NIKTOCONFIG{PLUGINDIR}/$file")
-          || print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$file' for read: $@\n";
+        open(LOCAL, "<$CONFIGFILE{PLUGINDIR}/$file")
+          || print STDERR "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/$file' for read: $@\n";
         my @l = <LOCAL>;
         close(LOCAL);
 
@@ -1706,9 +1706,9 @@ sub check_updates {
             exit;
         }
         if ($CONTENT ne "") {
-            open(OUT, ">$NIKTOCONFIG{PLUGINDIR}/$toget")
+            open(OUT, ">$CONFIGFILE{PLUGINDIR}/$toget")
               || die print STDERR
-              "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$toget' for write: $@\n";
+              "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/$toget' for write: $@\n";
             print OUT $CONTENT;
             close(OUT);
         }
@@ -1719,9 +1719,9 @@ sub check_updates {
         nprint("+ Retrieving 'CHANGES.txt'");
         my ($RES, $CONTENT) = nfetch(\%mark, "$serverdir/CHANGES.txt", "GET");
         if (($CONTENT ne "") && ($RES eq 200)) {
-            open(OUT, ">$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt")
+            open(OUT, ">$CONFIGFILE{DOCUMENTDIR}/CHANGES.txt")
               || die print STDERR
-              "+ ERROR: Unable to open '$NIKTOCONFIG{DOCUMENTDIR}/CHANGES.txt' for write: $@\n";
+              "+ ERROR: Unable to open '$CONFIGFILE{DOCUMENTDIR}/CHANGES.txt' for write: $@\n";
             print OUT $CONTENT;
             close(OUT);
         }
@@ -1738,7 +1738,7 @@ sub check_updates {
 # POSIX::Termios if it's a POSIX machine
 ###############################################################################
 sub read_data {
-    if ($NIKTOCONFIG{PROMPTS} eq 'no') { return; }
+    if ($CONFIGFILE{PROMPTS} eq 'no') { return; }
     my ($prompt, $mode, $POSIX) = @_;
     my $input;
 
@@ -1830,7 +1830,7 @@ sub proxy_check {
         # First check that we can connect to the proxy
         if (exists $result{'whisker'}{'error'}) {
             if ($result{'whisker'}{'error'} =~ /Transport endpoint is not connected/) {
-                nprint("+ ERROR: Could not connect to the defined proxy $NIKTOCONFIG{PROXYHOST}");
+                nprint("+ ERROR: Could not connect to the defined proxy $CONFIGFILE{PROXYHOST}");
             }
             nprint("+ ERROR: Proxy error: $result{'whisker'}{'error'}");
             exit 1;
@@ -1840,9 +1840,9 @@ sub proxy_check {
         {
 
             # have id/pw?
-            if ($NIKTOCONFIG{PROXYUSER} eq "") {
-                $NIKTOCONFIG{PROXYUSER} = read_data("Proxy ID: ",   "");
-                $NIKTOCONFIG{PROXYPASS} = read_data("Proxy Pass: ", "noecho");
+            if ($CONFIGFILE{PROXYUSER} eq "") {
+                $CONFIGFILE{PROXYUSER} = read_data("Proxy ID: ",   "");
+                $CONFIGFILE{PROXYPASS} = read_data("Proxy Pass: ", "noecho");
             }
             if ($result{'proxy-authenticate'} !~ /Basic/i) {
                 my @x = split(/ /, $result{'proxy-authenticate'});
@@ -1854,8 +1854,8 @@ sub proxy_check {
 
             # test it...
             LW2::http_close(\%request);    # force-close any old connections
-            LW2::auth_set("proxy-basic", \%request, $NIKTOCONFIG{PROXYUSER},
-                          $NIKTOCONFIG{PROXYPASS});    # set auth
+            LW2::auth_set("proxy-basic", \%request, $CONFIGFILE{PROXYUSER},
+                          $CONFIGFILE{PROXYPASS});    # set auth
             LW2::http_fixup_request(\%request);
             sleeper();
             LW2::http_do_request_timeout(\%request, \%result);
@@ -1960,13 +1960,13 @@ sub setup_hash {
     $reqhash->{'whisker'}->{'ssl'}  = $mark->{'ssl'};
 
     # Proxy stuff
-    if (($NIKTOCONFIG{PROXYHOST} ne '') && ($CLI{'useproxy'})) {
-        $reqhash->{'whisker'}->{'proxy_host'} = $NIKTOCONFIG{'PROXYHOST'};
-        $reqhash->{'whisker'}->{'proxy_port'} = $NIKTOCONFIG{'PROXYPORT'};
-        if ($NIKTOCONFIG{'PROXYUSER'} ne '') {
+    if (($CONFIGFILE{PROXYHOST} ne '') && ($CLI{'useproxy'})) {
+        $reqhash->{'whisker'}->{'proxy_host'} = $CONFIGFILE{'PROXYHOST'};
+        $reqhash->{'whisker'}->{'proxy_port'} = $CONFIGFILE{'PROXYPORT'};
+        if ($CONFIGFILE{'PROXYUSER'} ne '') {
             LW2::auth_set("proxy-basic", $reqhash,
-                          $NIKTOCONFIG{'PROXYUSER'},
-                          $NIKTOCONFIG{'PROXYPASS'});
+                          $CONFIGFILE{'PROXYUSER'},
+                          $CONFIGFILE{'PROXYPASS'});
         }
     }
 
@@ -2171,8 +2171,8 @@ sub set_scan_items {
     %TESTS = ();
     $COUNTERS{total_checks}=0;
     my @SKIPLIST = ();
-    if (defined $NIKTOCONFIG{SKIPIDS}) {
-        @SKIPLIST = split(/ /, $NIKTOCONFIG{SKIPIDS});
+    if (defined $CONFIGFILE{SKIPIDS}) {
+        @SKIPLIST = split(/ /, $CONFIGFILE{SKIPIDS});
     }
 
     # now load checks
@@ -2269,7 +2269,7 @@ sub parse_csv {
 
 #######################################################################
 sub version {
-    my @NIKTOFILES = dirlist($NIKTOCONFIG{PLUGINDIR}, "(^nikto|^db_)");
+    my @NIKTOFILES = dirlist($CONFIGFILE{PLUGINDIR}, "(^nikto|^db_)");
     nprint($NIKTO{'DIV'});
     nprint("$NIKTO{'name'} Versions");
     nprint($NIKTO{'DIV'});
@@ -2279,8 +2279,8 @@ sub version {
     nprint("LibWhisker                         $LW2::VERSION");
 
     foreach my $FILE (sort @NIKTOFILES) {
-        open(FI, "<$NIKTOCONFIG{PLUGINDIR}/$FILE")
-          || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/$FILE': $!\n";
+        open(FI, "<$CONFIGFILE{PLUGINDIR}/$FILE")
+          || die print STDERR "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/$FILE': $!\n";
         my @F = <FI>;
         close(FI);
         my @VERS = grep(/^#VERSION/, @F);
@@ -2319,25 +2319,29 @@ sub version {
 
 #######################################################################
 sub send_updates {
-    return if ($NIKTOCONFIG{'UPDATES'} !~ /yes|auto/i);
-
-    my $have_updates = 0;
+    return if ($CONFIGFILE{'UPDATES'} !~ /yes|auto/i);
+    my (@MARKS) = @_;
     my ($updated_version, $answer, $RES);
-    foreach my $ver (keys %UPDATES) {
-        # ignore useless ones...
-        if ($ver !~ /[0-9]/) { next; }
-        elsif ($ver eq "Win32")          { next; }
-        elsif ($ver eq "(Win32)")        { next; }
-        elsif ($ver eq "Linux-Mandrake") { next; }
-        $have_updates = 1;
-        $updated_version .= "$ver ";
-    }
+    my $have_updates = 0;
+
+    foreach my $mark (@MARKS) {
+	foreach my $component (keys %{$mark->{'components'}}) { 
+		if ($mark->{'components'}->{$component} eq 2) { 
+        		if ($component !~ /[0-9]/) { next; }
+        		elsif ($component eq "Win32")          { next; }
+        		elsif ($component eq "(Win32)")        { next; }
+        		elsif ($component eq "Linux-Mandrake") { next; }
+			$have_updates = 1;
+        		$updated_version .= "$ver ";
+			}
+		}
+	}
 
     if ((!$have_updates) || ($updated_version eq "")) { return; }
 
     # make sure the db_outdatedb isn't *too* old
-    open(OD, "<$NIKTOCONFIG{PLUGINDIR}/db_outdated")
-      || die print STDERR "+ ERROR: Unable to open '$NIKTOCONFIG{PLUGINDIR}/db_outdated': $!\n";
+    open(OD, "<$CONFIGFILE{PLUGINDIR}/db_outdated")
+      || die print STDERR "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/db_outdated': $!\n";
     @F = <OD>;
     close(OD);
 
@@ -2356,7 +2360,7 @@ sub send_updates {
     $updated_version =~ s/\s+$//;
     $updated_version =~ s/^\s+//;
 
-    if ($NIKTOCONFIG{'UPDATES'} eq "auto") {
+    if ($CONFIGFILE{'UPDATES'} eq "auto") {
         $answer = "y";
     }
     else {
@@ -2390,16 +2394,16 @@ sub send_updates {
     ($RES, $CONTENT) = nfetch(\%mark, "/cgi-bin/versions?DATA=$updated_version", "GET");
 
     if ($RES eq 407) {
-        if ($NIKTOCONFIG{PROXYUSER} eq "") {
-            $NIKTOCONFIG{PROXYUSER} = read_data("Proxy ID: ",   "");
-            $NIKTOCONFIG{PROXYPASS} = read_data("Proxy Pass: ", "noecho");
+        if ($CONFIGFILE{PROXYUSER} eq "") {
+            $CONFIGFILE{PROXYUSER} = read_data("Proxy ID: ",   "");
+            $CONFIGFILE{PROXYPASS} = read_data("Proxy Pass: ", "noecho");
         }
         ($RES, $CONTENT) = nfetch(\%mark, "/cgi-bin/versions?DATA=$updated_version", "GET");
     }
 
     if ($RES eq "") {
         LW2::http_close(\%request);    # force-close any old connections
-        $mark{'ip'} = $NIKTOCONFIG{CIRT};
+        $mark{'ip'} = $CONFIGFILE{CIRT};
         ($RES, $CONTENT) = nfetch(\%mark, "/cgi-bin/versions?DATA=$updated_version", "GET");
     }
 
@@ -2535,7 +2539,7 @@ sub usage {
 #######################################################################
 sub init_db {
     my $dbname   = $_[0];
-    my $filename = "$NIKTOCONFIG{PLUGINDIR}/" . $dbname;
+    my $filename = "$CONFIGFILE{PLUGINDIR}/" . $dbname;
     my (@dbarray, @headers);
     my $hashref = {};
 
@@ -2636,11 +2640,11 @@ sub list_plugins {
     # Plugin macros
     nprint("Defined plugin macros:");
 
-    foreach my $macro (keys %NIKTOCONFIG) {
+    foreach my $macro (keys %CONFIGFILE) {
         if ($macro =~ /^@@/) {
-            nprint(" $macro = \"" . $NIKTOCONFIG{$macro} . "\"");
-            if ($NIKTOCONFIG{$macro} =~ /@@/) {
-                nprint("  (expanded) = \"" . expand_pluginlist($NIKTOCONFIG{$macro}, 0) . "\"");
+            nprint(" $macro = \"" . $CONFIGFILE{$macro} . "\"");
+            if ($CONFIGFILE{$macro} =~ /@@/) {
+                nprint("  (expanded) = \"" . expand_pluginlist($CONFIGFILE{$macro}, 0) . "\"");
             }
         }
     }
@@ -2655,7 +2659,7 @@ sub expand_pluginlist {
     my ($pluginlist, $parent) = @_;
 
     my @macros;
-    foreach my $config (keys %NIKTOCONFIG) {
+    foreach my $config (keys %CONFIGFILE) {
         if ($config =~ /^@@/) {
             push(@macros, $config);
         }
@@ -2697,7 +2701,7 @@ sub expand_pluginlist {
                         # It's a macro, so replace the contents with the macro
                         # Add prefix and suffix to each member of the macro
                         my @temp;
-                        foreach my $child (split(/;/, $NIKTOCONFIG{$macro})) {
+                        foreach my $child (split(/;/, $CONFIGFILE{$macro})) {
                             push(@temp, "$prefix$child$suffix");
                         }
                         $result = join(';', @temp);

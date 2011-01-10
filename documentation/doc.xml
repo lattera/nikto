@@ -2474,15 +2474,6 @@ array[0]-&gt;{description}</screen>
           </varlistentry>
 
           <varlistentry>
-            <term><varname>%ERRSTRINGS</varname> (read)</term>
-
-            <listitem>
-              <para>Hash to contain all the entries in db_404 - a list of
-              strings that may indicate a 404.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
             <term><varname>%CLI</varname> (read)</term>
 
             <listitem>
@@ -2511,16 +2502,6 @@ array[0]-&gt;{description}</screen>
           </varlistentry>
 
           <varlistentry>
-            <term><varname>$CONTENT</varname> (read) (write)
-            (deprecated)</term>
-
-            <listitem>
-              <para>Global variable to store data from a fetch or nfetch. A
-              local variable should be used instead</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
             <term><varname>%NIKTO</varname> (read)</term>
 
             <listitem>
@@ -2530,7 +2511,7 @@ array[0]-&gt;{description}</screen>
           </varlistentry>
 
           <varlistentry>
-            <term><varname>%NIKTOCONFIG</varname> (read)</term>
+            <term><varname>%CONFIGFILE</varname> (read)</term>
 
             <listitem>
               <para>Hash containing the data read from the configuration
@@ -2601,17 +2582,6 @@ array[0]-&gt;{description}</screen>
             <listitem>
               <para>Placeholder used to hold the contents of
               <filename>db_tests</filename>.</para>
-            </listitem>
-          </varlistentry>
-
-          <varlistentry>
-            <term><varname>@BUILDITEMS</varname> (read) (write)
-            (deprecated)</term>
-
-            <listitem>
-              <para>Array to hold information for tests to act on later. Use
-              should be avoided, a local variable should be used
-              instead.</para>
             </listitem>
           </varlistentry>
 
