@@ -7,11 +7,12 @@
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
 	- Ticket 179: Update docs for -useproxy
 	- Ticket 178: Add -Interactive-off to disable interactivity
-	- Ticket 173: Skip current host
+	- Ticket 177: Enable http keep-alive
+	- Ticket 173: Skip current host with 'N' in interactive mode
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
 	- Ticket 82: Auth is now checked per realm, not per resource
-	- Created $mark->{'components'} to store server build items
+	- Created $mark->{'components'} to store server build items instead of @BUILDITEMS
 	- Variable consolidation & memory usage cleanup
 	- Move message on -root from notices to target host info (suggestion from YGN)
 	- Automatically escape invalid regexes in databases at run-time, so no dying
