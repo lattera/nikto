@@ -6472,3 +6472,4 @@
 "006481","0","9","/private.php","POST","MyBB has experienced an internal SQL error and cannot continue\.","","","Sorry, but no results were returned","","MyBBx 1.6 contains an SQL Injection in the keywords parameter of private.php. See http://yehg.net/lab/pr0js/advisories/[mybb1.6]_sql_injection","my_post_key=&keywords='+or+'a'+'a&quick_search=Search+PMs&allbox=Check+All&fromfid=0&fid=4&jumpto=4&action=do_stuff",""
 "006482","0","3","/en-GB/debug/sso","GET","SSO Enabled","","","","","Splunk's SSO debug may reveal sensitive info, such as internal IPs/hostnames.","",""
 "006483","0","3","/en-US/debug/sso","GET","SSO Enabled","","","","","Splunk's SSO debug may reveal sensitive info, such as internal IPs/hostnames.","",""
+"006484","0","3","/default.htm","GET","Behind Every Great Web Site","","","","","Default EPiServer file found","",""
