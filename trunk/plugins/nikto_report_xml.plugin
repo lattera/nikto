@@ -29,6 +29,7 @@ sub nikto_report_xml_init {
                report_host_start => \&xml_host_start,
                report_host_end   => \&xml_host_end,
                report_item       => \&xml_item,
+               report_summary    => \&xml_summary,
                report_close      => \&xml_close,
                report_format     => 'xml',
                copyright         => "2008 CIRT Inc."
@@ -50,6 +51,15 @@ sub xml_head {
     print OUT "$xml";
 
     return OUT;
+}
+###############################################################################
+sub xml_summary {
+    my ($handle, $mark) = @_;
+    my $xml = xml_change_vars($TEMPLATES{'xml_summary'}, $mark);
+    print $handle "$xml\n";
+
+    close($handle);
+    return;
 }
 ###############################################################################
 sub xml_close {
@@ -130,6 +140,9 @@ sub xml_change_vars {
     $variables{"#TEMPL_LINK_NAME"}          = "$protocol://$mark->{hostname}:$mark->{port}";
     $variables{"#TEMPL_LINK_IP"}            = "$protocol://$mark->{ip}:$mark->{port}/";
     $variables{"#TEMPL_ITEMS_FOUND"}        = $mark->{total_vulns};
+    $variables{"#TEMPL_SCAN_START"}         = localtime($COUNTERS{'scan_start'});
+    $variables{"#TEMPL_SCAN_END"}           = localtime($COUNTERS{'scan_end'});
+    $variables{"#TEMPL_SCAN_ELAPSED"}       = $COUNTERS{'scan_elapsed'} . " seconds";
 
     $variables{"#TEMPL_LINK_NAME"} = "N/A";
     if ($mark->{hostname} ne "") {

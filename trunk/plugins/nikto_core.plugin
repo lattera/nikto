@@ -155,7 +155,7 @@ sub get_ext {
 ###############################################################################
 sub status_report {
     my $secleft =
-      ((time() - $COUNTERS{'startsec'}) / $COUNTERS{'totalrequests'}) *
+      ((time() - $COUNTERS{'scan_start'}) / $COUNTERS{'totalrequests'}) *
       (($COUNTERS{'total_checks'} * $COUNTERS{'total_targets'}) - $COUNTERS{'totalrequests'});
     my $timeleft;
     if ($secleft > 60) {
@@ -742,6 +742,7 @@ sub reset_term {
 sub safe_quit {
     $mark->{'end_time'} = time();
     report_host_end($mark);
+    report_summary($mark);
     report_close($mark);
     reset_term();
     exit(1);
@@ -1550,6 +1551,7 @@ sub report_head {
                                          host_end   => $plugin->{report_host_end},
                                          item       => $plugin->{report_item},
                                          close      => $plugin->{report_close},
+                                         summary    => $plugin->{report_summary},
                                          handle     => $handle,
                                          };
                     push(@REPORTS, $report_entry);
@@ -1580,6 +1582,18 @@ sub report_host_end {
     foreach my $reporter (@REPORTS) {
         if (defined $reporter->{host_end}) {
             &{ $reporter->{host_end} }($reporter->{handle}, $mark);
+        }
+    }
+}
+
+###############################################################################
+sub report_summary { 
+    my ($mark) = @_;
+
+    # Go through all reporting modules
+    foreach my $reporter (@REPORTS) {
+        if (defined $reporter->{summary}) {
+            &{ $reporter->{summary} }($reporter->{handle}, $mark);
         }
     }
 }

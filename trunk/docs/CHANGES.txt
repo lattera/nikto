@@ -11,6 +11,10 @@
 	- Ticket 173: Skip current host with 'N' in interactive mode
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
+	- Ticket 148, 160: Added report summary to XML and HTML reports
+		XML CHANGES:
+		- The 'niktoscan' element is now included (was in schema, but unused)
+		- 'niktoscan' new variables: scanstart, scanend, scanelapsed
 	- Ticket 82: Auth is now checked per realm, not per resource
 	- Created $mark->{'components'} to store server build items instead of @BUILDITEMS
 	- Variable consolidation & memory usage cleanup

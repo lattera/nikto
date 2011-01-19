@@ -26,6 +26,7 @@ sub nikto_report_html_init {
                author            => "Sullo/Jabra",
                description       => "Produces an HTML report.",
                report_head       => \&html_head,
+               report_summary    => \&html_summary,
                report_host_start => \&html_host_start,
                report_host_end   => \&html_host_end,
                report_item       => \&html_item,
@@ -38,7 +39,7 @@ sub nikto_report_html_init {
     html_open_templates();
     return $id;
 }
-
+###############################################################################
 sub html_head {
     my ($file) = @_;
 
@@ -55,6 +56,15 @@ sub html_head {
 sub html_close {
     my ($handle, $mark) = @_;
     my $html = html_change_vars($TEMPLATES{'htm_close'}, $mark);
+    print $handle "$html\n";
+
+    close($handle);
+    return;
+}
+###############################################################################
+sub html_summary {
+    my ($handle, $mark) = @_;
+    my $html = html_change_vars($TEMPLATES{'htm_summary'}, $mark);
     print $handle "$html\n";
 
     close($handle);
@@ -124,6 +134,9 @@ sub html_change_vars {
     $variables{"#TEMPL_LINK_NAME"}          = "$protocol://$mark->{'hostname'}:$mark->{'port'}";
     $variables{"#TEMPL_LINK_IP"}            = "$protocol://$mark->{'ip'}:$mark->{'port'}/";
     $variables{"#TEMPL_ITEMS_FOUND"}        = $mark->{'total_vulns'};
+    $variables{"#TEMPL_SCAN_START"}          = localtime($COUNTERS{'scan_start'});
+    $variables{"#TEMPL_SCAN_END"}            = localtime($COUNTERS{'scan_end'});
+    $variables{"#TEMPL_SCAN_ELAPSED"}        = $COUNTERS{'scan_elapsed'} . " seconds";
 
     $variables{"#TEMPL_LINK_NAME"} = "N/A";
     if ($mark->{'hostname'} ne "") {

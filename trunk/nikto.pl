@@ -44,7 +44,7 @@ use vars qw/%NIKTO %CONFIGFILE %request %result %COUNTERS %db_extensions/;
 use vars qw/@RESULTS @PLUGINS @DBFILE @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
-$COUNTERS{'startsec'} = time();
+$COUNTERS{'scan_start'} = time();
 $NIKTO{'DIV'}         = "-" x 75;
 $NIKTO{'version'}     = "2.1.3";
 $NIKTO{'name'}        = "Nikto";
@@ -83,7 +83,7 @@ if ($config_exists == 0) {
 
 setup_dirs();
 require "$CONFIGFILE{'PLUGINDIR'}/nikto_core.plugin";
-nprint("T:" . localtime($COUNTERS{'startsec'}) . ": Starting", "d");
+nprint("T:" . localtime($COUNTERS{'scan_start'}) . ": Starting", "d");
 require "$CONFIGFILE{'PLUGINDIR'}/nikto_single.plugin";
 require "$CONFIGFILE{'PLUGINDIR'}/LW2.pm";
 
@@ -230,11 +230,14 @@ foreach my $mark (@MARKS) {
     $COUNTERS{'hosts_completed'}++;
     report_host_end($mark);
 }
+$COUNTERS{'scan_end'} = time();
+$COUNTERS{'scan_elapsed'} = ($COUNTERS{'scan_end'}-$COUNTERS{'scan_start'});
+report_summary();
 report_close();
 
  if ($CLI{'plugins'} ne '@@NONE') {
 nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
-nprint( "+ $COUNTERS{'totalrequests'} requests made in " .(time()-$COUNTERS{'startsec'}) . " seconds","v");
+nprint( "+ $COUNTERS{'totalrequests'} requests made in $COUNTERS{'scan_elapsed'} seconds","v");
 
 send_updates(@MARKS);
 }
