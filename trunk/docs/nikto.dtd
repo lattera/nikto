@@ -2,6 +2,9 @@
 <!ATTLIST niktoscan hoststest CDATA #IMPLIED>
 <!ATTLIST niktoscan options CDATA #REQUIRED>
 <!ATTLIST niktoscan version CDATA #REQUIRED>
+<!ATTLIST niktoscan scanstart CDATA #REQUIRED>
+<!ATTLIST niktoscan scanend CDATA #REQUIRED>
+<!ATTLIST niktoscan scanelapsed CDATA #REQUIRED>
 <!ATTLIST niktoscan nxmlversion CDATA #REQUIRED>
 
 <!ELEMENT scandetails (item*,statistics?,ssl?)>
