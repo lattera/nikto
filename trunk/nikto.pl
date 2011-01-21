@@ -45,10 +45,10 @@ use vars qw/@RESULTS @PLUGINS @DBFILE @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
 $COUNTERS{'scan_start'} = time();
-$NIKTO{'DIV'}         = "-" x 75;
-$NIKTO{'version'}     = "2.1.3";
-$NIKTO{'name'}        = "Nikto";
-$NIKTO{'configfile'}  = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
+$VARIABLES{'DIV'}         = "-" x 75;
+$VARIABLES{'name'}        = "Nikto";
+$VARIABLES{'version'}     = "2.1.3";
+$VARIABLES{'configfile'}  = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
 
 # put a signal trap so we can close down reports properly
 $SIG{'INT'} = \&safe_quit;
@@ -59,13 +59,13 @@ $SIG{'INT'} = \&safe_quit;
     Getopt::Long::Configure('pass_through', 'noauto_abbrev');
     GetOptions(\%optcfg, "config=s");
     Getopt::Long::Configure('nopass_through', 'auto_abbrev');
-    if (defined $optcfg{'config'}) { $NIKTO{'configfile'} = $optcfg{'config'}; }
+    if (defined $optcfg{'config'}) { $VARIABLES{'configfile'} = $optcfg{'config'}; }
 }
 
 # Read the config files in order
 my ($error, $home);
 my $config_exists = 0;
-$error = load_config("$NIKTO{'configfile'}");
+$error = load_config("$VARIABLES{'configfile'}");
 $config_exists = 1 if ($error eq "");
 
 # Guess home directory -- to support Windows
@@ -93,21 +93,21 @@ die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 general_config();
 load_databases();
 load_databases('u');
-nprint("- $NIKTO{'name'} v$NIKTO{'version'}");
+nprint("- $VARIABLES{'name'} v$VARIABLES{'version'}");
 
 LW2::http_init_request(\%request);
 $request{'whisker'}->{'ssl_save_info'}              = 1;
 $request{'whisker'}->{'lowercase_incoming_headers'} = 1;
 $request{'whisker'}->{'timeout'}                    = $CLI{'timeout'} || 10;
 if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'}; }
-$request{'User-Agent'} = $NIKTO{'useragent'};
+$request{'User-Agent'} = $VARIABLES{'useragent'};
 $request{'whisker'}->{'retry'} = 0;
 if ($CLI{'useproxy'} && ($CONFIGFILE{PROXYPORT} ne '') && ($CONFIGFILE{PROXYHOST} ne '')) {
    $request{'whisker'}->{'proxy_host'} = $CONFIGFILE{PROXYHOST};
    $request{'whisker'}->{'proxy_port'} = $CONFIGFILE{PROXYPORT};
    }
 
-nprint($NIKTO{'DIV'});
+nprint($VARIABLES{'DIV'});
 
 # No targets - quit while we're ahead
 if ($CLI{'host'} eq "") {
@@ -161,6 +161,7 @@ run_hooks("", "start");
 foreach my $mark (@MARKS) {
     next unless ($mark->{'test'});
     $mark->{'start_time'} = time();
+    $VARIABLES{'TEMPL_HCTR'}++;
 
     # These should just be passed in the hash - but it's a lot of work to move to a local $request
     $request{'whisker'}->{'host'} = $mark->{'hostname'} || $mark->{'ip'};
@@ -225,7 +226,7 @@ foreach my $mark (@MARKS) {
 		}
         nprint("+ End Time:           $time ($elapsed seconds)");
     }
-    nprint($NIKTO{'DIV'});
+    nprint($VARIABLES{'DIV'});
 
     $COUNTERS{'hosts_completed'}++;
     report_host_end($mark);

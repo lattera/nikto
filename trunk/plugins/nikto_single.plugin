@@ -33,10 +33,10 @@ sub single {
     $request{'whisker'}->{'uri_password'}        = "";
     $request{'whisker'}->{'include_host_in_uri'} = 0;
     $request{'whisker'}->{'retry'}               = 0;
-    $request{'User-Agent'}                       = "Mozilla/4.75 ($NIKTO{'name'}/$NIKTO{'version'}";
+    $request{'User-Agent'}                       = "Mozilla/4.75 ($VARIABLES{'name'}/$VARIABLES{'version'}";
 
 #### Ask
-    print "-" x $width, "  Nikto $NIKTO{'version'}\n";
+    print "-" x $width, "  Nikto $VARIABLES{'version'}\n";
     print "-" x $width, "  Single Request Mode\n";
 
     $request{'whisker'}{'host'}         = ask("Hostname or IP") || die print "Must specify host\n";

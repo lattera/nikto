@@ -387,7 +387,7 @@ sub dump_target_info {
     my $sslprint = "";
 
     if ($mark->{ssl}) {
-        $sslprint = "$NIKTO{'DIV'}\n";
+        $sslprint = "$VARIABLES{'DIV'}\n";
         $sslprint .=
             "+ SSL Info:        Subject: $mark->{'ssl_cert_subject'}\n"
           . "                   Ciphers: $mark->{'ssl_cipher'}\n"
@@ -444,7 +444,7 @@ sub dump_target_info {
     }
     my $time = date_disp($mark->{start_time});
     nprint("+ Start Time:         $time");
-    nprint($NIKTO{'DIV'});
+    nprint($VARIABLES{'DIV'});
 }
 
     if ($mark->{banner} ne "") {
@@ -657,10 +657,10 @@ sub general_config {
     $CLI{'timeout'} || 10;
 
     # Set up User-Agent
-    $NIKTO{'useragent'} = $CONFIGFILE{'USERAGENT'};
-    $NIKTO{'useragent'} =~ s/\@VERSION/$NIKTO{'version'}/g;
+    $VARIABLES{'useragent'} = $CONFIGFILE{'USERAGENT'};
+    $VARIABLES{'useragent'} =~ s/\@VERSION/$VARIABLES{'version'}/g;
     my $ev = $CLI{'evasion'} || "None";
-    $NIKTO{'useragent'} =~ s/\@EVASIONS/$ev/g;
+    $VARIABLES{'useragent'} =~ s/\@EVASIONS/$ev/g;
 
     # RFI URL -- push it to VARIABLES
     if (defined $CONFIGFILE{'RFIURL'}) {
@@ -680,11 +680,10 @@ sub general_config {
     my @F = <FI>;
     close(FI);
     my @VERS = grep(/^#VERSION/, @F);
-    $NIKTO{'core_version'} = $VERS[0];
-    $NIKTO{'core_version'} =~ s/\#VERSION,//;
-    chomp($NIKTO{'core_version'});
-    $NIKTO{'TEMPL_HCTR'}    = 0;
-    $NIKTO{'TEMPL_SUMMARY'} = 0;
+    $VARIABLES{'core_version'} = $VERS[0];
+    $VARIABLES{'core_version'} =~ s/\#VERSION,//;
+    chomp($VARIABLES{'core_version'});
+    $VARIABLES{'TEMPL_HCTR'}    = 0;
 
     # POSIX support for status?
     $NIKTO{'POSIX'}{'support'} = 0;
@@ -1627,7 +1626,7 @@ sub check_updates {
     my (%REMOTE, %LOCAL, @DBTOGET) = ();
     my ($pluginmsg, $remotemsg) = "";
     my $code_updates = 0;
-    my $serverdir    = "/nikto/UPDATES/$NIKTO{'version'}";
+    my $serverdir    = "/nikto/UPDATES/$VARIABLES{'version'}";
 
     # set up our mark
     my %mark = ('ident' => 'cirt.net',
@@ -1707,7 +1706,7 @@ sub check_updates {
         if ($update) {
             if ($remotefile eq "nikto") {
                 nprint
-                  "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $NIKTO{'version'}\n";
+                  "+ Nikto has been updated to $REMOTE{$remotefile}, local copy is $VARIABLES{'version'}\n";
                 nprint
                   "+ No update has taken place. Please upgrade Nikto by visiting http://$server/\n";
                 if ($remotemsg ne "") { nprint("+ $server message: $remotemsg"); }
@@ -1868,7 +1867,7 @@ sub proxy_check {
             if ($result{'proxy-authenticate'} !~ /Basic/i) {
                 my @x = split(/ /, $result{'proxy-authenticate'});
                 nprint(
-                    "+ Proxy server uses '$x[0]' rather than 'Basic' authentication. $NIKTO{'name'} $NIKTO{'version'} can't do that."
+                    "+ Proxy server uses '$x[0]' rather than 'Basic' authentication. $VARIABLES{'name'} $VARIABLES{'version'} can't do that."
                     );
                 exit;
             }
@@ -1968,7 +1967,7 @@ sub setup_hash {
     if (defined $CLI{'evasion'}) {
         $reqhash->{'whisker'}->{'encode_anti_ids'} = $CLI{'evasion'};
     }
-    $reqhash->{'User-Agent'} = $NIKTO{'useragent'};
+    $reqhash->{'User-Agent'} = $VARIABLES{'useragent'};
     $reqhash->{'User-Agent'} =~ s/\@TESTID/$testid/;
     $reqhash->{'whisker'}->{'retry'} = 0;
     $reqhash->{'whisker'}->{'host'} = $mark->{'hostname'} || $mark->{'ip'};
@@ -2290,12 +2289,12 @@ sub parse_csv {
 #######################################################################
 sub version {
     my @NIKTOFILES = dirlist($CONFIGFILE{PLUGINDIR}, "(^nikto|^db_)");
-    nprint($NIKTO{'DIV'});
-    nprint("$NIKTO{'name'} Versions");
-    nprint($NIKTO{'DIV'});
+    nprint($VARIABLES{'DIV'});
+    nprint("$VARIABLES{'name'} Versions");
+    nprint($VARIABLES{'DIV'});
     nprint("File                               Version      Last Mod");
     nprint("-----------------------------      --------     ----------");
-    nprint("Nikto main                         $NIKTO{'version'}");
+    nprint("Nikto main                         $VARIABLES{'version'}");
     nprint("LibWhisker                         $LW2::VERSION");
 
     foreach my $FILE (sort @NIKTOFILES) {
@@ -2313,7 +2312,7 @@ sub version {
         my $ws2 = (13 - length($VERS[0]));
         nprint("$FILE" . " " x $ws1 . "$VERS[0]" . " " x $ws2 . "$modification[4]");
     }
-    nprint($NIKTO{'DIV'});
+    nprint($VARIABLES{'DIV'});
 
     # Check dependencies
     eval "require RPC::XML";
@@ -2332,7 +2331,7 @@ sub version {
 	nprint("SSL: support not available.");
 	}
 
-    nprint($NIKTO{'DIV'});
+    nprint($VARIABLES{'DIV'});
 
     exit;
 }

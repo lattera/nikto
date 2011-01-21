@@ -41,7 +41,7 @@ sub nbe_open {
 
     # Write header
     print OUT
-      "timestamps|network|host|port|nikto_id|prio|$NIKTO{'name'} v$NIKTO{'version'}/$NIKTO{'core_version'}\n";
+      "timestamps|network|host|port|nikto_id|prio|$VARIABLES{'name'} v$VARIABLES{'version'}/$VARIABLES{'core_version'}\n";
     return OUT;
 }
 

@@ -41,7 +41,7 @@ sub text_open {
     open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
 
     # Write header
-    print OUT "- $NIKTO{'name'} v$NIKTO{'version'}/$NIKTO{'core_version'}\n";
+    print OUT "- $VARIABLES{'name'} v$VARIABLES{'version'}/$VARIABLES{'core_version'}\n";
 
     return OUT;
 }

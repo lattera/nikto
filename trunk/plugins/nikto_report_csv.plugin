@@ -41,7 +41,7 @@ sub csv_open {
 
     # Write header
     print OUT
-      "\"meta\",\"meta\",\"$NIKTO{'name'}\",\"v$NIKTO{'version'}/$NIKTO{'core_version'}\"\n";
+      "\"meta\",\"meta\",\"$VARIABLES{'name'}\",\"v$VARIABLES{'version'}/$VARIABLES{'core_version'}\"\n";
     return OUT;
 }
 
