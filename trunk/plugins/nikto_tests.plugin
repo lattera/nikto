@@ -184,6 +184,10 @@ sub passchecks {
 
     nprint("- Performing passfiles mutation", "v");
 
+    # Update total requests for status reports
+    my @CGIS = split(/ /, $VARIABLES{'@CGIDIRS'});
+    $COUNTERS{'total_checks'} = $COUNTERS{'total_checks'} + (scalar(@DIRS) * scalar(@PFILES)) + (scalar(@DIRS) * scalar(@PFILES) * scalar(@EXTS)) + ((scalar(@DIRS) * scalar(@PFILES) * scalar(@EXTS) * scalar(@CGIS)) * 2);
+
     foreach my $dir (@DIRS) {
     return if $mark->{'terminate'};
         foreach my $file (@PFILES) {
@@ -198,7 +202,8 @@ sub passchecks {
                 # dir/file.ext
                 testfile($mark, "$dir$file.$ext", "passfiles", "299998");
 
-                foreach my $cgi (@CGIDIRS) {
+                foreach my $cgi (@CGIS) {
+		    $cgi =~ s/\/$//;
                     # dir/file.ext
                     testfile($mark, "$cgi$dir$file.$ext", "passfiles", "299998");
 
@@ -238,6 +243,9 @@ sub allchecks {
             }
         }
     }
+
+    # Update total requests for status reports
+    $COUNTERS{'total_checks'} = $COUNTERS{'total_checks'} + (keys(%DIRS) * keys(%FILES));
 
     # Now do a check for each item - just check the return status, nothing else
     foreach my $dir (keys %DIRS) {

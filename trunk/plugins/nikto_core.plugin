@@ -526,7 +526,7 @@ sub general_config {
 
     # deprecated -findonly overrides -Plugins
     if ($CLI{'findonly'}) { 
-	$CLI{'plugins'} = "\@\@NONE";
+	$CLI{'plugins'} = '@@NONE';
 	}
 
     # CLI proxy overrides nikto.conf
