@@ -65,9 +65,8 @@ sub html_close {
 sub html_summary {
     my ($handle, $mark) = @_;
     my $html = html_change_vars($TEMPLATES{'htm_summary'}, $mark);
-    print $handle "$html\n";
+    print $handle $html;
 
-    close($handle);
     return;
 }
 ###############################################################################

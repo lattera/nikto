@@ -58,14 +58,13 @@ sub xml_summary {
     my $xml = xml_change_vars($TEMPLATES{'xml_summary'}, $mark);
     print $handle "$xml\n";
 
-    close($handle);
     return;
 }
 ###############################################################################
 sub xml_close {
     my ($handle, $mark) = @_;
     my $xml = xml_change_vars($TEMPLATES{xml_close}, $mark);
-    print $handle "$xml\n";
+    print $handle $xml;
 
     close($handle);
     return;

@@ -1,8 +1,16 @@
 2010-12-06
+        - Tickets 148, 160, 188: XML CHANGES: 
+                - Removed 'cyphers' from DTD (was never populated via the code)
+                - The 'niktoscan' element is now included (was in schema, but unused)
+                - 'niktoscan' new variables: scanstart, scanend, scanelapsed
+                - <statistics hoststotal="#TEMPL_NIKTO_HOSTS_TESTED" /> removed from templates (duplicate of hoststest)
+                - <!ATTLIST statistics hoststotal CDATA #IMPLIED> removed from DTD
+                - Removed duplicate <niktoscan> element from xml_summary.tpl
+                - Properly close <niktoscan>
+                - Incremented nxmlversion to 1.1
 	- Ticket 195: Update interactive status counts if mutate options are used
 	- Ticket 194: Look for internal IPs in cookies
 	- Ticket 192: Relabel IDS evasion as 'encoding techniques'
-	- Ticket 188: Remove 'cyhpers' from DTD
 	- Ticket 186: Enable sleep for fractions of seconds
 	- Ticket 184: Fix -root option
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
@@ -12,10 +20,6 @@
 	- Ticket 173: Skip current host with 'N' in interactive mode
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
-	- Ticket 148, 160: Added report summary to XML and HTML reports
-		XML CHANGES:
-		- The 'niktoscan' element is now included (was in schema, but unused)
-		- 'niktoscan' new variables: scanstart, scanend, scanelapsed
 	- Ticket 82: Auth is now checked per realm, not per resource
 	- Created $mark->{'components'} to store server build items instead of @BUILDITEMS
 	- Variable consolidation & memory usage cleanup
