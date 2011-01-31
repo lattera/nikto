@@ -1627,9 +1627,10 @@ sub check_updates {
     my ($pluginmsg, $remotemsg) = "";
     my $code_updates = 0;
     my $serverdir    = "/nikto/UPDATES/$VARIABLES{'version'}";
+    my $server = "CIRT.net";
 
     # set up our mark
-    my %mark = ('ident' => 'cirt.net',
+    my %mark = ('ident' => 'www.cirt.net',
                 'ssl'   => 0,
                 'port'  => 80
                 );
@@ -1645,7 +1646,7 @@ sub check_updates {
             last;
         }
     }
-    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
+    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('www.cirt.net');
 
     # retrieve versions file
     my ($RES, $CONTENT) = nfetch(\%mark, "$serverdir/versions.txt", "GET");
@@ -2386,8 +2387,8 @@ sub send_updates {
         $answer = read_data(
             "\n
       *********************************************************************
-      Portions of the server's ident string ($updated_version) are not in
-      the Nikto database or is newer than the known string. Would you like
+      Portions of the server's headers ($updated_version) are not in
+      the Nikto database or are newer than the known string. Would you like
       to submit this information (*no server specific data*) to CIRT.net
       for a Nikto update (or you may email to sullo\@cirt.net) (y/n)? ", ""
         );
@@ -2408,7 +2409,7 @@ sub send_updates {
         }
     }
 
-    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('cirt.net');
+    ($mark{'hostname'}, $mark{'ip'}, $mark{'display_name'}) = resolve('www.cirt.net');
 
     ($RES, $CONTENT) = nfetch(\%mark, "/cgi-bin/versions?DATA=$updated_version", "GET");
 
@@ -2427,7 +2428,7 @@ sub send_updates {
     }
 
     if ($CONTENT !~ /SUCCESS/) {
-        nprint("+ ERROR: ($RES, $CONTENT): Unable to send update info to cirt.net");
+        nprint("+ ERROR: ($RES, $CONTENT): Unable to send update info to CIRT.net");
     }
     else {
         nprint("- Sent updated info to CIRT.net -- Thank you!");
@@ -2511,7 +2512,7 @@ sub usage {
                                c     Remote Source Inclusion
                                x     Reverse Tuning Options (i.e., include all except specified)
        -useproxy          Use the proxy defined in nikto.conf
-       -update            Update databases and plugins from cirt.net
+       -update            Update databases and plugins from CIRT.net
        -vhost+            Virtual host (for Host header)
        -Version           Print plugin and database versions
    		+ requires a value
@@ -2542,7 +2543,7 @@ sub usage {
        -Single             Single request mode
        -timeout+           Timeout (default 2 seconds)
        -Tuning+            Scan tuning
-       -update             Update databases and plugins from cirt.net
+       -update             Update databases and plugins from CIRT.net
        -vhost+             Virtual host (for Host header)
        -Version            Print plugin and database versions
    		+ requires a value
@@ -2586,6 +2587,26 @@ sub init_db {
             push(@dbarray, $hashref);
         }
     }
+    close(IN);
+
+    # and now the udb_* file
+    $filename = "$CONFIGFILE{PLUGINDIR}/u" . $dbname;
+    if (open(IN, "<$filename")) {
+	while (<IN>) {
+		chomp;
+        	s/\#.*$//;
+		if ($_ eq "") { next; }
+            	# contents; so split them up and apply to hash
+                my @contents = parse_csv($_);
+                my $hashref  = {};
+                for (my $i = 0 ; $i <= $#contents ; $i++) {
+                	$hashref->{ $headers[$i] } = $contents[$i];
+                        }
+               push(@dbarray, $hashref);
+		}
+	}
+    close(IN);
+
     return \@dbarray;
 }
 

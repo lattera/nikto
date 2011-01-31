@@ -21,6 +21,8 @@
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
 	- Ticket 82: Auth is now checked per realm, not per resource
+	- Not all udb* files were loaded properly
+	- Server name not properly printed in update/submission output
 	- Created $mark->{'components'} to store server build items instead of @BUILDITEMS
 	- Variable consolidation & memory usage cleanup
 	- Move message on -root from notices to target host info (suggestion from YGN)

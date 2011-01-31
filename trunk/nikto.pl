@@ -48,12 +48,12 @@ $COUNTERS{'scan_start'} = time();
 $VARIABLES{'DIV'}         = "-" x 75;
 $VARIABLES{'name'}        = "Nikto";
 $VARIABLES{'version'}     = "2.1.3";
-$VARIABLES{'configfile'}  = "/etc/nikto.conf";    ### Change this line if it's having trouble finding it
+$VARIABLES{'configfile'}  = "/etc/nikto.conf";    ### Change if it's having trouble finding it
 
-# put a signal trap so we can close down reports properly
+# signal trap so we can close down reports properly
 $SIG{'INT'} = \&safe_quit;
 
-# read the --config option
+# read just the --config option
 {
     my %optcfg;
     Getopt::Long::Configure('pass_through', 'noauto_abbrev');
