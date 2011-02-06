@@ -12,6 +12,7 @@
 	- Ticket 194: Look for internal IPs in cookies
 	- Ticket 192: Relabel IDS evasion as 'encoding techniques'
 	- Ticket 186: Enable sleep for fractions of seconds
+        - Ticket 185: Make multiple index file output links in html reports
 	- Ticket 184: Fix -root option
 	- Ticket 181: Fix COOKIE set via nikto.conf. Also allow multiple cookies.
 	- Ticket 179: Update docs for -useproxy
@@ -21,6 +22,7 @@
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
 	- Ticket 82: Auth is now checked per realm, not per resource
+        - Various cleanups in nikto_report_xml.plugin and nikto_report_html.plugin
 	- Not all udb* files were loaded properly
 	- Server name not properly printed in update/submission output
 	- Created $mark->{'components'} to store server build items instead of @BUILDITEMS

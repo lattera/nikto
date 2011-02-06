@@ -133,35 +133,54 @@ sub html_change_vars {
     $variables{"#TEMPL_LINK_NAME"}          = "$protocol://$mark->{'hostname'}:$mark->{'port'}";
     $variables{"#TEMPL_LINK_IP"}            = "$protocol://$mark->{'ip'}:$mark->{'port'}/";
     $variables{"#TEMPL_ITEMS_FOUND"}        = $mark->{'total_vulns'};
-    $variables{"#TEMPL_SCAN_START"}          = localtime($COUNTERS{'scan_start'});
-    $variables{"#TEMPL_SCAN_END"}            = localtime($COUNTERS{'scan_end'});
-    $variables{"#TEMPL_SCAN_ELAPSED"}        = $COUNTERS{'scan_elapsed'} . " seconds";
+    $variables{"#TEMPL_SCAN_START"}         = localtime($COUNTERS{'scan_start'});
+    $variables{"#TEMPL_SCAN_END"}           = localtime($COUNTERS{'scan_end'});
+    $variables{"#TEMPL_SCAN_ELAPSED"}       = $COUNTERS{'scan_elapsed'} . " seconds";
 
     $variables{"#TEMPL_LINK_NAME"} = "N/A";
     if ($mark->{'hostname'} ne "") {
         $variables{"#TEMPL_LINK_NAME"} = "$protocol://$mark->{'hostname'}:$mark->{'port'}/";
     }
 
+    # do now in case we return early
     foreach my $var (keys %variables) {
         $template =~ s/$var/$variables{$var}/g;
     }
 
-    # Scanner Messages Handling
     if ($item->{'uri'} eq '') { return $template }
-    if ($template =~ /\#TEMPL_SMMSG/) {
-        my $OSVDB = $item->{'osvdb'};
-        if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
-        $OSVDB_LINK = "http://osvdb.org/$OSVDB";
-        $template =~ s/\#TEMPL_SMMSG/$item->{'message'}/;
-        $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
-        $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
-        $template =~ s/\#ID/$item->{'nikto_id'}/;
-    }
+
+    $variables{"#ID"}                       = $item->{'nikto_id'};
+
+    # OSVDB info
+    my $OSVDB = $item->{'osvdb'};
+    if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
+    $OSVDB_LINK = "http://osvdb.org/$OSVDB";
+    $variables{"#TEMPL_OSVDB_LINK"} = $OSVDB_LINK; 
+    $variables{"#TEMPL_OSVDB"} = $OSVDB; 
+
+    # Scanner Messages Handling
+    $variables{"#TEMPL_SMMSG"} = $item->{'message'};
 
     # Positives Handling
     if ($template =~ /\#TEMPL_MSG/) {
+	my $msg = simple_enc($item->{'message'});
+
+	# Message & handling for customized html output
+	# 740000 = multiple index files -- linkify file names
+	if ($item->{'nikto_id'} == 740000) {
+		$item->{'message'} =~ /^(.*: )(.*)$/;
+		$msg = $1;
+		my @links;
+		foreach my $f (parse_csv($2)) { #@files) { 
+			$f =~s/\s//g;
+			next if $f eq '';
+			push(@links, "<a href=\"$protocol://$mark->{'display_name'}:$mark->{'port'}/$f\">$f</a>");
+			}
+		$msg .= join(", ", @links);
+		}
+
         $variables{"#TEMPL_URI"}         = simple_enc($item->{'uri'});
-        $variables{"#TEMPL_MSG"}         = simple_enc($item->{'message'});
+        $variables{"#TEMPL_MSG"}         = $msg;
         $variables{"#TEMPL_HTTP_METHOD"} = $item->{'method'};
         $variables{"#TEMPL_ITEM_IP_LINK"} =
           "$protocol://$variables{\"#TEMPL_IP\"}:$mark->{'port'}$variables{\"#TEMPL_URI\"}";
@@ -171,16 +190,9 @@ sub html_change_vars {
               "$protocol://$variables{\"#TEMPL_HOSTNAME\"}:$mark->{'port'}$variables{\"#TEMPL_URI\"}";
         }
 
-        my $OSVDB = $item->{'osvdb'};
-        if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
-        my $OSVDB_LINK = "http://osvdb.org/$OSVDB";
-
-        $template =~ s/\#TEMPL_OSVDB_LINK/$OSVDB_LINK/;
-        $template =~ s/\#TEMPL_OSVDB/$OSVDB/;
-        $template =~ s/\#ID/$item->{'nikto_id'}/;
-
-        foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
     }
+
+    foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
 
     return $template;
 }
