@@ -161,7 +161,6 @@
 "000134","0","3","/SiteServer/Admin/knowledge/dsmgr/default.asp","GET","200","","","","","Used to view current search catalog configurations","",""
 "000135","1909","4","@CGIDIRScgiwrap/%3Cfont%20color=red%3E","GET","<font color=red>","","","","","cgiwrap allows HTML and possibly XSS injection. See http://archives.neohapsis.com/archives/bugtraq/2001-07/0499.html for details.","",""
 "000136","2878","4","@CGIDIRSmoin.cgi?test","GET","200","","","","","MoinMoin 1.1 and prior contain at least two XSS vulnerabilities. Version 1.0 and prior also contains a XSLT related vulnerability","",""
-"000137","0","4","/autologon.html?10514","GET","200","","","","","Remotely Anywhere 5.10.415 is vulnerable to XSS attacks that can lead to cookie theft or privilege escalation. This is typically found on port 2000.","",""
 "000138","0","4","/basilix/mbox-list.php3","GET","200","","","","","BasiliX webmail application prior to 1.1.1 contains a XSS issue in 'message list' function/page","",""
 "000139","0","4","/basilix/message-read.php3","GET","200","","","","","BasiliX webmail application prior to 1.1.1 contains a XSS issue in 'read message' function/page","",""
 "000140","0","4","/clusterframe.jsp","GET","200","","","","","Macromedia JRun 4 build 61650 remote administration interface is vulnerable to several XSS attacks.","",""
