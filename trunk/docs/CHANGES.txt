@@ -22,6 +22,8 @@
 	- Ticket 169: Allow regular expressions in db_tests
 	- Ticket 155: -findonly is deprecated in favor of -Plugins "@@NONE" (-f will replicate this functionality)
 	- Ticket 82: Auth is now checked per realm, not per resource
+	- Fix parsing of nmap greppable output so that any port descr matching http is checked. Thanks Moses Hernandez for reporting.
+	- Fix a potential div by zero error
         - Various cleanups in nikto_report_xml.plugin and nikto_report_html.plugin
 	- Not all udb* files were loaded properly
 	- Server name not properly printed in update/submission output

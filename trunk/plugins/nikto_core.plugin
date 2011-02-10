@@ -154,6 +154,12 @@ sub get_ext {
 
 ###############################################################################
 sub status_report {
+    # without this we could face a div by 0 error
+    if ($COUNTERS{'totalrequests'} eq 0) { 
+    	nprint("- STATUS: Starting up!");
+	return;
+	}
+
     my $secleft =
       ((time() - $COUNTERS{'scan_start'}) / $COUNTERS{'totalrequests'}) *
       (($COUNTERS{'total_checks'} * $COUNTERS{'total_targets'}) - $COUNTERS{'totalrequests'});
@@ -721,6 +727,11 @@ sub general_config {
 		}
 	}
 
+     # Default values
+     $COUNTERS{'totalrequests'} = 0;
+     $COUNTERS{'total_checks'} = 0;
+     $COUNTERS{'total_targets'} = 0;
+
      return;
 }
 
@@ -924,7 +935,7 @@ sub set_targets {
     nprint("- Getting targets", "v");
     if (scalar(@ports) == 1) {
 
-        # Only one port is set, assume that is the default port
+        # Only one port is set, assume that as the default port
         $defaultport = $ports[0];
     }
 
@@ -1006,7 +1017,7 @@ sub parse_hostfile {
     while (<IN>) {
         my $found = 0;
 
-        # Check whether this is an nmap oG file
+        # Check whether this is a greppable nmap file
         chomp;
         if (/^# Nmap [0-9.]* scan initiated/) {
             $nmap = 1;
@@ -1016,28 +1027,25 @@ sub parse_hostfile {
 
         # Parse for nmap files
         if ($nmap) {
+	    if (($_ !~ /Host/) || ($_ !~ /Ports/) || ($_ !~ /open/) || ($_ !~ /http/i)) { next; }
 
-            # First get the host name
+            # Get the host name
             my @line = split(/ /);
-            my @name = split(/\(|\)/, $line[2]);
-            $hostdesc = ($name[1] ne "") ? $name[1] : $line[1];
+	    $_ =~ /\(([^\)]+)/;
+            $hostdesc = ($1 ne "") ? $1 : $line[1];
 
-            # now parse the ports list
+            # Parse the ports list from:
+            # Host: 1.0.0.0 ()	Ports: 80/open/tcp//http///, 8000/open/tcp//http-alt///
             for (my $i = 3 ; $i <= $#line ; $i++) {
-                my @ports = split(/\//, $line[$i]);
-                if ($ports[1] eq "open" && $ports[4] eq "http") {
-                    $found = 1;
-                    $hostdesc .= ":" . $ports[0];
+		if (($line[$i] !~ /open\/tcp/) || ($line[$i] !~ /http/)) { next; }
+                    $line[$i] =~ /^(\d+)\//;
+		    push(@results, $hostdesc . ":" . $1);
                 }
             }
-        }
         else {
-
             # just add it to the list
-            $hostdesc = $_;
-            $found    = 1;
+            push(@results, $_);
         }
-        push(@results, $hostdesc) if ($found);
     }
     close(IN);
     return (@results);
@@ -2474,7 +2482,7 @@ sub usage {
                                xml   XML Format
        -host+             Target host
        -Help              Extended help information
-       -id+               Host authentication to use, format is userid:password
+       -id+               Host authentication to use, format is id:pass or id:pass:realm
        -list-plugins      List all available plugins, perform no testing
        -mutate+           Guess additional file names:\n";
 
@@ -2528,7 +2536,7 @@ sub usage {
        -Format+            save file (-o) format
        -host+              target host
        -Help               Extended help information
-       -id+                host authentication to use, format is userid:password
+       -id+                Host authentication to use, format is id:pass or id:pass:realm
        -list-plugins       List all available plugins
        -mutate+            Guess additional file names
        -mutate-options+    Provide extra information for mutations
