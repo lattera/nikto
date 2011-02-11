@@ -1011,14 +1011,16 @@ sub set_targets {
 sub parse_hostfile {
     my ($file) = @_;
     my (@results, $hostdesc);
-    my $nmap = 0;
-
+    my ($nmap, $lineno) = 0;
+   
     open(IN, $file) || die print STDERR "+ ERROR: Cannot open '$file':$@\n";
     while (<IN>) {
         my $found = 0;
+	$lineno++;
 
         # Check whether this is a greppable nmap file
         chomp;
+	#nprint("\nParsing line $lineno: $_", "d");
         $nmap = 1 if (/^# Nmap/);
         s/\#.*$//;
         if ($_ eq "") { next; }
@@ -1027,18 +1029,26 @@ sub parse_hostfile {
         if ($nmap) {
 	    if (($_ !~ /Host/) || ($_ !~ /Ports/) || ($_ !~ /open/) || ($_ !~ /(?:http|ssl)/i)) { next; }
 
+            # parse out the line
+            my @fields = split("\t", $_);
+
             # Get the host name
-            my @line = split(/ /);
-	    $_ =~ /\(([^\)]+)/;
-            $hostdesc = ($1 ne "") ? $1 : $line[1];
+	    $fields[0] =~ /Host:\s+([\d\.]+)\s+\(([^\)]+)?\)/;
+            $hostdesc = ($2 ne "") ? $2 : $1;
 
             # Parse the ports list from:
             # Host: 1.0.0.0 ()	Ports: 80/open/tcp//http///, 8000/open/tcp//http-alt///
-            for (my $i = 3 ; $i <= $#line ; $i++) {
-		if (($line[$i] !~ /open\/tcp/) || ($line[$i] !~ /http/)) { next; }
-                    $line[$i] =~ /^(\d+)\//;
+            $fields[1]=~s/^Ports: //;
+            my @ports = parse_csv($fields[1]);
+            foreach my $nmp (@ports) { 
+		if (($nmp !~ /(?:80|443)?\/open\/tcp/) || ($nmp !~ /(?:http|ssl)/i)) { 
+			nprint("\tNon web port identified on line $lineno: $hostdesc port: $nmp","d");
+			next;
+			}
+                    $nmp =~ /^(?:\s+)?(\d+)\//;
+		    nprint("\tWeb port identified on line $lineno: $hostdesc port $1 ","d");
 		    push(@results, $hostdesc . ":" . $1);
-                }
+		}
             }
         else {
             # just add it to the list
