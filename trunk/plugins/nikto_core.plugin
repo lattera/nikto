@@ -1010,8 +1010,8 @@ sub set_targets {
 ###############################################################################
 sub parse_hostfile {
     my ($file) = @_;
-    my (@results, $hostdesc, $nmap);
-    $nmap = 0;
+    my (@results, $hostdesc);
+    my $nmap = 0;
 
     open(IN, $file) || die print STDERR "+ ERROR: Cannot open '$file':$@\n";
     while (<IN>) {
@@ -1019,15 +1019,13 @@ sub parse_hostfile {
 
         # Check whether this is a greppable nmap file
         chomp;
-        if (/^# Nmap [0-9.]* scan initiated/) {
-            $nmap = 1;
-        }
+        $nmap = 1 if (/^# Nmap/);
         s/\#.*$//;
         if ($_ eq "") { next; }
 
         # Parse for nmap files
         if ($nmap) {
-	    if (($_ !~ /Host/) || ($_ !~ /Ports/) || ($_ !~ /open/) || ($_ !~ /http/i)) { next; }
+	    if (($_ !~ /Host/) || ($_ !~ /Ports/) || ($_ !~ /open/) || ($_ !~ /(?:http|ssl)/i)) { next; }
 
             # Get the host name
             my @line = split(/ /);
