@@ -423,13 +423,6 @@ sub dump_target_info {
             );
     }
 
-    if (defined $NIKTO{'hostid'}) {
-        nprint(
-            "+ Host Auth:       ID: $NIKTO{'hostid'}, PW: $NIKTO{'hostpw'}, Realm: $NIKTO{'hostdomain'}",
-            "v"
-            );
-    }
-
     if ($mark->{ssl}) {
         nprint($sslprint);
     }

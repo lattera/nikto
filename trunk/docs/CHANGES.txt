@@ -8,6 +8,7 @@
                 - Removed duplicate <niktoscan> element from xml_summary.tpl
                 - Properly close <niktoscan>
                 - Incremented nxmlversion to 1.1
+	- Ticket 201: Rewritten & fixed authorization code work better and make fewer requests
 	- Ticket 195: Update interactive status counts if mutate options are used
 	- Ticket 194: Look for internal IPs in cookies
 	- Ticket 192: Relabel IDS evasion as 'encoding techniques'

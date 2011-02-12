@@ -44,16 +44,14 @@ sub nikto_auth_init {
                copyright        => "2010 CIRT Inc"
                };
 
-    use vars qw/$REALMS %REALMSCHECKED/;
+    use vars qw/$REALMS/;
 
     return $id;
 }
 
+# Load up the database as soon as we can
 sub nikto_auth_load {
-
-    # Load up the database as soon as we can
     $REALMS        = init_db("db_realms");
-    %REALMSCHECKED = ();
         
     if (defined $CLI{'hostauth'}) {
         my @x = split(/:/, $CLI{'hostauth'});
@@ -69,27 +67,46 @@ sub nikto_auth_load {
     }
 }
 
+# Prefetch method can only set a default if it exists, since we don't have
+# any returned 401 header. This may mean we send auth headers when they are not
+# required, but it shouldn't matter. It also means if there are multiple realms
+# the postfetch method will keep changing default... 
 sub nikto_auth_pre {
-    my ($mark, $parameters, $request, $result) = @_;
-
-    # If we tried the realm then don't bother guessing it
-
-    if ($REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'status'} == 1) {
-
-        # Just set up the auth and return the valid result
-        LW2::auth_set($REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'authtype'},
-                      $request,
-                      $REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'id'},
-                      $REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'password'}
-                      );
-
-        # Patch to fix short reads
+   my ($mark, $parameters, $request, $result) = @_;
+   if ($mark->{'realms'}{'default'}{'authtype'} ne '') { 
+        LW2::auth_set(   $mark->{'realms'}{'default'}{'authtype'}, $request,
+			 $mark->{'realms'}{'default'}{'id'},
+			 $mark->{'realms'}{'default'}{'password'});
         $request->{'whisker'}->{'allow_short_reads'} = 1;
         LW2::http_fixup_request($request);
-    }
-    return $request, $result;
+	}
+   return $request, $result;
 }
 
+# Split up www-authenticate to realm and method
+sub split_auth_header { 
+	my $header = $_[0] || return;
+	my ($realm, $authtype);
+	my @authenticate = split(/=/, $header); 
+    	if ($authenticate[0] =~ /^ntlm/i) {
+        	$realm=$authtype='NTLM';
+        	}
+    	else {
+        	$realm=$authenticate[1];
+        	$realm =~ s/^\"//;
+        	$realm =~ s/\".*$//;
+        	if ($authenticate[0] =~ /^basic/i) {
+                	$authtype='basic';
+                	}
+        	elsif ($authenticate[0] =~ /^digest/i) {
+                	$authtype='digest';
+                	}
+        	}
+	return $realm, $authtype;
+	}
+
+# Actual authentication and retry takes place here.
+# User-supplied credentials will be tried first if present
 sub nikto_auth {
     my ($mark, $parameters, $request, $result) = @_;
     my ($authtype) = 'basic';
@@ -103,32 +120,17 @@ sub nikto_auth {
         return $request, $result;
     }
 
-    # Split up www-authenticate to realm and method
-    my @authenticate = split(/=/, $result->{'www-authenticate'});
-    if ($authenticate[0] =~ /^ntlm/i) { 
-	$realm=$authtype='NTLM'; 
-	}
-    else {
-	$realm=$authenticate[1];
-	$realm =~ s/^\"//;
-	$realm =~ s/\".*$//;
-    	if ($authenticate[0] =~ /^basic/i) {
-        	$authtype='basic';
-        	}
-    	elsif ($authenticate[0] =~ /^digest/i) {
-        	$authtype='digest';
-        	}
-	}
+    my ($realm, $authtype) = split_auth_header($result->{'www-authenticate'});
 
     # did we already test this realm?
-    if (exists $REALMSCHECKED{ $mark->{'hostname'} }{'$realm'}{'status'}) {
+    if (exists  $mark->{'realms'}{$realm}{'status'}) { 
 	return $request, $result;
 	}
 
     # Save to revert
     $save_auth = $result{'www-authenticate'};
 
-    nprint("+ $uri - Requires Authentication for realm '$realm'") if $OUTPUT{'show_auth'};
+    nprint("+ $uri - Requires Authentication for realm '$realm'") if ($OUTPUT{'show_auth'} || $uri =~ /^$CLI{'root'}\/?$/);
 
     # Now we have this we can try guessing the password
     foreach my $entry (@{$REALMS}) {
@@ -146,49 +148,50 @@ sub nikto_auth {
         $request->{'whisker'}->{'allow_short_reads'} = 1;
         LW2::http_fixup_request($request);
 
-        # pause if needed
 	sleeper();
-
         LW2::http_do_request_timeout($request, $result);    # test auth
         $COUNTERS{'totalrequests'}++;
         dump_var("Auth Request",  $request);
         dump_var("Auth Response", $result);
 
-        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'status'}   = 0;
-        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'id'}       = $entry->{'id'};
-        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'password'} = $entry->{'password'};
-        $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'authtype'} = $authtype;
+	$mark->{'realms'}{$realm}{'status'} = 0;
+	$mark->{'realms'}{$realm}{'id'} = $entry->{'id'};
+	$mark->{'realms'}{$realm}{'password'} = $entry->{'password'};
+	$mark->{'realms'}{$realm}{'authtype'} = $authtype;
 
         if ($result{'www-authenticate'} =~ /^ntlm/i) {
-
-            # Deal with ntlm
+            # NTLM is different...
             my @ntlm_x = split(/ /, $result{'www-authenticate'});
             if ($#ntlm_x == 1) {
+		sleeper();
+        	$request->{'whisker'}->{'allow_short_reads'} = 1;
+        	LW2::http_fixup_request($request);
                 LW2::http_do_request_timeout(\%request, \%result);
                 $COUNTERS{'totalrequests'}++;
             }
         }
 
-        if ($result->{'www-authenticate'} eq ''
-            && !defined $result->{'whisker'}->{'error'}) {
-            my $message =
-              "Default account found for '$realm' at $request->{'whisker'}->{'uri'} (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}";
-            if ($entry->{'id'} eq '' && $entry->{'password'} eq '') {
-                $message =
-                  "Blank credentials found at $request{whisker}->{uri}, $entry->{'realm'}: $entry->{'msg'}";
-            }
+        if ($result->{'www-authenticate'} eq '' && !defined $result->{'whisker'}->{'error'}) {
             unless ($entry->{'checked'} == 1) {
+	    	my $message;
+            	if ($entry->{'message'} eq "Credentials provided by CLI.") { 
+			$message = "Successfully authenticated to realm '$realm' with user-supplied credentials."; 
+			}
+            	elsif ($entry->{'id'} eq '' && $entry->{'password'} eq '') {
+               		$message = "Blank credentials found at $request{whisker}->{uri}, $entry->{'realm'}: $entry->{'msg'}.";
+            		}
+	    	else { 
+            		$message = "Default account found for '$realm' at $request->{'whisker'}->{'uri'} (ID '$entry->{'id'}', PW '$entry->{'password'}'). $entry->{message}.";
+			}
+
                 add_vulnerability($mark, $message, $entry->{tid}, 0, "GET", $request{whisker}->{uri}, $result);
-                $entry->{checked} = 1;
-            }
 
-            # Finally repeat the check
-            LW2::http_do_request_timeout($request, $result);    # test auth
-            $COUNTERS{'totalrequests'}++;
-
-            # Mark it successful
-            $REALMSCHECKED{ $mark->{hostname} }{'$realm'}{'status'}   = 1;
-            last;
+            	# Mark it successful
+                $entry->{'checked'} = 1;
+		$mark->{'realms'}{$realm}{'status'} = 1;
+		$mark->{'realms'}{'default'} = $mark->{'realms'}{$realm};
+            	last;
+            	}
         }
         else {
             $result->{'www-authenticate'} = $save_auth;
