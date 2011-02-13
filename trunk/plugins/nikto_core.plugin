@@ -897,13 +897,13 @@ sub set_targets {
     my ($hostlist, $portlist, $ssl, $root) = @_;
     my $host_ctr = 1;
     my @hosts    = split(/,/, $hostlist);
-    my @ports    = split(/,/, $portlist) if defined $portlist;
-    my (@checkhosts, @results, @marks);
-    my $defaultport = ($ssl) ? 443 : 80;
+    my @tempports    = split(/,/, $portlist) if defined $portlist;
+    my (@ports, @checkhosts, @results, @marks);
 
-    # Check for old style portlist and expand
-    my @newports;
-    foreach my $port (@ports) {
+    nprint("- Getting targets", "v");
+
+    # Check for portlist and expand
+    foreach my $port (@tempports) {
         if ($port =~ /-/) {
             my ($start, $end);
             my @temp = split(/-/, $port);
@@ -916,23 +916,20 @@ sub set_targets {
                 next;
             }
             for (my $i = $start ; $i <= $end ; $i++) {
-                push(@newports, $i);
+                push(@ports, $i);
             }
         }
         else {
-            push(@newports, $port);
+            push(@ports, $port);
         }
     }
-    @ports = @newports;
 
-    nprint("- Getting targets", "v");
-    if (scalar(@ports) == 1) {
+    # no ports explicitly set, so use default port
+    if (scalar(@ports) == 0) {
+	push(@ports, $defaultport);
+    	}
 
-        # Only one port is set, assume that as the default port
-        $defaultport = $ports[0];
-    }
-
-    # check whether it's a file or an entry
+    # check whether -h is a file or an entry
     foreach my $host (@hosts) {
         if (-e $host || $host eq "-") {
             @results = parse_hostfile($host);
@@ -943,18 +940,12 @@ sub set_targets {
         }
     }
 
-    # Now parse the list of checkhosts
+    # Now parse the list of checkhosts, store in %targs by host:port
+    my $targs={};
     foreach my $host (@checkhosts) {
-        my $defhost;
-        my $defport;
         $host =~ s/\s+//g;
         if (!defined $host) { next; }
-        my $markhash = {};
-
-        if ($root ne '') { 
-	    $markhash->{'root'} = $root;
-            nprint("- Added -root value of '$root' from CLI", "v");
-	    }
+        my ($defhost, $defport)='';
 
         # is it a URL?
         if ($host =~ /^https?:\/\//) {
@@ -962,40 +953,44 @@ sub set_targets {
 
             $defhost = $hostdata[2];
             $defport = $hostdata[3];
+            $targs{$defhost . ":" . $defport}= ($root ne "") ? $root : '/';
 
            if (($hostdata[0] ne '/') && ($hostdata[0] ne '') && ($root eq '')) {
-		$markhash->{'root'} = $hostdata[0];
+		$targs{$defhost . ":" . $defport}= $hostdata[0];
                 nprint("- Added -root value of '$hostdata[0]' from URI", "v");
             }
         }
         else {
             my @h = split(/\:|\,/, $host);
-
             $defhost = $h[0];
             $defport = $h[1];
+            $targs{$defhost . ":" . $defport} = ($root ne "") ? $root : '/'; 
         }
+}
 
-        # Now skip through all ports if port hasn't been added
-        if ($defport eq "" && scalar(@ports) > 0) {
+foreach my $host (keys %targs) { 
+	my ($h, $p) = split(/:/, $host);
+	if ($p eq '') { 
+            foreach my $port (@ports) {
+        	my $markhash = {};
+        	if ($root ne '') { $markhash->{'root'} = $root; nprint("- Added -root value of '$root' from CLI", "v"); }
 
-            foreach $port (@ports) {
-                $markhash->{'ident'} = $defhost;
+                $markhash->{'ident'} = $h;
                 $markhash->{'port'}  = $port;
+        	if ($targs{$host} ne '/') { $markhash->{'root'} = $targs{$host}; }
                 nprint("- Target:$markhash->{'ident'} port:$markhash->{'port'}", "v", $markhash);
                 push(@marks, $markhash);
-            }
-        }
-        else {
-            if ($defport eq "") {
-                $defport = $defaultport;
-            }
-            $markhash->{'ident'} = $defhost;
-            $markhash->{'port'}  = $defport;
+            	}
+	    }
+	else {
+        	my $markhash = {};
+        	if ($targs{$host} ne '/') { $markhash->{'root'} = $targs{$host}; }
 
-            nprint("- Target:$markhash->{'ident'} port:$markhash->{'port'}", "v", $markhash);
-            push(@marks, $markhash);
-        }
-    }
+                $markhash->{'ident'} = $h;
+                $markhash->{'port'}  = $p;
+                push(@marks, $markhash);
+    		}
+	}
 
     return @marks;
 }
@@ -2061,7 +2056,6 @@ sub cache_fetch {
 #######################################################################
 sub nfetch {
     my ($mark, $uri, $method, $data, $headers, $flags, $testid) = @_;
-    sleeper();
     my (%request, %result);
     setup_hash(\%request, $mark, $testid);
 
@@ -2108,11 +2102,13 @@ sub nfetch {
     }
 
     if (!$incache) {
+        sleeper();
         LW2::http_do_request_timeout(\%request, \%result);
         $COUNTERS{'totalrequests'}++;
 
 	# If we got an error, do 1 retry. This should be much more intelligent and configurable!
 	if (defined $result{'whisker'}->{'error'} || $result{'whisker'}{'code'} eq '') {
+                sleeper();
         	LW2::http_do_request_timeout(\%request, \%result);
         	$COUNTERS{'totalrequests'}++;
 		}
