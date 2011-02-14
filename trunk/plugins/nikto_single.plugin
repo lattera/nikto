@@ -33,7 +33,7 @@ sub single {
     $request{'whisker'}->{'uri_password'}        = "";
     $request{'whisker'}->{'include_host_in_uri'} = 0;
     $request{'whisker'}->{'retry'}               = 0;
-    $request{'User-Agent'}                       = "Mozilla/4.75 ($VARIABLES{'name'}/$VARIABLES{'version'}";
+    $request{'User-Agent'} = "Mozilla/4.75 ($VARIABLES{'name'}/$VARIABLES{'version'}";
 
 #### Ask
     print "-" x $width, "  Nikto $VARIABLES{'version'}\n";

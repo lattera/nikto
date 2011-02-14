@@ -27,19 +27,15 @@ sub nikto_apacheusers_init {
             full_name   => "Apache Users",
             author      => "Javier Fernandez-Sanguinoi Pena",
             description => "Checks whether we can enumerate usernames directly from the web server",
-            hooks       => {
-                              scan => {
-                                 method => \&nikto_apacheusers,
-                              },
-                           },
+            hooks       => { scan => { method => \&nikto_apacheusers, }, },
             copyright   => "2008 CIRT Inc.",
             options     => {
-                              enumerate  => "Flag to indicate whether to attempt to enumerate users",
-                              dictionary => "Filename for a dictionary file of users",
-                              size       => "Maximum size of username if bruteforcing",
-                              home       => "Look for ~user to enumerate",
-                              cgiwrap    => "User cgi-bin/cgiwrap to enumerate"
-                           }
+                         enumerate  => "Flag to indicate whether to attempt to enumerate users",
+                         dictionary => "Filename for a dictionary file of users",
+                         size       => "Maximum size of username if bruteforcing",
+                         home       => "Look for ~user to enumerate",
+                         cgiwrap    => "User cgi-bin/cgiwrap to enumerate"
+                         }
               };
     return $id;
 }
@@ -156,7 +152,7 @@ sub nikto_user_enum_apache_brute {
     my ($result, $content);
     my @foundusers = ();
     while (length($text) <= $size) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         if (($ctr % 500) eq 0) { nprint("- User enumeration guess $ctr ($text)", "v"); }
         ($result, $content) =
           nfetch($mark, $url . $text, "HEAD", "", "", "", "user_enum_apache: enumeration");
@@ -187,7 +183,7 @@ sub nikto_user_enum_apache_dictionary {
 
     # Now attempt on each entry
     while (<IN>) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         chomp;
         s/\#.*$//;
 

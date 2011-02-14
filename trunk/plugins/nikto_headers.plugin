@@ -21,21 +21,17 @@
 # General HTTP headers checks
 ###############################################################################
 sub nikto_headers_init {
-    my $id =    {
-                    name        => "headers",
-                    full_name   => "HTTP Headers",
-                    author      => "Sullo",
-                    description => "Performs various checks against the headers returned from an HTTP request.",
-                    hooks       => {
-                                        scan =>  {
-                                            method => \&nikto_headers,
-                                        },
-                                        postfetch => {
-                                            method => \&nikto_headers_postfetch,
-                                        },
-                                    },
-                    copyright   => "2008 CIRT Inc."
-                };
+    my $id = {
+        name        => "headers",
+        full_name   => "HTTP Headers",
+        author      => "Sullo",
+        description => "Performs various checks against the headers returned from an HTTP request.",
+        hooks       => {
+                   scan      => { method => \&nikto_headers, },
+                   postfetch => { method => \&nikto_headers_postfetch, },
+                   },
+        copyright => "2008 CIRT Inc."
+        };
 
     # some global variables
     use vars qw/%HFOUND/;
@@ -98,7 +94,7 @@ sub nikto_headers {
     my %transheaders;
     foreach
       my $f (qw/\/index.asp \/junk999.asp \/index.aspx \/junk988.aspx \/login.asp \/login.aspx/) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         (my $res, $content) =
           nfetch($mark, $f, "GET", "", \%transheaders, "", "headers: Translate-f #1");
         if ($res eq "200") {
@@ -208,7 +204,7 @@ sub nikto_headers {
     # Look for any uncommon headers
     my $reportnum = 999100;
     foreach my $header (sort keys %headers) {
-    	my $found     = 0;
+        my $found = 0;
         foreach my $st_header (@$dbarray) {
             if ($header eq $st_header->{'header'}) {
                 $found = 1;
@@ -217,7 +213,7 @@ sub nikto_headers {
         if ($found == 0) {
             my $x = $headers{$header};
             $x =~ s/\s+.*$//;
-            $mark->{'components'}->{$x}=1;
+            $mark->{'components'}->{$x} = 1;
             add_vulnerability($mark,
                               "Uncommon header '$header' found, with contents: $headers{$header}",
                               $reportnum, 0);
@@ -230,7 +226,7 @@ sub nikto_headers {
 
     # Try to grab a standard file
     foreach my $f (qw/\/index.html \/index.htm \/robots.txt/) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         (my $res, $content) = nfetch($mark, $f, "GET", "", \%headers, "", "headers: etag");
         last if (defined $headers{'etag'});
     }

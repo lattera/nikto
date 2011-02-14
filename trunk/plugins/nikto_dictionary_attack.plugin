@@ -21,17 +21,16 @@
 # Run dictionary tests
 ###############################################################################
 sub nikto_dictionary_attack_init {
-    my $id = { name         => "dictionary",
-               full_name    => "Dictionary attack",
-               author       => "Deity",
-               description  => "Attempts to dictionary attack commonly known directories/files",
+    my $id = { name        => "dictionary",
+               full_name   => "Dictionary attack",
+               author      => "Deity",
+               description => "Attempts to dictionary attack commonly known directories/files",
                hooks       => {
-                                 recon => {
-                                    method => \&nikto_dictionary_attack,
-                                    weight => 20,
-                                 },
-                              },                   
-               copyright    => "2009 CIRT Inc"
+                          recon => { method => \&nikto_dictionary_attack,
+                                     weight => 20,
+                                     },
+                            },
+               copyright => "2009 CIRT Inc"
                };
 
     return $id;
@@ -70,7 +69,7 @@ sub nikto_dictionary_attack {
 
     # Now attempt on each entry
     while (<IN>) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         chomp;
         s/\#.*$//;
         next if ($_ eq "");
@@ -78,6 +77,7 @@ sub nikto_dictionary_attack {
         if (($ctr % 100) == 0) { nprint("- Directory enumeration guess $ctr ($dir): /$dir/", "v"); }
         my ($result, $content) = nfetch($mark, "/$dir/", "HEAD", "", "", "", "dictionary_attack");
         foreach my $found (split(/ /, $VARIABLES{"\@HTTPFOUND"})) {
+
             if ($result eq $found) {
                 add_vulnerability($mark, "Found directory /$dir/", 999969, "0", "HEAD", "/$dir/");
             }

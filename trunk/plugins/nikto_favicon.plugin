@@ -26,11 +26,7 @@ sub nikto_favicon_init {
                author      => "Sullo",
                description => "Checks the web server's favicon against known favicons.",
                copyright   => "2008 CIRT Inc.",
-               hooks       => {
-                                 scan => {
-                                    method => \&nikto_favicon,
-                                 },
-                              },                              
+               hooks       => { scan => { method => \&nikto_favicon, }, },
                };
     return $id;
 }

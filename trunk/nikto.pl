@@ -44,11 +44,11 @@ use vars qw/%NIKTO %CONFIGFILE %request %result %COUNTERS %db_extensions/;
 use vars qw/@RESULTS @PLUGINS @DBFILE @REPORTS %CACHE %CONTENTSEARCH/;
 
 # setup
-$COUNTERS{'scan_start'} = time();
-$VARIABLES{'DIV'}         = "-" x 75;
-$VARIABLES{'name'}        = "Nikto";
-$VARIABLES{'version'}     = "2.1.4";
-$VARIABLES{'configfile'}  = "/etc/nikto.conf";    ### Change if it's having trouble finding it
+$COUNTERS{'scan_start'}  = time();
+$VARIABLES{'DIV'}        = "-" x 75;
+$VARIABLES{'name'}       = "Nikto";
+$VARIABLES{'version'}    = "2.1.4";
+$VARIABLES{'configfile'} = "/etc/nikto.conf";    ### Change if it's having trouble finding it
 
 # signal trap so we can close down reports properly
 $SIG{'INT'} = \&safe_quit;
@@ -103,9 +103,9 @@ if (defined $CLI{'evasion'}) { $request{'whisker'}->{'encode_anti_ids'} = $CLI{'
 $request{'User-Agent'} = $VARIABLES{'useragent'};
 $request{'whisker'}->{'retry'} = 0;
 if ($CLI{'useproxy'} && ($CONFIGFILE{PROXYPORT} ne '') && ($CONFIGFILE{PROXYHOST} ne '')) {
-   $request{'whisker'}->{'proxy_host'} = $CONFIGFILE{PROXYHOST};
-   $request{'whisker'}->{'proxy_port'} = $CONFIGFILE{PROXYPORT};
-   }
+    $request{'whisker'}->{'proxy_host'} = $CONFIGFILE{PROXYHOST};
+    $request{'whisker'}->{'proxy_port'} = $CONFIGFILE{PROXYPORT};
+}
 
 nprint($VARIABLES{'DIV'});
 
@@ -176,15 +176,16 @@ foreach my $mark (@MARKS) {
     # Cookies
     if (defined $CONFIGFILE{'STATIC-COOKIE'}) {
         $mark->{'cookiejar'} = LW2::cookie_new_jar();
-	# parse conf line into name/value pairs
-	foreach my $p (split(/;/, $CONFIGFILE{'STATIC-COOKIE'})) {
-		$p =~ s/(?:^\s+|\s+$)//;
-		$p =~ s/"(?:[ ]+)?=(?:[ ]+)?"/","/g;
-		my @cv = parse_csv($p);
 
-		# Set into the jar
-		LW2::cookie_set(\%{$mark->{'cookiejar'}}, $cv[0], $cv[1]);
-		}
+        # parse conf line into name/value pairs
+        foreach my $p (split(/;/, $CONFIGFILE{'STATIC-COOKIE'})) {
+            $p =~ s/(?:^\s+|\s+$)//;
+            $p =~ s/"(?:[ ]+)?=(?:[ ]+)?"/","/g;
+            my @cv = parse_csv($p);
+
+            # Set into the jar
+            LW2::cookie_set(\%{ $mark->{'cookiejar'} }, $cv[0], $cv[1]);
+        }
     }
 
     $mark->{'total_vulns'}  = 0;
@@ -196,7 +197,7 @@ foreach my $mark (@MARKS) {
            "getinfo");
 
     report_host_start($mark);
-    if ($CLI{'plugins'} eq '@@NONE') { 
+    if ($CLI{'plugins'} eq '@@NONE') {
         my $protocol = "http";
         if ($mark->{'ssl'}) { $protocol .= "s"; }
         if ($mark->{'banner'} eq "") {
@@ -209,8 +210,7 @@ foreach my $mark (@MARKS) {
     }
     else {
         dump_target_info($mark);
-        unless ((defined $CLI{'nofof'}) || ($CLI{'plugins'} eq '@@NONE'))
- 		{ map_codes($mark) }
+        unless ((defined $CLI{'nofof'}) || ($CLI{'plugins'} eq '@@NONE')) { map_codes($mark) }
         run_hooks($mark, "recon");
         run_hooks($mark, "scan");
     }
@@ -218,12 +218,16 @@ foreach my $mark (@MARKS) {
     my $time    = date_disp($mark->{'end_time'});
     my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
     if ($CLI{'plugins'} ne '@@NONE') {
-	if (!$mark->{'terminate'}) { 
-        	nprint("+ $COUNTERS{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
-		}
-	else { 
-		nprint("+ Scan terminated:  $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host");
-		}
+        if (!$mark->{'terminate'}) {
+            nprint(
+                "+ $COUNTERS{'total_checks'} items checked: $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
+                );
+        }
+        else {
+            nprint(
+                "+ Scan terminated:  $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
+                );
+        }
         nprint("+ End Time:           $time ($elapsed seconds)");
     }
     nprint($VARIABLES{'DIV'});
@@ -231,16 +235,16 @@ foreach my $mark (@MARKS) {
     $COUNTERS{'hosts_completed'}++;
     report_host_end($mark);
 }
-$COUNTERS{'scan_end'} = time();
-$COUNTERS{'scan_elapsed'} = ($COUNTERS{'scan_end'}-$COUNTERS{'scan_start'});
+$COUNTERS{'scan_end'}     = time();
+$COUNTERS{'scan_elapsed'} = ($COUNTERS{'scan_end'} - $COUNTERS{'scan_start'});
 report_summary();
 report_close();
 
- if ($CLI{'plugins'} ne '@@NONE') {
-nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
-nprint( "+ $COUNTERS{'totalrequests'} requests made in $COUNTERS{'scan_elapsed'} seconds","v");
+if ($CLI{'plugins'} ne '@@NONE') {
+    nprint("+ $COUNTERS{'hosts_completed'} host(s) tested");
+    nprint("+ $COUNTERS{'totalrequests'} requests made in $COUNTERS{'scan_elapsed'} seconds", "v");
 
-send_updates(@MARKS);
+    send_updates(@MARKS);
 }
 nprint("T:" . localtime() . ": Ending", "d");
 

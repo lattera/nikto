@@ -1,5 +1,5 @@
 #VERSION,2.00
-# $Id$ 
+# $Id$
 ###############################################################################
 #  Copyright (C) 2004 CIRT, Inc.
 #
@@ -26,12 +26,11 @@ sub nikto_subdomain_init {
                author      => "Ryan Dewhurst",
                description => "Attempts to bruteforce commonly known sub-domains",
                hooks       => {
-                                 scan => {
-                                    method => \&nikto_subdomain,
+                          scan => { method => \&nikto_subdomain,
                                     weight => 20,
-                                 },
-                              },
-               copyright   => "2009 Ryan Dewhurst"
+                                    },
+                            },
+               copyright => "2009 Ryan Dewhurst"
                };
 
     return $id;
@@ -49,7 +48,8 @@ sub nikto_subdomain {
     if (index($host, '.') < 0 || $host =~ /^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/) {
 
         # Host is an IP address, don't bother!
-        nprint("Host given to subdomain is an IP address or an unqualified hostname; skipping", "v");
+        nprint("Host given to subdomain is an IP address or an unqualified hostname; skipping",
+               "v");
         return;
     }
 
@@ -61,7 +61,7 @@ sub nikto_subdomain {
     $CLI{'nocache'} = 1;
 
     foreach my $item (@$dbarray) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
 
         # Use nfetch to minimize extra code
         # First we need to mangle the host.
@@ -69,7 +69,8 @@ sub nikto_subdomain {
         my ($result, $content, $error) = nfetch($mark, "/", "GET", "", "subdomain");
 
         if ($error eq "") {
-            add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'}, 0);
+            add_vulnerability($mark, "Subdomain $item->{'subdomain'} found", $item->{'nikto_id'},
+                              0);
         }
 
     }    # End foreach

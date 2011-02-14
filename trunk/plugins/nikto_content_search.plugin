@@ -23,21 +23,19 @@
 use vars qw/$CONTENTSEARCH %CSMATCHED/;
 
 sub nikto_content_search_init {
-    my $id = { name             => "content_search",
-               full_name        => "Content Search",
-               author           => "Sullo",
-               description      => "Search resultant content for interesting strings",
+    my $id = { name        => "content_search",
+               full_name   => "Content Search",
+               author      => "Sullo",
+               description => "Search resultant content for interesting strings",
                hooks       => {
-                                 start => {
-                                    method => \&nikto_content_search_load,
-                                    weight => 1,
-                                 },
-                                 postfetch => {
-                                    method => \&nikto_content_search,
-                                    weight => 20,
-                                 },
-                              },                   
-               copyright        => "2010 CIRT Inc"
+                          start => { method => \&nikto_content_search_load,
+                                     weight => 1,
+                                     },
+                          postfetch => { method => \&nikto_content_search,
+                                         weight => 20,
+                                         },
+                            },
+               copyright => "2010 CIRT Inc"
                };
 
     return $id;

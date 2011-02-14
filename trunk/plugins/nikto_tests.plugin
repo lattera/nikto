@@ -46,7 +46,7 @@ sub nikto_tests {
 
     # this is the actual the looped code for all the checks
     foreach my $checkid (sort keys %TESTS) {
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         if ($checkid >= 500000) { next; }    # skip TESTS added manually during run (for reports)
                                              # replace variables in the uri
         my @urilist = change_variables($TESTS{$checkid}{'uri'});
@@ -186,10 +186,14 @@ sub passchecks {
 
     # Update total requests for status reports
     my @CGIS = split(/ /, $VARIABLES{'@CGIDIRS'});
-    $COUNTERS{'total_checks'} = $COUNTERS{'total_checks'} + (scalar(@DIRS) * scalar(@PFILES)) + (scalar(@DIRS) * scalar(@PFILES) * scalar(@EXTS)) + ((scalar(@DIRS) * scalar(@PFILES) * scalar(@EXTS) * scalar(@CGIS)) * 2);
+    $COUNTERS{'total_checks'} =
+      $COUNTERS{'total_checks'} +
+      (scalar(@DIRS) * scalar(@PFILES)) +
+      (scalar(@DIRS) * scalar(@PFILES) * scalar(@EXTS)) +
+      ((scalar(@DIRS) * scalar(@PFILES) * scalar(@EXTS) * scalar(@CGIS)) * 2);
 
     foreach my $dir (@DIRS) {
-    return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         foreach my $file (@PFILES) {
             next if ($file eq "");
 
@@ -197,13 +201,14 @@ sub passchecks {
             testfile($mark, "$dir$file", "passfiles", "299998");
 
             foreach my $ext (@EXTS) {
-		return if $mark->{'terminate'};
+                return if $mark->{'terminate'};
 
                 # dir/file.ext
                 testfile($mark, "$dir$file.$ext", "passfiles", "299998");
 
                 foreach my $cgi (@CGIS) {
-		    $cgi =~ s/\/$//;
+                    $cgi =~ s/\/$//;
+
                     # dir/file.ext
                     testfile($mark, "$cgi$dir$file.$ext", "passfiles", "299998");
 
@@ -250,7 +255,7 @@ sub allchecks {
     # Now do a check for each item - just check the return status, nothing else
     foreach my $dir (keys %DIRS) {
         foreach my $file (keys %FILES) {
-	    return if $mark->{'terminate'};
+            return if $mark->{'terminate'};
             testfile($mark, "$dir$file", "all checks", 299999);
         }
     }

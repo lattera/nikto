@@ -25,12 +25,8 @@ sub nikto_cgi_init {
                full_name   => "CGI",
                author      => "Sullo",
                description => "Enumerates possible CGI directories.",
-               hooks       => {
-                                 recon => {
-                                    method => \&nikto_cgi,
-                                 },
-                              },                   
-               copyright    => "2008 CIRT Inc.",
+               hooks       => { recon => { method => \&nikto_cgi, }, },
+               copyright   => "2008 CIRT Inc.",
                };
     return $id;
 }

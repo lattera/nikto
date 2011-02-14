@@ -22,18 +22,16 @@
 ###############################################################################
 sub nikto_robots_init {
     my $id = {
-        name        => "robots",
-        full_name   => "Robots",
-        author      => "Sullo",
+        name      => "robots",
+        full_name => "Robots",
+        author    => "Sullo",
         description =>
-            "Checks whether there's anything within the robots.txt file and analyses it for other paths to pass to other scripts.",
-        hooks       =>  {
-                            recon => {
-                                method => \&nikto_robots,
-                                weight => 49,
-                            },
-                        },                            
-        copyright    => "2008 CIRT Inc."
+          "Checks whether there's anything within the robots.txt file and analyses it for other paths to pass to other scripts.",
+        hooks => { recon => { method => \&nikto_robots,
+                              weight => 49,
+                              },
+                     },
+        copyright => "2008 CIRT Inc."
         };
     return $id;
 }

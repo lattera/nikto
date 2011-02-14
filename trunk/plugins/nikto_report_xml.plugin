@@ -162,9 +162,9 @@ sub xml_change_vars {
     # OSVDB info
     my $OSVDB = $item->{'osvdb'};
     if ($OSVDB !~ /\d+/) { $OSVDB = 0; }
-    $OSVDB_LINK = "http://osvdb.org/$OSVDB";
+    $OSVDB_LINK                     = "http://osvdb.org/$OSVDB";
     $variables{"#TEMPL_OSVDB_LINK"} = $OSVDB_LINK;
-    $variables{"#TEMPL_OSVDB"} = $OSVDB;
+    $variables{"#TEMPL_OSVDB"}      = $OSVDB;
 
     # Scanner Messages Handling
     $variables{"#TEMPL_SMMSG"} = $item->{'message'};

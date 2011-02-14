@@ -33,12 +33,11 @@ sub nikto_msgs_init {
                author      => "Sullo",
                description => "Checks the server version against known issues.",
                hooks       => {
-                                 scan => {
-                                    method => \&nikto_msgs,
+                          scan => { method => \&nikto_msgs,
                                     weight => 20,
-                                 },
-                              },                                  
-               copyright   => "2008 CIRT Inc."
+                                    },
+                            },
+               copyright => "2008 CIRT Inc."
                };
     return $id;
 }
@@ -50,7 +49,7 @@ sub nikto_msgs {
     $dbarray = init_db("db_server_msgs");
 
     foreach my $item (@$dbarray) {
-	$item->{'server'} = validate_and_fix_regex($item->{'server'});
+        $item->{'server'} = validate_and_fix_regex($item->{'server'});
         if ($mark->{'banner'} =~ /($item->{'server'})\b/i) {
             add_vulnerability($mark, "$1 - $item->{'message'}",
                               $item->{'nikto_id'}, $item->{'osvdb'});
@@ -66,7 +65,7 @@ sub nikto_msgs {
         next unless ($RES == 200);
 
         # Computer name
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         my $name = $CONTENT;
         $name =~ s#(^.*<ComputerName>)([a-zA-Z0-9]*)(</ComputerName>.*$)#$2#;
         my $eposerver = $CONTENT;
@@ -84,7 +83,7 @@ sub nikto_msgs {
         my ($RES, $CONTENT) =
           nfetch($mark, "/cpqlogin.htm", "GET", "", "", "", "msgs: CompaqHTTPServer");
         next unless ($RES == 200);
-	return if $mark->{'terminate'};
+        return if $mark->{'terminate'};
         my $ipaddrs = "";
         my $name;
         foreach my $line (split(/\n/, $CONTENT)) {
