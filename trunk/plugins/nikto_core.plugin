@@ -2395,8 +2395,9 @@ sub send_updates {
                 elsif ($component eq "Win32")          { next; }
                 elsif ($component eq "(Win32)")        { next; }
                 elsif ($component eq "Linux-Mandrake") { next; }
+                elsif ($component eq "")               { next; }
                 $have_updates = 1;
-                $updated_version .= "$ver ";
+                $updated_version .= "$component ";
             }
         }
     }

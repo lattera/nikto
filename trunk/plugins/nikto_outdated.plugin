@@ -144,7 +144,7 @@ sub vereval {
     nprint("nikto_outdated.plugin: \$CURRENT:$CURRENT:\$RUNNING:$RUNNING\: (after numberifcation)",
            "d");
 
-    if (($CURRENT_ORIG !~ /[a-z]/) && ($RUNNING_ORIG !~ /[a-z]/)) {
+    if (($CURRENT !~ /[a-z]/) && ($RUNNING !~ /[a-z]/)) {
         @CUR = split(/\./, $CURRENT);
         @RUN = split(/\./, $RUNNING);
     }
