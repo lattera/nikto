@@ -6471,3 +6471,5 @@
 "006482","0","3","/en-GB/debug/sso","GET","SSO Enabled","","","","","Splunk's SSO debug may reveal sensitive info, such as internal IPs/hostnames.","",""
 "006483","0","3","/en-US/debug/sso","GET","SSO Enabled","","","","","Splunk's SSO debug may reveal sensitive info, such as internal IPs/hostnames.","",""
 "006484","0","3","/default.htm","GET","Behind Every Great Web Site","","","","","Default EPiServer file found","",""
+"006485","0","8","/axis2/axis2-web/HappyAxis.jsp","GET","Back Home","","","","","Apache Axis2 was found","",""
+"006486","59001","8","/axis2/services/Version?xsd=../../../../../../../../../../../etc/passwd","GET","root:","","","","","Apache Axis2 contains a directory traversal in the Version program.","",""
