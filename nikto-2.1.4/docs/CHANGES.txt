@@ -1,4 +1,4 @@
-2010-12-06
+2011-02-20 Nikto 2.1.4 release
         - Tickets 148, 160, 188: XML CHANGES: 
                 - Removed 'cyphers' from DTD (was never populated via the code)
                 - The 'niktoscan' element is now included (was in schema, but unused)
