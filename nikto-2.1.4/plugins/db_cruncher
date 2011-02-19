@@ -1,0 +1,42 @@
+#!/bin/perl
+
+open(IN,"<db_tests.orig");
+@DB=<IN>;
+close(IN);
+
+open(OUT,">db_tests.out");
+
+foreach my $line (@DB) { 
+	if ($line =~ /^#/) { print OUT $line; next; }
+	chomp($line);
+	my @item = parse_csv($line);
+        for (my $y = 5 ; $y <= 9 ; $y++) {
+                next if $item[$y] eq '';
+                next if $item[$y] =~ /^\@REGEX/; 
+		$item[$y] =~ s/\\"/"/g;
+		$item[$y] =~ s/([\%\&\@\[\]\(\)\{\}\*\.\+\/\?\^\$\|\+\\])/\\$1/g;
+		$item[$y] =~ s/"/\\"/g;
+		$item[$y] =~ s/[iI]ndex of/[Ii]ndex [Oo]f/g;
+		#print "$item[$y]\n";	
+		}
+
+	my $ol = join('","', @item);
+	print OUT "\"$ol\"\n";
+	
+	}
+
+close(OUT);
+
+
+
+sub parse_csv {
+    my $text = $_[0] || return;
+    my @new = ();
+    push(@new, $+) while $text =~ m{
+      "([^\"\\]*(?:\\.[^\"\\]*)*)",?
+       |  ([^,]+),?
+       | ,
+   }gx;
+    push(@new, undef) if substr($text, -1, 1) eq ',';
+    return @new;
+}
