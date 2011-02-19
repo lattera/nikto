@@ -1,4 +1,4 @@
-#VERSION,2.013
+#VERSION,2.014
 # $Id$
 #######################################################################
 # Source: http://cirt.net
@@ -396,7 +396,7 @@
 "600382","mini_httpd/","1.1919","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600383","Mini-Proxy/","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600384","Mini-Web/","0.10","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600385","MiniServ/","MiniServ/0.01","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"600385","MiniServ/","1.530","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600386","MiniWebSvr/","0.0.9svn","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600387","Minstrel-httpd/","2.0.g","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600388","Miranda Web/","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
@@ -1090,3 +1090,6 @@
 "601078","WebMod/","0.48","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "601079","xrl-thttpd/","2.25b08jan2011","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "601080","PanWebServer/","2.4.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"601081","mod_put/","2.0.9","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"601082","mod_qos/","9.26","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
+"601083","ScriptLogic.Webserver/","8.0.0.440","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
