@@ -1,4 +1,4 @@
-#VERSION,2.00
+#VERSION,2.01
 # $Id$
 ###############################################################################
 #  Copyright (C) 2010 CIRT, Inc.
@@ -30,9 +30,6 @@ sub nikto_cookies_init {
          copyright   => "2010 CIRT Inc."
          };
 
-    # if we need once per cookie
-    #use vars qw/%CFOUND/;
-
     return $id;
 }
 
@@ -43,19 +40,11 @@ sub nikto_cookies_postfetch {
         return $request, $result;
     }
 
-    # if we need to limit to once per cookie...
-    #my $key =
-    #  LW2::md4(  $mark->{'ip'}
-    #           . $mark->{'hostname'}
-    #           . $mark->{'port'}
-    #           . $mark->{'ssl'}
-    #           . $result->{'whisker'}->{'method'}
-    #           . $c);
-    #if (!exists $CFOUND{$key}) {
-
     foreach my $c (@{ $result->{'whisker'}->{'cookies'} }) {
-        if ($c =~ /([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/) {
-            my $ip = $1;
+        $c =~ /(?:\b|[^0-9])([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?:\b|[^0-9])/;
+        my $ip = $1;
+        my ($valid, $internal, $loopback) = is_ip($ip);
+        if ($valid && !$loopback) {
             if ($ip ne $mark->{'ip'}) {
                 my $msg   = "";
                 my $osvdb = 0;
@@ -70,10 +59,8 @@ sub nikto_cookies_postfetch {
                 else {
 
                     # is it an internal, or just different?
-                    my $int = "";
-                    if ($ip =~ /^(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\./) {
-                        $int = "Internal ";
-                    }
+                    my $int;
+                    if ($internal) { $int = "RFC-1918 "; }
 
                     $msg = $int . "IP address found in the '$cname' cookie. The IP is \"$ip\".";
                 }
@@ -81,11 +68,41 @@ sub nikto_cookies_postfetch {
             }
         }
 
-        #$CFOUND{$key} = $c;
-
     }
 
-    #}
+}
+
+# Check an IP's validity. Returns booleans for: validity, internal, loopback
+sub is_ip {
+        my $ip=$_[0] || return 0, 0, 0;
+        my $internal = 0;
+        my $loopback = 0;
+
+        # simple syntax check
+        # this will fail on some edge cases, but it's 99%...
+        if ($ip !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/)
+                { return 0, $internal, $loopback; }
+
+        # now validate octets
+        my @octets = split(/\./, $ip);
+        if (scalar(@octets) ne 4)
+                { return 0, $internal, $loopback; }
+        for (my $o=0; $o<=3;$o++) {
+                if (($octets[$o] < 0) || ($octets[$o] > 255))
+                        { return 0, $internal, $loopback; }
+                if ($octet[$o] =~ /^0/)
+                        { return 0, $internal, $loopback; }
+                if (($o eq 0) && ($octets[$o] < 1))
+                        { return 0, $internal, $loopback; }
+                }
+
+        # now check for internal
+        if ($ip =~ /^(?:10|192\.168|172\.(?:1[6-9]|2\d|3[01]))\./) { $internal=1; }
+
+        # lastly, loopback?
+        if ($ip eq '127.0.0.1') { $loopback=1; }
+
+        return 1, $internal, $loopback;
 }
 
 1;
