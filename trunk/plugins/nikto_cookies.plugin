@@ -54,8 +54,10 @@ sub nikto_cookies_postfetch {
     #if (!exists $CFOUND{$key}) {
 
     foreach my $c (@{ $result->{'whisker'}->{'cookies'} }) {
-        if ($c =~ /([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/) {
-            my $ip = $1;
+        $c =~ /(?:\b|[^0-9])([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?:\b|[^0-9])/;
+        my $ip = $1;
+	my ($valid, $internal, $loopback) = is_ip($ip);
+	if ($valid && !$loopback) { 
             if ($ip ne $mark->{'ip'}) {
                 my $msg   = "";
                 my $osvdb = 0;
@@ -70,10 +72,8 @@ sub nikto_cookies_postfetch {
                 else {
 
                     # is it an internal, or just different?
-                    my $int = "";
-                    if ($ip =~ /^(10|172\.(1[6-9]|2[0-9]|3[01])|192\.168)\./) {
-                        $int = "Internal ";
-                    }
+		    my $int;
+		    if ($internal) { $int = "RFC-1918 "; }
 
                     $msg = $int . "IP address found in the '$cname' cookie. The IP is \"$ip\".";
                 }

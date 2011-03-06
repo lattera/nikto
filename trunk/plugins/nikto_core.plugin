@@ -528,7 +528,7 @@ sub general_config {
 
     # deprecated -findonly overrides -Plugins
     if ($CLI{'findonly'}) {
-        $CLI{'plugins'} = '@@NONE';
+        $CLI{'plugins'} = '@@NONE;report_csv;report_html;report_text;report_xml;report_nbe;report_msf';
     }
 
     # CLI proxy overrides nikto.conf
@@ -2316,6 +2316,40 @@ sub set_scan_items {
 #######################################################################
 sub max_test_id {
     return (sort { $a <=> $b } keys %TESTS)[-1];
+}
+
+#######################################################################
+# Check an IP's validity. Returns booleans for: validity, internal, loopback
+sub is_ip {
+        my $ip=$_[0] || return 0, 0, 0;
+        my $internal = 0;
+	my $loopback = 0;
+
+        # simple syntax check
+        # this will fail on some edge cases, but it's 99%...
+        if ($ip !~ /^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/)
+                { return 0, $internal, $loopback; }
+
+        # now validate octets
+        my @octets = split(/\./, $ip);
+        if (scalar(@octets) ne 4)
+                { return 0, $internal, $loopback; }
+        for (my $o=0; $o<=3;$o++) {
+                if (($octets[$o] < 0) || ($octets[$o] > 255))
+                        { return 0, $internal, $loopback; }
+                if ($octet[$o] =~ /^0/)
+                        { return 0, $internal, $loopback; }
+                if (($o eq 0) && ($octets[$o] < 1))
+                        { return 0, $internal, $loopback; }
+                }
+
+        # now check for internal
+        if ($ip =~ /^(?:10|192\.168|172\.(?:1[6-9]|2\d|3[01]))\./) { $internal=1; }
+
+        # lastly, loopback?
+        if ($ip eq '127.0.0.1') { $loopback=1; }
+
+        return 1, $internal, $loopback;
 }
 
 #######################################################################
