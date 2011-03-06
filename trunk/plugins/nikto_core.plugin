@@ -529,7 +529,7 @@ sub general_config {
     # deprecated -findonly overrides -Plugins
     if ($CLI{'findonly'}) {
         $CLI{'plugins'} = '@@NONE;report_csv;report_html;report_text;report_xml;report_nbe;report_msf';
-    }
+    	}
 
     # CLI proxy overrides nikto.conf
     if ((defined($CLI{'useproxy'})) && ($CLI{'useproxy'} ne '')) {
