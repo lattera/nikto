@@ -85,19 +85,23 @@ sub nikto_outdated {
 
     my ($v, $V, $BI, $k) = "";
 
+    # For each running component
     foreach $BI (keys %{ $mark->{'components'} }) {
         my $have_match = 0;
+        # Check it against each value from db_outdated
         foreach $V (sort keys %OVERS) {
             next if $V eq '';
             if ($BI =~ /^$V/i)    # software name matched
             {
                 $have_match = 1;
+                # nab version
                 foreach $k (keys %{ $OVERS{$V} }) {
                     if ($k eq "")    { next; }
                     if ($k eq "tid") { next; }
                     $v = $k;
                 }
-                if (vereval($v, $BI, $V, $mark))    # version check
+                # do version check (return true if we should alert)
+                if (vereval($v, $BI, $V, $mark))
                 {
                     my $msg = $OVERS{$V}{$v};
                     $msg =~ s/\@RUNNING_VER/$BI/g;
@@ -112,9 +116,15 @@ sub nikto_outdated {
     return;
 }
 
+# do version evaluation
+# arguments: 
+#	0: latest version as defined in db_outdated
+#	1: running item being evaluated
+#	2: item being matched against in db_outdated
+#	3: mark hash
 sub vereval {
-
-    # split both by last char of @_[0], as it is the name to version separator
+	
+    # split both by last char of $_[2], as it is the name to version separator
     my $sepr = substr($_[2], (length($_[2]) - 1), 1);
     nprint("nikto_outdated.plugin: verstring: $_[2], sepr:$sepr", "d");
 
