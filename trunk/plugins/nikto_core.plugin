@@ -203,7 +203,7 @@ sub date_disp {
     my $result = sprintf("%d-%02d-%02d %02d:%02d:%02d",
                          $time[5] + 1900,
                          $time[4] + 1,
-                         $time[3] + 1,
+                         $time[3],
                          $time[2], $time[1], $time[0]);
     return $result;
 }

@@ -1,6 +1,7 @@
-2011-03-05 
+2011-03-18
 	- Ticket 208: Strengthen IP matching in cookies (nikto_cookies.plugin)
 	- Ticket 207: -findonly emulation now enables reporting plugins and screen output mimics versions < 2.1.4
+	- Fix date_disp for incorrect mday increment, thanks noop.0352.ja for notification
 2011-02-20 Nikto 2.1.4 release
         - Tickets 148, 160, 188: XML CHANGES: 
                 - Removed 'cyphers' from DTD (was never populated via the code)
