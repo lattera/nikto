@@ -11,8 +11,8 @@ the default), no (don't ask, just send), auto (don't ask, just send).
        </para>
       </listitem>
     </varlistentry>
-      <term><option>-Cgidirs</option></term>
     <varlistentry>
+      <term><option>-Cgidirs</option></term>
       <listitem>
         <para>Scan these CGI directories. Special words "none" or "all" may
 be used to scan all CGI directories or none, (respectively). A

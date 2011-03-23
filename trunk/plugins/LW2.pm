@@ -63,6 +63,80 @@ package LW2;
 $LW2::VERSION="2.5";
 $PACKAGE='LW2';
 
+# BEGIN is at the end of the file. Here come the functions.
+
+########################################################################
+#
+=item B<init_ssl_engine>
+
+Params: $lw_ssl_engine
+
+Return: always returns undef
+
+This function chooses the right SSL Engine and initializes SSL if needed.
+This has been done because SSLeay seems to have memory leaks and there
+was no other way to quickly change SSL Engine.
+lw_ssl_engine can have these values:
+	auto 	= autodetection where it uses SSLeay first
+		  (this is the default upon loading the module)
+	SSL  	= Net::SSL
+	SSLeay 	= Net::SSLeay
+
+Precondition for the function is that if you choose a specific library
+this library must be installed.
+
+=cut
+
+sub init_ssl_engine {
+    my  ($lw_ssl_engine) = @_;
+
+    # if user-specified, undef initialization in case user's desired lib is not available
+    if ($lw_ssl_engine ne 'auto') { 
+        $LW_SSL_LIB   = 0;
+        $_SSL_LIBRARY = undef;
+	}
+
+    if ($lw_ssl_engine eq 'SSLeay'){
+	# use Net::SSLeay as your SSL Library
+        eval "use Net::SSLeay";
+	if ( !$@ ) { 
+        	$LW_SSL_LIB   = 1;
+        	$_SSL_LIBRARY = 'Net::SSLeay';
+        	Net::SSLeay::load_error_strings();
+        	Net::SSLeay::SSLeay_add_ssl_algorithms();
+        	Net::SSLeay::randomize();
+		}
+    } elsif ($lw_ssl_engine eq 'SSL'){
+        # use Net:SSL
+        eval "use Net::SSL";
+	if ( !$@ ) { 
+        	$LW_SSL_LIB   = 2;
+        	$_SSL_LIBRARY = 'Net::SSL';
+		}
+    } else {
+	# assuming autodetection
+	eval "use Net::SSLeay";    # do we have SSL support?
+        if ( !$@ ) {
+	    $LW_SSL_LIB   = 1;
+            $_SSL_LIBRARY = 'Net::SSLeay';
+            Net::SSLeay::load_error_strings();
+            Net::SSLeay::SSLeay_add_ssl_algorithms();
+            Net::SSLeay::randomize();
+        } else {
+	    eval "use Net::SSL";
+            if ( !$@ ) {
+                $LW_SSL_LIB   = 2;
+                $_SSL_LIBRARY = 'Net::SSL';
+            }
+        }
+    }
+
+return undef;
+
+} #sub
+
+########################################################################
+# Module Initialization starts here
 BEGIN {
 package LW2;
 $PACKAGE='LW2';
@@ -74,37 +148,26 @@ $PACKAGE='LW2';
 
     $_SSL_LIBRARY = undef;
 
-    eval "use Socket";
-    if ( !$@ ) {
-        eval "use Net::SSLeay";    # do we have SSL support?
-        if ( !$@ ) {
-            $LW_SSL_LIB   = 1;
-            $_SSL_LIBRARY = 'Net::SSLeay';
-            Net::SSLeay::load_error_strings();
-            Net::SSLeay::SSLeay_add_ssl_algorithms();
-            Net::SSLeay::randomize();
+    # check for Socket
+     eval "use Socket";
+     if ( $@ ) {
+	die('You have to install the module Socket');
+     }
 
-        }
-        else {
-            eval "use Net::SSL";
-            if ( !$@ ) {
-                $LW_SSL_LIB   = 2;
-                $_SSL_LIBRARY = 'Net::SSL';
-            }
-        }
+    # init SSL with autoconfig first. App can later override this
+    init_ssl_engine('auto');
 
-        if ( $^O !~ /Win32/ ) {
-            eval "use POSIX qw(:errno_h :fcntl_h)";
-            if ($@) { $LW_NONBLOCK_CONNECT = 0; }
-        }
-        else {
-
-            # taken from Winsock2.h
-            *EINPROGRESS = sub { 10036 };
-            *EWOULDBLOCK = sub { 10035 };
-        }
+    if ( $^O !~ /Win32/ ) {
+        eval "use POSIX qw(:errno_h :fcntl_h)";
+        if ($@) { $LW_NONBLOCK_CONNECT = 0; }
     }
+    else {
 
+        # taken from Winsock2.h
+        *EINPROGRESS = sub { 10036 };
+        *EWOULDBLOCK = sub { 10035 };
+    }
+    
 } # BEGIN
 
 
@@ -113,7 +176,6 @@ $PACKAGE='LW2';
 =item B<auth_brute_force>
 
 Params: $auth_method, \%req, $user, \@passwords [, $domain, $fail_code ]
-
 Return: $first_valid_password, undef if error/none found
 
 Perform a HTTP authentication brute force against a server (host and URI 
@@ -6443,6 +6505,7 @@ sub utils_croak {
 	die _utils_carp_common(@_);
 }
 
+
 =back
 
 =head1 SEE ALSO
@@ -6454,5 +6517,6 @@ L<LWP>
 Copyright 2009 Jeff Forristal
 
 =cut
+
 
 1;

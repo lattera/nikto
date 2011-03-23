@@ -87,6 +87,9 @@ nprint("T:" . localtime($COUNTERS{'scan_start'}) . ": Starting", "d");
 require "$CONFIGFILE{'PLUGINDIR'}/nikto_single.plugin";
 require "$CONFIGFILE{'PLUGINDIR'}/LW2.pm";
 
+#set SSL Engine 
+LW2::init_ssl_engine($CONFIGFILE{'LW_SSL_ENGINE'}); 
+
 my ($a, $b) = split(/\./, $LW2::VERSION);
 die("- You must use LW2 2.4 or later\n") if ($a != 2 || $b < 4);
 
