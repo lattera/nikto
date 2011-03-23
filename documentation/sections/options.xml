@@ -288,6 +288,17 @@ specified)</para>
       </listitem>
     </varlistentry>
     <varlistentry>
+      <term><option>-Userdbs</option></term>
+      <listitem>
+        <para>Load user defined databases instead of standard databases. User defined
+        databases follow the same syntax as the standard files, but are prefixed with 
+        a 'u', e.g., 'udb_tests'</para>
+	<para>all - Disable all standard databases and load only user databases</para>
+	<para>tests - Disable db_tests and load udb_tests. All other databases are 
+        loaded normally.</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
       <term><option>-useproxy</option></term>
       <listitem>
         <para>Use the HTTP proxy defined in the configuration file. The proxy

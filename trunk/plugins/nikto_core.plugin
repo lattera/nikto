@@ -492,43 +492,51 @@ sub general_config {
       $COUNTERS{'totalrequests'} = $OUTPUT{'debug'} = $OUTPUT{'scrub'} = $OUTPUT{'errors'} = 0;
     $CLI{'all_options'} = join(" ", @ARGV);
 
-    GetOptions("nolookup"         => \$CLI{'skiplookup'},
+    GetOptions(
                "ask=s"            => \$CLI{'ask'},
-               "config=s"         => \$CLI{'config'},
                "Cgidirs=s"        => \$CLI{'forcecgi'},
-               "mutate=s"         => \$CLI{'mutate'},
-               "mutate-options=s" => \$CLI{'mutate-options'},
-               "id=s"             => \$CLI{'hostauth'},
-               "nointeractive"    => \$CLI{'nointeractive'},
-               "evasion=s"        => \$CLI{'evasion'},
-               "port=s"           => \$CLI{'ports'},
-               "findonly"         => \$CLI{'findonly'},
-               "root=s"           => \$CLI{'root'},
-               "timeout=i"        => \$CLI{'timeout'},
-               "Pause=f"          => \$CLI{'pause'},
-               "ssl"              => \$CLI{'ssl'},
-               "nocache"          => \$CLI{'nocache'},
-               "nossl"            => \$CLI{'nossl'},
-               "no404"            => \$CLI{'nofof'},
-               "useproxy:s"       => \$CLI{'useproxy'},
-               "vhost=s"          => \$CLI{'vhost'},
-               "host=s"           => \$CLI{'host'},
-               "output=s"         => \$CLI{'file'},
-               "Format=s"         => \$CLI{'format'},
-               "Display=s"        => \$CLI{'display'},
-               "Tuning=s"         => \$CLI{'tuning'},
-               "Plugins=s"        => \$CLI{'plugins'},
-               "Help"             => \&usage,
-               "Single"           => \&single,
-               "list-plugins"     => \&list_plugins,
-               "Version"          => \&version,
-               "update"           => \&check_updates,
+               "config=s"         => \$CLI{'config'},
                "dbcheck"          => \&check_dbs,
+               "Display=s"        => \$CLI{'display'},
+               "evasion=s"        => \$CLI{'evasion'},
+               "findonly"         => \$CLI{'findonly'},
+               "Format=s"         => \$CLI{'format'},
+               "Help"             => \&usage,
+               "host=s"           => \$CLI{'host'},
+               "id=s"             => \$CLI{'hostauth'},
+               "list-plugins"     => \&list_plugins,
+               "mutate-options=s" => \$CLI{'mutate-options'},
+               "mutate=s"         => \$CLI{'mutate'},
+               "no404"            => \$CLI{'nofof'},
+               "nocache"          => \$CLI{'nocache'},
+               "nointeractive"    => \$CLI{'nointeractive'},
+               "nolookup"         => \$CLI{'skiplookup'},
+               "nossl"            => \$CLI{'nossl'},
+               "output=s"         => \$CLI{'file'},
+               "Pause=f"          => \$CLI{'pause'},
+               "Plugins=s"        => \$CLI{'plugins'},
+               "port=s"           => \$CLI{'ports'},
+               "root=s"           => \$CLI{'root'},
+               "Single"           => \&single,
+               "ssl"              => \$CLI{'ssl'},
+               "timeout=i"        => \$CLI{'timeout'},
+               "Tuning=s"         => \$CLI{'tuning'},
+               "update"           => \&check_updates,
+               "Userdbs:s"        => \$CLI{'userdbs'},
+               "useproxy:s"       => \$CLI{'useproxy'},
+               "Version"          => \&version,
+               "vhost=s"          => \$CLI{'vhost'},
                ) or usage();
 
     # deprecated -findonly overrides -Plugins
     if ($CLI{'findonly'}) {
         $CLI{'plugins'} = '@@NONE;report_csv;report_html;report_text;report_xml;report_nbe;report_msf';
+    	}
+
+    # Userdb type: blank is db_tests only, so 'all' is only valid option
+    if (defined($CLI{'userdbs'})) { 
+    	if ($CLI{'userdbs'} =~ /^all$/i) { $CLI{'userdbs'}='all'; }
+	else { $CLI{'userdbs'}='tests'; }
     	}
 
     # CLI proxy overrides nikto.conf
@@ -1062,8 +1070,15 @@ sub parse_hostfile {
 
 ###############################################################################
 sub load_databases {
-    my @dbs = qw/db_404_strings  db_outdated  db_tests  db_variables db_content_search/;
-    my $prefix = $_[0] || "";
+    my @dbs = qw/db_404_strings  db_outdated  db_variables db_content_search/;
+    my $prefix = $_[0] || '';
+
+    # Only load the right databases if -Userdbs is set
+    if ((defined($CLI{'userdbs'})) && ($CLI{'userdbs'} eq 'all')) {
+	if ($prefix eq '') { return; }
+	else { push(@dbs, 'db_tests'); }
+	}
+    if (($prefix eq 'u') || (!defined($CLI{'userdbs'}))) { push(@dbs, 'db_tests'); }
 
     # verify required files
     for my $file (@dbs) {
@@ -2590,6 +2605,9 @@ sub usage {
                                b     Software Identification
                                c     Remote Source Inclusion
                                x     Reverse Tuning Options (i.e., include all except specified)
+       -Userdbs           Load only user databases, not the standard databases
+                               all   Disable standard dbs and load only user dbs
+                               tests Disable only db_tests and load udb_tests
        -useproxy          Use the proxy defined in nikto.conf
        -update            Update databases and plugins from CIRT.net
        -vhost+            Virtual host (for Host header)
@@ -2641,11 +2659,11 @@ sub init_db {
     my (@dbarray, @headers);
     my $hashref = {};
 
+    if ($CLI{'userdbs'} ne 'all') { 
     # Check that the database exists
     unless (open(IN, "<$filename")) {
         nprint("+ ERROR: Unable to open database file $dbname: $!.");
         return $dbarray;
-    }
 
     # Now read the header values
     while (<IN>) {
@@ -2667,8 +2685,10 @@ sub init_db {
         }
     }
     close(IN);
+    }
+    }
 
-    # and now the udb_* file
+    # And the udb_* file
     $filename = "$CONFIGFILE{PLUGINDIR}/u" . $dbname;
     if (open(IN, "<$filename")) {
         while (<IN>) {
