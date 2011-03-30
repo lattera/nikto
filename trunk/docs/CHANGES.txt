@@ -1,9 +1,10 @@
-2011-03-22
+2011-03-30
 	- Ticket 208: Strengthen IP matching in cookies (nikto_cookies.plugin)
 	- Ticket 207: -findonly emulation now enables reporting plugins and screen output mimics versions < 2.1.4
 	- Ticket 199: Allow user to specify SSL library to be used by LW2
 	- Ticket 198: Add -Userdbs to run only user databases. 'all' loads all user databases and no standard. 'tests' or nothing only loads udb_tests instead of db_tests
 	- Fix date_disp for incorrect mday increment, thanks noop.0352.ja for notification
+	- Print web ports found in gnmap input files, thanks @mubix
 2011-02-20 Nikto 2.1.4 release
         - Tickets 148, 160, 188: XML CHANGES: 
                 - Removed 'cyphers' from DTD (was never populated via the code)

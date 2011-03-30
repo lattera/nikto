@@ -1016,17 +1016,16 @@ sub set_targets {
 sub parse_hostfile {
     my ($file) = @_;
     my (@results, $hostdesc);
-    my ($nmap, $lineno) = 0;
+    my $nmap = 0;
 
     open(IN, $file) || die print STDERR "+ ERROR: Cannot open '$file':$@\n";
     while (<IN>) {
         my $found = 0;
-        $lineno++;
 
         # Check whether this is a greppable nmap file
         chomp;
 
-        #nprint("\nParsing line $lineno: $_", "d");
+        #nprint("\nParsing line: $_", "d");
         $nmap = 1 if (/^# Nmap/);
         s/\#.*$//;
         if ($_ eq "") { next; }
@@ -1050,11 +1049,11 @@ sub parse_hostfile {
             my @ports = parse_csv($fields[1]);
             foreach my $nmp (@ports) {
                 if (($nmp !~ /(?:80|443)?\/open\/tcp/) || ($nmp !~ /(?:http|ssl)/i)) {
-                    nprint("\tNon web port identified on line $lineno: $hostdesc port: $nmp", "d");
+                    nprint("\tNon web port identified: $hostdesc:$nmp", "d");
                     next;
                 }
                 $nmp =~ /^(?:\s+)?(\d+)\//;
-                nprint("\tWeb port identified on line $lineno: $hostdesc port $1 ", "d");
+		nprint("+ nmap Input Queued: $hostdesc:$1");
                 push(@results, $hostdesc . ":" . $1);
             }
         }
@@ -1065,6 +1064,7 @@ sub parse_hostfile {
         }
     }
     close(IN);
+    if ($nmap) { nprint($VARIABLES{'DIV'}); }
     return (@results);
 }
 
