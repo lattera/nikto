@@ -6475,3 +6475,4 @@
 "006487","0","b","/Util/login.aspx","GET","EPiServer CMS","","","","","EPiServer admin login page found.","",""
 "006488","3092","b","@PHPMYADMINsetup","GET","index\.php\?phpMyAdmin=","","","","","phpMyAdmin is for managing MySQL databases, and should be protected or limited to authorized hosts. The /setup/ directory may reveal details about the install application and databases.","",""
 "006489","0","1","/jsp/","GET","[iI]ndex [oO]f ","","","","","JSP directory has indexing enabled.","",""
+"006490","0","b","/portal/console/","GET","function\sfindTopWindow","","","","","Vignette Server admin console located.","",""
