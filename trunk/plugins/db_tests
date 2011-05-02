@@ -1379,7 +1379,7 @@
 "001369","1642","8","@CGIDIRSgbook/gbook.cgi?_MAILTO=xx;ls","GET","200","","","","","gbook.cgi allows command execution.","",""
 "001370","7161","8","@CGIDIRSbslist.cgi?email=x;ls","GET","200","","","","","BSList allows command execution.","",""
 "001371","7162","8","@CGIDIRSbsguest.cgi?email=x;ls","GET","200","","","","","BSGuest allows command execution.","",""
-"001372","10902","3","@CGIDIRSnbmember.cgi?cmd=list_all_users","GET","200 ","","","","","Netbilling ndmember.cgi reveals sensitive information.","",""
+"001372","10902","3","@CGIDIRSnbmember.cgi?cmd=list_all_users","GET","OK: Listing","","","","","Netbilling ndmember.cgi reveals sensitive information.","",""
 "001373","4804","a","//admin/admin.shtml","GET","200","","","","","Axis network camera may allow admin bypass by using double-slashes before URLs.","",""
 "001374","4808","70","/axis-cgi/buffer/command.cgi","GET","200","","","","","Axis WebCam 2400 may allow overwriting or creating files on the system. See http://www.websec.org/adv/axis2400.txt.html for details.","",""
 "001375","4806","3","/support/messages","GET","200","","","","","Axis WebCam allows retrieval of messages file (/var/log/messages). See http://www.websec.org/adv/axis2400.txt.html","",""
