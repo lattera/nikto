@@ -6477,3 +6477,4 @@
 "006489","0","1","/jsp/","GET","[iI]ndex [oO]f ","","","","","JSP directory has indexing enabled.","",""
 "006490","0","b","/portal/console/","GET","function\sfindTopWindow","","","","","Vignette Server admin console located.","",""
 "006491","0","2ab","/network/cgi/network.cgi","GET","Network\sConfiguration","","","","","IndigoVision web console access found without authentication.","",""
+"006492","0","b","/sitefinity/Login.aspx","GET","checkForIframe","","","","","Telerik Sitefinity CMS login found.","",""
