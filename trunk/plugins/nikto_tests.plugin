@@ -104,8 +104,7 @@ sub nikto_tests {
                     }
                 }
                 else {
-                    if (   ($res eq $TESTS{$checkid}{'match_1_or'})
-                        || ($res eq $FoF{'okay'}{'response'})) {
+                    if (($res eq $TESTS{$checkid}{'match_1_or'}) || ($res eq $FoF{'okay'}{'response'})) {
                         $positive = 1;
                     }
                 }
@@ -145,8 +144,11 @@ sub nikto_tests {
                 }
 
                 # lastly check for a false positive based on file extension or type
+                # skip this if either method is code =~ 4xx since that's a condition in is_404
                 if (($m1_method eq "code") || ($m1o_method eq "code")) {
-                    if (is_404($uri, $content, $res, $headers{'location'})) { next; }
+		    if (($TESTS{$checkid}{'match_1'} !~ /^4/) && ($TESTS{$checkid}{'match_1_or'} !~ /^4/)) {
+                    	if (is_404($uri, $content, $res, $headers{'location'})) { next; }
+			}
                 }
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;

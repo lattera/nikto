@@ -6478,3 +6478,6 @@
 "006490","0","b","/portal/console/","GET","function\sfindTopWindow","","","","","Vignette Server admin console located.","",""
 "006491","0","2ab","/network/cgi/network.cgi","GET","Network\sConfiguration","","","","","IndigoVision web console access found without authentication.","",""
 "006492","0","b","/sitefinity/Login.aspx","GET","checkForIframe","","","","","Telerik Sitefinity CMS login found.","",""
+"006493","3092","1","/cms/","GET","200","","","","","This might be interesting...","",""
+"006494","3092","1","/helpdesk/","GET","200","","","","","This might be interesting...","",""
+"006495","0","1b","@PHPMYADMIN","GET","200","401","","","","phpMyAdmin directory found","",""
