@@ -6481,3 +6481,4 @@
 "006493","3092","1","/cms/","GET","200","","","","","This might be interesting...","",""
 "006494","3092","1","/helpdesk/","GET","200","","","","","This might be interesting...","",""
 "006495","0","1b","@PHPMYADMIN","GET","200","401","","","","phpMyAdmin directory found","",""
+"006496","0","3b","/admin/install/phpinfo.php","GET","PHP Version","","","","","LimeSurvey phpinfo page found. The install directory may contain resetadminpw.php, which will set admin to the default password, likely 'password'. The install directory should be removed.","",""
