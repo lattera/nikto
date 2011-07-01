@@ -76,6 +76,8 @@ sub is_404 {
         }
     }
 
+    # Note: ERRCODES are checkined in nikto_tests.plugin as they 
+    # take precedent over ALL other tests
     foreach my $string (keys %{ $VARIABLES->{'ERRSTRINGS'} }) {
         if ($content =~ /$string/i) {
             return 1;
@@ -1122,8 +1124,15 @@ sub load_databases {
             # db_404_strings
             elsif ($file eq 'db_404_strings') {
                 foreach my $l (@file) {
-                    $l = validate_and_fix_regex($l);
-                    $VARIABLES->{'ERRSTRINGS'}->{$l} = 1;
+                    if ($l =~ /^\@CODE=/) { 
+                    	$l =~ s/^\@CODE=//;
+                    	$l = validate_and_fix_regex($l);
+                    	$VARIABLES->{'ERRCODES'}->{$l} = 1;
+			}
+		    else { 
+                    	$l = validate_and_fix_regex($l);
+                    	$VARIABLES->{'ERRSTRINGS'}->{$l} = 1;
+			}
                 }
             }
 

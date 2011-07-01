@@ -73,6 +73,16 @@ sub nikto_tests {
                   if $OUTPUT{'show_redirects'};
             }
 
+	   # If user puts a @CODE= string in db_404_strings, let it take precedence
+	   my $quickexit=0;
+	   foreach my $code (keys %{ $VARIABLES->{'ERRCODES'} }) {
+        	if ($res =~ /$code/) {
+			$quickexit=1;
+			last;
+        		}
+    		}
+	   return if $quickexit;
+
             my $m1_method = my $m1o_method = my $m1a_method = my $f2_method = my $f1_method =
               "content";
             my $positive = 0;
