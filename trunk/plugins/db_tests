@@ -6484,3 +6484,4 @@
 "006496","0","3b","/admin/install/phpinfo.php","GET","PHP Version","","","","","LimeSurvey phpinfo page found. The install directory may contain resetadminpw.php, which will set admin to the default password, likely 'password'. The install directory should be removed.","",""
 "006497","0","b","/portal/binary/junk/","GET","Attempt\smade\s\to\sload\sunavailable\sclass","","","","","Vignette Server binary loader.","",""
 "006498","0","b","/portal/webservice/","GET","And\snow\.\.\.","","","","","Vignette Server webservices.","",""
+"006499","0","b","/console/login/LoginForm.jsp","GET","Log\sin\sto\swork","","","","","Oracle WebLogic administrator login found.","",""
