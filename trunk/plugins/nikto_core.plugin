@@ -2574,8 +2574,9 @@ sub usage {
                                htm   HTML Format
                                msf+  Log to Metasploit
                                nbe   Nessus NBE format
-                               txt   Plain text (default if not specified)
+                               txt   Plain text
                                xml   XML Format
+                               (if not specified the format will be taken from the file extension passed to -output)
        -host+             Target host
        -Help              Extended help information
        -id+               Host authentication to use, format is id:pass or id:pass:realm
