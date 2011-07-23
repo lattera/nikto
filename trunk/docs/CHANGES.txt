@@ -1,3 +1,5 @@
+2011-07-23
+	- Ticket 220: Certificate wildcard matching incorrect
 2011-06-14
 	- Fix condition where match_1 or match_1_or are 4xx response code
 	- Fix condition where blank prefix added via change_variables
