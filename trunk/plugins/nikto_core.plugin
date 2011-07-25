@@ -2150,8 +2150,8 @@ sub nfetch {
     
     # check execution time
     if ($CLI{'maxtime'} ne '') { 
-       if ((time() - $COUNTERS{'scan_start'}) > $CLI{'maxtime'}) {
-       		nprint("+ ERROR: Host maximum execution time reached"); 
+       if ((time() - $mark->{'start_time'}) > $CLI{'maxtime'}) {
+       		nprint("+ ERROR: Host maximum execution time of $CLI{'maxtime'} seconds reached"); 
        		$mark->{'terminate'} = 1;
        		}
     	}
