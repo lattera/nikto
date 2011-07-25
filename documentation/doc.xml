@@ -112,20 +112,19 @@
 
         <listitem>
           <para>Various Linux and Unix installations (including RedHat,
-          Solaris, Debian, Knoppix, etc.)</para>
+          Solaris, Debian, Ubuntu, BackTrack, etc.)</para>
         </listitem>
       </itemizedlist>
 
       <para>The only required Perl module that does not come standard is
       LibWhisker. Nikto comes with and is configured to use a local LW.pm file
-      (in the plugins directory), but users may wish to change Nikto to use a
-      version installed on the system. See Section 2 for further
-      information.</para>
+      (in the plugins directory). As of Nikto version 2.1.5, the included
+      LibWhisker differs (slightly) from the standard LibWhisker 2.5
+      distribution.</para>
 
-      <para>For SSL support the Net::SSLeay Perl module must be installed
-      (which in turn requires OpenSSL on the Unix platform). Windows support
-      for SSL is dependent on the installation package, but is rumored to
-      exist for ActiveState's Perl.</para>
+      <para>For SSL support the Net::SSLeay Perl module must be installed.
+      Windows support for SSL is dependent on the installation package, but is
+      rumored to exist for ActiveState's Perl.</para>
 
       <para>For support for logging to Metasploit, the RPC::XML and
       RPC::XML::Client modules must be installed. Nikto will operate with

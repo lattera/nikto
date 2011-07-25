@@ -506,6 +506,7 @@ sub general_config {
                "Help"             => \&usage,
                "host=s"           => \$CLI{'host'},
                "id=s"             => \$CLI{'hostauth'},
+               "IgnoreCode=s"     => \$CLI{'ignorecode'},
                "list-plugins"     => \&list_plugins,
                "mutate-options=s" => \$CLI{'mutate-options'},
                "mutate=s"         => \$CLI{'mutate'},
@@ -529,6 +530,14 @@ sub general_config {
                "Version"          => \&version,
                "vhost=s"          => \$CLI{'vhost'},
                ) or usage();
+
+    # Set up IgnoreCode
+    if ($CLI{'ignorecode'} ne '') { 
+    	foreach my $code (split(/\s?,\s?/, $CLI{'ignorecode'})) { 
+    		if ($code =~ /[^\d]/) { next; }
+    		$VARIABLES->{'ERRCODES'}->{$code} = 1; 
+    		}
+    	}
 
     # deprecated -findonly overrides -Plugins
     if ($CLI{'findonly'}) {
@@ -2579,6 +2588,7 @@ sub usage {
                                (if not specified the format will be taken from the file extension passed to -output)
        -host+             Target host
        -Help              Extended help information
+       -IgnoreCode        Ignore Codes--treat as negative responses
        -id+               Host authentication to use, format is id:pass or id:pass:realm
        -list-plugins      List all available plugins, perform no testing
        -mutate+           Guess additional file names:\n";

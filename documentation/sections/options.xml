@@ -110,8 +110,13 @@ style output</para>
     <varlistentry>
       <term><option>-id</option></term>
       <listitem>
-        <para>ID and password to use for host Basic host authentication.
-Format is "id:password".</para>
+        <para>ID and password to use for host Basic host authentication.  Format is "id:password".</para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><option>-IgnoreCode</option></term>
+      <listitem>
+        <para>Ignore these HTTP codes as negative responses (always). Format is "302,301".</para>
       </listitem>
     </varlistentry>
     <varlistentry>
