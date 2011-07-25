@@ -2610,7 +2610,7 @@ sub usage {
        -root+             Prepend root value to all requests, format is /directory
        -ssl               Force ssl mode on port
        -Single            Single request mode
-       -timeout+          Timeout (default 2 seconds)
+       -timeout+          Timeout for requests (default 10 seconds)
        -Tuning+           Scan tuning:
                                1     Interesting File / Seen in logs
                                2     Misconfiguration / Default File
@@ -2659,7 +2659,7 @@ sub usage {
        -root+              Prepend root value to all requests, format is /directory 
        -ssl                Force ssl mode on port
        -Single             Single request mode
-       -timeout+           Timeout (default 2 seconds)
+       -timeout+           Timeout for requests (default 10 seconds)
        -Tuning+            Scan tuning
        -update             Update databases and plugins from CIRT.net
        -vhost+             Virtual host (for Host header)
