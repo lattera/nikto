@@ -508,6 +508,7 @@ sub general_config {
                "id=s"             => \$CLI{'hostauth'},
                "IgnoreCode=s"     => \$CLI{'ignorecode'},
                "list-plugins"     => \&list_plugins,
+               "maxtime=s"        => \$CLI{'maxtime'},
                "mutate-options=s" => \$CLI{'mutate-options'},
                "mutate=s"         => \$CLI{'mutate'},
                "no404"            => \$CLI{'nofof'},
@@ -538,7 +539,26 @@ sub general_config {
     		$VARIABLES->{'ERRCODES'}->{$code} = 1; 
     		}
     	}
-
+    	
+    # Maxtime must be seconds
+    if (($CLI{'maxtime'} ne '') && ($CLI{'maxtime'} =~ /[^\d]/)) { 
+    	if ($CLI{'maxtime'} =~ /m$/i) { 
+    		$CLI{'maxtime'} =~ s/m$//;
+    		$CLI{'maxtime'}  = ($CLI{'maxtime'} * 60);
+    		}
+    	elsif ($CLI{'maxtime'} =~ /h$/i) {
+    		$CLI{'maxtime'} =~ s/h$//;
+    		$CLI{'maxtime'}  = ($CLI{'maxtime'} * 3600);
+    		}
+    	elsif ($CLI{'maxtime'} =~ /s$/i) {
+    		$CLI{'maxtime'} =~ s/s$//;
+    		}
+    	else { 
+    		nprint("+ ERROR: Invalid maxtime, must be seconds or valid time (e.g., 3600, 60m, 1h)"); 
+    		exit; 
+    		}
+    	}
+    	
     # deprecated -findonly overrides -Plugins
     if ($CLI{'findonly'}) {
         $CLI{'plugins'} = '@@NONE;report_csv;report_html;report_text;report_xml;report_nbe;report_msf';
@@ -2127,6 +2147,14 @@ sub nfetch {
     if (($COUNTERS{'totalrequests'} % 10) == 0) {
         if (check_input() eq 'term') { $mark->{'terminate'} = 1; }
     }
+    
+    # check execution time
+    if ($CLI{'maxtime'} ne '') { 
+       if ((time() - $COUNTERS{'scan_start'}) > $CLI{'maxtime'}) {
+       		nprint("+ ERROR: Host maximum execution time reached"); 
+       		$mark->{'terminate'} = 1;
+       		}
+    	}
 
     $request{'whisker'}->{'uri'}    = $mark->{'root'} . $uri;  # prepend -root option's value if set
     $request{'whisker'}->{'method'} = $method;
@@ -2591,6 +2619,7 @@ sub usage {
        -IgnoreCode        Ignore Codes--treat as negative responses
        -id+               Host authentication to use, format is id:pass or id:pass:realm
        -list-plugins      List all available plugins, perform no testing
+       -maxtime+          Maximum testing time per host
        -mutate+           Guess additional file names:\n";
 
         foreach my $k (sort keys %{ $NIKTO{'mutate_opts'} }) {

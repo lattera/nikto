@@ -1,6 +1,7 @@
 2011-07-24
 	- Ticket 220: Certificate wildcard matching incorrect
 	- Ticket 217: Add -IgnoreCode option to allow db_404_strings' @CODE at the command line
+	- Ticket 202: -maxtime maximum execution time per host (seconds)
 2011-06-14
 	- Fix condition where match_1 or match_1_or are 4xx response code
 	- Fix condition where blank prefix added via change_variables

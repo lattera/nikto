@@ -135,6 +135,14 @@ style output</para>
     </varlistentry>
 
     <varlistentry>
+      <term><option>-maxtime</option></term>
+      <listitem>
+        <para>Maximum execution time per host, in seconds. Accepts minutes and hours
+            such that all of these are one hour: 3600, 3600s, 60m, 1h</para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
       <term><option>-mutate</option></term>
       <listitem>
         <para>Specify mutation technique. A mutation will cause Nikto to
