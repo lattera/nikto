@@ -1,4 +1,4 @@
-#VERSION,2.04
+#VERSION,2.05
 # $Id$
 ###############################################################################
 #  Copyright (C) 2004 CIRT, Inc.
@@ -55,8 +55,8 @@ sub nikto_robots {
                 $line =~ s/\#.*$//;
                 $line =~ s/(?:^\s+|\s+$)//g;
                 $line =~ s/\s+/ /g;
-                $line =~ s/\\t/ /g;
-                $line =~ s/(?:dis)?allow(?:\\:)?\s?//i;
+                $line =~ s/\t/ /g;
+                $line =~ s/(?:dis)?allow(?:\\:)?(?:\\\s+)?//i;
                 $line =~ s/\*//g;
                 $line =~ s/\/+/\//g;
 
@@ -76,33 +76,34 @@ sub nikto_robots {
                 if (($realdir  ne "") && ($realdir  ne "/")) { $DIRS{$realdir}++; }
                 if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
                 $DISCTR++;
-            }    # end if $line =~ disallow
+            }    # end if $line =~ allow
         }    # end foreach my $line (@DOC)_
 
         # add them  to mutate dir/file
-        my $raw;
-        foreach $raw (sort keys %DIRS) {
+        foreach my $dir (sort keys %DIRS) {
+	    my $raw  = $dir;
             $raw =~ s/\\//g;
-            if ($VARIABLES{"\@MUTATEDIRS"} !~ /$raw/) {
+            if ($VARIABLES{"\@MUTATEDIRS"} !~ /$dir/) {
                 $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
             }
-            if ($raw =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$raw/) {
+            if ($dir =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$dir/) {
                 $VARIABLES{"\@CGIDIRS"} .= " $raw";
             }
-            if ($raw =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$raw/) {
+            if ($dir =~ /forum/ && $VARIABLES{"\@NUKE"} !~ /$dir/) {
                 $VARIABLES{"\@NUKE"} .= " $raw";
             }
-            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$raw/) {
+            if ($dir =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$dir/) {
                 $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
             }
         }
 
-        foreach $raw (sort keys %RFILES) {
+        foreach my $file (sort keys %RFILES) {
+            my $raw = $file;
             $raw =~ s/\\//g;
-            if ($VARIABLES{"\@MUTATEFILES"} !~ /$raw/) {
+            if ($VARIABLES{"\@MUTATEFILES"} !~ /$file/) {
                 $VARIABLES{"\@MUTATEFILES"} .= " $raw";
             }
-            if ($raw =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$raw/) {
+            if ($file =~ /pass/ && $VARIABLES{"\@PASSWORDFILES"} !~ /$file/) {
                 $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
             }
         }
