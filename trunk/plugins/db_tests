@@ -6181,7 +6181,7 @@
 "006188","3092","1b","/LICENSE.TXT","GET","200","","","","","License file found may identify site software.","",""
 "006189","3092","1b","/INSTALL.TXT","GET","200","","","","","Install file found may identify site software.","",""
 "006190","3092","1b","/READ_THIS_FIRST.txt","GET","Welcome to ExpressionEngine","","","","","An ExpressionEngine readme file has been found.","",""
-"006191","0","3","/wp-app.log","GET","Array","LANG","","","","Wordpress' wp-app.log may leak application/system details.","",""
+"006191","0","3","/wp-app.log","GET","Array","LANG","","GOOG_FIXURL_LANG","","Wordpress' wp-app.log may leak application/system details.","",""
 "006192","0","3","/_vti_bin/_vti_adm/admin.dll","GET","osstatus=","","","specified module could not be found","","FrontPage/SharePoint file found.","",""
 "006193","58472","3","/read/rss?forum=nonexistant&rev=0.92","GET","no such element in array","","","","","Lyris ListManager error information disclosure.","",""
 "006194","58472","3","/subscribe/survey~1.tml","GET","Database error inf","","","","","Lyris ListManager error information disclosure.","",""

@@ -18,7 +18,7 @@
 "500002","b25dbe60830705d98ba3aaf0568c456a","iPlanet Web Server Enterprise Edition 6.0"
 "500003","226ffc5e483b85ec261654fe255e60be","Netscape 4.1"
 "500004","41e2c893098b3ed9fc14b821a2e14e73","Netscape 6.0"
-"500005","f1876a80546b3986dbb79bad727b0374","NetScreen WebUI"
+"500005","f1876a80546b3986dbb79bad727b0374","NetScreen WebUI or 3Com Router"
 "500006","799f70b71314a7508326d1d2f68f7519","JBoss Server"
 "500007","f5f2df7eec0d1c3c10b58960f3f8fb26","Horde Groupware Webmail 1.0.1 (Mnemo Theme)"
 "500008","4644f2d45601037b8423d45e13194c93","Apache Tomcat"
@@ -117,4 +117,3 @@
 "500104","eb6d4ce00ec36af7d439ebd4e5a395d7","Mailman"
 "500105","e298e00b2ff6340343ddf2fc6212010b","Nessus 4.x Web Client"
 "500106","ebe293e1746858d2548bca99c43e4969","Mantis Bug Tracker"
-
