@@ -237,6 +237,7 @@ foreach my $mark (@MARKS) {
 
     $COUNTERS{'hosts_completed'}++;
     report_host_end($mark);
+    cache_destroy($mark);
 }
 $COUNTERS{'scan_end'}     = time();
 $COUNTERS{'scan_elapsed'} = ($COUNTERS{'scan_end'} - $COUNTERS{'scan_start'});

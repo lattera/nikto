@@ -2083,7 +2083,9 @@ sub setup_hash {
 
 #######################################################################
 sub cache_add {
-    if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
+    # temporary fix
+    return if $_[5];
+    if (!defined $CLI{'nocache'}) {
         my $method        = shift;
         my $code          = shift;
         my $content       = shift;
@@ -2091,8 +2093,7 @@ sub cache_add {
         my $postdata      = shift;
         my $flags_nocache = shift;
         my ($mark)        = @_;
-        return if flags_nocache;
-
+    
         my $key =
           LW2::md4(  $mark->{'ip'}
                    . $mark->{'hostname'}
@@ -2110,13 +2111,14 @@ sub cache_add {
 
 #######################################################################
 sub cache_fetch {
-    if ((!defined $CLI{'nocache'}) && (!$flags_nocache)) {
+    # temporary fix
+    return if $_[3];
+    if (!defined $CLI{'nocache'}) {
         my $method        = shift;
         my $uri           = shift;
         my $postdata      = shift;
         my $flags_nocache = shift;
         my ($mark)        = @_;
-        return if flags_nocache;
 
         my $key =
           LW2::md4(  $mark->{'ip'}
@@ -2135,6 +2137,15 @@ sub cache_fetch {
         }
     }
     return 0;
+}
+
+sub cache_destroy {
+    my ($mark) = @_;
+
+    # For now just reset the hash
+    for my $key (keys %CACHE) {
+        delete $CACHE{$key};
+    }
 }
 
 #######################################################################
@@ -2189,7 +2200,7 @@ sub nfetch {
     my ($incache, $code, $content) =
       cache_fetch($request{'whisker'}->{'method'},
                   $request{'whisker'}->{'uri'},
-                  $data, $flags->{'nocache'}, $mark);
+                  $data, $flags->{'nocache'} || 0, $mark);
     if ($incache) {
         nprint("- Got $request{'whisker'}->{'uri'} from cache.", "d");
         $result{'whisker'}->{'code'} = $code;
@@ -2212,7 +2223,7 @@ sub nfetch {
                   $result{'whisker'}->{'code'},
                   $result{'whisker'}->{'data'},
                   $request{'whisker'}->{'uri'},
-                  $data, $flags->{'nocache'}, $mark);
+                  $data, $flags->{'nocache'} || 0, $mark);
 
         if ($OUTPUT{'debug'}) {
             dump_var("Request Hash", \%request);
