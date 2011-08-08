@@ -20,29 +20,36 @@
 # PURPOSE:
 # Get a favicon.ico file & MD5 fingerprint
 ###############################################################################
+use vars qw/$FAVICONDB/;
+
 sub nikto_favicon_init {
     my $id = { name        => "favicon",
                full_name   => "Favicon",
                author      => "Sullo",
                description => "Checks the web server's favicon against known favicons.",
                copyright   => "2008 CIRT Inc.",
-               hooks       => { scan => { method => \&nikto_favicon, }, },
+               hooks       => { scan => { method => \&nikto_favicon, },
+                                start => { method => \&nikto_favicon_load, }
+                              },
                };
     return $id;
+}
+
+sub nikto_favicon_load {
+    $FAVICONDB = init_db("db_favicon");
 }
 
 sub nikto_favicon {
     return if $mark->{'terminate'};
     my ($mark) = @_;
     my ($RES, $CONTENT) = nfetch($mark, "/favicon.ico", "GET", "", "", "", "favicon");
-    my $dbarray = init_db("db_favicon");
 
     if ($RES eq "200" && $CONTENT ne "") {
         my $hash = LW2::md5($CONTENT);
         $hash =~ s/^.*://;
         nprint("Got favicon.ico hash:$hash", "d", "");
 
-        foreach my $item (@$dbarray) {
+        foreach my $item (@$FAVICONDB) {
             if ($item->{'md5hash'} eq $hash) {
                 add_vulnerability($mark,
                               "/favicon.ico file identifies this server as: $item->{'description'}",

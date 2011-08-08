@@ -32,19 +32,25 @@ sub nikto_embedded_init {
                full_name   => "Embedded Detection",
                author      => "Deity",
                description => "Checks to see whether the host is an embedded server.",
-               hooks       => { scan => { method => \&nikto_embedded, }, },
+               hooks       => { scan => { method => \&nikto_embedded, }, 
+                                start => { method => \&nikto_embedded_load, },
+                              },
                copyright   => "2009 CIRT Inc."
                };
+    use vars qw/$EMBEDDEDDB/;
     return $id;
+}
+
+sub nikto_embedded_load {
+    # load up the database here so we don't redo it each time
+    $EMBEDDEDDB = init_db("db_embedded");
 }
 
 sub nikto_embedded {
     return if $mark->{'terminate'};
     my ($mark) = @_;
-    my $dbarray;
-    $dbarray = init_db("db_embedded");
 
-    foreach my $item (@$dbarray) {
+    foreach my $item (@$EMBEDDEDDB) {
         return if $mark->{'terminate'};
         (my $res, $content) =
           nfetch($mark, $item->{'uri'}, "GET", "", "", "", "embedded detection");

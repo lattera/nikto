@@ -1101,7 +1101,7 @@ sub parse_hostfile {
 
 ###############################################################################
 sub load_databases {
-    my @dbs = qw/db_404_strings  db_outdated  db_variables db_content_search/;
+    my @dbs = qw/db_404_strings  db_outdated  db_variables/;
     my $prefix = $_[0] || '';
 
     # Only load the right databases if -Userdbs is set
@@ -1162,16 +1162,6 @@ sub load_databases {
                     	$l = validate_and_fix_regex($l);
                     	$VARIABLES->{'ERRSTRINGS'}->{$l} = 1;
 			}
-                }
-            }
-
-            # db_content_search
-            elsif ($file eq 'db_content_search') {
-                foreach my $l (@file) {
-                    my @T = parse_csv($l);
-                    $CONTENTSEARCH{ $T[0] }{'osvdb'}   = $T[1];
-                    $CONTENTSEARCH{ $T[0] }{'string'}  = validate_and_fix_regex($T[2]);
-                    $CONTENTSEARCH{ $T[0] }{'message'} = $T[3];
                 }
             }
 
@@ -2721,32 +2711,31 @@ sub init_db {
     my $hashref = {};
 
     if ($CLI{'userdbs'} ne 'all') { 
-    # Check that the database exists
-    unless (open(IN, "<$filename")) {
-        nprint("+ ERROR: Unable to open database file $dbname: $!.");
-        return $dbarray;
-
-    # Now read the header values
-    while (<IN>) {
-        chomp;
-        s/\#.*$//;
-        if ($_ eq "") { next }
-        unless (@headers) {
-            @headers = parse_csv($_);
+        # Check that the database exists
+        unless (open(IN, "<$filename")) {
+            nprint("+ ERROR: Unable to open database file $dbname: $!.");
+            return $dbarray;
         }
-        else {
-
-            # contents; so split them up and apply to hash
-            my @contents = parse_csv($_);
-            my $hashref  = {};
-            for (my $i = 0 ; $i <= $#contents ; $i++) {
-                $hashref->{ $headers[$i] } = $contents[$i];
+        # Now read the header values
+        while (<IN>) {
+            chomp;
+            s/\#.*$//;
+            if ($_ eq "") { next }
+            unless (@headers) {
+                @headers = parse_csv($_);
             }
-            push(@dbarray, $hashref);
+            else {
+       
+                # contents; so split them up and apply to hash
+                my @contents = parse_csv($_);
+                my $hashref  = {};
+                for (my $i = 0 ; $i <= $#contents ; $i++) {
+                    $hashref->{ $headers[$i] } = $contents[$i];
+                }
+                push(@dbarray, $hashref);
+            }
         }
-    }
-    close(IN);
-    }
+        close(IN);
     }
 
     # And the udb_* file

@@ -20,6 +20,8 @@
 # PURPOSE:
 # General HTTP headers checks
 ###############################################################################
+use vars qw/$HEADERSDB/;
+
 sub nikto_headers_init {
     my $id = {
         name        => "headers",
@@ -29,6 +31,7 @@ sub nikto_headers_init {
         hooks       => {
                    scan      => { method => \&nikto_headers, },
                    postfetch => { method => \&nikto_headers_postfetch, },
+                   start     => { method => \&nikto_headers_load, },
                    },
         copyright => "2008 CIRT Inc."
         };
@@ -37,6 +40,10 @@ sub nikto_headers_init {
     use vars qw/%HFOUND/;
 
     return $id;
+}
+
+sub nikto_headers_load {
+    $HEADERSDB = init_db("db_headers");
 }
 
 sub nikto_headers_postfetch {
@@ -86,7 +93,6 @@ sub nikto_headers_check {
 sub nikto_headers {
     return if $mark->{'terminate'};
     my ($mark) = @_;
-    my $dbarray = init_db("db_headers");
     my %headers;
 
     #######################################################################
@@ -205,7 +211,7 @@ sub nikto_headers {
     my $reportnum = 999100;
     foreach my $header (sort keys %headers) {
         my $found = 0;
-        foreach my $st_header (@$dbarray) {
+        foreach my $st_header (@$HEADERSDB) {
             if ($header eq $st_header->{'header'}) {
                 $found = 1;
             }
