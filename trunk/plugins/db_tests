@@ -313,7 +313,7 @@
 "000287","2394","3","/path/nw/article.php?id='","GET","d:\/","","","","","News Wizard 2.0 reveals the file system path.","",""
 "000288","6467","3","/pw/storemgr.pw","GET","200","","","","","Encrypted ID/Pass for Mercantec's SoftCart, http://www.mercantec.com/, see http://www.mindsec.com/advisories/post2.txt for more information.","",""
 "000289","4245","3","/rtm.log","GET","HttpPost Retry","","","","","Rich Media's JustAddCommerce allows retrieval of a log file, which may contain sensitive information.","",""
-"000290","43917","3","/scozbook/view.php?PG=whatever","GET","Warning","","","","","ScozBook Beta 1.1 may reveal file system paths in error messages.","",""
+"000290","43917","3","/scozbook/view.php?PG=whatever","GET","Warning:\sSupplied","","","","","ScozBook Beta 1.1 may reveal file system paths in error messages.","",""
 "000291","0","3","/servlet/com.livesoftware.jrun.plugins.ssi.SSIFilter","GET","200","Error Occurred","","","","Allaire ColdFusion allows JSP source viewed through a vulnerable SSI call.","<!--#include virtual=\"/index.jsp\"-->",""
 "000292","0","3","/shopa_sessionlist.asp","GET","200","","","","","VP-ASP shopping cart test application is available from the web. This page may give the location of .mdb files which may also be available.","",""
 "000293","53303","3","/simplebbs/users/users.php","GET","200","","","","","Simple BBS 1.0.6 allows user information and passwords to be viewed remotely.","",""
