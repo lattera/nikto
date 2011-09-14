@@ -49,11 +49,11 @@ sub nikto_robots {
         my $DISCTR = 0;
         my @DOC = split(/\n/, $CONTENT);
         foreach my $line (@DOC) {
+            $line =~ s/(?:^\s+|\s+$)//g;
             $line = quotemeta($line);
             if ($line =~ /allow/i) {
                 chomp($line);
                 $line =~ s/\#.*$//;
-                $line =~ s/(?:^\s+|\s+$)//g;
                 $line =~ s/\s+/ /g;
                 $line =~ s/\t/ /g;
                 $line =~ s/(?:dis)?allow(?:\\:)?(?:\\\s+)?//i;

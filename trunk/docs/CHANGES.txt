@@ -1,7 +1,9 @@
-2011-07-24
+2011-09-13
+	- Ticket 224: Space in robots.txt kills scanner
 	- Ticket 220: Certificate wildcard matching incorrect
 	- Ticket 217: Add -IgnoreCode option to allow db_404_strings' @CODE at the command line
 	- Ticket 202: -maxtime maximum execution time per host (seconds)
+	- Fix crash on invalid regex chars in robots.txt (dis)allow lines
 2011-06-14
 	- Fix condition where match_1 or match_1_or are 4xx response code
 	- Fix condition where blank prefix added via change_variables
