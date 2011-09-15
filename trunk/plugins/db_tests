@@ -6485,3 +6485,4 @@
 "006497","0","b","/portal/binary/junk/","GET","Attempt\smade\s\to\sload\sunavailable\sclass","","","","","Vignette Server binary loader.","",""
 "006498","0","b","/portal/webservice/","GET","And\snow\.\.\.","","","","","Vignette Server webservices.","",""
 "006499","0","b","/console/login/LoginForm.jsp","GET","Log\sin\sto\swork","","","","","Oracle WebLogic administrator login found.","",""
+"006500","0","b3","/home/?vhelp","GET","Global\sAvailable\sMacros","","","","","Intuit (diginsite.com) debug mode enabled.","",""
