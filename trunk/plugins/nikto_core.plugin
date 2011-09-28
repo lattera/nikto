@@ -2052,7 +2052,7 @@ sub setup_hash {
     $reqhash->{'whisker'}->{'host'} = $mark->{'hostname'} || $mark->{'ip'};
 
     if ($mark->{'vhost'}) {
-        $request{'Host'} = $mark->{'vhost'};
+        $reqhash->{'Host'} = $mark->{'vhost'};
     }
     $reqhash->{'whisker'}->{'port'} = $mark->{'port'};
     $reqhash->{'whisker'}->{'ssl'}  = $mark->{'ssl'};

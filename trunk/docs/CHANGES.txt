@@ -1,4 +1,5 @@
-2011-09-13
+2011-09-28
+	- Fix vhost not being set properly, thanks to Brian Poole
 	- Ticket 224: Space in robots.txt kills scanner
 	- Ticket 220: Certificate wildcard matching incorrect
 	- Ticket 217: Add -IgnoreCode option to allow db_404_strings' @CODE at the command line
