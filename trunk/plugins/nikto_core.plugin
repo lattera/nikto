@@ -419,7 +419,7 @@ sub dump_target_info {
         }
 
         if ((defined $CLI{'vhost'}) && ($CLI{'vhost'} ne $mark->{hostname})) {
-            nprint("+ Virtual Host:   $CLI{'vhost'}", "", $mark);
+            nprint("+ Virtual Host:       $CLI{'vhost'}", "", $mark);
         }
 
         if ($request{'whisker'}->{'proxy_host'} ne '') {
