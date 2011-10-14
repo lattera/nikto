@@ -193,7 +193,9 @@ sub html_change_vars {
 
     }
 
-    foreach my $var (keys %variables) { $template =~ s/$var/$variables{$var}/g; }
+    foreach my $var (keys %variables) { 
+		$template =~ s/$var/$variables{$var}/g; 
+    	}
 
     return $template;
 }

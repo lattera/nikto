@@ -102,6 +102,7 @@ sub nikto_tests {
             }
             else {
                 if (($res eq $TESTS{$checkid}{'match_1'}) || ($res eq $FoF{'okay'}{'response'})) {
+                #if ($res eq $TESTS{$checkid}{'match_1'}) { 
                     $positive = 1;
                 }
             }

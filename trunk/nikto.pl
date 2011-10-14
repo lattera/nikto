@@ -4,8 +4,8 @@ use strict;
 #VERSION,2.1.4
 # $Id$
 use Getopt::Long;
+use Time::Local;
 Getopt::Long::Configure('no_ignore_case');
-
 # use LW2;                   ### Change this line to use a different installed version
 
 ###############################################################################
@@ -86,6 +86,7 @@ require "$CONFIGFILE{'PLUGINDIR'}/nikto_core.plugin";
 nprint("T:" . localtime($COUNTERS{'scan_start'}) . ": Starting", "d");
 require "$CONFIGFILE{'PLUGINDIR'}/nikto_single.plugin";
 require "$CONFIGFILE{'PLUGINDIR'}/LW2.pm";
+$VARIABLES{'GMTOFFSET'} = gmt_offset();
 
 #set SSL Engine 
 LW2::init_ssl_engine($CONFIGFILE{'LW_SSL_ENGINE'}); 
@@ -231,7 +232,7 @@ foreach my $mark (@MARKS) {
                 "+ Scan terminated:  $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
                 );
         }
-        nprint("+ End Time:           $time ($elapsed seconds)");
+        nprint("+ End Time:           $time (GMT$VARIABLES{'GMTOFFSET'}) ($elapsed seconds)");
     }
     nprint($VARIABLES{'DIV'});
 

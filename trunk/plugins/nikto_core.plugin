@@ -447,7 +447,7 @@ sub dump_target_info {
             }
         }
         my $time = date_disp($mark->{start_time});
-        nprint("+ Start Time:         $time");
+        nprint("+ Start Time:         $time (GMT$VARIABLES{'GMTOFFSET'})");
         nprint($VARIABLES{'DIV'});
     }
 
@@ -2982,6 +2982,12 @@ sub rquote {
     $string =~ s/([^A-Za-z_0-9 "'\\])/\\$1/g;
     return $string;
 }
+###############################################################################
+sub gmt_offset {
+	my @t = localtime(time);
+	return (timegm(@t) - timelocal(@t)) / 3600;
+}
+
 ###############################################################################
 sub nikto_core { return; }    # trap for this plugin being called to run. lame.
 ###############################################################################
