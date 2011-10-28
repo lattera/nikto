@@ -6490,3 +6490,4 @@
 "006502","0","b","/servlet/hitcount","GET","Snoop Servlet - Request/Client Information","","","","","IBM Websphere Hit Count example servlet found","",""
 "006503","0","b","/keepalive.htm","GET","200","","Alive!","","","Weblogic heartbeat page found","",""
 "006504","0","1b","/Admin/","GET","200","","Administration Homepage","","","Weblogic administration page found","",""
+"006505","0","23","/services/","GET","have\sreached\sthe\sAXIS\sHTTP\sServlet","","","","","Axis web services services found","",""
