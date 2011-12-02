@@ -323,8 +323,9 @@ http://192.168.0.1:8080/
  + Retrieving 'CHANGES.txt'
       </screen>
 
-      <para>Updates may also be manually downloaded from <ulink
-      url="http://www.cirt.net/">http://www.cirt.net/</ulink></para>
+      <para>Updates may also be manually downloaded from the appropriate version's directory at <ulink
+      url="http://cirt.net/nikto/UPDATES/">http://cirt.net/nikto/UPDATES/</ulink>. Plugin and database 
+      files from the server should replace those in the 'plugins' directory.</para>
     </section>
 
     <section>
