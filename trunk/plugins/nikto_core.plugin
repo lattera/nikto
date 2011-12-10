@@ -149,6 +149,7 @@ sub get_ext {
     if ($uri =~ /^\.[^.%]/) { return "DOTFILE"; }
     $uri =~ s/[?&%].*$//;
     if ($uri !~ /\./) { return "NONE"; }
+    $uri =~ s/\@[A-Z]+//;  # remove tokens
     $uri =~ s/\".*$//;
     $uri =~ s/^.*\.//;
     return $uri;

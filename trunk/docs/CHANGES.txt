@@ -1,9 +1,10 @@
-2011-09-28
+2011-12-09
 	- Ticket 226: Add GMT offset to time outputs
 	- Ticket 224: Space in robots.txt kills scanner
 	- Ticket 220: Certificate wildcard matching incorrect
 	- Ticket 217: Add -IgnoreCode option to allow db_404_strings' @CODE at the command line
 	- Ticket 202: -maxtime maximum execution time per host (seconds)
+	- Keep tokens from getting into %db_extensions, thanks to Erik Cabetas
 	- Fix vhost not being set properly, thanks to Brian Poole
 	- Fix crash on invalid regex chars in robots.txt (dis)allow lines
 2011-06-14
