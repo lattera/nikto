@@ -507,6 +507,7 @@ sub general_config {
                "Help"             => \&usage,
                "host=s"           => \$CLI{'host'},
                "id=s"             => \$CLI{'hostauth'},
+               "key=s"            => \$CLI{'key'},
                "IgnoreCode=s"     => \$CLI{'ignorecode'},
                "list-plugins"     => \&list_plugins,
                "maxtime=s"        => \$CLI{'maxtime'},
@@ -520,6 +521,7 @@ sub general_config {
                "output=s"         => \$CLI{'file'},
                "Pause=f"          => \$CLI{'pause'},
                "Plugins=s"        => \$CLI{'plugins'},
+               "RSAcert=s"        => \$CLI{'cert'},
                "port=s"           => \$CLI{'ports'},
                "root=s"           => \$CLI{'root'},
                "Single"           => \&single,
@@ -1372,7 +1374,7 @@ sub count_fields {
 
 ###############################################################################
 sub port_check {
-    my ($hostname, $ip, $port) = @_;
+    my ($hostname, $ip, $port, $key, $cert) = @_;
     my (%headers);
     my $m = {};
 
@@ -1401,6 +1403,10 @@ sub port_check {
                    $m
                    );
             $m->{ssl} = ($checkssl eq "HTTP") ? 0 : 1;
+            if ($m->{'ssl'}) {
+                $m->{'key'} = $key;
+                $m->{'cert'} = $cert;
+            }
             proxy_check($m);
             my ($res, $content) =
               nfetch($m, "/", $method, "", \%headers,
@@ -2057,6 +2063,8 @@ sub setup_hash {
     }
     $reqhash->{'whisker'}->{'port'} = $mark->{'port'};
     $reqhash->{'whisker'}->{'ssl'}  = $mark->{'ssl'};
+    $reqhash->{'whisker'}->{'ssl_rsacertfile'} = $mark->{'key'};
+    $reqhash->{'whisker'}->{'ssl_certfile'}    = $mark->{'cert'};
 
     # Proxy stuff
     if (($CONFIGFILE{PROXYHOST} ne '') && ($CLI{'useproxy'})) {
@@ -2620,6 +2628,7 @@ sub usage {
        -Help              Extended help information
        -IgnoreCode        Ignore Codes--treat as negative responses
        -id+               Host authentication to use, format is id:pass or id:pass:realm
+       -key+              Client certificate key file
        -list-plugins      List all available plugins, perform no testing
        -maxtime+          Maximum testing time per host
        -mutate+           Guess additional file names:\n";
@@ -2639,6 +2648,7 @@ sub usage {
        -Pause+            Pause between tests (seconds, integer or float)
        -Plugins+          List of plugins to run (default: ALL)
        -root+             Prepend root value to all requests, format is /directory
+       -RSAcert+          Client certificate file
        -ssl               Force ssl mode on port
        -Single            Single request mode
        -timeout+          Timeout for requests (default 10 seconds)
@@ -2670,17 +2680,13 @@ sub usage {
     else {
         print "
        -config+            Use this config file
-       -Cgidirs+           scan these CGI dirs: 'none', 'all', or values like \"/cgi/ /cgi-a/\"
        -dbcheck            check database and other key files for syntax errors
        -Display+           Turn on/off display outputs
-       -evasion+           ids evasion technique
        -Format+            save file (-o) format
        -host+              target host
        -Help               Extended help information
        -id+                Host authentication to use, format is id:pass or id:pass:realm
        -list-plugins       List all available plugins
-       -mutate+            Guess additional file names
-       -mutate-options+    Provide extra information for mutations
        -output+            Write output to this file
        -nocache            Disables the URI cache
        -nossl              Disables using SSL

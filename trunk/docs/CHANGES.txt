@@ -1,4 +1,5 @@
 2011-12-09
+	- Ticket 228: Add client SSL certificate support. Thanks to monnerat for code submission!
 	- Ticket 226: Add GMT offset to time outputs
 	- Ticket 224: Space in robots.txt kills scanner
 	- Ticket 220: Certificate wildcard matching incorrect

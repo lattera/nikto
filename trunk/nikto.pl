@@ -125,6 +125,11 @@ load_plugins();
 # Parse the supplied list of targets
 my @MARKS = set_targets($CLI{'host'}, $CLI{'ports'}, $CLI{'ssl'}, $CLI{'root'});
 
+if (defined($CLI{'key'}) || defined($CLI{'cert'})) {
+    $CLI{'key'} = $CLI{'cert'} unless (defined($CLI{'key'}));
+    $CLI{'cert'} = $CLI{'key'} unless (defined($CLI{'cert'}));
+}
+
 # Now check each target is real and remove duplicates/fill in extra information
 foreach my $mark (@MARKS) {
     $mark->{'test'} = 1;
@@ -139,7 +144,7 @@ foreach my $mark (@MARKS) {
     }
 
     # Check that the port is open
-    my $open = port_check($mark->{'hostname'}, $mark->{'ip'}, $mark->{'port'});
+    my $open = port_check($mark->{'hostname'}, $mark->{'ip'}, $mark->{'port'}, $CLI{'key'}, $CLI{'cert'});
     if (defined $CLI{'vhost'}) { $mark->{'vhost'} = $CLI{'vhost'} }
     if ($open == 0) {
         $mark->{'test'} = 0;
@@ -150,6 +155,10 @@ foreach my $mark (@MARKS) {
     }
     $mark->{'ssl'} = $open - 1;
 
+    if ($mark->{'ssl'}) {
+        $mark->{'key'} = $CLI{'key'};
+        $mark->{'cert'} = $CLI{'cert'};
+    }
 }
 
 # Open reporting
@@ -173,9 +182,11 @@ foreach my $mark (@MARKS) {
         $request{'Host'} = $CLI{'vhost'};
         $mark->{'vhost'} = $CLI{'vhost'};
     }
-    $request{'whisker'}->{'port'}    = $mark->{'port'};
-    $request{'whisker'}->{'ssl'}     = $mark->{'ssl'};
-    $request{'whisker'}->{'version'} = $CONFIGFILE{'DEFAULTHTTPVER'};
+    $request{'whisker'}->{'port'}            = $mark->{'port'};
+    $request{'whisker'}->{'ssl'}             = $mark->{'ssl'};
+    $request{'whisker'}->{'ssl_rsacertfile'} = $mark->{'key'};
+    $request{'whisker'}->{'ssl_certfile'}    = $mark->{'cert'};
+    $request{'whisker'}->{'version'}         = $CONFIGFILE{'DEFAULTHTTPVER'};
 
     # Cookies
     if (defined $CONFIGFILE{'STATIC-COOKIE'}) {
