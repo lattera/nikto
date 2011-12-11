@@ -790,8 +790,12 @@ sub reset_term {
 
 ###############################################################################
 sub safe_quit {
+	my ($mark) = @_;
     $mark->{'end_time'} = time();
-    report_host_end($mark);
+	$mark->{'elapsed'} = $mark->{'end_time'} - $mark->{'start_time'};
+	if ($mark->{'start_time'} ne '') {
+    	report_host_end($mark);
+    	}
     report_summary($mark);
     report_close($mark);
     reset_term();
@@ -800,6 +804,8 @@ sub safe_quit {
 
 ###############################################################################
 sub check_input {
+    my ($mark) = @_;
+
     my $key = readkey();
     if ($key eq '') { return; }
 
@@ -840,7 +846,7 @@ sub check_input {
         else                        { $OUTPUT{'show_auth'} = 1; }
     }
     elsif (($key eq 'q') || (ord($key) eq 3)) {
-        safe_quit();
+        safe_quit($mark);
     }
     elsif ($key eq 'P') {
         nprint("- Pausing--press P to resume.");
@@ -2155,7 +2161,7 @@ sub nfetch {
 
     # check for keyboard input
     if (($COUNTERS{'totalrequests'} % 10) == 0) {
-        if (check_input() eq 'term') { $mark->{'terminate'} = 1; }
+        if (check_input($mark) eq 'term') { $mark->{'terminate'} = 1; }
     }
     
     # check execution time

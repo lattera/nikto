@@ -16,6 +16,8 @@
 <!ATTLIST scandetails sitename CDATA #REQUIRED>
 <!ATTLIST scandetails siteip CDATA #REQUIRED>
 <!ATTLIST scandetails hostheader CDATA #IMPLIED>
+<!ATTLIST scandetails errors CDATA #REQUIRED>
+<!ATTLIST scandetails checks CDATA #REQUIRED>
 
 <!ELEMENT ssl EMPTY>
 <!ATTLIST ssl ciphers CDATA #IMPLIED>

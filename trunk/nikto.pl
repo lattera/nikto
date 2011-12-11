@@ -230,8 +230,7 @@ foreach my $mark (@MARKS) {
         run_hooks($mark, "scan");
     }
     $mark->{'end_time'} = time();
-    my $time    = date_disp($mark->{'end_time'});
-    my $elapsed = $mark->{'end_time'} - $mark->{'start_time'};
+	$mark->{'elapsed'} = $mark->{'end_time'} - $mark->{'start_time'};
     if (!$CLI{'findonly'}) {
         if (!$mark->{'terminate'}) {
             nprint(
@@ -243,7 +242,7 @@ foreach my $mark (@MARKS) {
                 "+ Scan terminated:  $mark->{'total_errors'} error(s) and $mark->{'total_vulns'} item(s) reported on remote host"
                 );
         }
-        nprint("+ End Time:           $time (GMT$VARIABLES{'GMTOFFSET'}) ($elapsed seconds)");
+        nprint("+ End Time:           " . date_disp($mark->{'end_time'}) . " (GMT$VARIABLES{'GMTOFFSET'}) ($mark->{'elapsed'} seconds)");
     }
     nprint($VARIABLES{'DIV'});
 

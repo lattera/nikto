@@ -144,6 +144,7 @@ sub xml_change_vars {
     $variables{"#TEMPL_SCAN_START"}         = localtime($COUNTERS{'scan_start'});
     $variables{"#TEMPL_SCAN_END"}           = localtime($COUNTERS{'scan_end'});
     $variables{"#TEMPL_SCAN_ELAPSED"}       = $COUNTERS{'scan_elapsed'} . " seconds";
+	$variables{"#TEMPL_ERRORS"}				= $mark->{'total_errors'};
 
     $variables{"#TEMPL_LINK_NAME"} = "N/A";
     if ($mark->{hostname} ne "") {
