@@ -1,6 +1,7 @@
 2011-12-11
 	- Ticket 228: Add client SSL certificate support. Thanks to monnerat for code submission!
 	- Ticket 226: Add GMT offset to time outputs
+	- Ticket 225: Template variables now have terminating hash to prevent collisions
 	- Ticket 224: Space in robots.txt kills scanner
 	- Ticket 220: Certificate wildcard matching incorrect
 	- Ticket 217: Add -IgnoreCode option to allow db_404_strings' @CODE at the command line
