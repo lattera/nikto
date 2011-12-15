@@ -42,14 +42,31 @@ sub nikto_report_xml_init {
 
 sub xml_head {
     my ($file) = @_;
+    
+    # check for xml headers
+    $header_present=0;
 
-    # Write header for xml file, return file handle
+    if (-e $file) { 
+    	open(IN,"<$file") || die print STDERR "+ ERROR: Unable to open '$file' for read: $@\n";
+    	my $linectr=0;
+    	while (<IN>) { 
+    		$linectr++;
+    		if ($_ =~ /DOCTYPE niktoscan/) { $header_present=1; last; }
+    		if ($linectr > 10) { last; }
+			}
+		close(IN);
+    	}
+
     open(OUT, ">>$file") || die print STDERR "+ ERROR: Unable to open '$file' for write: $@\n";
+ 
+ 	# If file doesn't contain a header, write it
+ 	if (!$header_present) { 
+	    my $xml = xml_change_vars($TEMPLATES{xml_start});
+    	$xml =~ s/\#NIKTODTD#/$CONFIGFILE{NIKTODTD}/;
+	    print OUT "$xml";
+	    }
 
-    my $xml = xml_change_vars($TEMPLATES{xml_start});
-    $xml =~ s/\#NIKTODTD#/$CONFIGFILE{NIKTODTD}/;
-    print OUT "$xml";
-
+ 	# Return file handle
     return OUT;
 }
 ###############################################################################

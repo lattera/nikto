@@ -1,4 +1,5 @@
 2011-12-11
+	- Ticket 229: Don't repeat XML headers if appending to an existing report file, thanks to digininja for idea
 	- Ticket 228: Add client SSL certificate support. Thanks to monnerat for code submission!
 	- Ticket 226: Add GMT offset to time outputs
 	- Ticket 225: Template variables now have terminating hash to prevent collisions

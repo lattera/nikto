@@ -1420,13 +1420,12 @@ sub port_check {
                      "Port Check");
 
             if ($res) {
-
-      # this will fix for some Apaches that are smart enough to answer non ssl reqs on an ssl server
+      			# this will fix for some Apaches that are smart enough to answer non ssl reqs on an ssl server
                 if (defined $content
                     && $content =~ /speaking plain HTTP to an SSL/) {
                     dump_var("Result Hash", \%result);
                     next;
-                }
+                	}
                 nprint("- $checkssl Server found: "
                          . ($hostname || $ip)
                          . ":$port \t$headers{server}",
