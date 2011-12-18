@@ -796,6 +796,8 @@ sub safe_quit {
 	if ($mark->{'start_time'} ne '') {
     	report_host_end($mark);
     	}
+    	
+    report_host_end($mark);
     report_summary($mark);
     report_close($mark);
     reset_term();
