@@ -531,6 +531,7 @@ sub general_config {
                "update"           => \&check_updates,
                "Userdbs:s"        => \$CLI{'userdbs'},
                "useproxy:s"       => \$CLI{'useproxy'},
+               "until:s"          => \$CLI{'until'},
                "Version"          => \&version,
                "vhost=s"          => \$CLI{'vhost'},
                ) or usage();
@@ -542,24 +543,47 @@ sub general_config {
     		$VARIABLES->{'ERRCODES'}->{$code} = 1; 
     		}
     	}
-    	
+	
     # Maxtime must be seconds
-    if (($CLI{'maxtime'} ne '') && ($CLI{'maxtime'} =~ /[^\d]/)) { 
-    	if ($CLI{'maxtime'} =~ /m$/i) { 
-    		$CLI{'maxtime'} =~ s/m$//;
-    		$CLI{'maxtime'}  = ($CLI{'maxtime'} * 60);
-    		}
-    	elsif ($CLI{'maxtime'} =~ /h$/i) {
-    		$CLI{'maxtime'} =~ s/h$//;
-    		$CLI{'maxtime'}  = ($CLI{'maxtime'} * 3600);
-    		}
-    	elsif ($CLI{'maxtime'} =~ /s$/i) {
-    		$CLI{'maxtime'} =~ s/s$//;
-    		}
-    	else { 
-    		nprint("+ ERROR: Invalid maxtime, must be seconds or valid time (e.g., 3600, 60m, 1h)"); 
+    if ($CLI{'maxtime'} ne '') { 
+    	$CLI{'maxtime'} = time_to_seconds($CLI{'maxtime'});
+    	if ($CLI{'maxtime'} eq '') {
+    		nprint("+ ERROR: Invalid maxtime value, must be a valid time (e.g., 3600s, 60m, 1h)"); 
     		exit; 
     		}
+    	}
+
+    # Until
+    if ($CLI{'until'} ne '') {
+    	# if a number of hours/mins/secs, convert to a time to pause
+    	my $pausetime;
+    	my $now;
+    	if ($CLI{'until'} =~ /[hms]$/i) { 
+    		my $gotime = time_to_seconds($CLI{'until'});
+    		if ($gotime eq '') { 
+    			nprint("+ ERROR: Invalid until value, must be a valid time (e.g., 3600s, 60m, 1h) or a time (e.g., 03:00)"); 
+    			exit; 
+    			}
+    		# convert to a pausetime
+    		$now = time();
+    		$pausetime = $now + $gotime;
+    		}
+    	elsif ($CLI{'until'} =~ /\d\d:\d\d:?(?:\d\d)?$/) { 
+    		# convert until time to epoch time
+    		# format: (mm dd)? hh:mm:ss
+    		$CLI{'until'} =~ /^(?:(\d\d)\s(\d\d))?\s?(\d\d):(\d\d):?(\d\d)?$/;
+    		my ($month,$day,$hh,$mm,$ss) = ($1, $2, $3, $4, $5);
+    		# get year and complete month/day info
+    		print "mon: $month, day: $day, hour: $hh, min: $mm, sec: $ss\n";
+    		exit;
+    		
+    		}
+    	
+    	# validate pausetime
+    	print "now:       $now\n";
+    	print "pausetime: $pausetime\n";
+    	exit;
+    	
     	}
     	
     # deprecated -findonly overrides -Plugins
@@ -775,6 +799,23 @@ sub general_config {
     return;
 }
 
+###############################################################################
+sub time_to_seconds { 
+	my $time = $_[0] || return;
+    if ($time =~ /m$/i) { 
+    	$time =~ s/m$//i;
+    	$time  = ($time * 60);
+		}
+   	elsif ($time =~ /h$/i) {
+   		$time =~ s/h$//i;
+   		$time  = ($time * 3600);
+   		}
+   	elsif ($time =~ /s$/i) {
+   		$time =~ s/s$//i;
+   		}
+	return $time;	
+	}
+	
 ###############################################################################
 sub sleeper {
     if ($CLI{'pause'} <= 0) { return; }
