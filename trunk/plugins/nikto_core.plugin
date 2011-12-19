@@ -557,7 +557,7 @@ sub general_config {
     if ($CLI{'until'} ne '') {
     	# if a number of hours/mins/secs, convert to a time to pause
     	my $pausetime;
-    	my $now;
+    	my $now = time();
     	if ($CLI{'until'} =~ /[hms]$/i) { 
     		my $gotime = time_to_seconds($CLI{'until'});
     		if ($gotime eq '') { 
@@ -565,25 +565,37 @@ sub general_config {
     			exit; 
     			}
     		# convert to a pausetime
-    		$now = time();
     		$pausetime = $now + $gotime;
     		}
     	elsif ($CLI{'until'} =~ /\d\d:\d\d:?(?:\d\d)?$/) { 
     		# convert until time to epoch time
     		# format: (mm dd)? hh:mm:ss
-    		$CLI{'until'} =~ /^(?:(\d\d)\s(\d\d))?\s?(\d\d):(\d\d):?(\d\d)?$/;
+    		$CLI{'until'} =~ /^(?:(\d\d)(?:\s|\/)(\d\d))?(?:\s|\/)?(\d?\d):(\d\d):?(\d\d)?$/;
     		my ($month,$day,$hh,$mm,$ss) = ($1, $2, $3, $4, $5);
+    		$ss = '00' if $ss eq '';
+
     		# get year and complete month/day info
-    		print "mon: $month, day: $day, hour: $hh, min: $mm, sec: $ss\n";
-    		exit;
-    		
-    		}
+            (undef,undef,undef,$cday,$cmon,$year) = localtime(time);            
+            $year += 1900;
+            $day = $cday if $day eq '';
+    		if ($month eq '') { 
+    			$month=$cmon;
+    			}
+    		else { 
+    			$month--;
+    			}
+            
+            $pausetime = timelocal($ss,$mm,$hh,$day,$month,$year);    
+            }
     	
     	# validate pausetime
     	print "now:       $now\n";
     	print "pausetime: $pausetime\n";
-    	exit;
-    	
+    	if ($now > $pausetime) { 
+    		nprint("+ ERROR: Pause time is in the past."); 
+    		exit; 
+    		}
+    	$CLI{'until'} = $pausetime;
     	}
     	
     # deprecated -findonly overrides -Plugins
@@ -892,9 +904,7 @@ sub check_input {
         safe_quit($mark);
     }
     elsif ($key eq 'P') {
-        nprint("- Pausing--press P to resume.");
-        while (readkey() ne 'P') { }
-        nprint("- Resuming.");
+    	pause();
     }
     elsif ($key eq 'N') {
         nprint("- Terminating host scan.");
@@ -902,7 +912,18 @@ sub check_input {
     }
     return;
 }
-
+###############################################################################
+sub pause { 
+	if ($_[0] eq 'u') { 
+    	nprint("- Pausing due to 'until' flag--press P to resume.");
+    	}
+    else { 
+    	nprint("- Pausing--press P to resume.");
+    	}
+    	
+    while (readkey() ne 'P') { $CLI{'until'}=''; sleep 1; }
+    nprint("- Resuming.");
+	}
 ###############################################################################
 sub readkey {
     if (!$NIKTO{'POSIX'}{'support'}) { return; }
@@ -2204,7 +2225,12 @@ sub nfetch {
     # check for keyboard input
     if (($COUNTERS{'totalrequests'} % 10) == 0) {
         if (check_input($mark) eq 'term') { $mark->{'terminate'} = 1; }
-    }
+        if ($CLI{'until'} ne '') {
+        	if ($CLI{'until'} <= time()) { 
+        		pause('u');
+        		}
+        	}
+    	}
     
     # check execution time
     if ($CLI{'maxtime'} ne '') { 

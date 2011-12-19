@@ -6499,3 +6499,4 @@
 "006511","3092","3","/web.config~","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
 "006512","3092","3","/.web.config.swp","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
 "006513","0","1","/nn.asp","GET","File\sName","","200","","","Directory listing program found","",""
+"006514","0","b3","/munin/index.html","GET","generated\sby\s.*munin","","200","","","Munin reveals system information.","",""
