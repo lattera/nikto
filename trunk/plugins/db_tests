@@ -518,7 +518,7 @@
 "000495","0","8","/msadc/..%255c../..%255c../..%255c../winnt/system32/cmd.exe?/c+dir+c:%5c","GET","The paramater is incorrect","","","Internal server error","","May be able to issue arbitrary commands to host.","",""
 "000496","0","8","/msadc/samples/adctest.asp","GET","Remote Data Service","","","","","The IIS sample application adctest.asp may be used to remotely execute commands on the server.  RFP9901 (http://www.wiretrip.net/rfp/p/doc.asp/i2/d3.htm)","",""
 "000497","0","b","/JUNK(10)","GET","SecureIIS application","","","","","Server appears to be running eEye's SecureIIS application, http://www.eeye.com/.","",""
-"000498","0","b","/nikto.ida","GET","Rejected-By-UrlScan","","","","","The IIS server is running UrlScan","",""
+"000498","0","b","/somethingnotthere.ida","GET","Rejected-By-UrlScan","","","","","The IIS server is running UrlScan","",""
 "000499","0","b","/SUNWmc/htdocs/","GET","en_US","","","","","Sun SMC (Solaris Management Console) is running.","",""
 "000500","0","d","@CGIDIRSwebfind.exe?keywords=01234567890123456789","GET","500","","","","","May be vulnerable to a buffer overflow (request 2000 bytes of data). Upgrade to WebSitePro 2.5 or greater","",""
 "000501","0","d","/cgi-shl/win-c-sample.exe","GET","200","","","","","win-c-sample.exe has a buffer overflow","",""
