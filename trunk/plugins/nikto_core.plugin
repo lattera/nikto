@@ -1174,7 +1174,7 @@ sub parse_hostfile {
 
 ###############################################################################
 sub load_databases {
-    my @dbs = qw/db_404_strings  db_outdated  db_variables/;
+    my @dbs = qw/db_parked_strings db_404_strings  db_outdated  db_variables/;
     my $prefix = $_[0] || '';
 
     # Only load the right databases if -Userdbs is set
@@ -1223,6 +1223,14 @@ sub load_databases {
                 }
             }
 
+            # db_parked_strings
+            elsif ($file eq 'db_parked_strings') {
+                foreach my $l (@file) {
+                    $l = validate_and_fix_regex($l);
+                    $VARIABLES->{'PARKEDSTRINGS'}->{$l} = 1;
+                }
+            }
+
             # db_404_strings
             elsif ($file eq 'db_404_strings') {
                 foreach my $l (@file) {
@@ -1259,7 +1267,7 @@ sub load_databases {
 ###############################################################################
 sub check_dbs {
     my @dbs =
-      qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
+      qw/db_headers db_httpoptions db_multiple_index db_server_msgs db_subdomains db_favicon db_embedded db_parked_strings db_404_strings  db_outdated  db_realms  db_tests  db_variables db_content_search/;
     my $prefix = $_[0];
     if (($prefix eq "") || ($prefix eq "dbcheck")) {
         $prefix = "";    # for options from Get::Opt
@@ -1343,6 +1351,19 @@ sub check_dbs {
             nprint("\t$ctr entries");
         }
         elsif ($file eq 'db_404_strings') {
+            my $ctr = 1;
+            foreach $line (<IN>) {
+                chomp($line);
+                $line =~ s/\#.*$//;
+                next if $line eq '';
+                my ($result, $bad) = validate_and_fix_regex($line, 1);
+                if ($bad) { nprint("\t+ ERROR: Invalid regex on line $ctr: \"$line\""); }
+                $ctr++;
+            }
+            $ctr--;
+            nprint("\t$ctr entries");
+        }
+       elsif ($file eq 'db_parked_strings') {
             my $ctr = 1;
             foreach $line (<IN>) {
                 chomp($line);

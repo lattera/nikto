@@ -1,4 +1,4 @@
-2011-12-11
+2011-12-21
 	- Ticket 229: Don't repeat XML headers if appending to an existing report file, thanks to digininja for idea
 	- Ticket 228: Add client SSL certificate support. Thanks to monnerat for code submission!
 	- Ticket 226: Add GMT offset to time outputs
@@ -9,6 +9,7 @@
 	- Ticket 211: Shuffled some information in HTML report and added more summary data. Added error count and total check count to XML (note: DTD change).
 	- Ticket 202: -maxtime maximum execution time per host (seconds)
 	- Ticket 175: -until run until specified time or duration
+	- Ticket 174: Checked for sites parked at hosting providers or advertising pages
 	- Keep tokens from getting into %db_extensions, thanks to Erik Cabetas
 	- Fix vhost not being set properly, thanks to Brian Poole
 	- Fix crash on invalid regex chars in robots.txt (dis)allow lines
