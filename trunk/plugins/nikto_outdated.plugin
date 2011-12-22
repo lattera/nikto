@@ -32,45 +32,47 @@ sub nikto_outdated_init {
 }
 
 sub nikto_outdated {
-    return if $mark->{'terminate'};
     my ($mark) = @_;
+    return if $mark->{'terminate'};
 
-    # populate @BUILDITEMS with appropriate values
-    # if Apache, split on space...
-    if ($mark->{'banner'} =~ /apache/i) {
+    # Process banner to populate @BUILDITEMS for later eval
+
+    # If banner has nothing that can be a version... return
+    if ($mark->{'banner'} !~ /(?:\d|\/|\.)/) { return; }
+
+    # If Apache, split on space...
+    elsif (   ($mark->{'banner'} =~ /apache/i)
+           || (($mark->{'banner'} =~ /\s/) && ($mark->{'banner'} =~ /\//))) {
         foreach my $item (split(/ /, $mark->{'banner'})) {
             $mark->{'components'}->{$item} = 1;
         }
     }
-    elsif ($mark->{'banner'} =~ /weblogic/i)    # strip all the date info...
-    {
+
+    # Some specific (and common) banner processing
+    # WebLogic: strip all the date info...
+    elsif ($mark->{'banner'} =~ /weblogic/i) {
         my @T = split(/ /, $mark->{'banner'});
         $mark->{'components'}->{ $T[0] . '\/' . $T[1] } = 1;
     }
-    elsif ($mark->{'banner'} =~ /sitescope/i)    # strip all the date info...
-    {
+
+    # SiteScipe: strip all the date info...
+    elsif ($mark->{'banner'} =~ /sitescope/i) {
         my @T = split(/ /, $mark->{'banner'});
         $mark->{'components'}->{ $T[0] } = 1;
     }
-    else {
-        if ($mark->{'banner'} !~ /\s/)           # has no spaces
-        {
-            $MATCHSTRING = $mark->{'banner'};
-        }
-        elsif ($mark->{'banner'} =~ /\//)        # has spaces and / sepr
-        {
-            $MATCHSTRING = $mark->{'banner'};
-            $MATCHSTRING =~ s/\s+//g;
-        }
-        else                                     # must create  sepr
-        {
 
-            # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)
-            my $sepr = $mark->{'banner'};
-            $sepr =~ s/[a-zA-Z0-9\.\(\)]//gi;
+    # Finally, unkonwn banners
+    else {
+
+        # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)
+        my $sepr = $mark->{'banner'};
+        $sepr =~ s/[a-zA-Z0-9\.\(\)]//gi;
+        if ($sepr eq '') {
+            $MATCHSTRING = $mark->{'banner'};
+        }
+        else {
             $sepr = substr($sepr, (length($sepr) - 1), 1);
 
-            # $sepr=~ s/\s+/ /g;
             # break up ID string on $sepr
             my @T = split(/$sepr/, $mark->{'banner'});
 
@@ -78,7 +80,6 @@ sub nikto_outdated {
             for ($i = 0 ; $i < $#T ; $i++) { $MATCHSTRING .= "$T[$i] "; }
         }
         $MATCHSTRING =~ s/\s+$//;
-
         $mark->{'components'}->{$MATCHSTRING} = 1;
         nprint("Server Version String:$MATCHSTRING", "d");
     }
@@ -88,21 +89,23 @@ sub nikto_outdated {
     # For each running component
     foreach $BI (keys %{ $mark->{'components'} }) {
         my $have_match = 0;
+
         # Check it against each value from db_outdated
         foreach $V (sort keys %OVERS) {
             next if $V eq '';
             if ($BI =~ /^$V/i)    # software name matched
             {
                 $have_match = 1;
+
                 # nab version
                 foreach $k (keys %{ $OVERS{$V} }) {
                     if ($k eq "")    { next; }
                     if ($k eq "tid") { next; }
                     $v = $k;
                 }
+
                 # do version check (return true if we should alert)
-                if (vereval($v, $BI, $V, $mark))
-                {
+                if (vereval($v, $BI, $V, $mark)) {
                     my $msg = $OVERS{$V}{$v};
                     $msg =~ s/\@RUNNING_VER/$BI/g;
                     $msg =~ s/\@CURRENT_VER/$v/g;
@@ -117,13 +120,13 @@ sub nikto_outdated {
 }
 
 # do version evaluation
-# arguments: 
+# arguments:
 #	0: latest version as defined in db_outdated
 #	1: running item being evaluated
 #	2: item being matched against in db_outdated
 #	3: mark hash
 sub vereval {
-	
+
     # split both by last char of $_[2], as it is the name to version separator
     my $sepr = substr($_[2], (length($_[2]) - 1), 1);
     nprint("nikto_outdated.plugin: verstring: $_[2], sepr:$sepr", "d");
@@ -163,16 +166,17 @@ sub vereval {
         @RUN = split(//, $RUNNING);
     }
 
-    # Check to see whether the arrays both have the same length
-    if (scalar(@RUN) != scalar(@CUR)) {
-        add_vulnerability(
-            $mark,
-            "Number of sections in the version string differ from those in the database, the server reports: $RUNNING_ORIG while the database has: $CURRENT. This may cause false positives.",
-            699999,
-            0,
-            "HEAD"
-            );
-    }
+# Check to see whether the arrays both have the same length
+# Note: with new processing rules this may not be relevant any longer
+#if (scalar(@RUN) != scalar(@CUR)) {
+#    add_vulnerability(
+#        $mark,
+#        "Number of sections in the version string differ from those in the database, the server reports: $RUNNING_ORIG while the database has: $CURRENT. This may cause false positives.",
+#        699999,
+#        0,
+#        "HEAD"
+#        );
+#}
 
     # start with 0... eval each in turn...
     for (my $i = 0 ; $i <= $#CUR ; $i++) {
