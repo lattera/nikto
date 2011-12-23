@@ -2692,9 +2692,8 @@ sub usage {
                                yes   Ask about each (default)
                                no    Don't ask, don't send
                                auto  Don't ask, just send
-       -config+            Use this config file
        -Cgidirs+           Scan these CGI dirs: \"none\", \"all\", or values like \"/cgi/ /cgi-a/\"
-       -dbcheck           Check database and other key files for syntax errors
+       -config+            Use this config file
        -Display+           Turn on/off display outputs:
                                1     Show redirects
                                2     Show cookies received
@@ -2705,6 +2704,7 @@ sub usage {
                                P     Print progress to STDOUT
                                S     Scrub output of IPs and hostnames
                                V     Verbose output
+       -dbcheck           Check database and other key files for syntax errors
        -evasion+          Encoding technique:\n";
 
         foreach my $k (sort keys %{ $NIKTO{'anti_ids'} }) {
@@ -2719,8 +2719,8 @@ sub usage {
                                txt   Plain text
                                xml   XML Format
                                (if not specified the format will be taken from the file extension passed to -output)
-       -host+             Target host
        -Help              Extended help information
+       -host+             Target host
        -IgnoreCode        Ignore Codes--treat as negative responses
        -id+               Host authentication to use, format is id:pass or id:pass:realm
        -key+              Client certificate key file
@@ -2739,14 +2739,13 @@ sub usage {
        -nossl             Disables the use of SSL
        -no404             Disables nikto attempting to guess a 404 page
        -output+           Write output to this file
-       -port+             Port to use (default 80)
        -Pause+            Pause between tests (seconds, integer or float)
        -Plugins+          List of plugins to run (default: ALL)
-       -root+             Prepend root value to all requests, format is /directory
+       -port+             Port to use (default 80)
        -RSAcert+          Client certificate file
-       -ssl               Force ssl mode on port
+       -root+             Prepend root value to all requests, format is /directory
        -Single            Single request mode
-       -timeout+          Timeout for requests (default 10 seconds)
+       -ssl               Force ssl mode on port
        -Tuning+           Scan tuning:
                                1     Interesting File / Seen in logs
                                2     Misconfiguration / Default File
@@ -2762,43 +2761,45 @@ sub usage {
                                b     Software Identification
                                c     Remote Source Inclusion
                                x     Reverse Tuning Options (i.e., include all except specified)
+       -timeout+          Timeout for requests (default 10 seconds)
        -Userdbs           Load only user databases, not the standard databases
                                all   Disable standard dbs and load only user dbs
                                tests Disable only db_tests and load udb_tests
-       -useproxy          Use the proxy defined in nikto.conf
+       -until             Run until the specified time or duration
        -update            Update databases and plugins from CIRT.net
-       -vhost+            Virtual host (for Host header)
+       -useproxy          Use the proxy defined in nikto.conf
        -Version           Print plugin and database versions
+       -vhost+            Virtual host (for Host header)
    		+ requires a value
    ";
     }
     else {
         print "
        -config+            Use this config file
-       -dbcheck            check database and other key files for syntax errors
        -Display+           Turn on/off display outputs
+       -dbcheck            check database and other key files for syntax errors
        -Format+            save file (-o) format
-       -host+              target host
        -Help               Extended help information
+       -host+              target host
        -id+                Host authentication to use, format is id:pass or id:pass:realm
        -list-plugins       List all available plugins
        -output+            Write output to this file
        -nocache            Disables the URI cache
        -nossl              Disables using SSL
        -no404              Disables 404 checks
-       -port+              Port to use (default 80)
        -Plugins+           List of plugins to run (default: ALL)
+       -port+              Port to use (default 80)
        -root+              Prepend root value to all requests, format is /directory 
-       -ssl                Force ssl mode on port
        -Single             Single request mode
-       -timeout+           Timeout for requests (default 10 seconds)
+       -ssl                Force ssl mode on port
        -Tuning+            Scan tuning
+       -timeout+           Timeout for requests (default 10 seconds)
        -update             Update databases and plugins from CIRT.net
-       -vhost+             Virtual host (for Host header)
        -Version            Print plugin and database versions
+       -vhost+             Virtual host (for Host header)
    		+ requires a value
 
-	Note: This is the short help output. Use -H for full help.
+	Note: This is the short help output. Use -H for full help text.
 
    ";
     }
