@@ -55,13 +55,22 @@ sub nikto_outdated {
         $mark->{'components'}->{ $T[0] . '\/' . $T[1] } = 1;
     }
 
-    # SiteScipe: strip all the date info...
+    # SiteScope: strip all the date info...
     elsif ($mark->{'banner'} =~ /sitescope/i) {
         my @T = split(/ /, $mark->{'banner'});
         $mark->{'components'}->{ $T[0] } = 1;
     }
 
-    # Finally, unkonwn banners
+    # Some, like WEBrick, have multiple items but no spaces
+    elsif (($mark->{'banner'} !~ /\s/) && ($mark->{'banner'} =~ /\/.*\//) && ($mark->{'banner'} =~ /\(/)) {
+
+        # try converting () t spaces
+        foreach my $item (split(/[\(\)]/, $mark->{'banner'})) {
+            $mark->{'components'}->{$item} = 1;
+        }
+    }
+
+    # Finally, unknown banners
     else {
 
         # use the last non 0-9 . a-z char as a sepr (' ', '-', '_' etc)

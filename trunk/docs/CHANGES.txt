@@ -11,6 +11,7 @@
 	- Ticket 202: -maxtime maximum execution time per host (seconds)
 	- Ticket 175: -until run until specified time or duration
 	- Ticket 174: Checked for sites parked at hosting providers or advertising pages
+	- Ticket 91: Identification of WEBrick fails. Updates made to handle banners with multiple items but no spaces
 	- Keep tokens from getting into %db_extensions, thanks to Erik Cabetas
 	- Fix vhost not being set properly, thanks to Brian Poole
 	- Fix crash on invalid regex chars in robots.txt (dis)allow lines
