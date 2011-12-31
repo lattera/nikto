@@ -283,7 +283,7 @@ sub map_codes {
         nprint("- Testing error for file: $file\n", "v");
         %headers = ();
         ($res, $content, $error) = nfetch($mark, $file, "GET", "", \%headers, "", "map_codes");
-
+        
         $ext = $REQS{$file};
         $FoF{$ext}{'response'} = $res;
 
@@ -2490,7 +2490,7 @@ sub max_test_id {
 sub is_ip {
         my $ip=$_[0] || return 0, 0, 0;
         my $internal = 0;
-	my $loopback = 0;
+		my $loopback = 0;
 
         # simple syntax check
         # this will fail on some edge cases, but it's 99%...

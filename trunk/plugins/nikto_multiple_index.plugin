@@ -70,7 +70,7 @@ sub nikto_multiple_index {
 
         my $tempstring;
         foreach my $f (keys %found) { $tempstring .= "$f, "; }
-        $tempstring =~ s/,$//;
+        $tempstring =~ s/, ?$//;
 
         # some unique... report slightly differently
         if ($total_unique < keys(%found)) {

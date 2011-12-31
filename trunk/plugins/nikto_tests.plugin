@@ -157,9 +157,11 @@ sub nikto_tests {
                 # lastly check for a false positive based on file extension or type
                 # skip this if either method is code =~ 4xx since that's a condition in is_404
                 if (($m1_method eq "code") || ($m1o_method eq "code")) {
-		    if (($TESTS{$checkid}{'match_1'} !~ /^4/) && ($TESTS{$checkid}{'match_1_or'} !~ /^4/)) {
+                
+                # Commented to see if FPs are fewer without--should be true now
+		 		#   if (($TESTS{$checkid}{'match_1'} !~ /^4/) && ($TESTS{$checkid}{'match_1_or'} !~ /^4/)) {
                     	if (is_404($uri, $content, $res, $headers{'location'})) { next; }
-			}
+				#	}
                 }
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;

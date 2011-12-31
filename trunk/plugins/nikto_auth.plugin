@@ -113,7 +113,7 @@ sub nikto_auth {
     my ($realm, $save_auth);
 
     unless (defined $result->{'www-authenticate'}) {
-        nprint("+ ERROR: No authentication header defined: $uri");
+        nprint("+ ERROR: No authentication header defined: $uri","v");
         return $request, $result;
     }
 
