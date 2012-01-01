@@ -807,6 +807,7 @@ sub general_config {
     $COUNTERS{'totalrequests'} = 0;
     $COUNTERS{'total_checks'}  = 0;
     $COUNTERS{'total_targets'} = 0;
+    if ($CLI{'nocache'} ne 1) { $CLI{'nocache'}=0; }
 
     return;
 }
@@ -1216,7 +1217,7 @@ sub load_databases {
             if ($file eq 'db_variables') {
                 foreach my $l (@file) {
                     if ($l =~ /^@/) {
-			next if $l eq '';
+						next if $l eq '';
                         my @temp = split(/=/, $l);
                         $VARIABLES{ $temp[0] } .= "$temp[1]";
                     }
@@ -1536,8 +1537,7 @@ sub load_plugins {
     # populate plugin macros
     $CONFIGFILE{'@@NONE'} = "";
 
-    # Check if running plugins is NONE - if so, don't bother initalising
-    # plugins
+    # Check if running plugins is NONE - if so, don't bother initalising plugins
     if ($CLI{'plugins'} eq '@@NONE') {
         return;
     }
@@ -2050,8 +2050,7 @@ sub proxy_check {
 
             # test it...
             LW2::http_close(\%request);    # force-close any old connections
-            LW2::auth_set("proxy-basic", \%request, $CONFIGFILE{PROXYUSER}, $CONFIGFILE{PROXYPASS})
-              ;                            # set auth
+            LW2::auth_set("proxy-basic", \%request, $CONFIGFILE{PROXYUSER}, $CONFIGFILE{PROXYPASS}); # set auth
             LW2::http_fixup_request(\%request);
             sleeper();
             LW2::http_do_request_timeout(\%request, \%result);
@@ -2172,18 +2171,16 @@ sub setup_hash {
 
 #######################################################################
 sub cache_add {
-    # temporary fix
-    return if $_[5];
-    if (!defined $CLI{'nocache'}) {
-        my $method        = shift;
-        my $code          = shift;
-        my $content       = shift;
-        my $uri           = shift;
-        my $postdata      = shift;
-        my $flags_nocache = shift;
-        my ($mark)        = @_;
+    return if ($_[5] || $CLI{'nocache'});
+    my $method        = shift;
+    my $code          = shift;
+    my $content       = shift;
+    my $uri           = shift;
+    my $postdata      = shift;
+    my $flags_nocache = shift;
+    my ($mark)        = @_;
     
-        my $key =
+    my $key =
           LW2::md4(  $mark->{'ip'}
                    . $mark->{'hostname'}
                    . $mark->{'port'}
@@ -2192,24 +2189,21 @@ sub cache_add {
                    . $uri
                    . $postdata);
 
-        $CACHE{$key}{'method'}  = $method;
-        $CACHE{$key}{'code'}    = $code;
-        $CACHE{$key}{'content'} = $content;
-    }
+    $CACHE{$key}{'method'}  = $method;
+    $CACHE{$key}{'code'}    = $code;
+    $CACHE{$key}{'content'} = $content;
 }
 
 #######################################################################
 sub cache_fetch {
-    # temporary fix
-    return if $_[3];
-    if (!defined $CLI{'nocache'}) {
-        my $method        = shift;
-        my $uri           = shift;
-        my $postdata      = shift;
-        my $flags_nocache = shift;
-        my ($mark)        = @_;
+    return 0 if ($_[3] || $CLI{'nocache'});
+    my $method        = shift;
+    my $uri           = shift;
+    my $postdata      = shift;
+    my $flags_nocache = shift;
+	my ($mark)        = @_;
 
-        my $key =
+    my $key =
           LW2::md4(  $mark->{'ip'}
                    . $mark->{'hostname'}
                    . $mark->{'port'}
@@ -2218,16 +2212,16 @@ sub cache_fetch {
                    . $uri
                    . $postdata);
 
-        if ($CACHE{$key}{'code'} ne '') {
+    if ($CACHE{$key}{'code'} ne '') {
             return (1, $CACHE{$key}{'code'}, $CACHE{$key}{'content'});
-        }
-        else {
+    }
+    else {
             return 0;
         }
-    }
     return 0;
 }
 
+#######################################################################
 sub cache_destroy {
     my ($mark) = @_;
 
@@ -2271,7 +2265,6 @@ sub nfetch {
 
     # check for extra HTTP headers
     if (defined $headers) {
-
         # loop through the hash ref passed and add each header to request
         while (my ($key, $value) = each(%$headers)) {
             $request{$key} = $value;
@@ -2300,8 +2293,7 @@ sub nfetch {
         $result{'whisker'}->{'code'} = $code;
         $result{'whisker'}->{'data'} = $content;
     }
-
-    if (!$incache) {
+	else {
         sleeper();
         LW2::http_do_request_timeout(\%request, \%result);
         $COUNTERS{'totalrequests'}++;
@@ -2330,20 +2322,18 @@ sub nfetch {
                 $mark->{'banner'} = $result{'server'};
             }
             else {
-
                 # Check banner hasn't changed
-                if (   exists $result{'server'}
+                if (exists $result{'server'}
                     && $mark->{'banner'} ne $result{'server'}
                     && !exists $mark->{'bannerchanged'}) {
                     nprint(
-                        "+ Server banner has changed from $mark->{banner} to $result{server}, this may suggest a WAF or load balancer is in place"
+                        "+ Server banner has changed from $mark->{banner} to $result{server} which may suggest a WAF, load balancer or proxy is in place"
                         );
                     $mark->{'bannerchanged'} = 1;
                 }
             }
 
             if (!exists $mark->{'ssl_cipher'} && $mark->{'ssl'}) {
-
                 # Grab ssl details
                 $mark->{'ssl_cipher'}       = $result{'whisker'}->{'ssl_cipher'};
                 $mark->{'ssl_cert_issuer'}  = $result{'whisker'}->{'ssl_cert_issuer'};
