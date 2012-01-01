@@ -76,15 +76,17 @@ sub nikto_robots {
                 if (($realfile ne "") && ($realfile ne "/")) { $RFILES{$realfile}++; }
                 $DISCTR++;
             }    # end if $line =~ allow
-        }    # end foreach my $line (@DOC)_
+        }    # end foreach my $line (@DOC)
 
         # add them  to mutate dir/file
         foreach my $dir (sort keys %DIRS) {
-	    my $raw  = $dir;
+	    	my $raw  = $dir;
             $raw =~ s/\\//g;
             if ($VARIABLES{"\@MUTATEDIRS"} !~ /$dir/) {
                 $VARIABLES{"\@MUTATEDIRS"} .= " $raw";
             }
+            
+            # Add to variables
             if ($dir =~ /cgi/ && $VARIABLES{"\@CGIDIRS"} !~ /$dir/) {
                 $VARIABLES{"\@CGIDIRS"} .= " $raw";
             }
@@ -94,6 +96,21 @@ sub nikto_robots {
             if ($dir =~ /pass/ && $VARIABLES{"\@PASSWORDDIRS"} !~ /$dir/) {
                 $VARIABLES{"\@PASSWORDDIRS"} .= " $raw";
             }
+            if ($dir =~ /nuke/i && $VARIABLES{"\@NUKE"} !~ /$dir/i) {
+                $VARIABLES{"\@NUKE"} .= " $raw";
+            }           
+        	if ($dir =~ /admin/i && $VARIABLES{"\@ADMIN"} !~ /$dir/i) {
+                $VARIABLES{"\@ADMIN"} .= " $raw";
+            }              
+            if ($dir =~ /phpmy/i && $VARIABLES{"\@PHPMYADMIN"} !~ /$dir/i) {
+                $VARIABLES{"\@PHPMYADMIN"} .= " $raw";
+            } 
+            if ($dir =~ /fck/i && $VARIABLES{"\@FCKEDITOR"} !~ /$dir/i) {
+                $VARIABLES{"\@FCKEDITOR"} .= " $raw";
+            } 
+            if ($dir =~ /crystal/i && $VARIABLES{"\@CRYSTALREPORTS"} !~ /$dir/i) {
+                $VARIABLES{"\@CRYSTALREPORTS"} .= " $raw";
+            } 
         }
 
         foreach my $file (sort keys %RFILES) {
@@ -103,28 +120,10 @@ sub nikto_robots {
                 $VARIABLES{"\@MUTATEFILES"} .= " $raw";
             }
             
-            # add to variables
+            # Add to variables
             if ($file =~ /pass/i && $VARIABLES{"\@PASSWORDFILES"} !~ /$file/i) {
                 $VARIABLES{"\@PASSWORDFILES"} .= " $raw";
             }
-            elsif ($file =~ /cgi/i && $VARIABLES{"\@CGIDIRS"} !~ /$file/i) {
-                $VARIABLES{"\@CGIDIRS"} .= " $raw";
-            }
-             elsif ($file =~ /nuke/i && $VARIABLES{"\@NUKE"} !~ /$file/i) {
-                $VARIABLES{"\@NUKE"} .= " $raw";
-            }           
-             elsif ($file =~ /admin/i && $VARIABLES{"\@ADMIN"} !~ /$file/i) {
-                $VARIABLES{"\@ADMIN"} .= " $raw";
-            }              
-             elsif ($file =~ /phpmy/i && $VARIABLES{"\@PHPMYADMIN"} !~ /$file/i) {
-                $VARIABLES{"\@PHPMYADMIN"} .= " $raw";
-            } 
-             elsif ($file =~ /fck/i && $VARIABLES{"\@FCKEDITOR"} !~ /$file/i) {
-                $VARIABLES{"\@FCKEDITOR"} .= " $raw";
-            } 
-             elsif ($file =~ /crystal/i && $VARIABLES{"\@CRYSTALREPORTS"} !~ /$file/i) {
-                $VARIABLES{"\@CRYSTALREPORTS"} .= " $raw";
-            } 
         }
 
         my $msg;
