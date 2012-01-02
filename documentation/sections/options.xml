@@ -314,7 +314,7 @@ specified)</para>
     <varlistentry>
       <term><option>-until</option></term>
       <listitem>
-        <para>Run until the specified time or duration.</para>
+        <para>Run until the specified time or duration, then pause.</para>
 	<para>Durations in hours, minutes or seconds, like: 1h, 60m, 3600s</para>
 	<para>Times like "mm dd hh:mm:ss" (mm, dd, ss optional): 12 1 22:30:00</para>
       </listitem>
