@@ -388,7 +388,7 @@
 "600373","Micro-HTTP/","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600374","Microsoft_PWS_Mac/","4.0b1","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600375","Microsoft-HTTPAPI/","2.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
-"600376","Microsoft-IIS/","7.5","@RUNNING_VER appears to be outdated (4.0 for NT 4, 5.0 for Win2k, current is at least @CURRENT_VER)"
+"600376","Microsoft-IIS/","7.5","@RUNNING_VER may be outdated (current is at least @CURRENT_VER; IIS 6.0 support is available until 2014)"
 "600377","Microsoft-Internet-Information-Server/","1.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600378","Microsoft-PWS-95/","2.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
 "600379","Microsoft-PWS/","3.0","@RUNNING_VER appears to be outdated (current is at least @CURRENT_VER)"
