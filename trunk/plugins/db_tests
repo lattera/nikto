@@ -959,7 +959,6 @@
 "000941","0","1","@CGIDIRSwwwadmin.pl","GET","200","","","","","Administration CGI?","",""
 "000942","0","1","/cfdocs/expeval/displayopenedfile.cfm","GET","200","","not found","","","Unknown vuln","",""
 "000943","0","1","/cfdocs/expeval/sendmail.cfm","GET","200","","","","","Can be used to send email; go to the page and fill in the form","",""
-"000944","22","1ab","/cgi-bin/bigconf.cgi","GET","200","","","","","BigIP Configuration CGI","",""
 "000945","0","1b","@CGIDIRSwebmap.cgi","GET","200","","","","","nmap front end... could be fun","",""
 "000946","0","1b","@CGIDIRSwwwwais","GET","UNISYS WEB SEARCH ENGINE","","","","","Unisys web server wais search found.","",""
 "000947","0","1b","/ammerum/","GET","200","","","","","Ammerum pre 0.6-1 had several security issues.","",""

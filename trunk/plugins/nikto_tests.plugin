@@ -74,14 +74,11 @@ sub nikto_tests {
             }
 
 	   # If user puts a @CODE= string in db_404_strings, let it take precedence
-	   my $quickexit=0;
 	   foreach my $code (keys %{ $VARIABLES->{'ERRCODES'} }) {
         	if ($res =~ /$code/) {
-			$quickexit=1;
-			last;
+			return;
         		}
     		}
-	   return if $quickexit;
 
             my $m1_method = my $m1o_method = my $m1a_method = my $f2_method = my $f1_method =
               "content";
@@ -161,7 +158,7 @@ sub nikto_tests {
                 # Commented to see if FPs are fewer without--should be true now
 		 		#   if (($TESTS{$checkid}{'match_1'} !~ /^4/) && ($TESTS{$checkid}{'match_1_or'} !~ /^4/)) {
                     	if (is_404($uri, $content, $res, $headers{'location'})) { next; }
-				#	}
+			#		}
                 }
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;
