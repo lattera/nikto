@@ -67,6 +67,7 @@ sub nikto_paths {
 
             # split dirs / files
             my $dir  = LW2::uri_get_dir($link);
+	    $dir = validate_and_fix_regex($dir);
             my $file = $link;
             $file =~ s/^$dir//;
 
