@@ -2938,23 +2938,6 @@
 "002945","3233","2","/index.html.de","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
 "002946","3233","2","/index.html.dk","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
 "002947","3233","2","/index.html.ee","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002965","3233","2","/index.html.pt-br","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002966","3233","2","/index.html.ru.cp-1251","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002967","3233","2","/index.html.ru.cp866","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002968","3233","2","/index.html.ru.iso-ru","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002969","3233","2","/index.html.ru.koi8-r","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002970","3233","2","/index.html.ru.utf8","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002971","3233","2","/index.html.se","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002972","3233","2","/index.html.tw","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002973","3233","2","/index.html.tw.Big5","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002974","3233","2","/index.html.var","GET","200","","","","","Apache default foreign language file found. All default files should be removed from the web server as they may give an attacker additional system information.","",""
-"002975","3233","2","/test","GET","test hierarchy","","","","","Apache Tomcat default file found. All default files should be removed.","",""
-"002976","3233","2","/iissamples/issamples/codebrws.asp","GET","Sample ASP Search Form","","","","","This is a default IIS script/file which should be  removed. CVE-1999-0739. MS99-013.","",""
-"002977","3233","2","/iissamples/issamples/ixqlang.htm","GET","Query Language","","","","","IIS default file found. All default files should be removed.","",""
-"002978","3233","2","/iissamples/issamples/Winmsdp.exe","GET","Sample ASP Search Form","","","","","This is a default IIS script/file that should be removed. CVE-1999-0738. MS99-013.","",""
-"002979","3233","2","/iissamples/sdk/asp/docs/codebrw2.asp","GET","200","","","","","This is a default IIS script/file that should be removed. CVE-1999-0739. MS99-013.","",""
-"002980","3233","2","/iissamples/sdk/asp/docs/codebrws.asp","GET","200","","","","","This is a default IIS script/file that should be removed. CVE-1999-0739. MS99-013.","",""
-"002981","3233","2","/iissamples/sdk/asp/docs/Winmsdp.exe","GET","200","","","","","This is a default IIS script/file that should be removed. CVE-1999-0738. MS99-013.","",""
 "002982","3233","2","/mc-icons/","GET","[Ii]ndex [Oo]f ","","","","","Default Netscape/iPlanet ns-icons and mc-icons are present. Edit the obj.conf and remove them. All default files should be removed.","",""
 "002983","3233","2","/ns-icons/","GET","[Ii]ndex [Oo]f ","","","","","Default Netscape/iPlanet ns-icons and mc-icons are present. Edit the obj.conf and remove them. All default files should be removed.","",""
 "002984","3233","3","@CGIDIRSprintenv","GET","DOCUMENT_ROOT","","","","","Apache 2.0 default script is executable and gives server environment variables. All default scripts should be removed. It may also allow XSS types of attacks. BID-4431.","",""
@@ -5482,44 +5465,6 @@
 "005549","5292","c","/phfito/phfito-post?SRC_PATH=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005550","5292","c","/phorum/plugin/replace/plugin.php?PHORUM[settings_dir]=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005551","5292","c","/photo_comment.php?toroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005552","5292","c","/php-inc/log.inc.php?SKIN_URL=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005553","5292","c","/php-include-robotsservices.php?page=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005554","5292","c","/php-nuke/modules/Forums/admin/admin_styles.php?phpbb_root_path=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005555","5292","c","/php.incs/common.inc.php?cm_basedir=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005556","5292","c","/php/init.gallery.php?include_class=@RFIURL/something","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005557","5292","c","/php121db.php?php121dir=@RFIURL%00","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005558","5292","c","/php4you.php?dir=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005559","5292","c","/phpAdsNew-2.0.7/libraries/lib-remotehost.inc?phpAds_geoPlugin=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005560","5292","c","/phpBB2/shoutbox.php?phpbb_root_path=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005561","5292","c","/phpCards.header.php?CardPath=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005562","5292","c","/phpGedView/help_text_vars.php?cmd=dir&PGV_BASE_DIRECTORY=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005563","5292","c","/phpMyChat.php3?=@RFIURL?cmd=id","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005564","5292","c","/phpMyConferences_8.0.2/common/visiteurs/include/menus.inc.php?lvc_include_dir=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005565","5292","c","/phpQLAdmin-2.2.7/ezmlm.php?_SESSION[path]=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005566","5292","c","/phpSiteBackup-0.1/pcltar.lib.php?g_pcltar_lib_dir=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005567","5292","c","/phpbb/sendmsg.php?phpbb_root_path=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005568","5292","c","/phpcalendar/includes/calendar.php?phpc_root_path=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005569","5292","c","/phpcalendar/includes/setup.php?phpc_root_path=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005570","5292","c","/phpdebug_PATH/test/debug_test.php?debugClassLocation=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005571","5292","c","/phpffl/phpffl_webfiles/program_files/livedraft/admin.php?PHPFFL_FILE_ROOT=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005572","5292","c","/phpffl/phpffl_webfiles/program_files/livedraft/livedraft.php?PHPFFL_FILE_ROOT=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005573","5292","c","/phphd_downloads/common.php?phphd_real_path=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005574","5292","c","/phphost_directoryv2/include/admin.php?rd=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005575","5292","c","/phphtml.php?htmlclass_path=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005576","5292","c","/phpi/edit_top_feature.php?include_connection=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005577","5292","c","/phpi/edit_topics_feature.php?include_connection=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005578","5292","c","/phplib/site_conf.php?ordnertiefe=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005579","5292","c","/phplib/version/1.3.3/functionen/class.csv.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005580","5292","c","/phplib/version/1.3.3/functionen/produkte_nach_serie.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005581","5292","c","/phplib/version/1.3.3/functionen/ref_kd_rubrik.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005582","5292","c","/phplib/version/1.3.3/module/hg_referenz_jobgalerie.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005583","5292","c","/phplib/version/1.3.3/module/produkte_nach_serie_alle.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005584","5292","c","/phplib/version/1.3.3/module/ref_kd_rubrik.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005585","5292","c","/phplib/version/1.3.3/module/referenz.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005586","5292","c","/phplib/version/1.3.3/module/surfer_aendern.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005587","5292","c","/phplib/version/1.3.3/module/surfer_anmeldung_NWL.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005588","5292","c","/phplib/version/1.3.3/standard/1/lay.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
-"005589","5292","c","/phplib/version/1.3.3/standard/3/lay.php?tt_docroot=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005590","5292","c","/phplinks/includes/smarty.php?full_path_to_public_program=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005591","5292","c","/phporacleview/inc/include_all.inc.php?page_dir=@RFIURL","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
 "005592","5292","c","/phporacleview/inc/include_all.inc.php?page_dir=@RFIURL?","GET","PHP Version","","","","","RFI from RSnake's list (http://ha.ckers.org/weird/rfi-locations.dat) or from http://osvdb.org/","",""
@@ -6443,3 +6388,58 @@
 "006514","0","b3","/munin/index.html","GET","generated\sby\s.*munin","","200","","","Munin reveals system information.","",""
 "006515","0","123","/includes/conexion.inc","GET","Provider=","DRIVER=","200","","","Possible database connection include file found.","",""
 "006516","0","123","/conexion.inc","GET","Provider=","DRIVER=","200","","","Possible database connection include file found.","",""
+#VERSION,2.018
+# $Id$
+#######################################################################
+# Source: http://cirt.net
+# This file may only be distributed and used with the full Nikto package.
+# This file may not be used with any software product without written permission from CIRT, Inc.
+# (c) 2007 CIRT, Inc., All Rights Reserved.
+#
+# NOTE: By sending any database updates to CIRT, Inc., it is assumed that you
+# grant CIRT, Inc., the unlimited, non-exclusive right to reuse, modify and relicense the changes.
+#######################################################################
+# Notes:
+# Tuning options (field 3):
+# 0 - File Upload
+# 1 - Interesting File / Seen in logs
+# 2 - Misconfiguration / Default File
+# 3 - Information Disclosure
+# 4 - Injection (XSS/Script/HTML)
+# 5 - Remote File Retrieval - Inside Web Root
+# 6 - Denial of Service
+# 7 - Remote File Retrieval - Server Wide
+# 8 - Command Execution / Remote Shell
+# 9 - SQL Injection
+# a - Authentication Bypass
+# b - Software Identification
+# c - Remote source inclusion
+#######################################################################
+"000001","0","b","/TiVoConnect?Command=QueryServer","GET","Calypso Server","","","","","The Tivo Calypso server is running. This page will display the version and platform it is running on. Other URLs may allow download of media.","",""
+"000002","0","b","/TiVoConnect?Command=QueryContainer&Container=/&Recurse=Yes","GET","TiVoContainer","","","","","TiVo client service is running and may allow download of mp3 or jpg files.","",""
+"006491","0","2ab","/network/cgi/network.cgi","GET","Network\sConfiguration","","","","","IndigoVision web console access found without authentication.","",""
+"006492","0","b","/sitefinity/Login.aspx","GET","checkForIframe","","","","","Telerik Sitefinity CMS login found.","",""
+"006493","3092","1","/cms/","GET","200","","","","","This might be interesting...","",""
+"006494","3092","1","/helpdesk/","GET","200","","","","","This might be interesting...","",""
+"006495","0","1b","@PHPMYADMIN","GET","200","401","","","","phpMyAdmin directory found","",""
+"006496","0","3b","/admin/install/phpinfo.php","GET","PHP Version","","","","","LimeSurvey phpinfo page found. The install directory may contain resetadminpw.php, which will set admin to the default password, likely 'password'. The install directory should be removed.","",""
+"006497","0","b","/portal/binary/junk/","GET","Attempt\smade\s\to\sload\sunavailable\sclass","","","","","Vignette Server binary loader.","",""
+"006498","0","b","/portal/webservice/","GET","And\snow\.\.\.","","","","","Vignette Server webservices.","",""
+"006499","0","b","/console/login/LoginForm.jsp","GET","Log\sin\sto\swork","","","","","Oracle WebLogic administrator login found.","",""
+"006500","0","b3","/home/?vhelp","GET","Global\sAvailable\sMacros","","","","","Intuit (diginsite.com) debug mode enabled.","",""
+"006501","0","b","/servlet/snoopservlet","GET","Hit Count Demonstration","","","","","IBM Websphere SnoopDog example servlet found","",""
+"006502","0","b","/servlet/hitcount","GET","Snoop Servlet - Request/Client Information","","","","","IBM Websphere Hit Count example servlet found","",""
+"006503","0","b","/keepalive.htm","GET","200","","Alive!","","","Weblogic heartbeat page found","",""
+"006504","0","1b","/Admin/","GET","200","","Administration Homepage","","","Weblogic administration page found","",""
+"006505","0","23","/services/","GET","have\sreached\sthe\sAXIS\sHTTP\sServlet","","","","","Axis web services services found","",""
+"006506","3092","3","/web.config.bak","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006507","3092","3","/web.config.back","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006508","3092","3","/web.config.backup","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006509","3092","3","/web.config.old","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006510","3092","3","/web.config.orig","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006511","3092","3","/web.config~","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006512","3092","3","/.web.config.swp","GET","<configuration>","","200","","","ASP config backup file is accessible.","",""
+"006513","0","1","/nn.asp","GET","File\sName","","200","","","Directory listing program found","",""
+"006514","0","b3","/munin/index.html","GET","generated\sby\s.*munin","","200","","","Munin reveals system information.","",""
+"006515","0","123","/includes/conexion.inc","GET","Provider=","DRIVER=","200","","","Munin reveals system information.","",""
+"006516","0","3b","/errorpage.aspx","GET","DotNetNuke\sError:\s-\sVersion","","","","","DotNetNuke reveals the version number in the error page.","",""
