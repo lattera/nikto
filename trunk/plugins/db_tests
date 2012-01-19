@@ -6502,3 +6502,4 @@
 "006515","0","123","/includes/conexion.inc","GET","Provider=","DRIVER=","200","","","Munin reveals system information.","",""
 "006516","0","3b","/errorpage.aspx","GET","DotNetNuke\sError:\s-\sVersion","","","","","DotNetNuke reveals the version number in the error page.","",""
 "006517","0","b","/spin/main.csp","GET","200","iTechnology SPIN","","","","CA iTechnology SPIN interface found","",""
+"006518","0","b","/openadmin/","GET","200","OpenAdmin Tool","","","","Informix OpenAdmin tool administration login","",""
