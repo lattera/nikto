@@ -6505,3 +6505,4 @@
 "006518","0","b","/openadmin/","GET","200","OpenAdmin Tool","","","","Informix OpenAdmin tool administration login","",""
 "006519","0","b","/wp-admin/wp-login.php?action=register","GET","Register\sFor\sThis\sSite","","","registration\sis\scurrently\snot","","Wordpress registration enabled","",""
 "006520","0","b","/wp-login.php?action=register","GET","Register\sFor\sThis\sSite","","","registration\sis\scurrently\snot","","Wordpress registration enabled","",""
+"006521","0","7","/../../windows/dvr2.ini","GET","\[generic\]","","","","","Tibetsystem DVR allows arbitrary file retrieval. See http://packetstormsecurity.org/files/109547/tibetsystem-traversal.txt","",""
