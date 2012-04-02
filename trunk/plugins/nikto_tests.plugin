@@ -63,11 +63,11 @@ sub nikto_tests {
 
             # auth is now done in nfetch
             if ($res eq 200) {
-                nprint("+ $uri - 200/OK Response could be $TESTS{$checkid}{'message'}")
+                nprint("+ $mark->{'root'}$uri - 200/OK Response could be $TESTS{$checkid}{'message'}")
                   if $OUTPUT{'show_ok'};
             }
             elsif ($res =~ /30(?:[0-3]|7)/) {
-                nprint(  "+ $uri - Redirects ($res) to "
+                nprint(  "+ $mark->{'root'}$uri - Redirects ($res) to "
                        . $headers{'location'}
                        . " , $TESTS{$checkid}{'message'}")
                   if $OUTPUT{'show_redirects'};
@@ -147,7 +147,7 @@ sub nikto_tests {
 
                 # if it's an index.php, check for normal /index.php to see if it's a FP
                 if ($uri =~ /^\/index.php\?/) {
-                    my $content = rm_active_content($content, $uri);
+                    my $content = rm_active_content($content, $mark->{'root'} . $uri);
                     if (LW2::md4($content) eq $FoF{'index.php'}{'match'}) { next; }
                 }
 
@@ -157,15 +157,15 @@ sub nikto_tests {
                 
                 # Commented to see if FPs are fewer without--should be true now
 		 		#   if (($TESTS{$checkid}{'match_1'} !~ /^4/) && ($TESTS{$checkid}{'match_1_or'} !~ /^4/)) {
-                    	if (is_404($uri, $content, $res, $headers{'location'})) { next; }
+                    	if (is_404($mark->{'root'} . $uri, $content, $res, $headers{'location'})) { next; }
 			#		}
                 }
 
                 $TESTS{$checkid}{'osvdb'} =~ s/\s+/ OSVDB\-/g;
-                add_vulnerability($mark, "$uri: $TESTS{$checkid}{'message'}",
+                add_vulnerability($mark, "$mark->{'root'}$uri: $TESTS{$checkid}{'message'}",
                                   $checkid,
                                   $TESTS{$checkid}{'osvdb'},
-                                  $TESTS{$checkid}{'method'}, $uri);
+                                  $TESTS{$checkid}{'method'}, $mark->{'root'} . $uri);
             }
         }
 
