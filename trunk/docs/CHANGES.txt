@@ -17,6 +17,7 @@
 	- Keep tokens from getting into %db_extensions, thanks to Erik Cabetas
 	- Fix vhost not being set properly, thanks to Brian Poole
 	- Fix crash on invalid regex chars in robots.txt (dis)allow lines
+	- Default to use Net::SSL instead of Net::SSLeay as a result of too many memory issues in SSLeay
 2011-06-14
 	- Fix condition where match_1 or match_1_or are 4xx response code
 	- Fix condition where blank prefix added via change_variables

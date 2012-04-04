@@ -77,7 +77,7 @@ This function chooses the right SSL Engine and initializes SSL if needed.
 This has been done because SSLeay seems to have memory leaks and there
 was no other way to quickly change SSL Engine.
 lw_ssl_engine can have these values:
-	auto 	= autodetection where it uses SSLeay first
+	auto 	= autodetection where it uses SSL first
 		  (this is the default upon loading the module)
 	SSL  	= Net::SSL
 	SSLeay 	= Net::SSLeay
@@ -115,23 +115,25 @@ sub init_ssl_engine {
         	$_SSL_LIBRARY = 'Net::SSL';
 		}
 	else  { print "ERROR: $@\n"; exit; }
-    } else {
+    } 
+	else {
 	# assuming autodetection
-	eval "use Net::SSLeay";    # do we have SSL support?
+	eval "use Net::SSL";
         if ( !$@ ) {
-	    $LW_SSL_LIB   = 1;
-            $_SSL_LIBRARY = 'Net::SSLeay';
-            Net::SSLeay::load_error_strings();
-            Net::SSLeay::SSLeay_add_ssl_algorithms();
-            Net::SSLeay::randomize();
-        } else {
-	    eval "use Net::SSL";
-            if ( !$@ ) {
                 $LW_SSL_LIB   = 2;
                 $_SSL_LIBRARY = 'Net::SSL';
-            }
+		}
+	else {
+        eval "use Net::SSLeay";
+        if ( !$@ ) {
+                $LW_SSL_LIB   = 1;
+                $_SSL_LIBRARY = 'Net::SSLeay';
+                Net::SSLeay::load_error_strings();
+                Net::SSLeay::SSLeay_add_ssl_algorithms();
+                Net::SSLeay::randomize();
+                }
+		}
         }
-    }
 
 return undef;
 
