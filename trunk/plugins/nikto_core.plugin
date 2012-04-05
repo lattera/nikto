@@ -831,7 +831,6 @@ sub time_to_seconds {
 	
 ###############################################################################
 sub sleeper {
-    if ($CLI{'pause'} <= 0) { return; }
     sleep($CLI{'pause'});
 }
 
