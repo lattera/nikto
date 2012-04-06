@@ -138,7 +138,7 @@ style output</para>
       <term><option>-maxtime</option></term>
       <listitem>
         <para>Maximum execution time per host, in seconds. Accepts minutes and hours
-            such that all of these are one hour: 3600, 3600s, 60m, 1h</para>
+            such that all of these are one hour: 3600s, 60m, 1h</para>
       </listitem>
     </varlistentry>
 

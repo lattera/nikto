@@ -323,9 +323,11 @@ http://192.168.0.1:8080/
  + Retrieving 'CHANGES.txt'
       </screen>
 
-      <para>Updates may also be manually downloaded from the appropriate version's directory at <ulink
-      url="http://cirt.net/nikto/UPDATES/">http://cirt.net/nikto/UPDATES/</ulink>. Plugin and database 
-      files from the server should replace those in the 'plugins' directory.</para>
+      <para>Updates may also be manually downloaded from the appropriate
+      version's directory at <ulink
+      url="http://cirt.net/nikto/UPDATES/">http://cirt.net/nikto/UPDATES/</ulink>.
+      Plugin and database files from the server should replace those in the
+      'plugins' or 'databases' directories.</para>
     </section>
 
     <section>
@@ -1191,20 +1193,23 @@ PROXYPASS=</screen>
 
           <term><varname>TEMPLATEDIR</varname></term>
 
+          <term><varname>DBDIR</varname></term>
+
           <term><varname>DOCDIR</varname></term>
 
           <listitem>
             <para>Defines where to find the location of Nikto, its plugins,
-            XML/HTML templates and documents. This should only normally be
-            changed if repackaging Nikto to work with different file system
-            standards. Nikto will use the EXECDIR item to guess the other
-            directories.</para>
+            databases, XML/HTML templates and documents. This should only
+            normally be changed if repackaging Nikto to work with different
+            file system standards. Nikto will use the EXECDIR item to guess
+            the other directories.</para>
 
             <para>Default Setting</para>
 
             <screen>EXECDIR=.
 PLUGINDIR=EXECDIR/plugins
 TEMPLATEDIR=EXECDIR/templates
+DBDIR=EXECDIR/databases
 DOCDIR=EXECDIR/docs</screen>
           </listitem>
         </varlistentry>
@@ -1391,13 +1396,13 @@ DOCDIR=EXECDIR/docs</screen>
 
       <para>Users can create their own, private tests for any of the
       databases. By placing a syntactically correct database file in the
-      <filename>plugins</filename> directory, with a file name prefaced with a
-      "u", the data will be loaded along with the built-in checks.</para>
+      <filename>databases</filename> directory, with a file name prefaced with
+      a "u", the data will be loaded along with the built-in checks.</para>
 
       <para>For example, create the file
-      <filename>plugins/udb_tests</filename> and it will be loaded at the same
-      time <filename>plugins/db_tests</filename> is loaded. These files will
-      also be checked for syntax when <parameter>-dbcheck</parameter> is
+      <filename>databases/udb_tests</filename> and it will be loaded at the
+      same time <filename>databases/db_tests</filename> is loaded. These files
+      will also be checked for syntax when <parameter>-dbcheck</parameter> is
       used.</para>
 
       <para>For tests which require a "private" OSVDB ID, use the OSVDB ID 0
