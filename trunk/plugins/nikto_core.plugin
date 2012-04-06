@@ -756,7 +756,7 @@ sub general_config {
     }
 
     # get core version
-    open(FI, "<$CONFIGFILE{PLUGINDIR}/nikto_core.plugin");
+    open(FI, "<$CONFIGFILE{'PLUGINDIR'}/nikto_core.plugin");
     my @F = <FI>;
     close(FI);
     my @VERS = grep(/^#VERSION/, @F);
@@ -1187,13 +1187,13 @@ sub load_databases {
 
     # verify required files
     for my $file (@dbs) {
-        if (!-r "$CONFIGFILE{PLUGINDIR}/$file") {
-            die nprint("+ ERROR: Can't find/read required file \"$CONFIGFILE{PLUGINDIR}/$file\"");
+        if (!-r "$CONFIGFILE{'DBDIR'}/$file") {
+            die nprint("+ ERROR: Can't find/read required file \"$CONFIGFILE{'DBDIR'}/$file\"");
         }
     }
 
     for my $file (@dbs) {
-        my $filename = $CONFIGFILE{PLUGINDIR} . "/" . $prefix . $file;
+        my $filename = $CONFIGFILE{DBDIR} . "/" . $prefix . $file;
         if (!-r $filename) { next; }
         open(IN, "<$filename") || die nprint("+ ERROR: Can't open \"$filename\":$!\n");
 
@@ -1279,7 +1279,7 @@ sub check_dbs {
     }
 
     for my $file (@dbs) {
-        my $filename = $CONFIGFILE{PLUGINDIR} . "/" . $prefix . $file;
+        my $filename = $CONFIGFILE{DBDIR} . "/" . $prefix . $file;
         if (!-r $filename) {
             nprint("+ ERROR: Unable to read \"$filename\"");
             next;
@@ -1531,7 +1531,7 @@ sub port_check {
 
 ###############################################################################
 sub load_plugins {
-    my @pluginlist = dirlist("$CONFIGFILE{PLUGINDIR}", '\.plugin$');
+    my @pluginlist = dirlist("$CONFIGFILE{'PLUGINDIR'}", '\.plugin$');
     my @all_names;
 
     # populate plugin macros
@@ -1546,7 +1546,7 @@ sub load_plugins {
         my $plugin_name = $plugin;
         $plugin_name =~ s/\.plugin$//;
         my $plugin_init = $plugin_name . "_init";
-        eval { require "$CONFIGFILE{PLUGINDIR}/$plugin"; };
+        eval { require "$CONFIGFILE{'PLUGINDIR'}/$plugin"; };
         if ($@) {
             nprint("- Could not load or parse plugin: $plugin_name\n Error: ");
             warn $@;
@@ -1855,12 +1855,16 @@ sub check_updates {
     }
 
     # get local versions of plugins/dbs
-    my @NIKTOFILES = dirlist($CONFIGFILE{PLUGINDIR}, "");
+    my %NIKTOFILES;
+    my @F = dirlist($CONFIGFILE{'PLUGINDIR'}, "");
+    foreach my $f (@F) { $NIKTOFILES{$f}=$CONFIGFILE{'PLUGINDIR'} . "/" . $f; }
+    @F = dirlist($CONFIGFILE{'DBDIR'}, "");
+    foreach my $f (@F) { $NIKTOFILES{$f}=$CONFIGFILE{'DBDIR'} . "/" . $f; }
 
-    foreach my $file (@NIKTOFILES) {
+    foreach my $file (keys %NIKTOFILES) {
         my $v = "";
-        open(LOCAL, "<$CONFIGFILE{PLUGINDIR}/$file")
-          || print STDERR "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/$file' for read: $@\n";
+        open(LOCAL, "<$NIKTOFILES{$file}")
+          || print STDERR "+ ERROR: Unable to open '$NIKTOFILES{$file}' for read: $@\n";
         my @l = <LOCAL>;
         close(LOCAL);
 
@@ -1902,9 +1906,12 @@ sub check_updates {
             exit;
         }
         if ($CONTENT ne "") {
-            open(OUT, ">$CONFIGFILE{PLUGINDIR}/$toget")
+	    my $dir='';
+	    if ($toget =~ /^db_/) { $dir=$CONFIGFILE{'DBDIR'}; }
+	    else { $dir=$CONFIGFILE{'PLUGINDIR'}; }
+            open(OUT, ">$dir/$toget")
               || die print STDERR
-              "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/$toget' for write: $@\n";
+              "+ ERROR: Unable to open '$dir/$toget' for write: $@\n";
             print OUT $CONTENT;
             close(OUT);
         }
@@ -2524,7 +2531,12 @@ sub parse_csv {
 
 #######################################################################
 sub version {
-    my @NIKTOFILES = dirlist($CONFIGFILE{PLUGINDIR}, "(^nikto|^db_)");
+    my %NIKTOFILES;
+    my @F = dirlist($CONFIGFILE{'PLUGINDIR'}, "");
+    foreach my $f (@F) { $NIKTOFILES{$f}=$CONFIGFILE{'PLUGINDIR'} . "/" . $f; }
+    @F = dirlist($CONFIGFILE{'DBDIR'}, "");
+    foreach my $f (@F) { $NIKTOFILES{$f}=$CONFIGFILE{'DBDIR'} . "/" . $f; }
+
     nprint($VARIABLES{'DIV'});
     nprint("$VARIABLES{'name'} Versions");
     nprint($VARIABLES{'DIV'});
@@ -2533,9 +2545,10 @@ sub version {
     nprint("Nikto main                         $VARIABLES{'version'}");
     nprint("LibWhisker                         $LW2::VERSION");
 
-    foreach my $FILE (sort @NIKTOFILES) {
-        open(FI, "<$CONFIGFILE{PLUGINDIR}/$FILE")
-          || die print STDERR "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/$FILE': $!\n";
+    foreach my $FILE (sort keys %NIKTOFILES) {
+	next if $FILE eq 'LW2.pm';
+        open(FI, "<$NIKTOFILES{$FILE}")
+          || die print STDERR "+ ERROR: Unable to open '$NIKTOFILES{$FILE}': $!\n";
         my @F = <FI>;
         close(FI);
         my @VERS = grep(/^#VERSION/, @F);
@@ -2559,9 +2572,10 @@ sub version {
     if ($@) {
         nprint("Module RPC::XML::Client missing. Logging to Metasploit is disabled.");
     }
+    LW2::init_ssl_engine();
     my ($avail, $lib, $ver) = LW2::ssl_is_available();
     if ($avail) {
-        nprint("SSL: $lib $ver");
+        nprint("SSL Module: $lib version $ver");
     }
     else {
         nprint("SSL: support not available.");
@@ -2596,8 +2610,8 @@ sub send_updates {
     if ((!$have_updates) || ($updated_version eq "")) { return; }
 
     # make sure the db_outdatedb isn't *too* old
-    open(OD, "<$CONFIGFILE{PLUGINDIR}/db_outdated")
-      || die print STDERR "+ ERROR: Unable to open '$CONFIGFILE{PLUGINDIR}/db_outdated': $!\n";
+    open(OD, "<$CONFIGFILE{'DBDIR'}/db_outdated")
+      || die print STDERR "+ ERROR: Unable to open '$CONFIGFILE{'DBDIR'}/db_outdated': $!\n";
     @F = <OD>;
     close(OD);
 
@@ -2799,7 +2813,7 @@ sub usage {
 #######################################################################
 sub init_db {
     my $dbname   = $_[0];
-    my $filename = "$CONFIGFILE{PLUGINDIR}/" . $dbname;
+    my $filename = "$CONFIGFILE{'DBDIR'}/" . $dbname;
     my (@dbarray, @headers);
     my $hashref = {};
 
@@ -2832,7 +2846,7 @@ sub init_db {
     }
 
     # And the udb_* file
-    $filename = "$CONFIGFILE{PLUGINDIR}/u" . $dbname;
+    $filename = "$CONFIGFILE{'DBDIR'}/u" . $dbname;
     if (open(IN, "<$filename")) {
         while (<IN>) {
             chomp;

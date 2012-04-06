@@ -331,6 +331,9 @@ sub setup_dirs {
     unless (defined $CONFIGFILE{'DOCUMENTDIR'}) {
         $CONFIGFILE{'DOCUMENTDIR'} = "$CONFIGFILE{'EXECDIR'}/docs";
     }
+    unless (defined $CONFIGFILE{'DBDIR'}) {
+        $CONFIGFILE{'DBDIR'} = "$CONFIGFILE{'EXECDIR'}/databases";
+    }
     return;
 }
 

@@ -7,6 +7,7 @@
 	- Ticket 222: Fix problems with banner parsing related to spaces, should result in fewer missed matches which should be hits.
 	- Ticket 220: Certificate wildcard matching incorrect
 	- Ticket 217: Add -IgnoreCode option to allow db_404_strings' @CODE at the command line
+	- Ticket 214: Relocate databases to 'databases/' directory from 'plugins/'
 	- Ticket 211: Shuffled some information in HTML report and added more summary data. Added error count and total check count to XML (note: DTD change).
 	- Ticket 202: -maxtime maximum execution time per host (seconds)
 	- Ticket 175: -until run until specified time or duration
