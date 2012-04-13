@@ -1,0 +1,86 @@
+#VERSION,1.00
+# $Id$
+###############################################################################
+#  Copyright (C) 2012 CIRT, Inc., Dr. Wetter IT-Consulting
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; version 2
+#  of the License only.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+###############################################################################
+# PURPOSE:
+# Check out the crossdomain.xml file
+###############################################################################
+sub nikto_crossdomain_init {
+    my $id = {
+            name      => "crossdomain",
+            full_name => "crossdomain.xml",
+            author    => "Dirk",
+            description =>
+              "Checks whether there's a crossdomain.xml file, and if it contains a wildcard entry.",
+            hooks => { recon => { method => \&nikto_crossdomain,
+                                  weight => 49,
+                                  },
+                         },
+            copyright => "2012 Dr. Wetter IT-Consulting"
+            };
+    return $id;
+}
+
+sub nikto_crossdomain {
+    my ($mark) = @_;
+    my %headers;
+    my $msg;
+    my $file = "/crossdomain.xml";
+    (my $RES, $CONTENT) = nfetch($mark, $file, "GET", "", \%headers, "", "crossdomain");
+
+    if (($RES eq 200) || ($RES eq $FoF{'okay'}{'response'})) {
+        if (is_404($file, $CONTENT, $RES, $headers{'location'})) { return; }
+
+        my $DISCTR = 0;
+        my @DOC = split(/\n/, $CONTENT);
+        foreach my $line (@DOC) {
+            chomp($line);
+            $line =~ s/\#.*$//;
+            if ($line eq "") { next; }
+            elsif ($line =~ /allow-access-from\sdomain="\*"/) {
+                add_vulnerability(
+                    $mark,
+                    "$file contains a full wildcard entry, which is a security risk. See http://jeremiahgrossman.blogspot.com/2008/05/crossdomainxml-invites-cross-site.html",
+                    999982,
+                    0,
+                    "GET",
+                    $file,
+                    \%result
+                    );
+            }
+            elsif ($line =~ /allow-access-from/) {
+                $DISCTR++;
+            }
+        }    # end foreach my $line (@DOC)
+
+        if ($DISCTR eq 1) {
+            $msg =
+              "$file contains $DISCTR an allow-access line which should be manually viewed for improper domains or wildcards.";
+        }
+        elsif ($DISCTR > 1) {
+            $msg =
+              "$file contains $DISCTR allow-access lines which should be manually viewed for improper domains or wildcards.";
+        }
+
+        if ($msg ne '') {
+            add_vulnerability($mark, $msg, 999981, 0, "GET", $file, \%result);
+        }
+    }
+}
+
+1;
