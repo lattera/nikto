@@ -14,6 +14,7 @@
 	- Ticket 175: -until run until specified time or duration
 	- Ticket 174: Checked for sites parked at hosting providers or advertising pages
 	- Ticket 91: Identification of WEBrick fails. Updates made to handle banners with multiple items but no spaces
+	- Add check for non-empty OPTIONS response body, which could be related to something like http://zacstewart.com/2012/04/14/http-options-method.html
 	- Add nikto_paths.plugin to look for things to add to db_variables values
 	- Items found in robots.txt are now added to values from db_variables
 	- Keep tokens from getting into %db_extensions, thanks to Erik Cabetas

@@ -589,8 +589,8 @@ sub general_config {
             }
     	
     	# validate pausetime
-    	print "now:       $now\n";
-    	print "pausetime: $pausetime\n";
+ #   	print "now:       $now\n";
+ #   	print "pausetime: $pausetime\n";
     	if ($now > $pausetime) { 
     		nprint("+ ERROR: Pause time is in the past."); 
     		exit; 

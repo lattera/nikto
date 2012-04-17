@@ -58,6 +58,11 @@ sub nikto_httpoptions {
     $aoptions .= $headers{'allow'};
     $poptions .= $headers{'public'};
 
+    # Odd case here, but maybe... http://zacstewart.com/2012/04/14/http-options-method.html
+    if ($content ne '') { 
+        add_vulnerability($mark, "Response body of OPTIONS / request is not empty--this may describe additonal REST/API services", 999980, 0, "OPTIONS", "/");
+	}
+
     foreach my $o (split(/,[ ]?/, $aoptions)) {
         $allow_methods .= ", $o" unless ($allow_methods =~ /\b$o\b/ || $o eq '');
     }
