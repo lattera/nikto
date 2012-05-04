@@ -6507,3 +6507,5 @@
 "006520","0","b","/wp-login.php?action=register","GET","Register\sFor\sThis\sSite","","","registration\sis\scurrently\snot","","Wordpress registration enabled","",""
 "006521","0","7","/../../windows/dvr2.ini","GET","\[generic\]","","","","","Tibetsystem DVR allows arbitrary file retrieval. See http://packetstormsecurity.org/files/109547/tibetsystem-traversal.txt","",""
 "006522","18255","7","/htdocs/../../../../../../../../../../../etc/passwd","GET","root:","","","","","SAP Internet Graphics Server (IGS) directory traversal","",""
+"006523","","38","/index.php?-s","GET","\"\>\&lt\;\?php","","","","","PHP allows retrieval of the source code via the -s parameter, and may allow command execution. See http://www.kb.cert.org/vuls/id/520827","",""
+"006523","","38","/login.php?-s","GET","\"\>\&lt\;\?php","","","","","PHP allows retrieval of the source code via the -s parameter, and may allow command execution. See http://www.kb.cert.org/vuls/id/520827","",""
