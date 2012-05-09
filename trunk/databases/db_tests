@@ -6508,4 +6508,5 @@
 "006521","0","7","/../../windows/dvr2.ini","GET","\[generic\]","","","","","Tibetsystem DVR allows arbitrary file retrieval. See http://packetstormsecurity.org/files/109547/tibetsystem-traversal.txt","",""
 "006522","18255","7","/htdocs/../../../../../../../../../../../etc/passwd","GET","root:","","","","","SAP Internet Graphics Server (IGS) directory traversal","",""
 "006523","","38","/?-s","GET","\"\>\&lt\;\?php","<\?php","","","","PHP allows retrieval of the source code via the -s parameter, and may allow command execution. See http://www.kb.cert.org/vuls/id/520827","",""
-"006523","","38","/login.php?-s","GET","\"\>\&lt\;\?php","<\?php","","","","PHP allows retrieval of the source code via the -s parameter, and may allow command execution. See http://www.kb.cert.org/vuls/id/520827","",""
+"006524","","38","/login.php?-s","GET","\"\>\&lt\;\?php","<\?php","","","","PHP allows retrieval of the source code via the -s parameter, and may allow command execution. See http://www.kb.cert.org/vuls/id/520827","",""
+"006525","0","b","/manager/html","GET","<tt>conf/tomcat-users.xml</tt>","","","","","Default Tomcat Manager interface found","",""
