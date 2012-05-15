@@ -6511,3 +6511,4 @@
 "006524","","38","/login.php?-s","GET","\"\>\&lt\;\?php","<\?php","","","","PHP allows retrieval of the source code via the -s parameter, and may allow command execution. See http://www.kb.cert.org/vuls/id/520827","",""
 "006525","0","b","/manager/html","GET","<tt>conf/tomcat-users.xml</tt>","","","","","Default Tomcat Manager interface found","",""
 "006526","0","b3","/getstatus","GET","License ID:","","","","","Chaos Software V-Ray status information available","",""
+"006527","0","b","/platform/","GET","\.\.\/base\/index\.jsp","","","","","Platform Management Console found","",""
