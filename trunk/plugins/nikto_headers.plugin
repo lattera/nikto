@@ -56,7 +56,7 @@ sub nikto_headers_postfetch {
 
     # Check for know headers
     my @interesting_headers =
-      qw /x-powered-by servlet-engine microsoftofficewebserver ms-author-via dasl dav daap-server x-aspnet-version/;
+      qw /x-served-by x-powered-by servlet-engine microsoftofficewebserver ms-author-via dasl dav daap-server x-aspnet-version/;
 
     foreach my $header (@interesting_headers) {
         nikto_headers_check($mark, $result, $header, 'Retrieved ' . $header . ' header:', 999986);
