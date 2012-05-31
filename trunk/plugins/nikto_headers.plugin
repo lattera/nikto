@@ -137,7 +137,7 @@ sub nikto_headers {
     $request{'whisker'}->{'method'} = "GET";
     $request{'whisker'}{'version'}  = "1.0";
     $request{'User-Agent'} = $VARIABLES{'useragent'};
-	$request{'User-Agent'} =~ s/\@TESTID/headers:\ IIS\ internal\ IP/;
+    $request{'User-Agent'} =~ s/\@TESTID/headers:\ IIS\ internal\ IP/;
 
     LW2::http_do_request_timeout(\%request, \%result);
     $COUNTERS{'totalrequests'}++;
@@ -160,7 +160,7 @@ sub nikto_headers {
     $request{'whisker'}->{'method'} = "GET";
     $request{'whisker'}{'version'}  = "1.0";
     $request{'User-Agent'} = $VARIABLES{'useragent'};
-	$request{'User-Agent'} =~ s/\@TESTID/headers:\ IIS\ internal\ IP/;
+    $request{'User-Agent'} =~ s/\@TESTID/headers:\ IIS\ internal\ IP/;
     delete $request{'whisker'}{'Host'};
     delete $request{'Host'};
     sleeper();
@@ -193,7 +193,7 @@ sub nikto_headers {
     $request{'whisker'}->{'method'} = "GET";
     $request{'whisker'}{'version'}  = "1.0";
     $request{'User-Agent'} = $VARIABLES{'useragent'};
-	$request{'User-Agent'} =~ s/\@TESTID/headers:\ WebLogic\ internal\ IP/;
+    $request{'User-Agent'} =~ s/\@TESTID/headers:\ WebLogic\ internal\ IP/;
     sleeper();
     LW2::http_do_request_timeout(\%request, \%result);
     $COUNTERS{'totalrequests'}++;
