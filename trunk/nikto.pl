@@ -277,6 +277,8 @@ sub config_init {
     if ($config_exists == 0) {
         die "- Could not find a valid nikto config file\n";
     }
+
+    return;
 }
 
 #################################################################################
@@ -318,6 +320,7 @@ sub setup_dirs {
     my $CURRENTDIR = $0;
     chomp($CURRENTDIR);
     $CURRENTDIR =~ s#[\\/]nikto.pl$##;
+    $CURRENTDIR = "." if $CURRENTDIR =~ /^nikto.pl$/;
 
     # First assume we get it from CONFIGFILE
     unless (defined $CONFIGFILE{'EXECDIR'}) {
@@ -362,4 +365,6 @@ sub check_config_defined {
           "- Warning: $item is not defined in Nikto configuration, setting to \"$default\"\n";
         $CONFIGFILE{$item} = $default;
     }
+
+    return;
 }
