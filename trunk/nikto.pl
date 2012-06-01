@@ -53,34 +53,7 @@ $VARIABLES{'configfile'} = "/etc/nikto.conf";    ### Change if it's having troub
 # signal trap so we can close down reports properly
 $SIG{'INT'} = \&safe_quit;
 
-# read just the --config option
-{
-    my %optcfg;
-    Getopt::Long::Configure('pass_through', 'noauto_abbrev');
-    GetOptions(\%optcfg, "config=s");
-    Getopt::Long::Configure('nopass_through', 'auto_abbrev');
-    if (defined $optcfg{'config'}) { $VARIABLES{'configfile'} = $optcfg{'config'}; }
-}
-
-# Read the config files in order
-my ($error, $home);
-my $config_exists = 0;
-$error = load_config("$VARIABLES{'configfile'}");
-$config_exists = 1 if ($error eq "");
-
-# Guess home directory -- to support Windows
-foreach my $var (split(/ /, "HOME USERPROFILE")) {
-    $home = $ENV{$var} if ($ENV{$var});
-}
-$error         = load_config("$home/nikto.conf");
-$config_exists = 1 if ($error eq "");
-$error         = load_config("nikto.conf");
-$config_exists = 1 if ($error eq "");
-
-if ($config_exists == 0) {
-    die "- Could not find a valid nikto config file\n";
-}
-
+config_init();
 setup_dirs();
 require "$CONFIGFILE{'PLUGINDIR'}/nikto_core.plugin";
 nprint("T:" . localtime($COUNTERS{'scan_start'}) . ": Starting", "d");
@@ -265,6 +238,46 @@ if (!$CLI{'findonly'}) {
 nprint("T:" . localtime() . ": Ending", "d");
 
 exit;
+
+#################################################################################
+# Load config files in order
+sub config_init {
+    # read just the --config option
+    {
+        my %optcfg;
+        Getopt::Long::Configure('pass_through', 'noauto_abbrev');
+        GetOptions(\%optcfg, "config=s");
+        Getopt::Long::Configure('nopass_through', 'auto_abbrev');
+        if (defined $optcfg{'config'}) { $VARIABLES{'configfile'} = $optcfg{'config'}; }
+    }
+
+    # Read the config files in order
+    my ($error, $home);
+    my $config_exists = 0;
+    $error = load_config("$VARIABLES{'configfile'}");
+    $config_exists = 1 if ($error eq "");
+
+    # Guess home directory -- to support Windows
+    foreach my $var (split(/ /, "HOME USERPROFILE")) {
+        $home = $ENV{$var} if ($ENV{$var});
+    }
+    $error         = load_config("$home/nikto.conf");
+    $config_exists = 1 if ($error eq "");
+
+    # Guess Nikto current directory
+    my $NIKTODIR = $0;
+    chomp($NIKTODIR);
+    $NIKTODIR =~ s#[\\/]nikto.pl$##;
+    $error         = load_config("$NIKTODIR/nikto.conf");
+    $config_exists = 1 if ($error eq "");
+
+    $error         = load_config("nikto.conf");
+    $config_exists = 1 if ($error eq "");
+
+    if ($config_exists == 0) {
+        die "- Could not find a valid nikto config file\n";
+    }
+}
 
 #################################################################################
 # load config file
