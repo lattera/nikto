@@ -734,7 +734,7 @@ sub general_config {
         undef($CLI{'ask'});
     }
 
-    $CLI{'timeout'} || 10;
+    $CLI{'timeout'} = $CLI{'timeout'} || 10;
 
     # Set up User-Agent
     $VARIABLES{'useragent'} = $CONFIGFILE{'USERAGENT'};
@@ -2240,7 +2240,7 @@ sub cache_destroy {
 
 #######################################################################
 sub nfetch {
-    my ($mark, $uri, $method, $data, $headers, $flags, $testid) = @_;
+    my ($mark, $uri, $method, $data, $headers, $flags, $testid, $httpver) = @_;
     my (%request, %result);
     setup_hash(\%request, $mark, $testid);
 
@@ -2282,6 +2282,12 @@ sub nfetch {
     if (defined($mark->{'cookiejar'})) {
         LW2::cookie_write($mark->{'cookiejar'}, \%request, 1);
     }
+
+    # over-ride HTTP version
+    my $httpver_old = $request{'whisker'}->{'version'};
+    if ($httpver ne '') { 
+	$request{'whisker'}->{'version'} = $httpver; 
+	}
 
     LW2::http_fixup_request(\%request) unless ($flags->{'noclean'});
 
@@ -2388,8 +2394,11 @@ sub nfetch {
         (%$request, %$result) = run_hooks($mark, "postfetch", \%request, \%result);
     }
 
+    # set version back
+    $request{'whisker'}->{'version'} = $httpver_old;
+
     return $result{'whisker'}->{'code'}, $result{'whisker'}->{'data'},
-      $result{'whisker'}->{'error'};
+      $result{'whisker'}->{'error'}, \%result;
 }
 
 #######################################################################
